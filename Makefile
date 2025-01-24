@@ -14,6 +14,10 @@ bp:
 	vlog -sv +incdir+./src/include ./src/testbench/fu_branchpred_tb.sv ./src/modules/fu_branchpred.sv
 	vsim -voptargs="+acc" work.fu_branchpred_tb
 
+wb:
+	vlog -sv +incdir+./src/include ./src/testbench/writeback_tb.sv ./src/modules/writeback.sv
+	vsim -voptargs="+acc" work.writeback_tb
+
 %:
 	vlog -sv ./src/testbench/$*_tb.sv ./src/modules/* +incdir+./src/include/
 	vsim -voptargs="+acc" work.$*_tb
