@@ -12,25 +12,6 @@ module fu_branchpred(
   parameter BUFFER_SIZE = 256;
   parameter IDX_SIZE    = 8;
   parameter TAG_SIZE    = 32 - IDX_SIZE - 2;
-  
-  // logic [IDX_SIZE-1:0] pc_idx;
-  // logic [IDX_SIZE-1:0] pc_fetch_idx;
-  // logic [TAG_SIZE-1:0] pc_tag;
-  // logic [TAG_SIZE-1:0] pc_fetch_tag;
-
-  // assign pc_idx = fubpif.pc[IDX_SIZE+1:2];
-  // assign pc_fetch_idx = fubpif.pc_fetch[IDX_SIZE+1:2];
-  // assign pc_tag = fubpif.pc[TAG_SIZE-1+IDX_SIZE+2:IDX_SIZE+2];
-  // assign pc_fetch_tag = fubpif.pc_fetch[31:IDX_SIZE+2];
-
-  // // Buffer Type
-  // typedef struct packed {
-  //   word_t target;
-  //   logic [TAG_SIZE-1:0] tag;
-  //   logic valid;
-  // } btb_t;
-
-  // btb_t [BUFFER_SIZE-1:0] buffer;
 
   logic [IDX_SIZE-1:0] pc_idx;
   logic [IDX_SIZE-1:0] pc_fetch_idx;
