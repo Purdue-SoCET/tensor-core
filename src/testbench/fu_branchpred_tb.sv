@@ -32,19 +32,10 @@ fu_branchpred DUT (.CLK(tb_clk), .nRST(tb_nrst), .ihit(tb_ihit), .fubpif(fubpif)
 
 string tb_test_case = "INIT";
 
-// task test_update;
-//     input word_t pc_val,
-//     input word_t branch_target
-// begin
-//     @(posedge tb_clk);
-// end
-// endtask
-
 initial begin
     // Power on Reset
     tb_test_case = "Reset";
     tb_nrst = 1'b0;
-    tb_enable = 1'b0;
     tb_ihit = 1'b0;
     fubpif.branch_outcome = '0;
     fubpif.update_btb = '0;
@@ -56,10 +47,9 @@ initial begin
     tb_nrst = 1'b1;
     #(CLK_PERIOD*2);
 
-    tb_enable = 1'b1;
     #(CLK_PERIOD*32);
 
-    tb_test_case = "Test 1";
+    tb_test_case = "Test 1: Index 64";
     fubpif.update_btb = '1;
     tb_ihit = 1'b1;
     fubpif.pc = 32'h00000100;
@@ -71,11 +61,27 @@ initial begin
     fubpif.pc_fetch = 32'h00000100;
 
     #(CLK_PERIOD*32);
+
+    tb_test_case = "Test 2";
+    tb_ihit = 1'b0;
+    fubpif.update_btb = '0;
+    fubpif.pc = 32'h00000124;
+    fubpif.pc_fetch = 32'h00000104;
+
+    #(CLK_PERIOD*32);
+
+    fubpif.pc = 32'h00000128;
+    fubpif.pc_fetch = 32'h00000104;
+
+    #(CLK_PERIOD*32);
+
+    tb_ihit = 1'b1;
+    fubpif.update_btb = '1;
+
+    #(CLK_PERIOD*32);
     tb_ihit = 1'b0;
     fubpif.update_btb = '0;
 
-    #(CLK_PERIOD*32);
-    tb_enable = 1'b0;
     #(CLK_PERIOD*32);
 
     $stop;
