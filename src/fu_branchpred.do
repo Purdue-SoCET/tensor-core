@@ -1,23 +1,15 @@
 onerror {resume}
 quietly WaveActivateNextPane {} 0
 add wave -noupdate -color Salmon /fu_branchpred_tb/tb_test_case
-add wave -noupdate -expand -group Inputs -color Cyan /fu_branchpred_tb/fubpif/update_btb
-add wave -noupdate -expand -group Inputs -color Cyan /fu_branchpred_tb/fubpif/branch_outcome
-add wave -noupdate -expand -group Inputs -color Cyan /fu_branchpred_tb/fubpif/branch_target
-add wave -noupdate -expand -group Inputs -color Cyan /fu_branchpred_tb/fubpif/pc
-add wave -noupdate -expand -group Inputs -color Cyan /fu_branchpred_tb/fubpif/pc_fetch
-add wave -noupdate -expand -group Outputs -color Magenta /fu_branchpred_tb/fubpif/pred_outcome
-add wave -noupdate -expand -group Outputs -color {Slate Blue} /fu_branchpred_tb/fubpif/pred_target
-add wave -noupdate -expand -group Outputs -color {Slate Blue} /fu_branchpred_tb/fubpif/hit
-add wave -noupdate -divider DUT
-add wave -noupdate /fu_branchpred_tb/DUT/ihit
-add wave -noupdate /fu_branchpred_tb/DUT/pc_idx
-add wave -noupdate /fu_branchpred_tb/DUT/pc_fetch_idx
-add wave -noupdate /fu_branchpred_tb/DUT/pc_tag
-add wave -noupdate /fu_branchpred_tb/DUT/pc_fetch_tag
-add wave -noupdate /fu_branchpred_tb/DUT/buffer
+add wave -noupdate -expand -group Inputs /fu_branchpred_tb/fubpif/pc
+add wave -noupdate -expand -group Inputs /fu_branchpred_tb/fubpif/update_pc
+add wave -noupdate -expand -group Inputs /fu_branchpred_tb/fubpif/update_btb
+add wave -noupdate -expand -group Inputs /fu_branchpred_tb/fubpif/branch_outcome
+add wave -noupdate -expand -group Inputs /fu_branchpred_tb/fubpif/branch_target
+add wave -noupdate -expand -group Outputs /fu_branchpred_tb/fubpif/predicted_outcome
+add wave -noupdate -expand -group Outputs /fu_branchpred_tb/fubpif/predicted_target
 TreeUpdate [SetDefaultTree]
-WaveRestoreCursors {{Cursor 1} {2760 ps} 0}
+WaveRestoreCursors {{Cursor 1} {84880 ps} 0}
 quietly wave cursor active 1
 configure wave -namecolwidth 142
 configure wave -valuecolwidth 100

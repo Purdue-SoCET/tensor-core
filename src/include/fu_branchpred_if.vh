@@ -6,17 +6,17 @@
 interface fu_branchpred_if;
   import cpu_types::*;
 
-  logic branch_outcome, update_btb, pred_outcome, hit;
-  word_t pc, pc_fetch, branch_target, pred_target;
+  logic branch_outcome, update_btb, predicted_outcome;
+  word_t pc, update_pc, branch_target, predicted_target;
 
   modport btb (
-    input branch_outcome, update_btb, branch_target, pc, pc_fetch,
-    output  pred_outcome, hit, pred_target
+    input pc, update_pc, update_btb, branch_outcome, branch_target,
+    output  predicted_outcome, predicted_target
   );
 
   modport tb (
-    input  pred_outcome, hit, pred_target,
-    output branch_outcome, update_btb, branch_target, pc, pc_fetch
+    input  predicted_outcome, predicted_target,
+    output pc, update_pc, update_btb, branch_outcome, branch_target
   );
 endinterface
 

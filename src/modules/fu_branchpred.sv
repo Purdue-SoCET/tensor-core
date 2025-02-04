@@ -3,25 +3,32 @@
 // `include "types_pkg.vh"
 
 module fu_branchpred(
-  input logic CLK, nRST, ihit,
+  input logic CLK, nRST,
   fu_branchpred_if.btb fubpif
 );
   import cpu_types::*;
   import types_pkg::*;
 
+  parameter WORD_W      = 32;
   parameter BUFFER_SIZE = 256;
   parameter IDX_SIZE    = 8;
-  parameter TAG_SIZE    = 32 - IDX_SIZE - 2;
+  parameter TAG_SIZE    = WORD_W - IDX_SIZE - 2;
 
   logic [IDX_SIZE-1:0] pc_idx;
-  logic [IDX_SIZE-1:0] pc_fetch_idx;
+  logic [IDX_SIZE-1:0] update_pc_idx;
   logic [TAG_SIZE-1:0] pc_tag;
-  logic [TAG_SIZE-1:0] pc_fetch_tag;
+  logic [TAG_SIZE-1:0] update_pc_tag;
 
+  logic btb_hit;
+  word_t btb_target;
+
+  // Extract indices from pc and update_pc (lower 2 bits are ignored due to word alignment)
   assign pc_idx = fubpif.pc[IDX_SIZE+1:2];
-  assign pc_fetch_idx = fubpif.pc_fetch[IDX_SIZE+1:2];
-  assign pc_tag = fubpif.pc[31:IDX_SIZE+2];
-  assign pc_fetch_tag = fubpif.pc_fetch[31:IDX_SIZE+2];
+  assign update_pc_idx = fubpif.update_pc[IDX_SIZE+1:2];
+
+  // Extract tag from pc and update_pc
+  assign pc_tag = fubpif.pc[WORD_W-1:IDX_SIZE+2];
+  assign update_pc_tag = fubpif.update_pc[WORD_W-1:IDX_SIZE+2];
 
   // Buffer Type
   typedef struct packed {
@@ -36,29 +43,35 @@ module fu_branchpred(
     if (nRST == 1'b0) begin
       buffer <= '0;
     end else begin
-      // update_btb should be high when branch signal from control unit is high
-      if (ihit && fubpif.update_btb) begin
-        buffer[pc_idx].valid <= 1'b1;
-        buffer[pc_idx].tag <= pc_tag;
-        buffer[pc_idx].target <= fubpif.branch_target;
+      // update_btb should be high when branch instruction is processed
+      if (fubpif.update_btb) begin
+        // Update BTB for taken branches only
+        // TODO: Test this optimization
+        if (fubpif.branch_outcome) begin
+          buffer[update_pc_idx].valid <= 1'b1;
+          buffer[update_pc_idx].tag <= update_pc_tag;
+          buffer[update_pc_idx].target <= fubpif.branch_target;
+        end else begin
+          // Invalidate entries for branches that are not taken
+          buffer[update_pc_idx].valid <= 1'b0;
+        end
       end
     end
   end
 
+  assign btb_hit = buffer[pc_idx].valid && (buffer[pc_idx].tag == fubpif.pc[WORD_W-1:IDX_SIZE+2]);
+  assign btb_target = buffer[pc_idx].target;
+
   always_comb begin : OUTPUT_LOGIC
-    fubpif.pred_target = '0;
-    fubpif.pred_outcome = 1'b0;
-    fubpif.hit = 1'b0;
+    fubpif.predicted_outcome = 1'b0;
+    fubpif.predicted_target = fubpif.pc + 4;
 
-    if (buffer[pc_fetch_idx].valid && buffer[pc_fetch_idx].tag == pc_fetch_tag) begin
-      fubpif.hit = 1'b1;
-      fubpif.pred_target = buffer[pc_fetch_idx].target;
+    if (btb_hit) begin
+      fubpif.predicted_outcome = (btb_target < fubpif.pc);
+    end
 
-      if (buffer[pc_fetch_idx].target < fubpif.pc_fetch) begin
-        fubpif.pred_outcome = 1'b1;
-      end else begin
-        fubpif.pred_outcome = 1'b0;
-      end
+    if (fubpif.predicted_outcome) begin
+      fubpif.predicted_target = btb_target;
     end
   end
 endmodule

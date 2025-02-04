@@ -15,9 +15,6 @@ localparam CLK_PERIOD = 1;
 // Testbench Signals
 logic tb_clk;
 logic tb_nrst;
-logic tb_enable;
-logic tb_ihit;
-logic [0:15] tb_count;
 
 always
 begin
@@ -28,61 +25,59 @@ begin
 end
 
 fu_branchpred_if fubpif ();
-fu_branchpred DUT (.CLK(tb_clk), .nRST(tb_nrst), .ihit(tb_ihit), .fubpif(fubpif));
+fu_branchpred DUT (.CLK(tb_clk), .nRST(tb_nrst), .fubpif(fubpif));
 
 string tb_test_case = "INIT";
+
+task check_outputs;
+    input string test_name;
+    input logic actual_outcome;
+    input logic expected_outcome;
+    input word_t actual_target;
+    input word_t expected_target;
+begin
+    if (actual_outcome == expected_outcome && actual_target == expected_target) begin
+        $display("PASSED %s", test_name);
+    end else begin
+        $display("FAILED %s", test_name);
+    end
+end
+endtask
 
 initial begin
     // Power on Reset
     tb_test_case = "Reset";
     tb_nrst = 1'b0;
-    tb_ihit = 1'b0;
-    fubpif.branch_outcome = '0;
-    fubpif.update_btb = '0;
-    fubpif.branch_target = '0;
-    fubpif.pc_fetch = '0;
     fubpif.pc = '0;
+    fubpif.update_pc = '0;
+    fubpif.update_btb = '0;
+    fubpif.branch_outcome = '0;
+    fubpif.branch_target = '0;
 
     #(CLK_PERIOD*2);
     tb_nrst = 1'b1;
     #(CLK_PERIOD*2);
 
-    #(CLK_PERIOD*32);
+    #20;
 
-    tb_test_case = "Test 1: Index 64";
-    fubpif.update_btb = '1;
-    tb_ihit = 1'b1;
-    fubpif.pc = 32'h00000100;
-    fubpif.pc_fetch = 32'h00000080;
-    fubpif.branch_target = 32'h00000060;
+    // Case 1
+    tb_test_case = "Test 1: Backward Taken";
+    fubpif.pc = 32'h00000010;
+    #10;
+    fubpif.update_pc = 32'h00000010;
+    fubpif.update_btb = 1'b1;
+    fubpif.branch_target = 32'h00000008;
+    fubpif.branch_outcome = 1'b1;
+    
+    #10;
+    fubpif.update_btb = 1'b1;
+    #10;
 
-    #(CLK_PERIOD*32);
-    fubpif.pc = 32'h00000120;
-    fubpif.pc_fetch = 32'h00000100;
-
-    #(CLK_PERIOD*32);
-
-    tb_test_case = "Test 2";
-    tb_ihit = 1'b0;
-    fubpif.update_btb = '0;
-    fubpif.pc = 32'h00000124;
-    fubpif.pc_fetch = 32'h00000104;
-
-    #(CLK_PERIOD*32);
-
-    fubpif.pc = 32'h00000128;
-    fubpif.pc_fetch = 32'h00000104;
-
-    #(CLK_PERIOD*32);
-
-    tb_ihit = 1'b1;
-    fubpif.update_btb = '1;
-
-    #(CLK_PERIOD*32);
-    tb_ihit = 1'b0;
-    fubpif.update_btb = '0;
-
-    #(CLK_PERIOD*32);
+    // Case 2
+    tb_test_case = "Test 2: Forward Not Taken";
+    fubpif.pc = 32'h00000020;
+    #10;
+    check_outputs(tb_test_case, fubpif.predicted_outcome, 1'b0, fubpif.predicted_target, 32'h00000024);
 
     $stop;
 end
