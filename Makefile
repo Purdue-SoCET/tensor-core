@@ -11,8 +11,8 @@ branch:
 	vsim -voptargs="+acc" work.fu_branch_tb
 
 bp:
-	vlog -sv +incdir+./src/include ./src/testbench/fu_branchpred_tb.sv ./src/modules/fu_branchpred.sv
-	vsim -voptargs="+acc" work.fu_branchpred_tb
+	vlog -sv +incdir+./src/include ./src/testbench/fu_branch_predictor_tb.sv ./src/modules/fu_branch_predictor.sv
+	vsim -voptargs="+acc" work.fu_branch_predictor_tb
 
 %:
 	vlog -sv ./src/testbench/$*_tb.sv ./src/modules/* +incdir+./src/include/

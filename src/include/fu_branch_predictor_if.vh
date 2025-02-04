@@ -1,9 +1,9 @@
-// `ifndef FU_BRANCHPRED_IF_VH
-// `define FU_BRANCHPRED_IF_VH
+// `ifndef FU_BRANCH_PREDICTOR_IF_VH
+// `define FU_BRANCH_PREDICTOR_IF_VH
 
 `include "cpu_types.vh"
 
-interface fu_branchpred_if;
+interface fu_branch_predictor_if;
   import cpu_types::*;
 
   logic branch_outcome, update_btb, predicted_outcome;

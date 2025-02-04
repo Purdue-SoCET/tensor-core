@@ -1,10 +1,10 @@
-// `include "fu_branchpred_if.vh"
+// `include "fu_branch_predictor_if.vh"
 // `include "cpu_types.vh"
 // `include "types_pkg.vh"
 
-module fu_branchpred(
+module fu_branch_predictor(
   input logic CLK, nRST,
-  fu_branchpred_if.btb fubpif
+  fu_branch_predictor_if.btb fubpif
 );
   import cpu_types::*;
   import types_pkg::*;
@@ -46,7 +46,6 @@ module fu_branchpred(
       // update_btb should be high when branch instruction is processed
       if (fubpif.update_btb) begin
         // Update BTB for taken branches only
-        // TODO: Test this optimization
         if (fubpif.branch_outcome) begin
           buffer[update_pc_idx].valid <= 1'b1;
           buffer[update_pc_idx].tag <= update_pc_tag;
@@ -59,7 +58,7 @@ module fu_branchpred(
     end
   end
 
-  assign btb_hit = buffer[pc_idx].valid && (buffer[pc_idx].tag == fubpif.pc[WORD_W-1:IDX_SIZE+2]);
+  assign btb_hit = buffer[pc_idx].valid && (buffer[pc_idx].tag == pc_tag);
   assign btb_target = buffer[pc_idx].target;
 
   always_comb begin : OUTPUT_LOGIC
