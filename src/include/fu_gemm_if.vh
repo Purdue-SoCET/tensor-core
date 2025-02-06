@@ -12,18 +12,19 @@ interface fu_gemm_if;
     
     //These would be outputs from the GEMM function
     matbits_t rs1, rs2, rs3, rd; //tells the systolic array which values to multiply together
+    matbits_t weight1, weight2, weight3, weightd;
 
     //Inputs to latch
     logic flush, freeze;
     
     modport GEMM (
-        input fetch_p, flush, freeze,
+        input fetch_p, flush, freeze, weight1, weight2, weigh3, weightd,
         output rs1, rs2, rs3, rd
     );
 
     modport tb (
         input rs1, rs2, rs3, rd,
-        output fetch_p, flush, freeze
+        output fetch_p, flush, freeze, weight1, weight2, weigh3, weightd
     );
 
 endinterface

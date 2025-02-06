@@ -10,7 +10,7 @@ module fust_s (
 
   fust_s_t fust;
   
-  always_ff @(posedge CLK, negedge nRST) begin
+  always_ff @(negedge CLK, negedge nRST) begin
     if (~nRST)
       fuif.fust <= '0;
     else
@@ -20,7 +20,7 @@ module fust_s (
   always_comb begin
     fust = fuif.fust;
     
-    fust.op[fuif.fu] = fuif.en ? fuif.fust_row;
+    fust.op[fuif.fu] = fuif.en ? fuif.fust_row : fuif.fust.op[fuif.fu];
   end
 
 endmodule

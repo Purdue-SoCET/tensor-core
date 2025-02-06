@@ -20,7 +20,7 @@ module fust_g (
   always_comb begin
     fust = fuif.fust;
    
-    fust.op = fuif.en ? fuif.fust_row;
+    fust.op = fuif.en ? fuif.fust_row : fuif.fust.op;
   end
 
 endmodule

@@ -14,7 +14,7 @@ interface fust_m_if;
   fust_m_t fust;
     
   modport FUSTM (
-      input en, fu, fust_row,
+      input en, fust_row,
       output fust
   );
 

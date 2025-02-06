@@ -8,7 +8,7 @@ interface rst_m_if;
   // Inputs from dispatch
   logic [3:0] di_sel;
   logic di_write;
-  logic di_tag;
+  logic [1:0] di_tag;
 
   // Inputs from writeback
   logic [3:0] wb_sel;

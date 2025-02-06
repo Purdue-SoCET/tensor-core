@@ -7,7 +7,7 @@ interface fust_s_if;
 
   // Inputs from dispatch
   logic en;
-  fu_s_t fu;
+  fu_scalar_t fu;
   fust_s_row_t fust_row;
 
   // Outputs of stage

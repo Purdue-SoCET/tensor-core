@@ -3,16 +3,18 @@
 // rrbathin
 // 8/22/2024
 
-`include "cpu_types.vh"
+`include "isa_types.vh"
+`include "datapath_types.vh"
 `include "regfile_if.vh"
 
-module register_file(
+module regfile(
     input logic CLK,
     input logic nRST,
     regfile_if.rf rf_if
 );
 
-    import cpu_types::*;
+    import datapath_pkg::*;
+    import isa_pkg::*;
 
     word_t [31:0] register, next_reg;
 
@@ -28,7 +30,7 @@ module register_file(
     always_comb begin
         next_reg = register;
         if (rf_if.WEN && (rf_if.wsel != 0)) begin 
-            next_reg[rf_if.wsel] = rf_if.wdat;
+            next_reg[rf_if.wsel] = rf_if.wdata;
         end
     end
 

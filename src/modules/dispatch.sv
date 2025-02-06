@@ -91,8 +91,9 @@ module dispatch(
 
       // only write to Reg Status Table if doing a regwrite,
       // and the instruction is actually moving forward
+      rstsif.di_write = 1'b0;
       if (cuif.s_reg_write) begin
-        if (~WAW & ~flush & ~diif.freeze) begin
+        if (~WAW & ~flush & ~diif.freeze) begin // WAW a little strange, will need to take a look going forward
           rstsif.di_sel = s_rd;
           rstsif.di_write = 1'b1;
           rstsif.di_tag = (cuif.fu_s == FU_S_LD_ST) ? 2'd2 : 2'd1; // 1 for ALU, 2 for LD
@@ -111,20 +112,22 @@ module dispatch(
       // writeback needs to update the RST on commits
       if (diif.wb.s_rw_en) begin
         rstsif.wb_sel = diif.wb.s_rw;
-        rstsif.wb_write = diif.wb.s_rw_en;
+        // rstsif.wb_write = diif.wb.rw_en;
+        rstsif.wb_write = '0;
       end
 
       if (diif.wb.m_rw_en) begin
         rstmif.wb_sel = diif.wb.m_rw;
-        rstmif.wb_write = diif.wb.m_rw_en;
+        // rstmif.wb_write = diif.wb.m_rw_en;
+        rstmif.wb_write = '0;
       end
     end
 
     always_comb begin : FUST
       // To Issue **Combinationally**
-      diif.n_fust_s_en   = (cuif.fu_t == FU_S_T & ~flush & ~diif.freeze & ~hazard);
+      diif.n_fust_s_en   = (cuif.fu_t == FU_S_T & ~diif.flush & ~diif.freeze & ~hazard);
       diif.n_fu_s        = cuif.fu_s;
-      diif.n_fust_s.busy = 1'b1;
+      diif.n_fust_s.busy = 1'b0;
       diif.n_fust_s.rd   = s_rd;
       diif.n_fust_s.rs1  = s_rs1;
       diif.n_fust_s.rs2  = s_rs2;
@@ -134,7 +137,7 @@ module dispatch(
 
       diif.n_fust_m_en   = (cuif.fu_t == FU_M_T & ~flush & ~diif.freeze & ~hazard);
       //n_fu_m           = 1'b0; // only one row in FUST
-      diif.n_fust_m.busy = 1'b1;
+      diif.n_fust_m.busy = 1'b0;
       diif.n_fust_m.rd   = m_rd;
       diif.n_fust_m.rs1  = s_rs1;
       diif.n_fust_m.rs2  = s_rs2;
@@ -144,11 +147,11 @@ module dispatch(
 
       diif.n_fust_g_en   = (cuif.fu_t == FU_G_T & ~flush & ~diif.freeze & ~hazard);
       //n_fu_g           = 1'b0; // only one row in FUST
-      diif.n_fust_g.busy = 1'b1;
+      diif.n_fust_g.busy = 1'b0;
       diif.n_fust_g.rd   = m_rd;
-      diif.n_fust_g.rs1  = m_rs1;
-      diif.n_fust_g.rs2  = m_rs2;
-      diif.n_fust_g.rs3  = m_rs3;
+      diif.n_fust_g.ms1  = m_rs1;
+      diif.n_fust_g.ms2  = m_rs2;
+      diif.n_fust_g.ms3  = m_rs3;
       diif.n_fust_g.t1   = rstmif.status.idx[m_rs1].tag;
       diif.n_fust_g.t2   = rstmif.status.idx[m_rs2].tag;
       diif.n_fust_g.t3   = rstmif.status.idx[m_rs3].tag;
@@ -160,18 +163,18 @@ module dispatch(
       // To Execute
       dispatch.fu_s = cuif.fu_s;
       dispatch.fu_m = cuif.fu_m;
-      dispatch.fu_alu_ctr.alu_op = cuif.alu_op;
-      dispatch.fu_branch_ctr.branch_op = cuif.branch_op;
-      dispatch.fu_ldst_ctr.imm = cuif.imm;
-      dispatch.fu_ldst_ctr.mem_type = cuif.s_mem_type;
-      dispatch.fu_ldst_m_ctr.imm = cuif.imm;
-      dispatch.fu_ldst_m_ctr.mem_type = cuif.m_mem_type;
+
+      dispatch.ex_ctr.imm = cuif.imm;
+      dispatch.ex_ctr.alu_op = cuif.alu_op;
+      dispatch.ex_ctr.branch_op = cuif.branch_op;
+      dispatch.ex_ctr.s_mem_type = cuif.s_mem_type;
+      dispatch.ex_ctr.m_mem_type = cuif.m_mem_type;
+      dispatch.ex_ctr.m_rw = cuif.matrix_rd;
+      dispatch.ex_ctr.m_rw_en = cuif.m_reg_write;
 
       // To Writeback
-      dispatch.wb.s_rw_en = cuif.s_reg_write;
-      dispatch.wb.s_rw = s_rd;
-      dispatch.wb.m_rw_en = cuif.m_reg_write; //to be implemented
-      dispatch.wb.m_rw = m_rd;
+      dispatch.wb_ctr.s_rw_en = cuif.s_reg_write;
+      dispatch.wb_ctr.s_rw = s_rd;
     end
 
     function automatic void init_rst();
