@@ -1,0 +1,5 @@
+VCS_HOME=/usr/apps/vcs/K-2015.09
+export VCS_HOME
+# force clean compile
+rm -rf simv.daidir csrc
+bsub -I -q vlog_sim_vcs $VCS_HOME/bin/vcs -full64 -R -gui -debug_pp -sverilog +v2k +define+DDR4_2G_X8 arch_package.sv proj_package.sv dimm_interface.sv StateTable.svp MemoryArray.svp ddr4_model.svp dimm_tb.sv

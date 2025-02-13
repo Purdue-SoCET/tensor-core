@@ -1,0 +1,1 @@
+ncverilog +access+rwc +gui +sv +define+DDR4_2G_X8 -run arch_package.sv proj_package.sv dimm_interface.sv StateTable.svp StateTableCore.svp MemoryArray.svp ddr4_model.svp dimm_tb.sv

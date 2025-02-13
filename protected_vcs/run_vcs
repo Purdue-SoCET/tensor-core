@@ -1,0 +1,1 @@
+vcs -full64 -R -gui -debug_pp -sverilog +v2k +define+DDR4_2G_X8 arch_package.sv proj_package.sv interface.sv StateTable.svp MemoryArray.svp ddr4_model.svp tb.sv
