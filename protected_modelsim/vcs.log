@@ -1,0 +1,21 @@
+QuestaSim-64 vlog 2021.4 Compiler 2021.10 Oct 13 2021
+Start time: 00:21:22 on Feb 13,2025
+vlog -reportprogress 300 -work work "+acc" -l vcs.log -sv "+define+DDR4_8G_X8" arch_package.sv proj_package.sv interface.sv StateTable.svp MemoryArray.svp ddr4_model.svp tb.sv 
+-- Compiling package arch_package
+-- Compiling package proj_package
+-- Importing package arch_package
+-- Compiling interface DDR4_if
+-- Importing package proj_package
+** Warning: ** while parsing file included at ddr4_model.svp(17)
+** at StateTable.svp(17): (vlog-2275) Existing <protected> '<protected>'<protected> will be overwritten<protected>.
+** Warning: ** while parsing file included at ddr4_model.svp(17)
+** at MemoryArray.svp(17): (vlog-2275) Existing <protected> '<protected>'<protected> will be overwritten<protected>.
+** Warning: ** while parsing file included at tb.sv(41)
+** at StateTable.svp(17): (vlog-2275) Existing <protected> '<protected>'<protected> will be overwritten<protected>.
+-- Compiling module tb
+-- Compiling module dqrx
+
+Top level modules:
+	tb
+End time: 00:21:23 on Feb 13,2025, Elapsed time: 0:00:01
+Errors: 0, Warnings: 3

@@ -26,6 +26,6 @@
 #########################################################################################
 
 vlib work
-vlog -work work +acc -l vcs.log -novopt -sv +define+DDR4_8G_X8 arch_package.sv proj_package.sv interface.sv StateTable.svp MemoryArray.svp ddr4_model.svp tb.sv
-vsim -novopt tb
+vlog -work work +acc -l vcs.log -sv +define+DDR4_8G_X8 arch_package.sv proj_package.sv interface.sv StateTable.svp MemoryArray.svp ddr4_model.svp tb.sv
+vsim tb
 run -all
