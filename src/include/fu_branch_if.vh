@@ -2,9 +2,10 @@
 `define FU_BRANCH_IF_VH
 
 `include "datapath_types.vh"
+`include "isa_types.vh"
 
 interface fu_alu_if;
-  import datapath_pkg::*;
+  import isa_pkg::*;
 
   logic branch_outcome, update_btb, pred_outcome, hit;
   word_t pc, pc_fetch, branch_target, pred_target;

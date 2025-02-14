@@ -11,16 +11,9 @@ mls:
 	vsim -voptargs="+acc" work.fu_matrix_ls_tb
 
 %:
-<<<<<<< HEAD
 	vlog -sv ./src/testbench/$*_tb.sv ./src/modules/$*.sv +incdir+./src/include/
 	vsim -voptargs="+acc" work.$*_tb
 	# verilator --sc ./src/testbench/$*_tb.sv ./src/modules/$*.sv -Isrc/include/
-=======
-	vlog -sv ./src/testbench/$*_tb.sv ./src/modules/$*.sv +incdir+./src/include/ 
-	vsim -voptargs="+acc" work.$*_tb -do "view objects; do ./src/waves/$*.do; run -all;" -onfinish stop
-
-# ./src/waves/$*.do 
->>>>>>> 5f9c4317860be72072f0034195077a2da92bac26
 
 # dispatch:
 # 	vlog -sv ./src/testbench/dispatch_tb.sv ./src/modules/dispatch.sv ./src/modules/rst_m.sv ./src/modules/rst_s.sv +incdir+./src/include/

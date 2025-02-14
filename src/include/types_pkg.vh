@@ -2,10 +2,11 @@
 `ifndef TYPES_PKG_VH
 `define TYPES_PKG_VH
 
-`include "cpu_types.vh"
+`include "datapath_types.vh"
+`include "isa_types.vh"
 
 package types_pkg;
-  import cpu_types::*;
+  import datapath_pkg::*;
   // all our instruction params
   parameter WORD_W = 32;
   parameter REG_W  = 5;
