@@ -80,7 +80,7 @@ package datapath_pkg;
     regbits_t rd;
     regbits_t rs1;
     regbits_t rs2;
-    word_t imm; //instr[31:7] TODO: double check this is right 
+    word_t imm; //instr[31:7] TO: double check this is right 
     fu_sbits_t t1;
     fu_sbits_t t2;
   } fust_s_row_t;
@@ -172,12 +172,21 @@ package datapath_pkg;
     // only GEMM?
   } ex_ctr_t;
 
+  // output for Writeback.sv
   typedef struct packed {
     logic s_rw_en;
     regbits_t s_rw;
     logic m_rw_en;
     matbits_t m_rw; // still need m_rw in wb for dispatch loopback to clear RST
   } wb_ctr_t;
+
+  typedef struct packed {
+    logic s_rw_en;  // scalar read write reg enable
+    regbits_t s_rw; // scalar read write register
+    logic [WORD_W-1:0] s_wdata; //empty until execute (write data)
+    logic load_done;  // Load Done Signal for Score Board
+    logic alu_done;   // Alu Done Signal for Score Board
+  } wb_t;
 
   /**********
     DISPATCH
@@ -205,6 +214,19 @@ package datapath_pkg;
     matbits_t ms2;
     matbits_t ms3;
   } issue_t;
+
+  /**************************
+    Functional Unit Structs
+  **************************/
+
+  typedef struct packed {
+    logic           done;       // Done signal to Issue Queue
+    logic [1:0]     ls_out;     // Load or store to Scratchpad [Load, Store]
+    logic [4:0]     rd_out;     // Matrix Reg destination (to Scratchpad)
+    logic [10:0]    imm_out;    // Immediate to Scratchpad
+    word_t          address;    // Address to Scratchpad
+    word_t          stride_out; // stride value
+  } matrix_ls_t;
 
 endpackage
 `endif

@@ -19,6 +19,10 @@ package isa_pkg;
   // alu op width
   parameter AOP_W     = 4;
 
+  // Stride Parameter
+  parameter stride    = 16;
+  parameter SBYTES    = stride * 2;
+
   // word_t
   typedef logic [WORD_W-1:0] word_t;
 

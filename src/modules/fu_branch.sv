@@ -1,62 +1,37 @@
-`include "fu_branch_if.vh"
-`include "datapath_types.vh"
+// `include "fu_branch_if.vh"
+// `include "cpu_types.vh"
+// `include "types_pkg.vh"
 
 module fu_branch(
-  input logic CLK, nRST, ihit,
-  fu_branch_if.btb fubif
+  input logic CLK, nRST,
+  fu_branch_if.br fubif
 );
-  import datapath_pkg::*;
+  import cpu_types::*;
+  import types_pkg::*;
 
-  parameter BUFFER_SIZE = 256;
-  parameter IDX_SIZE    = 8;
-  parameter TAG_SIZE    = 32 - IDX_SIZE - 2;
-  
-  logic [IDX_SIZE-1:0] pc_idx;
-  logic [IDX_SIZE-1:0] pc_fetch_idx;
-  logic [TAG_SIZE-1:0] pc_tag;
-  logic [TAG_SIZE-1:0] pc_tag_idx;
+  logic zero;
 
-  assign pc_idx = fubif.pc[IDX_SIZE+1:2];
-  assign pc_fetch_idx = fubif.pc_fetch[IDX_SIZE+1:2];
-  assign pc_tag = fubif.pc[TAG_SIZE-1+IDX_SIZE+2:IDX_SIZE+2];
-  assign pc_fetch_tag = fubif.pc_fetch[31:IDX_SIZE+2];
+  always_comb begin : ZERO_LOGIC
+    zero = '0;
 
-  // Buffer Type
-  typedef struct packed {
-    word_t target;
-    logic [TAG_SIZE-1:0] tag;
-    logic valid;
-  } btb_t;
-
-  btb_t [BUFFER_SIZE-1:0] buffer;
-
-  always_ff @(posedge CLK, negedge nRST) begin : REG_LOGIC
-    if (nRST == 1'b0) begin
-      buffer <= '0;
-    end else begin
-      // update_btb should be high when branch signal from control unit is high
-      if (ihit && fubif.update_btb) begin
-        buffer[pc_idx].valid <= 1'b1;
-        buffer[pc_idx].tag <= pc_tag;
-        buffer[pc_idx].target <= fubif.branch_target;
-      end
-    end
+    casez (fubif.branch_type)
+      2'd0: zero = (fubif.reg_a - fubif.reg_b) ? 1'b0 : 1'b1;                    // 2'd0: BEQ, BNE
+      2'd1: zero = ($signed(fubif.reg_a) < $signed(fubif.reg_b)) ? 1'b0 : 1'b1;  // 2'd1: BLT, BGE
+      2'd2: zero = (fubif.reg_a < fubif.reg_b) ? 1'b0 : 1'b1;                    // 2'd2: BLTU, BGEU
+    endcase
   end
 
-  always_comb begin : OUTPUT_LOGIC
-    fubif.hit = 1'b0;
-    fubif.pred_target = '0;
-    fubif.pred_outcome = 1'b0;
+  always_comb begin : BRANCH_LOGIC
+    fubif.branch_outcome = '0;
+    fubif.updated_pc = fubif.current_pc + 32'd4;
 
-    if (buffer[pc_fetch_idx].valid && buffer[pc_fetch_idx].tag == pc_fetch_tag) begin
-      fubif.hit = 1'b1;
-      fubif.pred_target = buffer[pc_fetch_idx].target;
+    if (fubif.branch) begin
+      casez (fubif.branch_gate_sel)
+        1'b0: fubif.branch_outcome = zero;    // 1'b0: BEQ, BGE, BGEU
+        1'b1: fubif.branch_outcome = ~zero;   // 1'b1: BNE, BLT, BLTU
+      endcase
 
-      if (buffer[pc_fetch_idx].target < fubif.pc_fetch) begin
-        fubif.pred_outcome = 1'b1;
-      end else begin
-        fubif.pred_outcome = 1'b0;
-      end
+      if (fubif.branch_outcome) fubif.updated_pc = fubif.current_pc + fubif.imm;
     end
   end
 endmodule

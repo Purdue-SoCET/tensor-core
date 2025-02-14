@@ -1,8 +1,8 @@
 /*
     Interface signals for the Matrix Load Store
 */
-`ifndef MATRIX_LS_IF_VH
-`define MATRIX_LS_IF_VH
+`ifndef FU_MATRIX_LS_IF_VH
+`define FU_MATRIX_LS_IF_VH
 
 // types
 `include "datapath_types.vh"
@@ -33,26 +33,18 @@ logic [4:0]     rd_in;
 logic [10:0]    imm_in;
 word_t          stride_in, rs_in;
 
-/*
-    Outputs: 
-    stride_out: stride
-    ls_out: Load or store to Scratchpad
-    imm_out: Immediate to Scratchpad
-    rd_out: Matrix Reg destination (to Scratchpad)
-    rs_out: Matrix Reg Source (to Scratchpad)
-    done: done signal to Issue Queue
-*/
-
-logic           done;
-logic [1:0]     ls_out;
-logic [4:0]     rd_out;
-logic [10:0]    imm_out;
-word_t          address, stride_out;
+// Outputs (REFER TO DATAPATH_TYPES)
+matrix_ls_t fu_matls_out;
 
 // LS Matrix Port Map
 modport mls (
     input   mhit, enable, ls_in, rd_in, rs_in, stride_in, imm_in,
-    output  done, ls_out, rd_out, address, stride_out
+    output  fu_matls_out
+);
+
+modport tb (
+    output   mhit, enable, ls_in, rd_in, rs_in, stride_in, imm_in,
+    input  fu_matls_out
 );
 
 endinterface
