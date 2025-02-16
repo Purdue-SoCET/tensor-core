@@ -1,0 +1,12 @@
+DRAM:
+  type: DDR5
+  channels: 2
+  ranks: 2
+  banks: 16
+  rows: 65536
+  columns: 1024
+  tCK: 0.5ns
+  tRCD: 14ns
+  tCL: 14ns
+  tRP: 14ns
+  tRAS: 32ns
