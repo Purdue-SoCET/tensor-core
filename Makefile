@@ -10,6 +10,14 @@ fc:
 
 #make sf
 
+lint_%:
+	verilator --lint-only ./src/modules/$*.sv -y src/include
+
+sim_%:
+	verilator --binary --trace-fst --trace-structs --hierarchical -Wno-TIMESCALEMOD -j 0 src/testbench/$*_tb.sv -y src/include -y src/modules
+	./obj_dir/V$*_tb
+	gtkwave waveforms/$*_tb.fst
+
 sf:
 	vlog -sv -svstrict -pedanticerrors -lint +incdir+./src/include/ \
 	     ./src/modules/sysarr_FIFO.sv \

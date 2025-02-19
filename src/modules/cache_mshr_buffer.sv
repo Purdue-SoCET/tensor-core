@@ -8,7 +8,6 @@ module cache_mshr_buffer (
     output mshr_reg mshr_out,
     output logic stall
 );
-
     mshr_reg [MSHR_BUFFER_LEN-1:0] buffer, next_buffer, buffer_copy;
     logic [MSHR_BUFFER_LEN-1:0] secondary_misses;
 
@@ -50,12 +49,12 @@ module cache_mshr_buffer (
 
     genvar j;
     generate
-        for (i = 1; i < MSHR_BUFFER_LEN; i++) begin
+        for (j = 1; j < MSHR_BUFFER_LEN; j++) begin
             always_comb begin
-                next_buffer[i] = buffer_copy[i];
+                next_buffer[j] = buffer_copy[j];
 
-                if (!buffer[i].valid || bank_empty) begin
-                    next_buffer[i] = buffer_copy[i - 1];
+                if (!buffer[j].valid || bank_empty) begin
+                    next_buffer[j] = buffer_copy[j - 1];
                 end
             end
         end
@@ -71,6 +70,10 @@ module cache_mshr_buffer (
                 next_buffer[0] = mshr_new_miss;
             end else begin
                 stall = 1;
+            end
+        end else begin
+            if (!buffer[1].valid || bank_empty) begin
+                next_buffer[0] = 0;
             end
         end
 
