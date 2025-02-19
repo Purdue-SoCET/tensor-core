@@ -12,7 +12,7 @@ package types_pkg;
   parameter FU_S_W = 2;
   parameter FU_M_W = 1;
   parameter MAT_S_W = 2;
-  parameter ROW_SEL_W = 2;
+  parameter ROW_S_W = 2;
 
 
 
@@ -23,11 +23,6 @@ package types_pkg;
 
   typedef logic [FU_S_W-1:0] fu_sbits_t;
   typedef logic [FU_M_W-1:0] fu_mbits_t;
-
-  typedef logic [BITS_PER_ROW-1:0] row_bits_t;
-  typedef logic [MAT_S_W-1:0] mat_s_t;
-  typedef logic [ROW_SEL_W-1:0] row_s_t;
-
  
   // defines the Function Units
   typdef enum logic [FU_S_W-1:0] {

@@ -4,16 +4,40 @@
 
 interface scratchpad_bank_if;
     import types_pkg::*;
-    row_bits_t wdat, rdat;
-    mat_s_t w_mat_sel, r_mat_sel;
-    row_s_t w_row_sel, r_row_sel;
+    logic wFIFO_WEN, rFIFO_WEN, dramFIFO_REN, gemmFIFO_REN;
+    logic [(BITS_PER_ROW+MAT_S_W+ROW_S_W):0] wFIFO_wdata;
+    logic [(WORD_W+MAT_S_W+ROW_S_W+1):0] rFIFO_wdata;
+
+    logic wFIFO_full, rFIFO_full, gemm_complete, dramFIFO_empty, gemmFIFO_empty;
+    logic [WORD_W+BITS_PER_ROW+MAT_S_W+ROW_S_W-1:0] dramFIFO_rdata;
+    logic [BITS_PER_ROW+MAT_S_W+ROW_S_W+1:0] gemmFIFO_rdata;
 
     modport sp (
-        input wdat, w_mat_sel, w_row_sel, wen, r_mat_sel, r_row_sel
-        output rdat
+        input wFIFO_WEN, rFIFO_WEN, dramFIFO_REN, gemmFIFO_REN, wFIFO_wdata, rFIFO_wdata,
+        output wFIFO_full, rFIFO_full, gemm_complete, dramFIFO_empty, gemmFIFO_empty, dramFIFO_rdata, gemmFIFO_rdata
     );
     
 
 endinterface
+
+    /*
+    in ports
+    wFIFO_WEN
+    wFIFO_wdata
+    rFIFO_WEN
+    rFIFO_wdata
+    dramFIFO_REN
+    gemmFIFO_REN
+
+    out ports
+    wFIFO_full
+    rFIFO_full
+    gemm_complete
+    dramFIFO_rdata
+    dramFIFO_empty
+    gemmFIFO_rdata
+    gemmFIFO_empty
+    
+    */
 
 `endif 
