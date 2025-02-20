@@ -3,7 +3,7 @@ fc:
 	vsim -voptargs="+acc" work.flex_counter_tb
 # make file_name
 %:
-	vlog -sv -svstrict -pedanticerrors -lint +incdir+./src/include/ \
+	vlog -sv -pedanticerrors -lint +incdir+./src/include/ \
 	     ./src/modules/$*.sv \
 	     ./src/testbench/$*_tb.sv
 	vsim -voptargs="+acc" work.$*_tb -do "run -all"

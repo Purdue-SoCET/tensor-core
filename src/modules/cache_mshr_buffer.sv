@@ -9,7 +9,7 @@ module cache_mshr_buffer (
     output logic stall
 );
     mshr_reg [MSHR_BUFFER_LEN-1:0] buffer, next_buffer, buffer_copy;
-    logic [MSHR_BUFFER_LEN-1:0] secondary_misses;
+    logic [MSHR_BUFFER_LEN-2:0] secondary_misses;
 
     mshr_reg mshr_new_miss;
     always_comb begin
@@ -38,7 +38,7 @@ module cache_mshr_buffer (
                 buffer_copy[i] = buffer[i];
                 secondary_misses[i] = 0;
 
-                if (mshr_new_miss.valid && buffer[i].block_addr == mshr_new_miss.block_addr) begin
+                if (mshr_new_miss.valid && buffer[i].block_addr == mshr_new_miss.block_addr && buffer[i].valid) begin
                     buffer_copy[i].write_status = buffer[i].write_status | mshr_new_miss.write_status;
                     buffer_copy[i].write_block[mem_instr.addr.block_offset] =  (mem_instr.rw_mode) ? mem_instr.store_value : buffer[i].write_block[mem_instr.addr.block_offset];
                     secondary_misses[i] = 1;
@@ -72,7 +72,7 @@ module cache_mshr_buffer (
                 stall = 1;
             end
         end else begin
-            if (!buffer[1].valid || bank_empty) begin
+            if (buffer[1].valid || bank_empty) begin
                 next_buffer[0] = 0;
             end
         end

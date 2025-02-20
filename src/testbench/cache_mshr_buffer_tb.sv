@@ -34,8 +34,6 @@ program test (input logic tb_clk,
             input mshr_reg tb_mshr_out,
             input logic tb_stall);
     initial begin
-        $dumpfile("waveforms/cache_mshr_buffer_fst.vcd");
-        $dumpvars(0);
         // Full reset
         tb_nrst = 0;
         tb_miss = 0;
@@ -62,7 +60,6 @@ program test (input logic tb_clk,
         @(posedge tb_clk);
 
         $info("finished!");
-        $finish;
     end
 endprogram
 
