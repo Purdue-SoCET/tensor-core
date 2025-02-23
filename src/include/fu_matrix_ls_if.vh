@@ -8,7 +8,7 @@
 `include "datapath_types.vh"
 `include "isa_types.vh"
 
-interface matrix_ls_if;
+interface fu_matrix_ls_if;
 // import types
 import datapath_pkg::*;
 import isa_pkg::*;
@@ -29,9 +29,9 @@ import isa_pkg::*;
 logic           mhit;
 logic           enable;
 logic [1:0]     ls_in;
-logic [4:0]     rd_in;
+logic [3:0]     rd_in, rs_in;
 logic [10:0]    imm_in;
-word_t          stride_in, rs_in;
+word_t          stride_in;
 
 // Outputs (REFER TO DATAPATH_TYPES)
 matrix_ls_t fu_matls_out;

@@ -211,13 +211,14 @@ module issue(
 
             if (isif.wb.s_rw_en & isif.wb.alu_done & (i == 0)) begin
               next_fust_state[i] = incoming_instr[i] ? FUST_WAIT : FUST_EMPTY;
-              // What the fuck is this? A combinational loop???
+              // TODO 
               fusif.fust.op[1].t1 = (fusif.fust.op[1].t1 == 2'd1) && fusif.busy[1] ? '0 : fusif.fust.op[1].t1;
               fusif.fust.op[1].t2 = (fusif.fust.op[1].t2 == 2'd1) && fusif.busy[1] ? '0 : fusif.fust.op[1].t2;
               fusif.fust.op[2].t1 = (fusif.fust.op[2].t1 == 2'd1) && fusif.busy[2] ? '0 : fusif.fust.op[2].t1;
               fusif.fust.op[2].t2 = (fusif.fust.op[2].t2 == 2'd1) && fusif.busy[2] ? '0 : fusif.fust.op[2].t2;
             end else if (isif.wb.s_rw_en & isif.wb.load_done & (i == 1)) begin
               next_fust_state[i] = incoming_instr[i] ? FUST_WAIT : FUST_EMPTY;
+              // TODO 
               fusif.fust.op[0].t1 = (fusif.fust.op[0].t1 == 2'd2) && fusif.busy[0] ? '0 : fusif.fust.op[0].t1;
               fusif.fust.op[0].t2 = (fusif.fust.op[0].t2 == 2'd2) && fusif.busy[0] ? '0 : fusif.fust.op[0].t2;
               fusif.fust.op[2].t1 = (fusif.fust.op[2].t1 == 2'd2) && fusif.busy[2] ? '0 : fusif.fust.op[2].t1;

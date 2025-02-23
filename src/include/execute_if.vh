@@ -1,6 +1,6 @@
 `ifndef EXECUTE_IF_VH
 `define EXECUTE_IF_VH
-`include "cpu_types.vh"
+`include "cpu_types_pkg.vh"
 `include "datapath_types.vh"
 
 interface execute_if;

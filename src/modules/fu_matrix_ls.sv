@@ -16,19 +16,20 @@ import isa_pkg::*;
 assign mlsif.fu_matls_out.done = mlsif.mhit; // Mhit
 
 always_comb begin : LOAD_STORE
+    mlsif.fu_matls_out = '0;
     if (mlsif.enable) begin     // LOAD STORE ENABLE
         if (mlsif.ls_in[0]) begin   // LOAD
             mlsif.fu_matls_out.ls_out[0] = 1;
             mlsif.fu_matls_out.rd_out = mlsif.rd_in;
             mlsif.fu_matls_out.stride_out = mlsif.stride_in;
-            mlsif.fu_matls_out.address = mlsif.rs_in + mlsif.imm_in;
+            mlsif.fu_matls_out.address = ( {28'b0, mlsif.rs_in} + {21'b0, mlsif.imm_in} );
         end
 
         else if (mlsif.ls_in[1]) begin  // STORE
             mlsif.fu_matls_out.ls_out[1] = 1;
             mlsif.fu_matls_out.rd_out = mlsif.rs_in;
             mlsif.fu_matls_out.stride_out = mlsif.stride_in;
-            mlsif.fu_matls_out.address = mlsif.rd_in + mlsif.imm_in;
+            mlsif.fu_matls_out.address = ( {28'b0, mlsif.rd_in} + {21'b0, mlsif.imm_in} );
         end
     end
 end
