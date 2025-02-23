@@ -1,22 +1,24 @@
 `ifndef FU_BRANCH_IF_VH
 `define FU_BRANCH_IF_VH
 
-`include "datapath_types.vh"
+`include "isa_types.vh"
 
-interface fu_alu_if;
-  import datapath_pkg::*;
+interface fu_branch_if;
+  import isa_pkg::*;
 
-  logic branch_outcome, update_btb, pred_outcome, hit;
-  word_t pc, pc_fetch, branch_target, pred_target;
+  logic branch, branch_gate_sel, branch_outcome;
+  logic predicted_outcome, misprediction, update_btb;
+  logic [1:0] branch_type;
+  word_t reg_a, reg_b, current_pc, imm, updated_pc, correct_pc, update_pc, branch_target;
 
-  modport btb (
-    input branch_outcome, update_btb, branch_target, pc, pc_fetch,
-    output  pred_outcome, hit, pred_target
+  modport br (
+    input branch, branch_type, branch_gate_sel, reg_a, reg_b, current_pc, imm, predicted_outcome,
+    output branch_outcome, updated_pc, misprediction, correct_pc, update_btb, update_pc, branch_target
   );
 
   modport tb (
-    input  pred_outcome, hit, pred_target,
-    output branch_outcome, update_btb, branch_target, pc, pc_fetch
+    output branch, branch_type, branch_gate_sel, reg_a, reg_b, current_pc, imm, predicted_outcome,
+    input branch_outcome, updated_pc, misprediction, correct_pc, update_btb, update_pc, branch_target
   );
 endinterface
 

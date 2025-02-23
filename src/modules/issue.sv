@@ -193,14 +193,19 @@ module issue(
     // Issue Policy: Oldest instruction first
     always_comb begin : FUST_Next_State
       next_fust_state = fust_state;
+
       for (int i = 0; i < 5; i++) begin
         case (fust_state[i])
-          FUST_EMPTY: next_fust_state[i] = incoming_instr[i] ? FUST_WAIT : FUST_EMPTY;
+          FUST_EMPTY: begin
+            next_fust_state[i] = incoming_instr[i] ? FUST_WAIT : FUST_EMPTY;
+          end
           FUST_WAIT: begin
             if (n_rdy[i])
               next_fust_state[i] = (n_rdy[i] == next_oldest_rdy[i]) ? FUST_EX : FUST_RDY;
           end
-          FUST_RDY: next_fust_state[i] = (next_oldest_rdy[i]) ? FUST_EX : FUST_RDY;
+          FUST_RDY: begin
+            next_fust_state[i] = (next_oldest_rdy[i]) ? FUST_EX : FUST_RDY;
+          end
           FUST_EX: begin
             //TODO:handle flushing on speculation
 
@@ -240,9 +245,10 @@ module issue(
               // stall LD/ST from writing
               next_fust_state[i] = FUST_EX;
             end
-
           end
-          default: next_fust_state = fust_state;
+          default: begin
+            next_fust_state = fust_state;
+          end
         endcase
       end
     end

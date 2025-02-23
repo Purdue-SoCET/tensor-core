@@ -1,10 +1,10 @@
-`include "datapath_types.vh"
 `include "fu_alu_if.vh"
+`include "isa_types.vh"
 
 module fu_alu(
     fu_alu_if.alu aluif
 );
-    import datapath_pkg::*;
+    import isa_pkg::*;
 
     logic sign_a;
     logic sign_b;

@@ -216,9 +216,39 @@ package datapath_pkg;
     matbits_t ms3;
   } issue_t;
 
-  /**************************
-    Functional Unit Structs
-  **************************/
+  typedef struct packed {
+    // Branch FU
+    logic bfu_pred_outcome;
+    logic bfu_hit;
+    word_t bfu_pred_target;
+    
+    // Scalar ALU FU
+    logic salu_negative;
+    logic salu_overflow;
+    word_t salu_port_output;
+    logic salu_zero;
+    
+    // Scalar Load/Store FU
+    word_t sls_dmemaddr;
+    logic sls_dmemREN;
+    logic sls_dmemWEN;
+    word_t sls_dmemstore;
+    word_t sls_dmemload;
+    logic sls_dhit;
+    
+    // MLS FU
+    logic mls_done;
+    logic [1:0] mls_ls_out;
+    logic [4:0] mls_rd_out;
+    word_t mls_address;
+    word_t mls_stride_out;
+    
+    // Gemm FU
+    word_t gemm_rs1;
+    word_t gemm_rs2;
+    word_t gemm_rs3;
+    word_t gemm_rd;
+  } eif_output_t;
 
   typedef struct packed {
     logic           done;       // Done signal to Issue Queue
