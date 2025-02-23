@@ -6,14 +6,14 @@ parameter BLOCK_SIZE = 4;
 parameter NUM_WAYS = 4;
 parameter NUM_BANKS = 4;
 parameter MSHR_BUFFER_LEN = 8;
-localparam CACHE_RW_SIZE = 64; // in bits 
+parameter CACHE_RW_SIZE = 32; 
 
-// TODO: Shouldn't some of these become params? 
 localparam NUM_SETS = (CACHE_SIZE / 4) / (BLOCK_SIZE * NUM_WAYS);
 localparam NUM_SETS_PER_BANK = NUM_SETS / NUM_BANKS;
 localparam BYTE_OFF_BIT_LEN = 2;
 localparam BLOCK_OFF_BIT_LEN = $clog2(BLOCK_SIZE); // choose which block within the bank
 localparam BLOCK_INDEX_BIT_LEN = $clog2(NUM_SETS); // chose the set
+localparam WAYS_LEN = $clog2(NUM_WAYS); 
 localparam TAG_BIT_LEN = 32 - BLOCK_INDEX_BIT_LEN - BLOCK_OFF_BIT_LEN - BYTE_OFF_BIT_LEN;
 
 typedef struct packed {
@@ -30,22 +30,24 @@ typedef struct packed {
     logic [31:0] store_value;
 } in_mem_instr;
 
+typedef logic [BLOCK_SIZE-1:0][31:0] cache_block;
+
 typedef struct packed {
     logic valid;
     logic [3:0] uuid;
     addr_t block_addr;
-    logic [BLOCK_SIZE-1:0] write_status;
-    logic [BLOCK_SIZE-1:0][31:0] write_block;
+    logic [BLOCK_SIZE-1:0] write_status; // assuming 1 means WEN and 0 means REN
+    cache_block write_block;
 } mshr_reg;
 
 typedef struct packed {
     logic valid;
     logic dirty;
     logic [TAG_BIT_LEN-1:0] tag;
-    logic [BLOCK_SIZE-1:0][31:0] block; // 1 word -> 4 bytes -> 32 bits, each block is X words
+    cache_block block; // 1 word -> 4 bytes -> 32 bits, each block is X words
 } cache_frame;
 
 typedef cache_frame [NUM_WAYS-1:0] cache_set;
-typedef cache_set   [NUM_SETS_PER_BANK-1:0] cache_bank; 
 
 `endif
+
