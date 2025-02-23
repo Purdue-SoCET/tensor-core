@@ -15,8 +15,8 @@ module load_FSM (
 
     state_t state, n_state;
     logic [MAT_S_W+ROW_S_W-1:0] load_mat, n_load_mat, n_gemm_mat, gemm_mat;
-    logic psumoutFIFO_WEN, psumoutFIFO_empty;
-    logic [BITS_PER_ROW+ROW_S_W-1:0] psumoutFIFO_wdata;
+    logic psumoutFIFO_REN, psumoutFIFO_empty;
+    logic [BITS_PER_ROW+ROW_S_W-1:0] psumoutFIFO_rdata;
 
     always_ff @(posedge CLK, negedge nRST) begin
         if (nRST == 1'b0) begin
@@ -38,12 +38,12 @@ module load_FSM (
                 if (psumoutFIFO_empty == 1'b0) begin
                     n_state = PSUMLOAD;
                 end
-                else if  (spif.instr_FIFO_empty == 1'b0) begin
+                else if  (spif.instrFIFO_empty == 1'b0) begin
                     case(spif.instrFIFO_rdata[37:36]) 
                         2'b01: n_state = LOAD;
                         2'b10: n_state = STORE0;
                         2'b11: begin
-                            if (spif.instr_FIFO_rdata[35]) begin
+                            if (spif.instrFIFO_rdata[35]) begin
                                 n_state = W_GEMM0;
                             end
                             else begin
@@ -463,8 +463,8 @@ module load_FSM (
         spif.wFIFO1_WEN = 1'b0;
         spif.wFIFO2_WEN = 1'b0;
         spif.wFIFO3_WEN = 1'b0;
-        storeFIFO_wdata = '0;
-        storeFIFO_WEN = 1'b0;
+        // storeFIFO_wdata = '0;
+        // storeFIFO_WEN = 1'b0;
         n_gemm_mat = gemm_mat;
         psumoutFIFO_REN = 1'b0;
         spif.rFIFO0_wdata = '0;

@@ -15,8 +15,9 @@ module scratchpad_bank (
     logic [MAT_S_W-1:0] w_mat_sel, r_mat_sel;
     logic [ROW_S_W-1:0] w_row_sel, r_row_sel;
     logic [(BITS_PER_ROW+MAT_S_W+ROW_S_W):0] wFIFO_rdata;
-    logic [(MAT_S_W+ROW_S_W+1):0] rFIFO_rdata;
-    logic [BITS_PER_ROW+MAT_S_W-1:0] dramFIFO_wdata, gemmFIFO_wdata;
+    logic [(WORD_W+MAT_S_W+ROW_S_W+1):0] rFIFO_rdata;
+    logic [WORD_W+BITS_PER_ROW+MAT_S_W+ROW_S_W-1:0] dramFIFO_wdata; 
+    logic [BITS_PER_ROW+MAT_S_W+ROW_S_W+1:0] gemmFIFO_wdata;
     logic wFIFO_REN, wFIFO_empty, wen, rFIFO_empty, rFIFO_REN, dramFIFO_WEN, dramFIFO_full, gemmFIFO_WEN, gemmFIFO_full;
 
     always_ff @(posedge CLK, negedge nRST) begin
@@ -81,22 +82,22 @@ module scratchpad_bank (
 
 
     //{1 bit gemm result, 2 bits mat sel, 2 bits row sel, 64 bits data}
-    socetlib_fifo #(.T(logic [(BITS_PER_ROW+MAT_S_W+ROW_S_W):0]), .DEPTH(12)) wFIFO(.CLK(CLK), 
+    socetlib_fifo #(.T(logic [(BITS_PER_ROW+MAT_S_W+ROW_S_W):0]), .DEPTH(8)) wFIFO(.CLK(CLK), 
     .nRST(nRST), .WEN(spif.wFIFO_WEN), .REN(wFIFO_REN), .clear(), .wdata(spif.wFIFO_wdata), 
     .full(spif.wFIFO_full), .empty(wFIFO_empty), .underrun(), .overrun(), .count(), .rdata(wFIFO_rdata));
 
     //{2(32'baddress, 00 = store, rest = gemm mat type (order preserved)), 2 bits mat sel, 2 bits row sel,}
-    socetlib_fifo #(.T(logic [(WORD_W+MAT_S_W+ROW_S_W+1):0]), .DEPTH(12)) rFIFO(.CLK(CLK), 
+    socetlib_fifo #(.T(logic [(WORD_W+MAT_S_W+ROW_S_W+1):0]), .DEPTH(8)) rFIFO(.CLK(CLK), 
     .nRST(nRST), .WEN(spif.rFIFO_WEN), .REN(rFIFO_REN), .clear(), .wdata(spif.rFIFO_wdata), 
     .full(spif.rFIFO_full), .empty(rFIFO_empty), .underrun(), .overrun(), .count(), .rdata(rFIFO_rdata));
 
     //{32'baddress, 2 bits mat_sel, 2 bits row sel, 64 bits data}
-    socetlib_fifo #(.T(logic [WORD_W+BITS_PER_ROW+MAT_S_W+ROW_S_W-1:0]), .DEPTH(12)) dramFIFO(.CLK(CLK), 
+    socetlib_fifo #(.T(logic [WORD_W+BITS_PER_ROW+MAT_S_W+ROW_S_W-1:0]), .DEPTH(8)) dramFIFO(.CLK(CLK), 
     .nRST(nRST), .WEN(dramFIFO_WEN), .REN(spif.dramFIFO_REN), .clear(), .wdata(dramFIFO_wdata), 
     .full(dramFIFO_full), .empty(spif.dramFIFO_empty), .underrun(), .overrun(), .count(), .rdata(spif.dramFIFO_rdata));
 
     //{2 bits gemm mat type, 2 bits mat_sel, 2 bits row sel, 64 bits data}
-    socetlib_fifo #(.T(logic [BITS_PER_ROW+MAT_S_W+ROW_S_W+1:0]), .DEPTH(12)) gemmFIFO(.CLK(CLK), 
+    socetlib_fifo #(.T(logic [BITS_PER_ROW+MAT_S_W+ROW_S_W+1:0]), .DEPTH(8)) gemmFIFO(.CLK(CLK), 
     .nRST(nRST), .WEN(gemmFIFO_WEN), .REN(spif.gemmFIFO_REN), .clear(), .wdata(gemmFIFO_wdata), 
     .full(gemmFIFO_full), .empty(spif.gemmFIFO_empty), .underrun(), .overrun(), .count(), .rdata(spif.gemmFIFO_rdata));
 

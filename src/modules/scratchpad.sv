@@ -1,10 +1,9 @@
+`include "load_FSM_if.vh"
 `include "types_pkg.vh"
 `include "scratchpad_if.vh"
 `include "scratchpad_bank_if.vh"
-`include "load_FSM_if.vh"
 `include "gemm_FSM_if.vh"
 `include "dramstore_FSM_if.vh"
-`include "types_pkg.vh"
 
 import types_pkg::*;
 
@@ -50,8 +49,6 @@ module scratchpad (
     assign lfsmif.psumoutFIFO_wdata = {spif.psumout_row_sel_in, spif.psumout_data}; /////FULL Not Implemented
 
     //Inputs
-    assign lfsmif.instrFIFO_wdata = spif.instrFIFO_wdata;
-    assign lfsmif.instrFIFO_WEN = spif.instrFIFO_WEN;
     assign gfsmif.drained = spif.drained;
     assign gfsmif.fifo_has_space = spif.fifo_has_space;
     assign lfsmif.load_data = spif.load_data;
@@ -61,7 +58,6 @@ module scratchpad (
 
     //Outputs
     assign spif.gemm_complete = (spbif0.gemm_complete || spbif1.gemm_complete || spbif2.gemm_complete || spbif3.gemm_complete);
-    assign spif.instrFIFO_full = lfsmif.instrFIFO_full;
     assign spif.partial_enable = gfsmif.partial_enable;
     assign spif.weight_enable = gfsmif.weight_enable;
     assign spif.input_enable = gfsmif.input_enable;

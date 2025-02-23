@@ -1,9 +1,10 @@
 `ifndef  SCRATCHPAD_IF_VH
 `define SCRATCHPAD_IF_VH
 `include "types_pkg.vh"
+import types_pkg::*;
 
 interface scratchpad_if;
-    import types_pkg::*;
+    
     
     
     logic instrFIFO_WEN, psumout_en, drained, fifo_has_space, sLoad_hit, sStore_hit;
@@ -22,6 +23,14 @@ interface scratchpad_if;
         input instrFIFO_WEN, psumout_en, drained, fifo_has_space, sLoad_hit, sStore_hit, 
         instrFIFO_wdata, psumout_row_sel_in, sLoad_row, psumout_data, load_data,
         output instrFIFO_full, partial_enable, weight_enable, input_enable, sLoad, sStore,
+        weight_input_data, partial_sum_data, store_data, weight_input_row_sel, partial_sum_row_sel,
+        load_addr, store_addr, gemm_complete
+    );
+
+    modport tb (
+        output instrFIFO_WEN, psumout_en, drained, fifo_has_space, sLoad_hit, sStore_hit, 
+        instrFIFO_wdata, psumout_row_sel_in, sLoad_row, psumout_data, load_data,
+        input instrFIFO_full, partial_enable, weight_enable, input_enable, sLoad, sStore,
         weight_input_data, partial_sum_data, store_data, weight_input_row_sel, partial_sum_row_sel,
         load_addr, store_addr, gemm_complete
     );

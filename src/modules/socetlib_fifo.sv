@@ -19,7 +19,7 @@ module socetlib_fifo #(
 );
 
     // Parameter checking
-    //
+    
     // Width can be any number of bits > 1, but depth must be a power-of-2 to accomodate addressing scheme
     // TODO: 
     generate
