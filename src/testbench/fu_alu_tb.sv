@@ -1,7 +1,9 @@
 `include "fu_alu_if.vh"
-`include "cpu_types.vh"
+`include "isa_types.vh"
 
 `timescale 1 ns / 1 ns
+
+import isa_pkg::*;
 
 module fu_alu_tb;
   string tb_test_case = "INIT";

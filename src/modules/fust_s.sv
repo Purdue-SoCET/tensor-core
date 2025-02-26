@@ -10,7 +10,7 @@ module fust_s (
 
   fust_s_t fust;
   
-  always_ff @(posedge CLK, negedge nRST) begin
+  always_ff @(negedge CLK, negedge nRST) begin
     if (~nRST)
       fuif.fust <= '0;
     else

@@ -145,12 +145,13 @@ program test (
 
         // (opcode, rd, rs1, rs2, funct3, funct7)
         rtype_instr(RTYPE, 5'd10, 5'd11, 5'd12, ADD_SUB, ADD);
-        rtype_instr(RTYPE, 5'd10, 5'd15, 5'd14, ADD_SUB, ADD);
-
+        rtype_instr(RTYPE, 5'd15, 5'd10, 5'd14, ADD_SUB, ADD);
 
         @(posedge CLK);
 
         sbif.wb.alu_done = '1;
+        sbif.wb_ctrl.alu_done = '1;
+
         sbif.wb_ctrl.s_rw_en = '1;
         sbif.wb_ctrl.s_rw = 5'd10;
 
@@ -160,6 +161,7 @@ program test (
         @(posedge CLK);
 
         sbif.wb.alu_done = '0;
+        sbif.wb_ctrl.alu_done = '0;
 
         sbif.wb_ctrl.s_rw_en = '0;
         sbif.wb_ctrl.s_rw = '0;
@@ -173,6 +175,7 @@ program test (
         @(posedge CLK);
 
         sbif.wb.alu_done = '1;
+        sbif.wb_ctrl.alu_done = '1;
 
         sbif.wb_ctrl.s_rw_en = '1;
         sbif.wb_ctrl.s_rw = 5'd10;
@@ -183,6 +186,7 @@ program test (
         @(posedge CLK);
 
         sbif.wb.alu_done = '0;
+        sbif.wb_ctrl.alu_done = '0;
 
         sbif.wb_ctrl.s_rw_en = '0;
         sbif.wb_ctrl.s_rw = '0;
@@ -194,19 +198,21 @@ program test (
         @(posedge CLK);
         @(posedge CLK);
         @(posedge CLK);
-
 
         reset_in();
         reset_dut();
 
+        @(posedge CLK);
+
         itype_instr(ITYPE_LW, 5'd4, 5'd6, funct3_i_t'(3'h2), 12'd0);
-        rtype_instr(RTYPE, 5'd10, 5'd4, 5'd12, ADD_SUB, ADD);
+        rtype_instr(RTYPE, 5'd10, 5'd4, 5'd12, ADD_SUB, ADD); 
         sbif.fetch.imemload = '0;
 
         @(posedge CLK);
         @(posedge CLK);
 
         sbif.wb.load_done = '1;
+        sbif.wb_ctrl.load_done = '1;
 
         sbif.wb_ctrl.s_rw_en = '1;
         sbif.wb_ctrl.s_rw = 5'd4;
@@ -217,6 +223,7 @@ program test (
         @(posedge CLK);
 
         sbif.wb.load_done = '0;
+        sbif.wb_ctrl.load_done = '0;
 
         sbif.wb_ctrl.s_rw_en = '0;
         sbif.wb_ctrl.s_rw = '0;
@@ -229,6 +236,7 @@ program test (
         @(posedge CLK);
 
         sbif.wb.alu_done = '1;
+        sbif.wb_ctrl.alu_done = '1;
 
         sbif.wb_ctrl.s_rw_en = '1;
         sbif.wb_ctrl.s_rw = 5'd10;
@@ -239,6 +247,7 @@ program test (
         @(posedge CLK);
 
         sbif.wb.alu_done = '0;
+        sbif.wb_ctrl.alu_done = '0;
 
         sbif.wb_ctrl.s_rw_en = '0;
         sbif.wb_ctrl.s_rw = '0;
@@ -250,23 +259,141 @@ program test (
         @(posedge CLK);
         @(posedge CLK);
 
+        // out of order 
 
-        // once that instruction is done and wb sends done, send second instruction
-        // allow second instruction to go through 
-        // do the same as above but add a load/store instruction for the third instruction 
-        // let it all go through 
-
-        // do three s type instructions all back to back no dependencies
-        
-        // do three s type instructions all back to back with dependencies 
-        // do three i type (lw) instructions all back to back no dependencies
-        
-        // do three i type (lw) instructions all back to back with dependencies 
-        // mix and match the above
-        // go into matrix stuff now, similar to the above stuff
+        itype_instr(ITYPE_LW, 5'd5, 5'd7, funct3_i_t'(3'h2), 12'd0);
+        rtype_instr(RTYPE, 5'd10, 5'd9, 5'd12, ADD_SUB, ADD); // 1
+        sbif.fetch.imemload = '0;
 
         @(posedge CLK);
         @(posedge CLK);
+
+        sbif.wb.alu_done = '1;
+        sbif.wb_ctrl.alu_done = '1;
+
+        sbif.wb_ctrl.s_rw_en = '1;
+        sbif.wb_ctrl.s_rw = 5'd10;
+
+        sbif.wb.s_rw_en = '1;
+        sbif.wb.s_rw = 5'd10;
+
+        @(posedge CLK);
+
+        sbif.wb.alu_done = '0;
+        sbif.wb_ctrl.alu_done = '0;
+
+        sbif.wb_ctrl.s_rw_en = '0;
+        sbif.wb_ctrl.s_rw = '0;
+
+        sbif.wb.s_rw_en = '0;
+        sbif.wb.s_rw = '0;
+
+        @(posedge CLK);
+
+        rtype_instr(RTYPE, 5'd11, 5'd13, 5'd14, ADD_SUB, ADD); // 2
+        sbif.fetch.imemload = '0;
+
+        @(posedge CLK);
+        @(posedge CLK);
+
+        sbif.wb.alu_done = '1;
+        sbif.wb_ctrl.alu_done = '1;
+
+        sbif.wb_ctrl.s_rw_en = '1;
+        sbif.wb_ctrl.s_rw = 5'd11;
+
+        sbif.wb.s_rw_en = '1;
+        sbif.wb.s_rw = 5'd11;
+
+        @(posedge CLK);
+
+        sbif.wb.alu_done = '0;
+        sbif.wb_ctrl.alu_done = '0;
+
+        sbif.wb_ctrl.s_rw_en = '0;
+        sbif.wb_ctrl.s_rw = '0;
+
+        sbif.wb.s_rw_en = '0;
+        sbif.wb.s_rw = '0;
+
+        @(posedge CLK);
+
+        rtype_instr(RTYPE, 5'd17, 5'd15, 5'd16, ADD_SUB, ADD); // 3
+        sbif.fetch.imemload = '0;
+
+        @(posedge CLK);
+        @(posedge CLK);
+
+        sbif.wb.alu_done = '1;
+        sbif.wb_ctrl.alu_done = '1;
+
+        sbif.wb_ctrl.s_rw_en = '1;
+        sbif.wb_ctrl.s_rw = 5'd17;
+
+        sbif.wb.s_rw_en = '1;
+        sbif.wb.s_rw = 5'd17;
+
+        @(posedge CLK);
+
+        sbif.wb.alu_done = '0;
+        sbif.wb_ctrl.alu_done = '0;
+
+        sbif.wb_ctrl.s_rw_en = '0;
+        sbif.wb_ctrl.s_rw = '0;
+
+        sbif.wb.s_rw_en = '0;
+        sbif.wb.s_rw = '0;
+
+        @(posedge CLK);
+        @(posedge CLK);
+        @(posedge CLK);
+        @(posedge CLK);
+        @(posedge CLK);
+        @(posedge CLK);
+
+        sbif.wb.load_done = '1;
+        sbif.wb_ctrl.load_done = '1;
+
+        sbif.wb_ctrl.s_rw_en = '1;
+        sbif.wb_ctrl.s_rw = 5'd5;
+
+        sbif.wb.s_rw_en = '1;
+        sbif.wb.s_rw = 5'd5;
+
+        @(posedge CLK);
+
+        sbif.wb.load_done = '0;
+        sbif.wb_ctrl.load_done = '0;
+
+        sbif.wb_ctrl.s_rw_en = '0;
+        sbif.wb_ctrl.s_rw = '0;
+
+        sbif.wb.s_rw_en = '0;
+        sbif.wb.s_rw = '0;
+
+        @(posedge CLK);
+        @(posedge CLK);
+        @(posedge CLK);
+        @(posedge CLK);
+        @(posedge CLK);
+
+
+        // // once that instruction is done and wb sends done, send second instruction
+        // // allow second instruction to go through 
+        // // do the same as above but add a load/store instruction for the third instruction 
+        // // let it all go through 
+
+        // // do three s type instructions all back to back no dependencies
+        
+        // // do three s type instructions all back to back with dependencies 
+        // // do three i type (lw) instructions all back to back no dependencies
+        
+        // // do three i type (lw) instructions all back to back with dependencies 
+        // // mix and match the above
+        // // go into matrix stuff now, similar to the above stuff
+
+        // @(posedge CLK);
+        // @(posedge CLK);
         
 
         $finish;

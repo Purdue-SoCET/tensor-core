@@ -33,10 +33,10 @@ add wave -noupdate /scoreboard_tb/DUT/DI/s_busy
 add wave -noupdate /scoreboard_tb/DUT/DI/m_busy
 add wave -noupdate -expand -group diif /scoreboard_tb/DUT/diif/fetch
 add wave -noupdate -expand -group diif /scoreboard_tb/DUT/diif/wb
-add wave -noupdate -expand -group diif -subitemconfig {/scoreboard_tb/DUT/diif/out.fust_s -expand /scoreboard_tb/DUT/diif/out.fust_s.busy -expand /scoreboard_tb/DUT/diif/out.fust_s.op -expand} /scoreboard_tb/DUT/diif/out
+add wave -noupdate -expand -group diif /scoreboard_tb/DUT/diif/out
 add wave -noupdate -expand /scoreboard_tb/DUT/DI/diif/n_fust_s
 add wave -noupdate -expand /scoreboard_tb/DUT/DI/diif/n_fust_m
-add wave -noupdate -expand -subitemconfig {/scoreboard_tb/DUT/diif/fust_s.busy -expand /scoreboard_tb/DUT/diif/fust_s.op -expand {/scoreboard_tb/DUT/diif/fust_s.op[1]} -expand} /scoreboard_tb/DUT/diif/fust_s
+add wave -noupdate -expand -subitemconfig {/scoreboard_tb/DUT/diif/fust_s.busy -expand /scoreboard_tb/DUT/diif/fust_s.op -expand} /scoreboard_tb/DUT/diif/fust_s
 add wave -noupdate /scoreboard_tb/DUT/DI/diif/n_fust_g
 add wave -noupdate /scoreboard_tb/DUT/DI/diif/n_fu_s
 add wave -noupdate /scoreboard_tb/DUT/DI/diif/n_fust_s_en
@@ -50,7 +50,7 @@ add wave -noupdate -group rstif /scoreboard_tb/DUT/DI/rstsif/di_write
 add wave -noupdate -group rstif /scoreboard_tb/DUT/DI/rstsif/di_tag
 add wave -noupdate -group rstif /scoreboard_tb/DUT/DI/rstsif/wb_sel
 add wave -noupdate -group rstif /scoreboard_tb/DUT/DI/rstsif/wb_write
-add wave -noupdate /scoreboard_tb/DUT/DI/rstsif/status
+add wave -noupdate -subitemconfig {/scoreboard_tb/DUT/DI/rstsif/status.idx -expand} /scoreboard_tb/DUT/DI/rstsif/status
 add wave -noupdate -divider FUST
 add wave -noupdate -group fuif /scoreboard_tb/DUT/IS/FS/fuif/en
 add wave -noupdate -group fuif /scoreboard_tb/DUT/IS/FS/fuif/fu
@@ -69,11 +69,13 @@ add wave -noupdate -expand -group isif /scoreboard_tb/DUT/isif/flush
 add wave -noupdate -expand -group isif /scoreboard_tb/DUT/isif/freeze
 add wave -noupdate -expand -group isif /scoreboard_tb/DUT/isif/wb
 add wave -noupdate -expand -group isif /scoreboard_tb/DUT/isif/out
-add wave -noupdate -expand -group isif -expand /scoreboard_tb/DUT/isif/fust_s
+add wave -noupdate -expand -group isif -expand -subitemconfig {/scoreboard_tb/DUT/isif/fust_s.busy -expand /scoreboard_tb/DUT/isif/fust_s.t1 -expand /scoreboard_tb/DUT/isif/fust_s.t2 -expand} /scoreboard_tb/DUT/isif/fust_s
 add wave -noupdate -expand /scoreboard_tb/DUT/IS/fust_state
 add wave -noupdate /scoreboard_tb/DUT/IS/incoming_instr
+add wave -noupdate /scoreboard_tb/DUT/sbif/wb
+add wave -noupdate /scoreboard_tb/DUT/sbif/wb_ctrl
 TreeUpdate [SetDefaultTree]
-WaveRestoreCursors {{Cursor 1} {63290 ps} 0}
+WaveRestoreCursors {{Cursor 1} {345000 ps} 0}
 quietly wave cursor active 1
 configure wave -namecolwidth 150
 configure wave -valuecolwidth 209
@@ -89,4 +91,4 @@ configure wave -griddelta 40
 configure wave -timeline 0
 configure wave -timelineunits ps
 update
-WaveRestoreZoom {0 ps} {95150 ps}
+WaveRestoreZoom {214440 ps} {372920 ps}

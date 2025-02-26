@@ -173,6 +173,7 @@ package datapath_pkg;
     // only GEMM?
   } ex_ctr_t;
 
+  // output for Writeback.sv
   typedef struct packed {
     logic s_rw_en;
     regbits_t s_rw;
@@ -216,6 +217,59 @@ package datapath_pkg;
     matbits_t ms2;
     matbits_t ms3;
   } issue_t;
+
+
+  
+  typedef struct packed {
+    logic [3:0] rs1;
+    logic [3:0] rs2;
+    logic [3:0] rs3;
+    logic [3:0] rd;
+  } fu_gemm_t;
+
+
+
+  typedef struct packed {
+    logic           done;       // Done signal to Issue Queue
+    logic [1:0]     ls_out;     // Load or store to Scratchpad [Load, Store]
+    logic [3:0]     rd_out;     // Matrix Reg destination (to Scratchpad)
+    logic [10:0]    imm_out;    // Immediate to Scratchpad
+    word_t          address;    // Address to Scratchpad
+    word_t          stride_out; // stride value
+  } matrix_ls_t;
+
+  typedef struct packed {
+    // Branch FU
+    logic bfu_branch_outcome;
+    word_t bfu_updated_pc;
+    logic bfu_misprediction;
+    word_t bfu_correct_pc;
+    logic bfu_update_btb;
+    word_t bfu_update_pc;
+    word_t bfu_branch_target;
+
+    // Scalar ALU FU
+    logic salu_negative;
+    logic salu_overflow;
+    word_t salu_port_output;
+    logic salu_zero;
+    
+    // Scalar Load/Store FU
+    word_t sls_dmemaddr;
+    logic sls_dmemREN;
+    logic sls_dmemWEN;
+    word_t sls_dmemstore;
+    word_t sls_dmemload;
+    logic sls_dhit;
+    
+    // MLS FU
+    matrix_ls_t fu_matls_out;
+    
+    // Gemm FU
+    logic gemm_new_weight_out;
+    fu_gemm_t gemm_matrix_num;
+  } eif_output_t;
+
 
 endpackage
 `endif

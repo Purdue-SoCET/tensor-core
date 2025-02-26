@@ -1,10 +1,10 @@
-`include "datapath_types.vh"
 `include "fu_alu_if.vh"
+`include "isa_types.vh"
 
 module fu_alu(
     fu_alu_if.alu aluif
 );
-    import datapath_pkg::*;
+    import isa_pkg::*;
 
     logic sign_a;
     logic sign_b;
@@ -43,8 +43,8 @@ module fu_alu(
             ALU_AND: aluif.port_output = aluif.port_a & aluif.port_b;
             ALU_OR: aluif.port_output = aluif.port_a | aluif.port_b;
             ALU_XOR: aluif.port_output = aluif.port_a ^ aluif.port_b;
-            ALU_SLT: aluif.port_output = $signed(aluif.port_a) < $signed(aluif.port_b);
-            ALU_SLTU: aluif.port_output = aluif.port_a < aluif.port_b;
+            ALU_SLT: aluif.port_output = {31'b0, $signed(aluif.port_a) < $signed(aluif.port_b)};
+            ALU_SLTU: aluif.port_output = {31'b0, aluif.port_a < aluif.port_b};
         endcase
     end
 
