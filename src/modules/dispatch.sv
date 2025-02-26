@@ -125,6 +125,8 @@ module dispatch(
 
     always_comb begin : FUST
       diif.n_fu_t = cuif.fu_t;
+      diif.n_t1 = diif.fust_s.t1;
+      diif.n_t2 = diif.fust_s.t2;
 
       // tag updates on WB
       if (diif.wb.s_rw_en & diif.wb.alu_done & diif.fust_state[0] == FUST_EX) begin
