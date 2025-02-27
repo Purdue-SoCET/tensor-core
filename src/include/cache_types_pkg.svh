@@ -14,6 +14,7 @@ localparam BYTE_OFF_BIT_LEN = 2;
 localparam BLOCK_OFF_BIT_LEN = $clog2(BLOCK_SIZE); // choose which block within the bank
 localparam BLOCK_INDEX_BIT_LEN = $clog2(NUM_SETS); // chose the set
 localparam WAYS_LEN = $clog2(NUM_WAYS); 
+localparam BANKS_LEN = $clog2(NUM_BANKS); 
 localparam TAG_BIT_LEN = 32 - BLOCK_INDEX_BIT_LEN - BLOCK_OFF_BIT_LEN - BYTE_OFF_BIT_LEN;
 
 typedef struct packed {
@@ -29,6 +30,11 @@ typedef struct packed {
     logic rw_mode; // 0 = read, 1 = write
     logic [31:0] store_value;
 } in_mem_instr;
+
+typedef struct packed {
+    logic [WAYS_LEN-1:0] lru_way;
+    logic [NUM_WAYS-1:0][31:0] age;
+} lru_frame;
 
 typedef logic [BLOCK_SIZE-1:0][31:0] cache_block;
 
