@@ -2,3 +2,6 @@ transcript
 work/
 .venv
 vsim.*
+obj_dir/ 
+obj_dir/*
+*.cpp
