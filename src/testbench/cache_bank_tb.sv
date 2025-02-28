@@ -111,6 +111,7 @@ program test (
 );
 
     addr_t address;
+    string test; 
 
     initial begin
         tb_nrst = 0;
@@ -127,7 +128,8 @@ program test (
         tb_bank_id = BANKS_LEN'(4'd3);
         
         // testing a write to addr 15 with store_value = 42 
-        $display("Trying a WRITE - Fails");
+        test = "Attempting Write";
+        $display("Trying a WRITE - MISS");
         tb_instr_valid = 1;
         address = { 24'd10245, 4'd15, 2'b00, 2'b00}; 
         tb_mem_instr  = {4'd9, address, 1'b1, 32'd55};
@@ -135,14 +137,15 @@ program test (
         tb_instr_valid = 0;
         @(posedge tb_clk);
 
-        $display("Emulated MSHR");
-        tb_mshr_entry = {1'b1, 4'd9, address, BLOCK_SIZE'('0), cache_block'(0)};
+        test = "Setting MSHR";
         $display("Sending in MSHR Entry");
+        tb_mshr_entry = {1'b1, 4'd9, address, BLOCK_SIZE'('0), cache_block'(0)};
         tb_ram_mem_complete = 1'b1; 
         tb_ram_mem_data = CACHE_RW_SIZE'(32'd2048);
         tb_ram_mem_complete = 1'b1;
         @(posedge tb_clk);
 
+        test = "START -> BLOCK_PULL";
         $display("Completed START, should begin BLOCK_PULL now");
         $display("  ram_mem_complete: %b, ram_mem_addr: %h, ram_mem_store: %h, ram_mem_WEN: %b, ram_mem_REN: %b, tb_cache_bank_busy: %b", tb_ram_mem_complete, tb_ram_mem_addr, tb_ram_mem_store, tb_ram_mem_WEN, tb_ram_mem_REN, tb_cache_bank_busy);
         @(posedge tb_clk);
@@ -152,8 +155,8 @@ program test (
         @(posedge tb_clk);
         $display("  ram_mem_complete: %b, ram_mem_addr: %h, ram_mem_store: %h, ram_mem_WEN: %b, ram_mem_REN: %b, tb_cache_bank_busy: %b", tb_ram_mem_complete, tb_ram_mem_addr, tb_ram_mem_store, tb_ram_mem_WEN, tb_ram_mem_REN, tb_cache_bank_busy);
         @(posedge tb_clk);
-        $display("  ram_mem_complete: %b, ram_mem_addr: %h, ram_mem_store: %h, ram_mem_WEN: %b, ram_mem_REN: %b, tb_cache_bank_busy: %b", tb_ram_mem_complete, tb_ram_mem_addr, tb_ram_mem_store, tb_ram_mem_WEN, tb_ram_mem_REN, tb_cache_bank_busy);
 
+        test = "BLOCK_PULL -> VICTIM_EJECT";
         $display("Completed BLOCK_PULL, should begin VICTIM_EJECT now");
         $display("  ram_mem_complete: %b, ram_mem_addr: %h, ram_mem_store: %h, ram_mem_WEN: %b, ram_mem_REN: %b, tb_cache_bank_busy: %b", tb_ram_mem_complete, tb_ram_mem_addr, tb_ram_mem_store, tb_ram_mem_WEN, tb_ram_mem_REN, tb_cache_bank_busy);
         @(posedge tb_clk);
@@ -162,22 +165,31 @@ program test (
         $display("  ram_mem_complete: %b, ram_mem_addr: %h, ram_mem_store: %h, ram_mem_WEN: %b, ram_mem_REN: %b, tb_cache_bank_busy: %b", tb_ram_mem_complete, tb_ram_mem_addr, tb_ram_mem_store, tb_ram_mem_WEN, tb_ram_mem_REN, tb_cache_bank_busy);
         @(posedge tb_clk);
         $display("  ram_mem_complete: %b, ram_mem_addr: %h, ram_mem_store: %h, ram_mem_WEN: %b, ram_mem_REN: %b, tb_cache_bank_busy: %b", tb_ram_mem_complete, tb_ram_mem_addr, tb_ram_mem_store, tb_ram_mem_WEN, tb_ram_mem_REN, tb_cache_bank_busy);
+        tb_ram_mem_complete = 1'b0; 
         @(posedge tb_clk);
-        $display("  ram_mem_complete: %b, ram_mem_addr: %h, ram_mem_store: %h, ram_mem_WEN: %b, ram_mem_REN: %b, tb_cache_bank_busy: %b", tb_ram_mem_complete, tb_ram_mem_addr, tb_ram_mem_store, tb_ram_mem_WEN, tb_ram_mem_REN, tb_cache_bank_busy);
 
+
+        test = "VICTIM_EJECT -> FINISH";
         $display("Completed VICTIM_EJECT, should begin FINISH now");
-        $display("  ram_mem_complete: %b, ram_mem_addr: %h, ram_mem_store: %h, ram_mem_WEN: %b, ram_mem_REN: %b, tb_cache_bank_busy: %b", tb_ram_mem_complete, tb_ram_mem_addr, tb_ram_mem_store, tb_ram_mem_WEN, tb_ram_mem_REN, tb_cache_bank_busy);
+        $display("  tb_scheduler_uuid_out: %h, ram_mem_complete: %b, ram_mem_addr: %h, ram_mem_store: %h, ram_mem_WEN: %b, ram_mem_REN: %b, tb_cache_bank_busy: %b", tb_scheduler_uuid_out, tb_ram_mem_complete, tb_ram_mem_addr, tb_ram_mem_store, tb_ram_mem_WEN, tb_ram_mem_REN, tb_cache_bank_busy);
         @(posedge tb_clk);
-        $display("  ram_mem_complete: %b, ram_mem_addr: %h, ram_mem_store: %h, ram_mem_WEN: %b, ram_mem_REN: %b, tb_cache_bank_busy: %b", tb_ram_mem_complete, tb_ram_mem_addr, tb_ram_mem_store, tb_ram_mem_WEN, tb_ram_mem_REN, tb_cache_bank_busy);
+
+        test = "Resetting MSHR";
+        tb_mshr_entry = '0;
+        tb_ram_mem_complete = 1'b0; 
+        tb_ram_mem_data = '0;
+        tb_ram_mem_complete = 1'b0;
         @(posedge tb_clk);
 
         // testing a read to addr 15
+        $display("Trying a READ - HIT");
+        test = "READ";
         tb_instr_valid = 1;
         address = { 24'd10245, 4'd15, 2'b00, 2'b00}; 
         tb_mem_instr  = {4'd9, address, 1'b0, 32'd0};
         @(posedge tb_clk);
         tb_instr_valid = 0;
-        $display("  tb_scheduler_data_out: %h, tb_scheduler_uuid_out: %h, tb_scheduler_hit: %b", tb_scheduler_data_out, tb_scheduler_uuid_out, tb_scheduler_hit);
+        $display("  tb_scheduler_data_out: %d, tb_scheduler_uuid_out: %h, tb_scheduler_hit: %b", tb_scheduler_data_out, tb_scheduler_uuid_out, tb_scheduler_hit);
 
         repeat (10) @(posedge tb_clk);
 
