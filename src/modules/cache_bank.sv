@@ -4,7 +4,6 @@ module cache_bank (
     input logic CLK, nRST,
     input logic [BANKS_LEN-1:0] bank_id, // for requesting RAM
     input logic instr_valid, // valid single-cycle request 
-    input logic [BLOCK_SIZE-1:0][31:0] scheduler_data_in, // data coming in for single-cycle scheduler_hit 
     input logic [CACHE_RW_SIZE-1:0] ram_mem_data, // data incoming from RAM
     input mshr_reg mshr_entry,
     input in_mem_instr mem_instr_in,
@@ -38,6 +37,7 @@ module cache_bank (
     logic [BLOCK_INDEX_BIT_LEN-1:0] latched_victim_set_index, set_index, victim_set_index; 
 
     lru_frame [NUM_SETS_PER_BANK-1:0] lru, next_lru;
+    
 
     assign set_index = mem_instr_in.addr.index >> BANKS_LEN;    
     assign victim_set_index = mshr_entry.block_addr.index >> BANKS_LEN; 
@@ -58,7 +58,7 @@ module cache_bank (
             bank <= next_bank; 
             lru <= next_lru;
             if (curr_state == START) begin
-                if (instr_valid && mshr_entry.valid) begin 
+                if (mshr_entry.valid) begin 
                     latched_victim_set_index <= victim_set_index;
                     latched_victim_way_index <= victim_way_index;
                     latched_victim_eject_buffer <= bank[victim_set_index][victim_way_index];
@@ -119,7 +119,7 @@ module cache_bank (
         next_bank = bank; 
         scheduler_hit = 1'b0; 
         scheduler_data_out = '0;
-        
+        hit_way_index = '0; 
         wrong_state = 1'b0; 
 
         if (instr_valid) begin
@@ -140,7 +140,7 @@ module cache_bank (
         case (curr_state) 
             default: wrong_state = 1'b1; 
             START: begin 
-                if (instr_valid && mshr_entry.valid) begin 
+                if (mshr_entry.valid) begin 
                     next_bank[latched_victim_set_index][latched_victim_way_index].valid = 1'b0; 
                 end
             end 
@@ -186,12 +186,14 @@ module cache_bank (
     always_comb begin : fsm_state_logic
         next_state = curr_state; 
         case (curr_state) 
-            START: if (instr_valid && mshr_entry.valid) next_state = BLOCK_PULL;
+            START: if (mshr_entry.valid) next_state = BLOCK_PULL;
             BLOCK_PULL:  if (count_FSM == BLOCK_OFF_BIT_LEN'(BLOCK_SIZE - 1)) next_state = VICTIM_EJECT; 
             VICTIM_EJECT: if (count_FSM == BLOCK_OFF_BIT_LEN'(BLOCK_SIZE - 1)) next_state = FINISH; 
             FINISH: next_state = START; 
             default: next_state = START;  
         endcase
     end 
+
+
 
 endmodule

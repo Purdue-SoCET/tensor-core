@@ -1,14 +1,18 @@
 fc:
 	vlog -sv ./src/testbench/flex_counter_tb.sv ./src/modules/flex_counter.sv
 	vsim -voptargs="+acc" work.flex_counter_tb
-# make file_name
-%:
+
+%.sim:
+	vlog -sv -pedanticerrors -lint +incdir+./src/include/ \
+	     ./src/modules/$*.sv \
+	     ./src/testbench/$*_tb.sv
+	vsim -c -voptargs="+acc" work.$*_tb -do "run -all; quit"
+
+%.wav:
 	vlog -sv -pedanticerrors -lint +incdir+./src/include/ \
 	     ./src/modules/$*.sv \
 	     ./src/testbench/$*_tb.sv
 	vsim -voptargs="+acc" work.$*_tb -do "run -all"
-
-#make sf
 
 lint_%:
 	verilator --lint-only ./src/modules/$*.sv -y src/include
