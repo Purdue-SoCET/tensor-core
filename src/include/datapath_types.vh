@@ -81,6 +81,7 @@ package datapath_pkg;
     regbits_t rs1;
     regbits_t rs2;
     word_t imm; //instr[31:7] TODO: double check this is right 
+    logic spec;
   } fust_s_row_t;
 
   typedef struct packed {
@@ -216,6 +217,7 @@ package datapath_pkg;
     matbits_t ms1;
     matbits_t ms2;
     matbits_t ms3;
+    logic spec;
   } issue_t;
 
 

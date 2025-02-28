@@ -24,6 +24,7 @@ interface issue_if;
 
     // Inputs from execute
     // ex_t ex; //branch and matrix done signals
+    logic mispredict;
 
     // Inputs from writeback
     wb_t wb; //alu and ld/st done signals

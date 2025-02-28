@@ -35,6 +35,8 @@ module dispatch(
     logic flush;
     dispatch_t n_dispatch;
     dispatch_t dispatch;
+    logic spec; // tracks if in SPEC state or not, needs set to 1 if theres a branch, and every following instruction needs marked as spec, gets cleared on branch resolution
+    logic n_spec;
 
     always_ff @ (posedge CLK, negedge nRST) begin: Pipeline_Latching
       if (~nRST)
@@ -123,6 +125,23 @@ module dispatch(
       end
     end
 
+    always_ff @ (posedge CLK, negedge nRST) begin: Speculation_State_Latch
+      if (~nRST)
+        spec <= '0;
+      else
+        spec <= n_spec;
+    end
+
+    always_comb begin : Speculation_State
+      n_spec = spec;
+      // TODO: needs some kind of branch resolve signal from branch FU to
+      // clear speculation bit
+      if (cuif.fu_s == FU_S_BRANCH)
+        n_spec = 1'b1;
+      // else if (diif.branch_resolved)
+      //   n_spec = 1'b0;
+    end
+
     always_comb begin : FUST
       diif.n_fu_t = cuif.fu_t;
       diif.n_t1 = diif.fust_s.t1;
@@ -148,6 +167,20 @@ module dispatch(
       diif.n_fust_s.rs1  = s_rs1;
       diif.n_fust_s.rs2  = s_rs2;
       diif.n_fust_s.imm  = cuif.imm;
+      diif.n_fust_s.spec = spec; // sets spec bit in FUST on new instructions
+      // look at TODO in issue about branch resolution and needing flush bits
+      // example: 
+      // for i = 1 to 5, if diif.fust_s.op[i].spec & diif.mispredict, then
+      // diif.n_flush[i] = 1'1b1;
+      // (would need to add a mispredict signal coming from branch FU, and 
+      // logic to the fust_s.sv for clearing all the rows with flush bits, 
+      // where flush is not attached to the op for the row, but a separate 
+      // array similar to t1, t2, and busy)
+      // could also do this in issue, like how busy is currently done for the
+      // fust rows (left comment in issue about where to do this), would maybe
+      // be cleaner to do in issue to leave dispatch as simple as possible of
+      // just writing spec bits to the rows and letting issue do flush
+      // logic/looping
       diif.n_t1[cuif.fu_s]   = diif.n_fust_s_en ? rstsif.status.idx[s_rs1].tag : diif.n_t1[cuif.fu_s];
       diif.n_t2[cuif.fu_s]   = diif.n_fust_s_en ? rstsif.status.idx[s_rs2].tag : diif.n_t2[cuif.fu_s];
 

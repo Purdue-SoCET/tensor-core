@@ -100,6 +100,9 @@ module issue(
       fusif.busy[0]  = (fust_state[0] == FUST_EX && (next_fust_state[0] == FUST_EMPTY || next_fust_state[0] == FUST_WAIT)) ? 1'd0 : next_fust_state[0] != FUST_EMPTY;
       fusif.busy[1]  = (fust_state[1] == FUST_EX && (next_fust_state[1] == FUST_EMPTY || next_fust_state[1] == FUST_WAIT)) ? 1'd0 : next_fust_state[1] != FUST_EMPTY;
       fusif.busy[2]  = (fust_state[2] == FUST_EX && (next_fust_state[2] == FUST_EMPTY || next_fust_state[2] == FUST_WAIT)) ? 1'd0 : next_fust_state[2] != FUST_EMPTY;
+      // could be writing the flush bits here as well if not in the dispatch,
+      // like how busy is being written independent of the rows that dispatch
+      // writes
       fusif.t1 = isif.n_t1;
       fusif.t2 = isif.n_t2;
 
@@ -210,21 +213,16 @@ module issue(
           end
           FUST_EX: begin
             //TODO:handle flushing on speculation
+            // if (isif.mispredict & fusif.fust.op[i].spec) 
+            //  then flush fusif.fust.op[i], easiest way is
+            //  probably adding a flush bit to the fusif.fust.op[]
+            //  and let the fust_s clear its rows with that bit asserted
+            //  since fusif.fust.op can only write one row at a time
 
             if (isif.wb.s_rw_en & isif.wb.alu_done & (i == 0)) begin
               next_fust_state[i] = incoming_instr[i] ? FUST_WAIT : FUST_EMPTY;
-            //   // TODO 
-            //   fusif.fust.op[1].t1 = (fusif.fust.op[1].t1 == 2'd1) && fusif.busy[1] ? '0 : fusif.fust.op[1].t1;
-            //   fusif.fust.op[1].t2 = (fusif.fust.op[1].t2 == 2'd1) && fusif.busy[1] ? '0 : fusif.fust.op[1].t2;
-            //   fusif.fust.op[2].t1 = (fusif.fust.op[2].t1 == 2'd1) && fusif.busy[2] ? '0 : fusif.fust.op[2].t1;
-            //   fusif.fust.op[2].t2 = (fusif.fust.op[2].t2 == 2'd1) && fusif.busy[2] ? '0 : fusif.fust.op[2].t2;
             end else if (isif.wb.s_rw_en & isif.wb.load_done & (i == 1)) begin
               next_fust_state[i] = incoming_instr[i] ? FUST_WAIT : FUST_EMPTY;
-            //   // TODO 
-            //   fusif.fust.op[0].t1 = (fusif.fust.op[0].t1 == 2'd2) && fusif.busy[0] ? '0 : fusif.fust.op[0].t1;
-            //   fusif.fust.op[0].t2 = (fusif.fust.op[0].t2 == 2'd2) && fusif.busy[0] ? '0 : fusif.fust.op[0].t2;
-            //   fusif.fust.op[2].t1 = (fusif.fust.op[2].t1 == 2'd2) && fusif.busy[2] ? '0 : fusif.fust.op[2].t1;
-            //   fusif.fust.op[2].t2 = (fusif.fust.op[2].t2 == 2'd2) && fusif.busy[2] ? '0 : fusif.fust.op[2].t2;
             end
             //TODO: handle dones from branch and matrix FUs
 
@@ -261,7 +259,6 @@ module issue(
       s_rs1 = '0;
       s_rs2 = '0;
       for (int i = 0; i < 5; i++) begin
-        //TODO:verify this will only ever apply to one instruction per cycle
         if (fust_state[i] != FUST_EX & next_fust_state[i] == FUST_EX) begin
           // issue this instruction
           // TODO: add opcode to be sent to FUs
