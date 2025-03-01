@@ -1,0 +1,6 @@
+/package/eda/mg/questa2021.4/questasim/gcc-7.4.0-linux_x86_64/bin/g++ -shared -fPIC -I/package/eda/mg/questa2021.4/questasim/include -o memory.so memory.cpp
+
+
+vlog example_mem_tb.sv
+
+vsim -c memory_testbench -sv_lib memory -do "run -all;exit"
