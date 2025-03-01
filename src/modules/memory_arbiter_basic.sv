@@ -106,14 +106,14 @@ module memory_arbiter_basic(
         acif.ramaddr = acif.daddr;
         acif.ramWEN = acif.dWEN;
         acif.ramREN = !acif.dWEN && acif.dREN;
-        acif.dwait = (acif.dREN || acif.dWEN);
+        acif.dwait = ((ccif.dREN && ccif.ramstate == ACCESS) || (ccif.dWEN && ccif.ramstate == ACCESS)) ? 1'b0 : 1'b1;
         acif.dload = acif.ramload;
       end
 
       ICACHE: begin
         acif.ramaddr = acif.iaddr;
         acif.iload = acif.ramload;
-        acif.iwait = acif.iREN;
+        acif.iwait = (ccif.ramstate == BUSY || ccif.dREN || ccif.dWEN) ? 1'b1 : 1'b0;
       end
     endcase
   end

@@ -19,6 +19,7 @@ interface arbiter_caches_if(
  
   // ram
   logic                   ramWEN, ramREN;
+  ramstate_t              ramstate;
   word_t                  ramaddr, ramstore, ramload;
 
   always_comb begin
@@ -40,7 +41,7 @@ interface arbiter_caches_if(
             // cache inputs
     input   iREN, dREN, dWEN, dstore, iaddr, daddr,
             // ram inputs
-            ramload,
+            ramload, ramstate,
             // cache outputs
     output  iwait, dwait, iload, dload,
             // ram outputs
