@@ -15,7 +15,8 @@ module cache_bank (
     output logic [CACHE_RW_SIZE-1:0] ram_mem_store, 
     output logic [31:0] ram_mem_addr,
     output logic [31:0] scheduler_data_out,
-    output logic [3:0] scheduler_uuid_out
+    output logic [3:0] scheduler_uuid_out,
+    output logic scheduler_uuid_ready
 );
 
     typedef enum logic [2:0] { 
@@ -43,7 +44,6 @@ module cache_bank (
     assign set_index = mem_instr_in.addr.index >> BANKS_LEN;    
     assign victim_set_index = mshr_entry.block_addr.index >> BANKS_LEN; 
     assign victim_way_index = lru[victim_set_index].lru_way;
-    assign cache_bank_busy = (curr_state != START); 
 
     always_ff @ (posedge CLK, negedge nRST) begin : sequential_update
         if (!nRST) begin 
@@ -123,6 +123,8 @@ module cache_bank (
         scheduler_data_out = '0;
         hit_way_index = '0; 
         wrong_state = 1'b0; 
+        scheduler_uuid_ready = 0;
+        cache_bank_busy = 0;
 
         if (instr_valid) begin
             for (int i = 0; i < NUM_WAYS; i++) begin 
@@ -143,10 +145,12 @@ module cache_bank (
             default: wrong_state = 1'b1; 
             START: begin 
                 if (mshr_entry.valid) begin 
-                    next_bank[latched_victim_set_index][latched_victim_way_index].valid = 1'b0; 
+                    next_bank[latched_victim_set_index][latched_victim_way_index].valid = 1'b0;
+                    cache_bank_busy = 1; 
                 end
             end 
             BLOCK_PULL: begin 
+                cache_bank_busy = 1; 
                 if (count_FSM != (BLOCK_OFF_BIT_LEN'(BLOCK_SIZE - 1))) count_flush = 1'b0; 
 
                 if (ram_mem_complete || (count_FSM == 0)) begin 
@@ -164,6 +168,7 @@ module cache_bank (
                 end
             end 
             VICTIM_EJECT: begin 
+                cache_bank_busy = 1; 
                 if (count_FSM != BLOCK_OFF_BIT_LEN'(BLOCK_SIZE - 1)) count_flush = 1'b0; 
 
                 if (ram_mem_complete || (count_FSM == 0)) begin 
@@ -175,11 +180,13 @@ module cache_bank (
                 ram_mem_WEN = 1'b1; 
             end
             FINISH: begin 
+                cache_bank_busy = 0; 
                 next_bank[latched_victim_set_index][latched_victim_way_index].valid = 1'b1; 
                 next_bank[latched_victim_set_index][latched_victim_way_index].dirty = |mshr_entry.write_status; 
                 next_bank[latched_victim_set_index][latched_victim_way_index].tag = mshr_entry.block_addr.tag; 
                 next_bank[latched_victim_set_index][latched_victim_way_index].block = latched_block_pull_buffer.block; 
                 scheduler_uuid_out = mshr_entry.uuid;
+                scheduler_uuid_ready = 1;
             end
         endcase
     end 
