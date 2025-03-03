@@ -15,7 +15,8 @@ fc:
 	vsim -voptargs="+acc" work.$*_tb -do "run -all"
 
 lint_%:
-	verilator --lint-only ./src/modules/$*.sv -y src/include
+	vlog -sv -pedanticerrors -lint +incdir+./src/include/ \
+	     ./src/modules/$*.sv
 
 sim_%:
 	verilator --binary --trace-fst --trace-structs --hierarchical -Wno-TIMESCALEMOD -j 0 src/testbench/$*_tb.sv -y src/include -y src/modules

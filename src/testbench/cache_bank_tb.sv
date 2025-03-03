@@ -28,11 +28,6 @@ module cache_bank_tb;
         #(CLK_PERIOD/2);
     end
     
-    initial begin
-        $dumpfile("waveforms/cache_bank_tb.vcd");
-        $dumpvars(0, cache_bank_tb);
-    end
-
     cache_bank dut (
         .CLK(tb_clk),
         .nRST(tb_nrst),
@@ -192,7 +187,5 @@ program test (
         $display("  tb_scheduler_data_out: %d, tb_scheduler_uuid_out: %h, tb_scheduler_hit: %b", tb_scheduler_data_out, tb_scheduler_uuid_out, tb_scheduler_hit);
 
         repeat (10) @(posedge tb_clk);
-
-        $finish;
     end
 endprogram
