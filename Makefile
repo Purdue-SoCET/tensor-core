@@ -5,13 +5,15 @@ fc:
 %.sim:
 	vlog -sv -pedanticerrors -lint +incdir+./src/include/ \
 	     ./src/modules/$*.sv \
-	     ./src/testbench/$*_tb.sv
+	     ./src/testbench/$*_tb.sv \
+	     ./src/testbench/$*_bind.sv 
 	vsim -c -voptargs="+acc" work.$*_tb -do "run -all; quit"
 
 %.wav:
 	vlog -sv -pedanticerrors -lint +incdir+./src/include/ \
 	     ./src/modules/$*.sv \
-	     ./src/testbench/$*_tb.sv
+	     ./src/testbench/$*_tb.sv \
+	     ./src/testbench/$*_bind.sv 
 	vsim -voptargs="+acc" work.$*_tb -do "run -all"
 
 lint_%:

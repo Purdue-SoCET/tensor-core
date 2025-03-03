@@ -33,11 +33,12 @@ module cache_bank (
     
     cache_set [NUM_SETS_PER_BANK-1:0] bank, next_bank;
     
-    logic [WAYS_LEN-1:0] latched_victim_way_index, victim_way_index, hit_way_index;  
+    logic [WAYS_LEN-1:0] latched_victim_way_index, victim_way_index, hit_way_index;
+    logic [WAYS_LEN-1:0] max_way;
     logic [BLOCK_INDEX_BIT_LEN-1:0] latched_victim_set_index, set_index, victim_set_index; 
 
     lru_frame [NUM_SETS_PER_BANK-1:0] lru, next_lru;
-    
+    int max_age;
 
     assign set_index = mem_instr_in.addr.index >> BANKS_LEN;    
     assign victim_set_index = mshr_entry.block_addr.index >> BANKS_LEN; 
@@ -84,25 +85,26 @@ module cache_bank (
         else if (count_flush) count_FSM <= '0;
     end
 
-   always_comb begin : age_based_lru
-        next_lru = lru; 
+    always_comb begin : age_based_lru
+        next_lru = lru;
 
         if (scheduler_hit || (curr_state == FINISH)) begin
             for (int i = 0; i < NUM_SETS_PER_BANK; i++) begin
-                for (int j = 0; j <= NUM_WAYS - 1; j++) begin
-                    next_lru[i].age[j] = lru[i].age[j] + 1; 
-                    if (lru[i].age[lru[i].lru_way] < lru[i].age[j]) begin
-                        next_lru[i].lru_way = j[WAYS_LEN-1:0];
+                max_age = 0;
+                max_way = 0;
+
+                for (int j = 0; j < NUM_WAYS; j++) begin
+                    if (scheduler_hit) next_lru[set_index].age[hit_way_index] = 0;
+                    else if (curr_state == FINISH) next_lru[latched_victim_set_index].age[latched_victim_way_index] = 0;
+                    else next_lru[i].age[j] = lru[i].age[j] + 1;
+
+                    if (next_lru[i].age[j] > max_age) begin
+                        max_age = next_lru[i].age[j];
+                        max_way = j[WAYS_LEN-1:0];
                     end
                 end
-            end
-
-            if (scheduler_hit) begin
-                next_lru[set_index].age[hit_way_index] = 0;
-            end
-            
-            if (curr_state == FINISH) begin
-                next_lru[latched_victim_set_index].age[latched_victim_way_index] = 0;
+                
+                next_lru[i].lru_way = max_way;
             end
         end
     end

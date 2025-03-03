@@ -28,11 +28,6 @@ module cache_bank_tb;
         #(CLK_PERIOD/2);
     end
     
-    initial begin
-        $dumpfile("waveforms/cache_bank_tb.vcd");
-        $dumpvars(0, cache_bank_tb);
-    end
-
     cache_bank dut (
         .CLK(tb_clk),
         .nRST(tb_nrst),
@@ -51,6 +46,12 @@ module cache_bank_tb;
         .scheduler_data_out(tb_scheduler_data_out),
         .scheduler_uuid_out(tb_scheduler_uuid_out)
     );
+
+    bind cache_bank confirm_lru_age lru_mon_inst (
+        .CLK(CLK), 
+        .lru(lru)
+    );
+
 
     test PROG (
         .tb_clk(tb_clk),
@@ -114,6 +115,7 @@ program test (
     string test; 
 
     initial begin
+        $dumpfile("waveforms/cache_bank_tb.vcd");
         tb_nrst = 0;
         tb_bank_id = '0;
         tb_instr_valid = 0;
@@ -192,6 +194,7 @@ program test (
         $display("  tb_scheduler_data_out: %d, tb_scheduler_uuid_out: %h, tb_scheduler_hit: %b", tb_scheduler_data_out, tb_scheduler_uuid_out, tb_scheduler_hit);
 
         repeat (10) @(posedge tb_clk);
+        $dumpvars(0, cache_bank_tb);
 
         $finish;
     end
