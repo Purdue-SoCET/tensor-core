@@ -3,39 +3,102 @@
 `include "cache_types_pkg.svh";
 
 module RAM (
+    input logic CLK, nRST,
     input logic [31:0] ram_addr,
     input logic [31:0] ram_store,
-    input logic ram_REN, ram_WEN, ram_END
+    input logic ram_REN, ram_WEN, ram_END,
     output logic [31:0] ram_load,
     output logic ram_ready
 );
 
-    logic [31:0] ram_data [logic [31:0]];
-    logic [31:0] current_addr;
+    localparam cycle_delay = 100;
 
-    always begin
-        fork
-        if (ram_REN) begin
-            current_addr = ram_addr;
-            #100;
-            if (ram_data.exists(ram_addr)) begin
-                ram_load = ram_data[ram_addr];
-            end else begin
-                ram_load = 32'h0;
-            end
-            ram_ready = 1;
-            @(ram_addr != current_addr);
-        end else if (ram_WEN) begin
-            current_addr = ram_addr;
-            #100;
-            ram_data[ram_addr] = ram_store;
-            ram_ready = 1;
-            @(ram_addr != current_addr);
+
+    logic [31:0] ram_data [logic [31:0]];
+    logic [31:0] current_addr, prev_addr;
+    logic [31:0] counter, next_counter;
+    typedef enum logic [5:0] { start, ram_read, ram_write } state_t;
+    state_t state, next_state;
+    logic read, write;
+
+    assign current_addr = ram_addr;
+
+    always_ff @ (posedge CLK, negedge nRST) begin
+        if (!nRST) begin
+            counter <= 0;
+            state <= start;
+            prev_addr <= 0;
         end else begin
-            ram_ready = 0;
-            current_addr = 0;
+            counter <= next_counter;
+            state <= next_state;
+            prev_addr <= current_addr;
         end
-        join
+    end
+
+    always_comb begin
+        next_state = state;
+
+        case (state)
+            start: begin
+                if (ram_REN) begin
+                    next_state = ram_read;
+                end
+                if (ram_WEN) begin
+                    next_state = ram_write;
+                end
+            end
+            ram_read: begin
+                if (!ram_REN) begin
+                    next_state = ram_WEN ? ram_write : start;
+                end
+                if (current_addr != prev_addr) begin
+                    next_state = ram_WEN ? ram_write : (ram_REN ? ram_read : start);
+                end
+            end
+            ram_write: begin
+                if (!ram_WEN) begin
+                    next_state = ram_REN ? ram_read : start;
+                end
+                if (current_addr != prev_addr) begin
+                    next_state = ram_WEN ? ram_write : (ram_REN ? ram_read : start);
+                end
+            end
+        endcase
+    end
+
+    always_comb begin
+        next_counter = counter;
+        read = 0;
+        write = 0;
+        ram_ready = 0;
+        ram_load = 0;
+
+        case (state)
+            start: begin
+            end
+            ram_read: begin
+                if (!ram_REN || current_addr != prev_addr) begin
+                    next_counter = 0;
+                end else if (counter == cycle_delay) begin
+                    read = 1;
+                    ram_ready = 1;     
+                    ram_load = ram_data[current_addr];               
+                end else begin
+                    next_counter = counter + 1;
+                end
+            end
+            ram_write: begin
+                if (!ram_WEN || current_addr != prev_addr) begin
+                    next_counter = 0;
+                end else if (counter == cycle_delay) begin
+                    write = 1;
+                    ram_ready = 1;
+                    ram_data[current_addr] = ram_store;
+                end else begin
+                    next_counter = counter + 1;
+                end
+            end   
+        endcase
     end
 
 
@@ -53,12 +116,15 @@ module lockup_free_cache_tb;
     logic tb_ram_END;
 
     RAM u_RAM (
+        .CLK (tb_clk),
+        .nRST (tb_nrst),
         .ram_addr     (tb_ram_addr),
         .ram_store    (tb_ram_store),
         .ram_REN      (tb_ram_REN),
         .ram_WEN      (tb_ram_WEN),
         .ram_load     (tb_ram_load),
-        .ram_ready    (tb_ram_ready)
+        .ram_ready    (tb_ram_ready),
+        .ram_END (tb_ram_END)
     );
 
     always begin
@@ -83,8 +149,17 @@ module lockup_free_cache_tb;
         tb_ram_addr = 32'h4567;
         tb_ram_store = 32'h5678;
         tb_ram_WEN = 1;
-        while (tb_ram_ready == 0);
+        while (tb_ram_ready == 0) begin
+            @(posedge tb_clk);
+        end
         tb_ram_WEN = 0;
+        tb_ram_REN = 1;
+        @(posedge tb_clk);
+        while (tb_ram_ready == 0) begin
+            @(posedge tb_clk);
+        end
+        $display("%08x:%08x", tb_ram_addr, tb_ram_load);
+        tb_ram_REN = 0;
         $finish;
     end
 
