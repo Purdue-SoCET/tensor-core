@@ -6,12 +6,12 @@ module RAM (
     input logic CLK, nRST,
     input logic [31:0] ram_addr,
     input logic [31:0] ram_store,
-    input logic ram_REN, ram_WEN, ram_END,
+    input logic ram_REN, ram_WEN,
     output logic [31:0] ram_load,
     output logic ram_ready
 );
 
-    localparam cycle_delay = 100;
+    localparam cycle_delay = 5;
 
 
     logic [31:0] ram_data [logic [31:0]];
@@ -19,7 +19,6 @@ module RAM (
     logic [31:0] counter, next_counter;
     typedef enum logic [5:0] { start, ram_read, ram_write } state_t;
     state_t state, next_state;
-    logic read, write;
 
     assign current_addr = ram_addr;
 
@@ -68,8 +67,6 @@ module RAM (
 
     always_comb begin
         next_counter = counter;
-        read = 0;
-        write = 0;
         ram_ready = 0;
         ram_load = 0;
 
@@ -80,9 +77,9 @@ module RAM (
                 if (!ram_REN || current_addr != prev_addr) begin
                     next_counter = 0;
                 end else if (counter == cycle_delay) begin
-                    read = 1;
-                    ram_ready = 1;     
+                    ram_ready = 1;
                     ram_load = ram_data[current_addr];               
+                    $display("read from %08x: %08x", current_addr, ram_load);     
                 end else begin
                     next_counter = counter + 1;
                 end
@@ -91,7 +88,6 @@ module RAM (
                 if (!ram_WEN || current_addr != prev_addr) begin
                     next_counter = 0;
                 end else if (counter == cycle_delay) begin
-                    write = 1;
                     ram_ready = 1;
                     ram_data[current_addr] = ram_store;
                 end else begin
@@ -104,28 +100,12 @@ module RAM (
 
 endmodule
 
+
 module lockup_free_cache_tb;
     localparam CLK_PERIOD = 1;
 
     logic tb_clk;
     logic tb_nrst;
-    logic [31:0] tb_ram_addr;
-    logic [31:0] tb_ram_load;
-    logic [31:0] tb_ram_store;
-    logic tb_ram_REN, tb_ram_WEN, tb_ram_ready;
-    logic tb_ram_END;
-
-    RAM u_RAM (
-        .CLK (tb_clk),
-        .nRST (tb_nrst),
-        .ram_addr     (tb_ram_addr),
-        .ram_store    (tb_ram_store),
-        .ram_REN      (tb_ram_REN),
-        .ram_WEN      (tb_ram_WEN),
-        .ram_load     (tb_ram_load),
-        .ram_ready    (tb_ram_ready),
-        .ram_END (tb_ram_END)
-    );
 
     always begin
         tb_clk = 1'b0;
@@ -134,34 +114,126 @@ module lockup_free_cache_tb;
         #(CLK_PERIOD/2.0);
     end
 
+    logic tb_mem_in;
+    logic [3:0] tb_mem_in_uuid;
+    logic [31:0] tb_mem_in_addr;
+    logic tb_mem_in_rw_mode;
+    logic [31:0] tb_mem_in_store_value;
+    logic tb_stall;
+    logic tb_hit;
+    logic [31:0] tb_hit_load;
+    logic [NUM_BANKS-1:0] tb_block_status;
+    logic [NUM_BANKS-1:0][3:0] tb_uuid_block;
+    logic [NUM_BANKS-1:0] tb_ram_mem_REN;
+    logic [NUM_BANKS-1:0] tb_ram_mem_WEN;
+    logic [NUM_BANKS-1:0][31:0] tb_ram_mem_addr;
+    logic [NUM_BANKS-1:0][31:0] tb_ram_mem_store;
+    logic [NUM_BANKS-1:0][31:0] tb_ram_mem_data;
+    logic [NUM_BANKS-1:0] tb_ram_mem_complete;
+
+
+
+    lockup_free_cache u_lockup_free_cache (
+        .CLK                   (tb_clk),
+        .nRST                  (tb_nrst),
+        .mem_in                (tb_mem_in),
+        .mem_in_uuid           (tb_mem_in_uuid),
+        .mem_in_addr           (tb_mem_in_addr),
+        .mem_in_rw_mode        (tb_mem_in_rw_mode),
+        // 0 = read, 1 = writetb_
+        .mem_in_store_value    (tb_mem_in_store_value),
+        .stall                 (tb_stall),
+        .hit                   (tb_hit),
+        .hit_load              (tb_hit_load),
+        .block_status          (tb_block_status),
+        .uuid_block            (tb_uuid_block),
+        // RAM Signalstb_
+        .ram_mem_REN           (tb_ram_mem_REN),
+        .ram_mem_WEN           (tb_ram_mem_WEN),
+        .ram_mem_addr          (tb_ram_mem_addr),
+        .ram_mem_store         (tb_ram_mem_store),
+        .ram_mem_data          (tb_ram_mem_data),
+        .ram_mem_complete      (tb_ram_mem_complete)
+    );
+
+    genvar i;
+    generate
+        for (i = 0; i < NUM_BANKS; i++) begin : RAM_GEN
+            RAM u_RAM (
+                .CLK          (tb_clk),
+                .nRST         (tb_nrst),
+                .ram_addr     (tb_ram_mem_addr[i]),
+                .ram_store    (tb_ram_mem_store[i]),
+                .ram_REN      (tb_ram_mem_REN[i]),
+                .ram_WEN      (tb_ram_mem_WEN[i]),
+                .ram_load     (tb_ram_mem_data[i]),
+                .ram_ready    (tb_ram_mem_complete[i])
+            );
+        end
+    endgenerate
+
+    task data_read(input logic [31:0] addr, input logic [3:0] uuid, output logic [31:0] data);
+        @(posedge tb_clk);
+        tb_mem_in = 1;
+        tb_mem_in_uuid = uuid;
+        tb_mem_in_addr = addr;
+        tb_mem_in_rw_mode = 0;
+        tb_mem_in_store_value = 0;
+        @(negedge tb_clk);
+        $display("hit status: %d", tb_hit);
+        if (!tb_hit) begin
+            $display("miss!");
+            @(posedge tb_clk);
+            tb_mem_in = 0;
+            tb_mem_in_uuid = uuid;
+            tb_mem_in_addr = addr;
+            tb_mem_in_rw_mode = 0;
+            while (tb_block_status == 0) begin
+                @(posedge tb_clk);
+            end
+        end else begin
+            $display("hit!");
+            data = tb_hit_load;
+        end
+    endtask
+
+    task data_write(input logic [31:0] addr, input logic [3:0] uuid, input logic [31:0] data);
+        @(posedge tb_clk);
+        tb_mem_in = 1;
+        tb_mem_in_uuid = uuid;
+        tb_mem_in_addr = addr;
+        tb_mem_in_rw_mode = 1;
+        tb_mem_in_store_value = data;
+        if (!tb_hit) begin
+            $display("write miss!");
+            @(posedge tb_clk);
+            tb_mem_in = 0;
+            while (tb_block_status == 0) begin
+                @(posedge tb_clk);
+            end
+            $display("miss finished!");
+        end else begin
+            $display("hit!");
+        end
+    endtask
+
+
+    logic [31:0] data_out;
+
     initial begin
         tb_nrst = 0;
-        tb_ram_addr = 32'h0;
-        tb_ram_store = 32'h0;
-        tb_ram_REN = 0;
-        tb_ram_WEN = 0;
-        tb_ram_END = 0;
-
+        tb_mem_in = 0;
+        tb_mem_in_uuid = 0;
+        tb_mem_in_addr = 0;
+        tb_mem_in_rw_mode = 0;
+        tb_mem_in_store_value = 0;
         @(negedge tb_clk);
         tb_nrst = 1;
-
         @(posedge tb_clk);
-        tb_ram_addr = 32'h4567;
-        tb_ram_store = 32'h5678;
-        tb_ram_WEN = 1;
-        while (tb_ram_ready == 0) begin
-            @(posedge tb_clk);
-        end
-        tb_ram_WEN = 0;
-        tb_ram_REN = 1;
-        @(posedge tb_clk);
-        while (tb_ram_ready == 0) begin
-            @(posedge tb_clk);
-        end
-        $display("%08x:%08x", tb_ram_addr, tb_ram_load);
-        tb_ram_REN = 0;
+        $display("starting!");
+        data_write(32'h4567, 4'd5, 32'h5678);
+        data_read(32'h4567, 4'd6, data_out);
         $finish;
     end
-
 
 endmodule
