@@ -356,6 +356,14 @@ class AluImm(Op):
         funct3 = int(RISCV.get_funct3(self.opcode).value)
         imm = self.args[1].value & 0xFFF  # Ensure imm is 12-bit
         self.bytes = (imm << 20) | (self.args[0].num << 15) | (funct3 << 12) | (self.destination.num << 7) | opcode
+        
+
+# LI Instruction (I-type)
+class Li(Macro):
+    def __init__(self, l, opcode, filename, line_number):
+        super().__init__(l, opcode, filename, line_number)
+        self.parseoperands()
+    
     
 # Branches
 class Branch(AluImm):
