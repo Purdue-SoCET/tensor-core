@@ -7,14 +7,14 @@ fc:
 	     ./src/modules/$*.sv \
 	     ./src/testbench/$*_tb.sv \
 	     ./src/testbench/$*_bind.sv 
-	vsim -c -voptargs="+acc" work.$*_tb -do "run -all; quit"
+	vsim -c -voptargs="+acc" work.$*_tb -do  "run -all; quit"
 
 %.wav:
 	vlog -sv -pedanticerrors -lint +incdir+./src/include/ \
 	     ./src/modules/$*.sv \
 	     ./src/testbench/$*_tb.sv \
 	     ./src/testbench/$*_bind.sv 
-	vsim -voptargs="+acc" work.$*_tb -do "run -all"
+	vsim -voptargs="+acc" work.$*_tb -do "view objects; do ./waveforms/$*.do; run -all;" -onfinish stop
 
 lint_%:
 	vlog -sv -pedanticerrors -lint +incdir+./src/include/ \

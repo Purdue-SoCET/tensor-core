@@ -53,6 +53,10 @@ typedef struct packed {
     cache_block block; // 1 word -> 4 bytes -> 32 bits, each block is X words
 } cache_frame;
 
+typedef enum logic [2:0] { 
+    START, BLOCK_PULL, VICTIM_EJECT, FINISH 
+} bank_fsm_states; 
+
 typedef cache_frame [NUM_WAYS-1:0] cache_set;
 
 `endif

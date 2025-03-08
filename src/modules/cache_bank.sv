@@ -19,12 +19,10 @@ module cache_bank (
     output logic scheduler_uuid_ready
 );
 
-    typedef enum logic [2:0] { 
-        START, BLOCK_PULL, VICTIM_EJECT, FINISH 
-    } states; 
+
 
     logic [BLOCK_OFF_BIT_LEN-1:0] count_FSM;
-    states curr_state, next_state; 
+    bank_fsm_states curr_state, next_state; 
     logic count_enable; 
     logic count_flush; 
     logic wrong_state; // Debugging?
@@ -34,8 +32,7 @@ module cache_bank (
     
     cache_set [NUM_SETS_PER_BANK-1:0] bank, next_bank;
     
-    logic [WAYS_LEN-1:0] latched_victim_way_index, victim_way_index, hit_way_index;
-    logic [WAYS_LEN-1:0] max_way;
+    logic [WAYS_LEN-1:0] latched_victim_way_index, victim_way_index, hit_way_index, max_way;
     logic [BLOCK_INDEX_BIT_LEN-1:0] latched_victim_set_index, set_index, victim_set_index; 
 
     lru_frame [NUM_SETS_PER_BANK-1:0] lru, next_lru;
@@ -72,10 +69,10 @@ module cache_bank (
                     latched_victim_way_index <= '0;
                     latched_victim_eject_buffer <= '0;
                     latched_victim_eject_buffer <= '0;
-                end
+                end 
             end else if ((curr_state == BLOCK_PULL) && (ram_mem_complete || (count_FSM == 0))) begin 
                 latched_block_pull_buffer.block[count_FSM] <= ram_mem_data;
-            end 
+            end
         end 
     end 
 
@@ -180,7 +177,9 @@ module cache_bank (
                 ram_mem_WEN = 1'b1; 
             end
             FINISH: begin 
-                cache_bank_busy = 0; 
+                // Note: This forces the MSHR Entry to update on the next clock edge, so 
+                // we have a new one on the START
+                cache_bank_busy = 1; 
                 next_bank[latched_victim_set_index][latched_victim_way_index].valid = 1'b1; 
                 next_bank[latched_victim_set_index][latched_victim_way_index].dirty = |mshr_entry.write_status; 
                 next_bank[latched_victim_set_index][latched_victim_way_index].tag = mshr_entry.block_addr.tag; 
