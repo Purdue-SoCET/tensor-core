@@ -2,18 +2,18 @@ fc:
 	vlog -sv ./src/testbench/flex_counter_tb.sv ./src/modules/flex_counter.sv
 	vsim -voptargs="+acc" work.flex_counter_tb
 
-%.sim:
+%.log: 
+	@if [ ! -f ./src/testbench/$*_bind.sv ]; then \
+	    echo "// Empty file" > ./src/testbench/$*_bind.sv; \
+	fi
 	vlog -sv -pedanticerrors -lint +incdir+./src/include/ \
 	     ./src/modules/$*.sv \
-	     ./src/testbench/$*_tb.sv \
-	     ./src/testbench/$*_bind.sv 
+	     ./src/testbench/$*_tb.sv 
+
+%.sim: %.log
 	vsim -c -voptargs="+acc" work.$*_tb -do  "run -all; quit"
 
-%.wav:
-	vlog -sv -pedanticerrors -lint +incdir+./src/include/ \
-	     ./src/modules/$*.sv \
-	     ./src/testbench/$*_tb.sv \
-	     ./src/testbench/$*_bind.sv 
+%.wav: %.log
 	vsim -voptargs="+acc" work.$*_tb -do "view objects; do ./waveforms/$*.do; run -all;" -onfinish stop
 
 lint_%:

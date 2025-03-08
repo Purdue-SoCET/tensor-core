@@ -3,10 +3,10 @@
 module lockup_free_cache (
     input logic CLK, nRST,
     input logic mem_in,
-    input logic [3:0] mem_in_uuid,
     input logic [31:0] mem_in_addr,
     input logic mem_in_rw_mode, // 0 = read, 1 = write
     input logic [31:0] mem_in_store_value,
+    output logic [3:0] mem_out_uuid,
     output logic stall,
     output logic hit,
     output logic [31:0] hit_load,
@@ -19,13 +19,12 @@ module lockup_free_cache (
     output logic [NUM_BANKS-1:0][31:0] ram_mem_addr,
     output logic [NUM_BANKS-1:0][31:0] ram_mem_store,
     input logic [NUM_BANKS-1:0][31:0] ram_mem_data,
-    input logic [NUM_BANKS-1:0]ram_mem_complete
+    input logic [NUM_BANKS-1:0] ram_mem_complete
 );
 
     in_mem_instr hit_check_instr;
     logic [NUM_BANKS-1:0] hit_check;
 
-    assign hit_check_instr.uuid = mem_in_uuid;
     assign hit_check_instr.addr = addr_t'(mem_in_addr);
     assign hit_check_instr.rw_mode = mem_in_rw_mode;
     assign hit_check_instr.store_value = mem_in_store_value;
@@ -37,13 +36,13 @@ module lockup_free_cache (
     logic [NUM_BANKS-1:0] bank_stall;
     logic [NUM_BANKS-1:0] bank_busy;
     logic [NUM_BANKS-1:0][31:0] hit_return_load;
+    logic [NUM_BANKS-1:0][UUID_SIZE-1:0] bank_uuids;
 
     mshr_reg [NUM_BANKS-1:0] mshr_out;
 
     logic [BANKS_LEN-1:0] bank_id;
     assign bank_id = mem_in_addr & (NUM_BANKS - 1);
     
-    assign new_miss.uuid = mem_in_uuid;
     assign new_miss.addr = addr_t'(mem_in_addr);
     assign new_miss.rw_mode = mem_in_rw_mode;
     assign new_miss.store_value = mem_in_store_value;
@@ -58,7 +57,8 @@ module lockup_free_cache (
                 .mem_instr     (new_miss),
                 .bank_empty    (~bank_busy[i]),
                 .mshr_out      (mshr_out[i]),
-                .stall         (bank_stall[i])
+                .stall         (bank_stall[i]),
+                .uuid_out      (bank_uuids[i])
             );
             cache_bank u_cache_bank (
                 .CLK                   (CLK),
@@ -93,8 +93,9 @@ module lockup_free_cache (
         hit = 0;
         hit_load = 0;
         hit_check = 0;
+        mem_out_uuid = '0; 
 
-        if (bank_hit == 0 && mem_in) begin
+        if (bank_hit == '0 && mem_in) begin
             miss[bank_id] = 1;
         end
         if (bank_stall != 0) begin
@@ -108,6 +109,7 @@ module lockup_free_cache (
         end
 
         hit_check[bank_id] = 1;
+        mem_out_uuid = bank_uuids[bank_id];
     end
 
 endmodule

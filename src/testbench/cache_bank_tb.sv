@@ -155,13 +155,12 @@ program test (
         logic [BLOCK_INDEX_BIT_LEN-1:0] index,
         logic [BLOCK_OFF_BIT_LEN-1:0] block_offset,
         logic [BYTE_OFF_BIT_LEN-1:0] byte_offset,
-        logic [3:0] uuid,
         logic rw_mode,
         logic [31:0] store_value
     ); 
         tb_instr_valid = 1;
         address = { tag, index, block_offset, byte_offset }; 
-        tb_mem_instr  = {uuid, address, rw_mode, store_value };
+        tb_mem_instr  = {address, rw_mode, store_value };
         @(posedge tb_clk);
         tb_instr_valid = 0;
         log_ram_inputs(1, tb_ram_mem_complete, tb_ram_mem_addr, tb_ram_mem_store, tb_ram_mem_WEN, tb_ram_mem_REN, tb_cache_bank_busy, tb_scheduler_data_out, tb_scheduler_uuid_out, tb_scheduler_hit, tb_scheduler_uuid_ready);
@@ -273,7 +272,6 @@ program test (
             .index(4'd15), 
             .block_offset(2'b00), 
             .byte_offset(2'b00), 
-            .uuid(4'd9), 
             .rw_mode(1'b0), 
             .store_value(32'd0)
         );
@@ -302,7 +300,6 @@ program test (
             .index(4'd15), 
             .block_offset(2'b00), 
             .byte_offset(2'b00), 
-            .uuid(4'd9), 
             .rw_mode(1'b0), 
             .store_value(32'd0)
         );
@@ -342,7 +339,6 @@ program test (
                         $urandom_range(0, NUM_SETS-1), 
                         $urandom_range(0, BLOCK_SIZE-1), 
                         '0, 
-                        $urandom_range(0,15), 
                         $urandom_range(0,1), 
                         CACHE_RW_SIZE'(32'hBEEFDEAD)
                     );

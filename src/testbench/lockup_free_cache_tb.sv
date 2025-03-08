@@ -13,7 +13,6 @@ module RAM (
 
     localparam cycle_delay = 5;
 
-
     logic [31:0] ram_data [logic [31:0]];
     logic [31:0] current_addr, prev_addr;
     logic [31:0] counter, next_counter;
@@ -115,7 +114,8 @@ module lockup_free_cache_tb;
     end
 
     logic tb_mem_in;
-    logic [3:0] tb_mem_in_uuid;
+    logic [UUID_SIZE-1:0] tb_mem_out_uuid;
+    logic [UUID_SIZE-1:0] uuid;
     logic [31:0] tb_mem_in_addr;
     logic tb_mem_in_rw_mode;
     logic [31:0] tb_mem_in_store_value;
@@ -131,13 +131,11 @@ module lockup_free_cache_tb;
     logic [NUM_BANKS-1:0][31:0] tb_ram_mem_data;
     logic [NUM_BANKS-1:0] tb_ram_mem_complete;
 
-
-
     lockup_free_cache u_lockup_free_cache (
         .CLK                   (tb_clk),
         .nRST                  (tb_nrst),
         .mem_in                (tb_mem_in),
-        .mem_in_uuid           (tb_mem_in_uuid),
+        .mem_out_uuid           (tb_mem_out_uuid),
         .mem_in_addr           (tb_mem_in_addr),
         .mem_in_rw_mode        (tb_mem_in_rw_mode),
         // 0 = read, 1 = writetb_
@@ -172,10 +170,9 @@ module lockup_free_cache_tb;
         end
     endgenerate
 
-    task data_read(input logic [31:0] addr, input logic [3:0] uuid, output logic [31:0] data);
+    task data_read(input logic [31:0] addr, output logic [31:0] data);
         @(posedge tb_clk);
         tb_mem_in = 1;
-        tb_mem_in_uuid = uuid;
         tb_mem_in_addr = addr;
         tb_mem_in_rw_mode = 0;
         tb_mem_in_store_value = 0;
@@ -185,7 +182,6 @@ module lockup_free_cache_tb;
             $display("miss!");
             @(posedge tb_clk);
             tb_mem_in = 0;
-            tb_mem_in_uuid = uuid;
             tb_mem_in_addr = addr;
             tb_mem_in_rw_mode = 0;
             while (tb_block_status == 0) begin
@@ -197,10 +193,9 @@ module lockup_free_cache_tb;
         end
     endtask
 
-    task data_write(input logic [31:0] addr, input logic [3:0] uuid, input logic [31:0] data);
+    task data_write(input logic [31:0] addr, input logic [31:0] data);
         @(posedge tb_clk);
         tb_mem_in = 1;
-        tb_mem_in_uuid = uuid;
         tb_mem_in_addr = addr;
         tb_mem_in_rw_mode = 1;
         tb_mem_in_store_value = data;
@@ -223,7 +218,6 @@ module lockup_free_cache_tb;
     initial begin
         tb_nrst = 0;
         tb_mem_in = 0;
-        tb_mem_in_uuid = 0;
         tb_mem_in_addr = 0;
         tb_mem_in_rw_mode = 0;
         tb_mem_in_store_value = 0;
@@ -231,8 +225,8 @@ module lockup_free_cache_tb;
         tb_nrst = 1;
         @(posedge tb_clk);
         $display("starting!");
-        data_write(32'h4567, 4'd5, 32'h5678);
-        data_read(32'h4567, 4'd6, data_out);
+        data_write(32'h4567, 32'h5678);
+        data_read(32'h4567, data_out);
         $finish;
     end
 
