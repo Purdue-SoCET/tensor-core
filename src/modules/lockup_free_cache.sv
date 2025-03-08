@@ -14,12 +14,12 @@ module lockup_free_cache (
     output logic [NUM_BANKS-1:0][3:0] uuid_block,
 
     // RAM Signals
-    output logic ram_mem_REN,
-    output logic ram_mem_WEN,
-    output logic [31:0] ram_mem_addr,
-    output logic [31:0] ram_mem_store,
-    input logic [31:0] ram_mem_data,
-    input logic ram_mem_complete
+    output logic [NUM_BANKS-1:0] ram_mem_REN,
+    output logic [NUM_BANKS-1:0] ram_mem_WEN,
+    output logic [NUM_BANKS-1:0][31:0] ram_mem_addr,
+    output logic [NUM_BANKS-1:0][31:0] ram_mem_store,
+    input logic [NUM_BANKS-1:0][31:0] ram_mem_data,
+    input logic [NUM_BANKS-1:0]ram_mem_complete
 );
 
     in_mem_instr hit_check_instr;
@@ -36,7 +36,7 @@ module lockup_free_cache (
     logic [NUM_BANKS-1:0] bank_hit;
     logic [NUM_BANKS-1:0] bank_stall;
     logic [NUM_BANKS-1:0] bank_busy;
-    logic [NUM_BANKS-1:0] hit_return_load;
+    logic [NUM_BANKS-1:0][31:0] hit_return_load;
 
     mshr_reg [NUM_BANKS-1:0] mshr_out;
 
@@ -67,19 +67,19 @@ module lockup_free_cache (
                 // for requesting RAM
                 .instr_valid           (hit_check[i]),
                 // valid single-cycle request 
-                .ram_mem_data          (ram_mem_data),
+                .ram_mem_data          (ram_mem_data[i]),
                 // data incoming from RAM
                 .mshr_entry            (mshr_out[i]),
                 .mem_instr_in          (hit_check_instr),
-                .ram_mem_complete      (ram_mem_complete),
+                .ram_mem_complete      (ram_mem_complete[i]),
                 // RAM completed operation
                 .cache_bank_busy       (bank_busy[i]),
                 // High when MSHR in-flight
                 .scheduler_hit         (bank_hit[i]),
-                .ram_mem_REN           (ram_mem_REN),
-                .ram_mem_WEN           (ram_mem_WEN),
-                .ram_mem_store         (ram_mem_store),
-                .ram_mem_addr          (ram_mem_addr),
+                .ram_mem_REN           (ram_mem_REN[i]),
+                .ram_mem_WEN           (ram_mem_WEN[i]),
+                .ram_mem_store         (ram_mem_store[i]),
+                .ram_mem_addr          (ram_mem_addr[i]),
                 .scheduler_data_out    (hit_return_load[i]),
                 .scheduler_uuid_out    (uuid_block[i]),
                 .scheduler_uuid_ready  (block_status[i])
@@ -91,22 +91,23 @@ module lockup_free_cache (
         miss = 0;
         stall = 0;
         hit = 0;
-        block_status = 0;
-        uuid_block = 0;
         hit_load = 0;
+        hit_check = 0;
 
-        if (bank_hit == 0) begin
+        if (bank_hit == 0 && mem_in) begin
             miss[bank_id] = 1;
         end
         if (bank_stall != 0) begin
             stall = 1;
         end
         for (int j = 0; j < NUM_BANKS; j++) begin
-            if (bank_hit[j]) begin
+            if (bank_hit[j] && mem_in) begin
                 hit = 1;
                 hit_load = hit_return_load[j];
             end
         end
+
+        hit_check[bank_id] = 1;
     end
 
 endmodule

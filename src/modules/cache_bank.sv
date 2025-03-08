@@ -80,6 +80,7 @@ module cache_bank (
         if (!nRST) count_FSM <= '0;
         else if (count_enable) count_FSM <= count_FSM + 1;
         else if (count_flush) count_FSM <= '0;
+        else count_FSM <= count_FSM;
     end
 
     always_comb begin : age_based_lru
@@ -150,31 +151,25 @@ module cache_bank (
                 cache_bank_busy = 1; 
                 if (count_FSM != (BLOCK_OFF_BIT_LEN'(BLOCK_SIZE - 1))) count_flush = 1'b0; 
 
-                if (ram_mem_complete || (count_FSM == 0)) begin 
-                    ram_mem_addr = {bank[latched_victim_set_index][latched_victim_way_index].tag, mshr_entry.block_addr.index, count_FSM, 2'b00}; 
-                    
-                    count_enable = 1'b1; 
 
-                    if (mshr_entry.write_status[count_FSM] == 1) begin 
-                        ram_mem_WEN = 1;  
-                        ram_mem_store = latched_victim_eject_buffer.block[count_FSM];
-                    end else begin
-                        ram_mem_REN = 1;
-                        ram_mem_store = '0;
-                    end 
+                if (ram_mem_complete) begin
+                    count_enable = 1'b1;
                 end
+
+                ram_mem_REN = 1;
+                ram_mem_addr = {mshr_entry.block_addr.tag, mshr_entry.block_addr.index, BLOCK_INDEX_BIT_LEN'(count_FSM), 2'b0};
             end 
             VICTIM_EJECT: begin 
                 cache_bank_busy = 1; 
                 if (count_FSM != BLOCK_OFF_BIT_LEN'(BLOCK_SIZE - 1)) count_flush = 1'b0; 
 
-                if (ram_mem_complete || (count_FSM == 0)) begin 
-                    ram_mem_store = latched_victim_eject_buffer.block[count_FSM];
-                    ram_mem_addr = {latched_victim_eject_buffer.tag, ((latched_victim_set_index << BANKS_LEN) | BLOCK_INDEX_BIT_LEN'(bank_id)), count_FSM, 2'b00}; 
-                    count_enable = 1'b1; 
+                if (ram_mem_complete) begin
+                    count_enable = 1'b1;
                 end
 
                 ram_mem_WEN = 1'b1; 
+                ram_mem_addr = {latched_victim_eject_buffer.tag, latched_victim_set_index << BANKS_LEN, BLOCK_INDEX_BIT_LEN'(count_FSM), 2'b0};
+                ram_mem_store = latched_victim_eject_buffer.block[count_FSM];
             end
             FINISH: begin 
                 // Note: This forces the MSHR Entry to update on the next clock edge, so 
