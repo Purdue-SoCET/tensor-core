@@ -33,27 +33,13 @@ module cache_mshr_buffer (
         mshr_new_miss.write_block[mem_instr.addr.block_offset] = mem_instr.store_value;
     end
 
-    always_ff @(posedge CLK or negedge nRST) begin
-        if (!nRST)
-            uuid <= 0;
-        else if (miss && (secondary_misses == 0) && (!buffer[0].valid || bank_empty))
-            uuid <= next_uuid; 
-    end
-
-    always_ff @ (posedge CLK, negedge nRST) begin
-        if (!nRST) uuid <= 0;
-        else begin
-            if (miss && (secondary_misses == 0) && (!buffer[0].valid || bank_empty)) begin
-                uuid <= next_uuid; 
-            end
-        end
-    end
-
     always_ff @( posedge CLK, negedge nRST ) begin
         if (!nRST) begin
             buffer <= 0;
+            uuid <= 0;
         end else begin
             buffer <= next_buffer;
+            if (miss && (secondary_misses == 0) && (!buffer[0].valid || bank_empty)) uuid <= next_uuid;
         end
     end
 
