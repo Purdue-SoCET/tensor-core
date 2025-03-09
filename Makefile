@@ -25,7 +25,7 @@ scratchpad:
      ./src/modules/gemm_FSM.sv \
      ./src/modules/dramstore_FSM.sv \
      ./src/modules/socetlib_fifo.sv \
-	vsim work.scratchpad_tb 
+	vsim work.scratchpad_tb
 
 fc:
 	vlog -sv ./src/testbench/flex_counter_tb.sv ./src/modules/flex_counter.sv

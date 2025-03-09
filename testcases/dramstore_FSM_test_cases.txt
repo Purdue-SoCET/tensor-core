@@ -1,0 +1,4 @@
+- set each FIFO's emty signals 
+    - ensure correct priority of operation
+    - ensure correct operation of sStore
+    - ensure correct value are sent to DRAM

@@ -43,12 +43,17 @@ module scratchpad_bank (
         {w_mat_sel, w_row_sel, wdat} = '0;
         wen = 1'b0;
         wFIFO_REN = 1'b0;
+        spif.gemm_complete = 1'b0;
+        spif.load_complete = 1'b0;
         if (wFIFO_empty == 1'b0) begin
             {w_mat_sel, w_row_sel, wdat} = wFIFO_rdata;
             wen = 1'b1;
             wFIFO_REN = 1'b1;
             if (wFIFO_rdata[68]) begin
                 spif.gemm_complete = 1'b1;
+            end
+            else begin
+                spif.load_complete = 1'b1;
             end
         end
     end

@@ -58,6 +58,7 @@ module scratchpad (
 
     //Outputs
     assign spif.gemm_complete = (spbif0.gemm_complete || spbif1.gemm_complete || spbif2.gemm_complete || spbif3.gemm_complete);
+    assign spif.load_complete = (spbif0.load_complete || spbif1.load_complete || spbif2.load_complete || spbif3.load_complete);
     assign spif.partial_enable = gfsmif.partial_enable;
     assign spif.weight_enable = gfsmif.weight_enable;
     assign spif.input_enable = gfsmif.input_enable;
