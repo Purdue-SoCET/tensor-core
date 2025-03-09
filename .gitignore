@@ -2,3 +2,5 @@ transcript
 work/
 .venv
 vsim.*
+out.bin
+kernels/out.ops

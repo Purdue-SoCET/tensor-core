@@ -6,16 +6,16 @@
 #--------------------------------------
 org 0x0000
 
-li t0, 1
-li t1, 0xF # FAIL
-li t2, 0xECE437 # PASS
+li $0, 1
+li $6, 0xF # FAIL
+li $7, 0xECE437 # PASS
 
-beq t2, t0, beq_check
-sw t2, 400(a0)
+beq $7, $0, beq_check
+sw $7, 400($10)
 j exit
 
 beq_check:
- sw t1, 400(a0)
+ sw $6, 400($10)
 
 exit:
 halt

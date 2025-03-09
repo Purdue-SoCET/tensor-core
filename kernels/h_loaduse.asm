@@ -1,8 +1,8 @@
 org 0x0000
-li x10, 0xFFF
+li $10, 0xFFF
 
-lw x10, 0(x0)
-addi x11, x10, 5
-sw x11, 200(x0)
+lw $10, 0($0)
+addi $11, $10, 5
+sw $11, 200($0)
 
 halt

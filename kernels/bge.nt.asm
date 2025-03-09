@@ -6,16 +6,16 @@
 #--------------------------------------
 org 0x0000
 
-li t0, 1
-li t1, 0xF # FAIL
-li t2, 0xECE437 # PASS
+li $5, 1
+li $6, 0xF # FAIL
+li $7, 0xECE437 # PASS
 
-bge t0, t2, bge_check 
-sw t2, 400(a0)
+bge $5, $7, bge_check 
+sw $7, 400($10)
 j exit
 
 bge_check:
- sw t1, 400(a0)
+ sw $6, 400($10)
 
 exit:
 halt

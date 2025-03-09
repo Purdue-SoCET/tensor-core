@@ -356,15 +356,8 @@ class AluImm(Op):
         funct3 = int(RISCV.get_funct3(self.opcode).value)
         imm = self.args[1].value & 0xFFF  # Ensure imm is 12-bit
         self.bytes = (imm << 20) | (self.args[0].num << 15) | (funct3 << 12) | (self.destination.num << 7) | opcode
-        
-
-# LI Instruction (I-type)
-class Li(Macro):
-    def __init__(self, l, opcode, filename, line_number):
-        super().__init__(l, opcode, filename, line_number)
-        self.parseoperands()
-    
-    
+            
+            
 # Branches
 class Branch(AluImm):
     def __init__(self, l, opcode, filename, line_number):
@@ -445,9 +438,32 @@ class Jr(Macro):
         jalr = Jalr(f"jal {self.args[0]}", "jalr", self.filename, self.line_number)
         jalr.args = (jalr.args[0], GPRegister("$0"))
         return []
-
-class Renderer():
     
+# LI Instruction (I-type)
+class Li(Macro):
+    def __init__(self, l, opcode, filename, line_number):
+        super().__init__(l, opcode, filename, line_number)
+        self.parseoperands()
+    
+    def parseoperands(self):
+        match_li = re.match(r"^\s*li\s+(?P<dest>\$\d+)\s*,\s*(?P<imm>-?\w+)", self.line)
+        self.throw_parse_error(match_li is not None)
+        self.destination = GPRegister(match_li.group("dest"))
+        self.args = (Immediate(match_li.group("imm")),)
+
+    def expand(self):
+        imm = self.args[0].value
+        if -2048 <= imm <= 2047:  # 12-bit immediate
+            return [AluImm(f"addi {self.destination}, $0, {imm}", "addi", self.filename, self.line_number)]
+        else:  # Needs LUI + ADDI
+            upper = (imm + 0x800) >> 12  # Sign extension
+            lower = imm & 0xFFF
+            return [
+                Lui(f"lui {self.destination}, {upper}", "lui", self.filename, self.line_number),
+                AluImm(f"addi {self.destination}, {self.destination}, {lower}", "addi", self.filename, self.line_number)
+            ]
+            
+class Renderer():
     filename: str
     code: list[str]
     ops: list[Op]
@@ -493,6 +509,7 @@ class Renderer():
         "srai": AluImm,
         "ori": AluImm,
         "andi": AluImm,
+        "li": Li,
         
         "add": Alu,
         "sub": Alu,
