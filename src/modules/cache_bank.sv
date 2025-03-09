@@ -172,9 +172,7 @@ module cache_bank (
                 ram_mem_store = latched_victim_eject_buffer.block[count_FSM];
             end
             FINISH: begin 
-                // Note: This forces the MSHR Entry to update on the next clock edge, so 
-                // we have a new one on the START
-                cache_bank_busy = 1; 
+                cache_bank_busy = 0; // RTL Simulation might get glitchy on start, after finish -> Won't happen in synthesis, so ignore.
                 next_bank[latched_victim_set_index][latched_victim_way_index].valid = 1'b1; 
                 next_bank[latched_victim_set_index][latched_victim_way_index].dirty = |mshr_entry.write_status; 
                 next_bank[latched_victim_set_index][latched_victim_way_index].tag = mshr_entry.block_addr.tag; 
