@@ -28,22 +28,23 @@ import isa_pkg::*;
 
 logic           mhit;
 logic           enable;
-logic [1:0]     ls_in;
-logic [3:0]     rd_in, rs_in;
-logic [10:0]    imm_in;
+regbits_t       rd_in;
+word_t          rs_in;
+word_t          imm_in;
 word_t          stride_in;
 
 // Outputs (REFER TO DATAPATH_TYPES)
+matrix_mem_t fu_matls_in;
 matrix_ls_t fu_matls_out;
 
 // LS Matrix Port Map
 modport mls (
-    input   mhit, enable, ls_in, rd_in, rs_in, stride_in, imm_in,
+    input   mhit, enable, rd_in, rs_in, stride_in, imm_in, fu_matls_in,
     output  fu_matls_out
 );
 
 modport tb (
-    output   mhit, enable, ls_in, rd_in, rs_in, stride_in, imm_in,
+    output   mhit, enable, rd_in, rs_in, stride_in, imm_in, fu_matls_in,
     input  fu_matls_out
 );
 

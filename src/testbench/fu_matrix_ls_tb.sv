@@ -13,7 +13,7 @@ module fu_matrix_ls_tb;
     import isa_pkg::*;
     import isa_pkg::*;
 
-    fu_matrix_ls_if.tb mlsif();
+    fu_matrix_ls_if mlsif();
 
     fu_matrix_ls DUT (
         .mlsif(mlsif)
@@ -67,12 +67,13 @@ module fu_matrix_ls_tb;
         // --- Initialization ---
         // Set initial values for all input signals.
         mlsif.enable    = 0;         // Module disabled initially
-        mlsif.ls_in     = 2'b00;     // No operation selected
+        // mlsif.ls_in     = 2'b00;     // No operation selected
         mlsif.rd_in     = 5'd0;      // Initialize destination register value
         mlsif.rs_in     = '0;        // Initialize source register (word_t)
         mlsif.stride_in = '0;        // Initialize stride (word_t)
-        mlsif.imm_in    = 11'd0;     // Initialize immediate value
+        mlsif.imm_in    = 32'd0;     // Initialize immediate value
         mlsif.mhit      = 0;         // Scratchpad not ready initially
+        mlsif.fu_matls_in = M_LOAD;
         #10;                        // Wait 10 ns for stabilization
 
         // --- Test Case 1: LOAD Operation ---
@@ -82,11 +83,12 @@ module fu_matrix_ls_tb;
         //   - Address is computed as rs_in + imm_in.
         //   - done should follow mhit.
         mlsif.enable    = 1;         // Enable the module
-        mlsif.ls_in     = 2'b01;     // LOAD operation selected (bit0 high)
+        // mlsif.ls_in     = 2'b01;     // LOAD operation selected (bit0 high)
+        mlsif.fu_matls_in = M_LOAD;
         mlsif.rd_in     = 5'd15;     // Example destination register value
         mlsif.rs_in     = 32'd100;   // Example source register value (assume word_t is 32-bit)
         mlsif.stride_in = 32'd5;     // Example stride value
-        mlsif.imm_in    = 11'd20;    // Immediate value (address = rs_in + imm_in)
+        mlsif.imm_in    = 32'd20;    // Immediate value (address = rs_in + imm_in)
         mlsif.mhit      = 1;         // Scratchpad ready; done should be 1
         #20;                        // Allow time for combinational logic to settle
 
@@ -105,11 +107,12 @@ module fu_matrix_ls_tb;
         //   - rd_out should now be driven by rs_in.
         //   - Address is computed as rd_in + imm_in.
         //   - done remains equal to mhit.
-        mlsif.ls_in     = 2'b10;     // STORE operation selected (bit1 high)
+        // mlsif.ls_in     = 2'b10;     // STORE operation selected (bit1 high)
+        mlsif.fu_matls_in = M_STORE;
         mlsif.rd_in     = 5'd25;     // Used for address calculation (address = rd_in + imm_in)
         mlsif.rs_in     = 32'd200;   // For STORE, rd_out should reflect rs_in
         mlsif.stride_in = 32'd3;     // Example stride value
-        mlsif.imm_in    = 11'd30;    // Immediate value (address = 25 + 30 = 55)
+        mlsif.imm_in    = 32'd30;    // Immediate value (address = 25 + 30 = 55)
         // mlsif.mhit remains 1; done should still be 1
         #20;                        // Wait for combinational logic to settle
 
@@ -125,7 +128,8 @@ module fu_matrix_ls_tb;
         // --- Test Case 3: Disable Operation ---
         // Disable the module to verify that no operation is performed.
         mlsif.enable = 0;
-        mlsif.ls_in  = 2'b00;
+        // mlsif.ls_in  = 2'b00;
+        mlsif.fu_matls_in = M_LOAD;
         #20;
 
         // End the simulation

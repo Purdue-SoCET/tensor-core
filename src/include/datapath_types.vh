@@ -233,9 +233,9 @@ package datapath_pkg;
 
   typedef struct packed {
     logic           done;       // Done signal to Issue Queue
-    logic [1:0]     ls_out;     // Load or store to Scratchpad [Load, Store]
-    logic [3:0]     rd_out;     // Matrix Reg destination (to Scratchpad)
-    logic [10:0]    imm_out;    // Immediate to Scratchpad
+    // logic [1:0]     ls_out;     // Load or store to Scratchpad [Load, Store]
+    regbits_t       rd_out;     // Matrix Reg destination (to Scratchpad)
+    word_t          imm_out;    // Immediate to Scratchpad
     word_t          address;    // Address to Scratchpad
     word_t          stride_out; // stride value
   } matrix_ls_t;
