@@ -96,6 +96,7 @@ int test_num;
       // check dirty bit
       write('0, '0, '1, 32'b111100, 32'hFEEDCAFE, '1, '0);    // choose 1 as block offset, that row should be come FEEDCAFE, ffffffff and dirty bit 
       #50
+      mem_save();
 
       
 
@@ -104,30 +105,36 @@ int test_num;
       // write test case -- miss -- if it is not dirty -- tag doesn't exist  -- one word should be zero and the other one is BBBBBBBB
       write('0, '0, '1, 32'b100000, 32'hBBBBBBBB, '1, '0); 
       #50
+      // mem_save();
 
 
       test_num = test_num + 1;   // test case 3
       // write test case -- miss -- if it is dirty
        write('0, '0, '1, 32'b111100, 32'hAAAAAAAA, '1, '0);     // one word should be  FEEDCAFE and the other one should be AAAAAAAA
       #50
-      mem_read(32'b111100, read_data);
-      mem_save();
-      $display("Data at address 32'b111000: %h", read_data);
+      // mem_read(32'b111100, read_data);
+      // mem_save();
+      // $display("Data at address 32'b111100: %h", read_data);
       write('0, '0, '1, 32'b111100, 32'hAAAAAAAA, '0, '0);     // one word should be  FEEDCAFE and the other one should be AAAAAAAA
       #50
-      mem_read(32'b111100, read_data);
-      mem_save();
-      $display("Data at address 32'b111000: %h", read_data);
+      // mem_read(32'b111100, read_data);
+      // mem_save();
+      // $display("Data at address 32'b111100: %h", read_data);
       write('0, '0, '1, 32'b111100, 32'hAAAAAAAA, '1, '0);     // one word should be  FEEDCAFE and the other one should be AAAAAAAA
       #50
-      mem_read(32'b111100, read_data);
-      mem_save();
-      $display("Data at address 32'b111000: %h", read_data);
+      // mem_read(32'b111100, read_data);
+      // mem_save();
+      // $display("Data at address 32'b111100: %h", read_data);
       write('0, '0, '1, 32'b111100, 32'hAAAAAAAA, '0, '0);     // one word should be  FEEDCAFE and the other one should be AAAAAAAA
       #50
+
+
+
+
       mem_read(32'b111100, read_data);
+      $display("Data at address 32'b111100: %h", read_data);
+      #50
       mem_save();
-      $display("Data at address 32'b111000: %h", read_data);
 
 
 
