@@ -1,0 +1,78 @@
+`include "scratchpad_if.vh"
+
+`timescale 1 ns / 1 ns
+
+module scratchpad_tb();
+  parameter PERIOD = 10;
+
+  logic CLK = 0, nRST;
+
+  // clock
+  always #(PERIOD/2) CLK++;
+
+  // interfaces
+  scratchpad_if spif ();
+
+  // test program
+  test PROG (CLK, nRST, spif);
+
+  // DUT
+  scratchpad DUT(CLK, nRST, spif);
+
+
+endmodule
+
+program test(
+  input logic CLK, 
+  output logic nRST,
+  scratchpad_if.tb spif_tb
+);
+parameter PERIOD = 10;
+
+initial begin
+  string test_name = "Reset";
+  spif_tb.instrFIFO_WEN = 1'b0;
+  nRST = 1;
+  #(PERIOD);
+
+  nRST = 0;
+  #(PERIOD * 2);
+
+  nRST = 1;
+  #(PERIOD);
+
+  @(posedge CLK);
+
+  test_name = "Load Instruction";
+  @(negedge CLK);
+
+  spif_tb.instrFIFO_WEN = 1'b1;
+  spif_tb.instrFIFO_wdata = {2'b01, 4'hf, 32'hf0f0f0f0};
+  @(negedge CLK);
+  spif_tb.instrFIFO_WEN = 1'b0;
+
+  #(PERIOD*10);
+  @(negedge CLK);
+  spif_tb.sLoad_hit = 1'b1;
+  spif_tb.sLoad_row = 2'd0;
+  spif_tb.load_data = 64'h0123456789abcdef;
+  #(PERIOD);
+  @(negedge CLK);
+  spif_tb.sLoad_hit = 1'b1;
+  spif_tb.sLoad_row = 2'd1;
+  spif_tb.load_data = 64'h0123456701234567;
+  #(PERIOD);
+  @(negedge CLK);
+  spif_tb.sLoad_hit = 1'b1;
+  spif_tb.sLoad_row = 2'd2;
+  spif_tb.load_data = 64'h8888888888888888;
+  #(PERIOD);
+  @(negedge CLK);
+  spif_tb.sLoad_hit = 1'b1;
+  spif_tb.sLoad_row = 2'd3;
+  spif_tb.load_data = 64'h928374601974adfe;
+  #(PERIOD*10);
+  $finish;
+
+end
+endprogram

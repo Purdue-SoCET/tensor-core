@@ -8,6 +8,7 @@ module dramstore_FSM (
 );
 
     always_comb begin
+        spif.sStore = 1'b0; //~(spif.dramFIFO0_empty && spif.dramFIFO1_empty && spif.dramFIFO2_empty && spif.dramFIFO3_empty);
         spif.dramFIFO0_REN = 1'b0;
         spif.dramFIFO1_REN = 1'b0;
         spif.dramFIFO2_REN = 1'b0;
@@ -18,28 +19,27 @@ module dramstore_FSM (
             spif.dramFIFO0_REN = spif.sStore_hit;
             spif.store_addr = spif.dramFIFO0_rdata[99:68] + (STRIDE * spif.dramFIFO0_rdata[65:64]);
             spif.store_data = spif.dramFIFO0_rdata[63:0];
+            spif.sStore = 1'b1;
         end
         else if (spif.dramFIFO1_empty == 1'b0) begin
             spif.dramFIFO1_REN = spif.sStore_hit;
             spif.store_addr = spif.dramFIFO1_rdata[99:68] + (STRIDE * spif.dramFIFO0_rdata[65:64]);
             spif.store_data = spif.dramFIFO1_rdata[63:0];
+            spif.sStore = 1'b1;
         end
         else if (spif.dramFIFO2_empty == 1'b0) begin
             spif.dramFIFO2_REN = spif.sStore_hit;
             spif.store_addr = spif.dramFIFO2_rdata[99:68] + (STRIDE * spif.dramFIFO0_rdata[65:64]);
             spif.store_data = spif.dramFIFO2_rdata[63:0];
+            spif.sStore = 1'b1;
         end
         else if (spif.dramFIFO3_empty == 1'b0) begin
             spif.dramFIFO3_REN = spif.sStore_hit;
             spif.store_addr = spif.dramFIFO3_rdata[99:68] + (STRIDE * spif.dramFIFO0_rdata[65:64]);
             spif.store_data = spif.dramFIFO3_rdata[63:0];
+            spif.sStore = 1'b1;
         end
     end
-
-    assign sStore = ~(spif.dramFIFO0_empty && spif.dramFIFO1_empty && spif.dramFIFO2_empty && spif.dramFIFO3_empty);
-
-
-
 endmodule
 /*
 Inputs:

@@ -9,7 +9,7 @@ module scratchpad_bank (
 );
 
 
-    logic [3:0][3:0][VALUE_BITS-1:0] n_mats, mats;
+    logic [3:0][3:0][BITS_PER_ROW-1:0] n_mats, mats;
 
     logic [BITS_PER_ROW-1:0] wdat, rdat;
     logic [MAT_S_W-1:0] w_mat_sel, r_mat_sel;
@@ -53,7 +53,9 @@ module scratchpad_bank (
                 spif.gemm_complete = 1'b1;
             end
             else begin
-                spif.load_complete = 1'b1;
+                if (wFIFO_rdata[65:64] == 2'd3) begin
+                    spif.load_complete = 1'b1;
+                end
             end
         end
     end

@@ -10,7 +10,7 @@ interface scratchpad_if;
     logic instrFIFO_WEN, psumout_en, drained, fifo_has_space, sLoad_hit, sStore_hit;
     logic [2+MAT_S_W+ROW_S_W+WORD_W-1:0] instrFIFO_wdata;
     logic [ROW_S_W-1:0] psumout_row_sel_in, sLoad_row;
-    logic [BITS_PER_ROW-2:0] psumout_data, load_data;
+    logic [BITS_PER_ROW-1:0] psumout_data, load_data;
 
     logic instrFIFO_full, partial_enable, weight_enable, input_enable, sLoad, sStore, gemm_complete, load_complete;
     logic [BITS_PER_ROW-1:0] weight_input_data, partial_sum_data, store_data;

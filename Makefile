@@ -19,13 +19,17 @@ else
 endif
 
 
-scratchpad:	
-	vlog -sv +incdir+./src/include ./src/testbench/scratchpad_tb.sv ./src/modules/scratchpad.sv ./src/modules/scratchpad_bank.sv \
-     ./src/modules/load_FSM.sv \
-     ./src/modules/gemm_FSM.sv \
-     ./src/modules/dramstore_FSM.sv \
-     ./src/modules/socetlib_fifo.sv \
-	vsim work.scratchpad_tb
+scratchpad:
+	vlog -sv +incdir+./src/include ./src/testbench/scratchpad_tb.sv \
+        ./src/modules/scratchpad.sv \
+        ./src/modules/scratchpad_bank.sv \
+        ./src/modules/load_FSM.sv \
+        ./src/modules/gemm_FSM.sv \
+        ./src/modules/dramstore_FSM.sv \
+        ./src/modules/socetlib_fifo.sv
+	vsim -voptargs="+acc" work.scratchpad_tb \
+        -do "do /home/asicfab/a/vvaidya/seniordesign/tensor-core/src/scripts/scratchpad.do; run 100us;" \
+        -suppress 2275
 
 fc:
 	vlog -sv ./src/testbench/flex_counter_tb.sv ./src/modules/flex_counter.sv
