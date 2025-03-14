@@ -29,15 +29,12 @@ add wave -noupdate -expand -group Outputs -expand -group {Memory Control} /scrat
 add wave -noupdate -expand -group Outputs -expand -group {Memory Control} /scratchpad_tb/spif/store_data
 add wave -noupdate -expand -group Outputs -expand -group {Memory Control} /scratchpad_tb/spif/load_addr
 add wave -noupdate -expand -group Outputs -expand -group {Memory Control} /scratchpad_tb/spif/store_addr
-add wave -noupdate /scratchpad_tb/DUT/spb0/mats
+add wave -noupdate -expand /scratchpad_tb/DUT/spb0/mats
 add wave -noupdate /scratchpad_tb/DUT/spb1/mats
 add wave -noupdate /scratchpad_tb/DUT/spb2/mats
 add wave -noupdate /scratchpad_tb/DUT/spb3/mats
-add wave -noupdate /scratchpad_tb/DUT/spb3/wFIFO/wdata
-add wave -noupdate -expand /scratchpad_tb/DUT/spb3/wFIFO/fifo
-add wave -noupdate /scratchpad_tb/DUT/spb3/wFIFO/WEN
 TreeUpdate [SetDefaultTree]
-WaveRestoreCursors {{Cursor 1} {115 ns} 0}
+WaveRestoreCursors {{Cursor 1} {499 ns} 0}
 quietly wave cursor active 1
 configure wave -namecolwidth 208
 configure wave -valuecolwidth 295

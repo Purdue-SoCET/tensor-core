@@ -48,7 +48,7 @@ initial begin
   @(negedge CLK);
   
   spif_tb.instrFIFO_WEN = 1'b1;
-  spif_tb.instrFIFO_wdata = {2'b01, 4'hf, 32'hf0f0f0f0};
+  spif_tb.instrFIFO_wdata = {2'b01, 4'h2, 32'hf0f0f0f0};
   @(negedge CLK);
   spif_tb.instrFIFO_WEN = 1'b0;
   #(PERIOD*5);
@@ -80,7 +80,7 @@ initial begin
 
   test_name = "Store Instruction";
   spif_tb.instrFIFO_WEN = 1'b1;
-  spif_tb.instrFIFO_wdata = {2'b10, 4'hf, 32'hf0f0f0f0};
+  spif_tb.instrFIFO_wdata = {2'b10, 4'h2, 32'hf0f0f0f0};
   @(negedge CLK);
   spif_tb.instrFIFO_WEN = 1'b0;
   #(PERIOD*5);
@@ -102,8 +102,9 @@ initial begin
 
   test_name = "Load Instruction 2";
   
+  spif_tb.sLoad_row = 2'd0;
   spif_tb.instrFIFO_WEN = 1'b1;
-  spif_tb.instrFIFO_wdata = {2'b01, 4'h2, 32'hf0f0f0f0};
+  spif_tb.instrFIFO_wdata = {2'b01, 4'hf, 32'hf0f0f0f0};
   @(negedge CLK);
   spif_tb.instrFIFO_WEN = 1'b0;
   #(PERIOD*5);
