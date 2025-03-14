@@ -7,7 +7,7 @@ add wave -noupdate /cache_bank_tb/PROG/test_id
 add wave -noupdate /cache_bank_tb/PROG/SingleCycle_RW_Done
 add wave -noupdate /cache_bank_tb/PROG/MSHR_Thread_Done
 add wave -noupdate -divider PROG
-add wave -noupdate -subitemconfig {/cache_bank_tb/PROG/tb_mshr_entry.block_addr {-height 16 -childformat {{tag -radix decimal} {index -radix hexadecimal}} -expand} /cache_bank_tb/PROG/tb_mshr_entry.block_addr.tag {-radix decimal} /cache_bank_tb/PROG/tb_mshr_entry.block_addr.index {-radix hexadecimal}} /cache_bank_tb/PROG/tb_mshr_entry
+add wave -noupdate /cache_bank_tb/PROG/tb_mshr_entry
 add wave -noupdate -expand -subitemconfig {/cache_bank_tb/PROG/tb_mem_instr.addr -expand} /cache_bank_tb/PROG/tb_mem_instr
 add wave -noupdate -expand -group {PROG Inputs} /cache_bank_tb/PROG/tb_cache_bank_busy
 add wave -noupdate -expand -group {PROG Inputs} /cache_bank_tb/PROG/tb_ram_mem_REN
@@ -49,8 +49,21 @@ add wave -noupdate -group {LRU Logic} /cache_bank_tb/dut/latched_victim_way_inde
 add wave -noupdate -group {LRU Logic} /cache_bank_tb/dut/latched_victim_set_index
 add wave -noupdate -group {LRU Logic} /cache_bank_tb/dut/hit_way_index
 add wave -noupdate -group {LRU Logic} /cache_bank_tb/dut/set_index
+add wave -noupdate -divider RAM
+add wave -noupdate /cache_bank_tb/u_RAM/ram_addr
+add wave -noupdate /cache_bank_tb/u_RAM/ram_store
+add wave -noupdate /cache_bank_tb/u_RAM/ram_REN
+add wave -noupdate /cache_bank_tb/u_RAM/ram_WEN
+add wave -noupdate /cache_bank_tb/u_RAM/ram_load
+add wave -noupdate /cache_bank_tb/u_RAM/ram_ready
+add wave -noupdate /cache_bank_tb/u_RAM/current_addr
+add wave -noupdate /cache_bank_tb/u_RAM/prev_addr
+add wave -noupdate /cache_bank_tb/u_RAM/counter
+add wave -noupdate /cache_bank_tb/u_RAM/next_counter
+add wave -noupdate /cache_bank_tb/u_RAM/state
+add wave -noupdate /cache_bank_tb/u_RAM/next_state
 TreeUpdate [SetDefaultTree]
-WaveRestoreCursors {{Cursor 1} {329 ps} 0}
+WaveRestoreCursors {{Cursor 1} {20 ps} 0}
 quietly wave cursor active 1
 configure wave -namecolwidth 228
 configure wave -valuecolwidth 88
@@ -66,4 +79,4 @@ configure wave -griddelta 40
 configure wave -timeline 0
 configure wave -timelineunits ps
 update
-WaveRestoreZoom {2 ps} {879 ps}
+WaveRestoreZoom {0 ps} {168 ps}

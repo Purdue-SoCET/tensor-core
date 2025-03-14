@@ -8,7 +8,8 @@ fc:
 	fi
 	vlog -sv -pedanticerrors -lint +incdir+./src/include/ \
 	     ./src/modules/$*.sv \
-	     ./src/testbench/$*_tb.sv 
+	     ./src/testbench/$*_tb.sv \
+	     ./src/testbench/$*_bind.sv 
 
 %.sim: %.log
 	vsim -c -voptargs="+acc" work.$*_tb -do  "run -all; quit"
@@ -30,3 +31,6 @@ sf:
 	     ./src/modules/sysarr_FIFO.sv \
 	     ./src/testbench/sysarr_FIFO_tb.sv
 	vsim -voptargs="+acc" work.sysarr_FIFO_tb -do "run -all"
+
+clean: 
+	rm -rf ./obj_dir ./verilator ./work ./.deps
