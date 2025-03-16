@@ -424,6 +424,16 @@ program test (
         set_test_id("-------> RANDOMIZED SIMULATION");
         @(posedge tb_clk);
 
+
+        MSHR_Thread_Done = 1; 
+        SingleCycle_RW_Done = 1; 
+        @(posedge tb_clk);
+
+        MSHR_Thread_Done = 0; 
+        SingleCycle_RW_Done = 0; 
+        @(posedge tb_clk);
+
+        
         fork
         begin : mshr_process
             for (int set = 0; set < NUM_SETS; set++) begin
