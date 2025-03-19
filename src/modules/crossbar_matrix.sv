@@ -5,7 +5,7 @@ module crossbar #(
 ) ( 
     input logic CLK, nRST, 
     input logic [N_SIZE-1:0][DATA_WIDTH-1:0] input_vector, 
-    input logic [N_SIZE-1:0][$clog2(N_SIZE):0] route_mask, // Holds output port index
+    input logic [N_SIZE-1:0][$clog2(N_SIZE):0] route_mask, 
     output logic [N_SIZE-1:0][DATA_WIDTH-1:0] output_vector, 
     output logic stall 
 ); 
@@ -34,7 +34,7 @@ module crossbar #(
     endgenerate
 
 
-    generate : tri_state_matric
+    generate : tri_state_matrix
         for (j = 0; j < N; j = j + 1) begin 
             logic [DATA_WIDTH-1:0] bus_j; 
             for (k = 0; k < N; k = k + 1) begin 
