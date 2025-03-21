@@ -65,8 +65,8 @@ module crossbar_butterfly #(
     genvar ji;
     generate
         for (ji = 0; ji < N_SIZE; ji = ji + 1) begin : stage_0
-            assign stage_data[0][ji] = input_vector[ji];
-            assign stage_route[0][ji] = route_mask[ji];
+            assign stage_data[0][ji] = arbiter_data_out[ji];
+            assign stage_route[0][ji] = arbiter_route_out[ji];
         end
     endgenerate
 
