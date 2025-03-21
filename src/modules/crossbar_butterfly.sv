@@ -2,32 +2,30 @@ module crossbar_butterfly #(
     parameter N_SIZE     = 4,
     parameter DATA_WIDTH = 32,
     parameter FIFO_SIZE  = 2,
-    parameter STAGES     = $clog2(N_SIZE)
+    parameter STAGES = $clog2(N_SIZE),
+    parameter ROUTE_BITS = $clog2(N_SIZE)
 ) ( 
     input logic CLK, nRST, 
     input logic [N_SIZE-1:0][DATA_WIDTH-1:0] input_vector, 
-    input logic [N_SIZE-1:0][STAGES:0] route_mask, // Holds output port index
+    input logic [N_SIZE-1:0][ROUTE_BITS:0] route_mask, // Holds output port index
     output logic [N_SIZE-1:0][DATA_WIDTH-1:0] output_vector, 
     output logic stall 
 ); 
 
     logic [N_SIZE-1:0] stall_bus, pop_bus; 
     logic [N_SIZE-1:0][DATA_WIDTH-1:0] arbiter_input; 
-    logic [N_SIZE-1:0][STAGES-1:0] arbiter_router_mask;
+    logic [N_SIZE-1:0][ROUTE_BITS-1:0] arbiter_router_mask;
 
     logic [N_SIZE-1:0][DATA_WIDTH-1:0] arbiter_data_out;
-    logic [N_SIZE-1:0][STAGES-1:0] arbiter_route_out;
+    logic [N_SIZE-1:0][ROUTE_BITS-1:0] arbiter_route_out;
 
     logic [STAGES:0][N_SIZE-1:0][DATA_WIDTH-1:0] stage_data;
-    logic [STAGES:0][N_SIZE-1:0][STAGES-1:0] stage_route;
+    logic [STAGES:0][N_SIZE-1:0][ROUTE_BITS-1:0] stage_route;
 
     logic grant; 
     genvar i, j, k, s, p;
 
     assign stall = |stall_bus; 
-    assign output_vector = stage_data[STAGES];
-    assign stage_data[0] = arbiter_data_out;
-    assign stage_route[0] = arbiter_route_out;
 
     generate : input_fifos
         for (i = 0; i < N_SIZE; i = i + 1) begin : fifo_inst
@@ -64,24 +62,52 @@ module crossbar_butterfly #(
         end
     end
 
-    generate : butterflies
-        for (s = 0; s < STAGES; s = s + 1) begin : stages
-            // each butterfly acts on 2 values
-            for (p = 0; p < N_SIZE/2; p = p + 1) begin : pair_switches
-                localparam int idx0 = 2 * p;
-                localparam int idx1 = 2 * p + 1;
-                butterfly_switch #(.DATA_WIDTH(DATA_WIDTH))
-                  bs (
-                    .in0(stage_data[s][idx0]),
-                    .in1(stage_data[s][idx1]),
-                    .control(stage_route[s][idx0][s]),
-                    .out0(stage_data[s+1][idx0]),
-                    .out1(stage_data[s+1][idx1])
-                  );
-                assign stage_route[s+1][idx0] = stage_route[s][idx0];
-                assign stage_route[s+1][idx1] = stage_route[s][idx1];
+    genvar ji;
+    generate
+        for (ji = 0; ji < N_SIZE; ji = ji + 1) begin : stage_0
+            assign stage_data[0][ji] = input_vector[ji];
+            assign stage_route[0][ji] = route_mask[ji];
+        end
+    endgenerate
+
+    genvar jk;
+    generate
+        for (jk = 0; jk < N_SIZE; jk = jk + 1) begin : stage_STAGE
+            assign output_vector[jk] = stage_data[STAGES][jk];
+        end
+    endgenerate
+
+    genvar i, k;
+    generate
+        for (i = 1; i <= STAGES; i = i + 1) begin : stage_loop
+            localparam int flip_val = (1 << (STAGES - i));
+
+            for (k = 0; k < N_SIZE; k = k + 1) begin : switch_inst
+                localparam int partner = k ^ flip_val;
+
+                if (k < partner) begin // perform only once per pair
+                    wire [DATA_WIDTH-1:0] out0, out1;
+                    butterfly_unit #(
+                        .DATA_WIDTH(DATA_WIDTH)
+                    ) u_butterfly (
+                        .in0(stage_data[i-1][k]),
+                        .in1(stage_data[i-1][partner];),
+                        .control(stage_route[i-1][k][STAGES-1]),
+                        .out0(stage_data[i][k]),
+                        .out1(stage_data[i][partner])
+                    );
+
+                    assign stage_route[i][k] = stage_route[i-1][k] >> 1;
+                    assign stage_route[i][partner] = stage_route[i-1][partner] >> 1;
+
+                    initial begin
+                        $display("Stage %0d: Instantiated butterfly unit for pair (%0d, %0d)", i, k, partner);
+                    end
+                end
             end
         end
     endgenerate
+
+
 
 endmodule

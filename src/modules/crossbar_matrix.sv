@@ -1,18 +1,19 @@
 module crossbar #(
     parameter N_SIZE = 4,
     parameter DATA_WIDTH = 32,
-    parameter FIFO_SIZE = 2
+    parameter FIFO_SIZE = 2,
+    parameter ROUTE_BITS = $clog2(N_SIZE)
 ) ( 
     input logic CLK, nRST, 
     input logic [N_SIZE-1:0][DATA_WIDTH-1:0] input_vector, 
-    input logic [N_SIZE-1:0][$clog2(N_SIZE):0] route_mask, 
+    input logic [N_SIZE-1:0][ROUTE_BITS:0] route_mask, 
     output logic [N_SIZE-1:0][DATA_WIDTH-1:0] output_vector, 
     output logic stall 
 ); 
 
     logic [N_SIZE-1:0] stall_bus, enable_bus, pop_bus; 
     logic [N_SIZE-1:0][DATA_WIDTH-1:0] arbiter_input; 
-    logic [N_SIZE-1:0][$clog2(N_SIZE):0] arbiter_router_mask;
+    logic [N_SIZE-1:0][ROUTE_BITS:0] arbiter_router_mask;
     logic grant;
     genvar i, j, k;
 
@@ -20,7 +21,7 @@ module crossbar #(
 
     generate : input_fifos
         fifo (
-            .DATA_WIDTH(DATA_WIDTH + $clog2(N_SIZE)), 
+            .DATA_WIDTH(DATA_WIDTH + ROUTE_BITS), 
             .FIFO_SIZE(FIFO_SIZE)
         ) _input_buffer_i ( 
             .CLK(CLK), 
