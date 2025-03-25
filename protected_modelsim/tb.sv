@@ -44,6 +44,24 @@ module tb;
     timeprecision 1ps;
     import arch_package::*;
     import proj_package::*;
+    
+    // parameter CLK_PERIOD = 1500;
+    logic CLK, nRST, clear;
+    logic [31:0] count_out;
+    typedef struct {
+        logic clear;
+        string timing_name;
+    } var_t;
+
+    
+
+    // always begin
+    //     CLK = 1'b0;
+    //     #(CLK_PERIOD / 2);
+    //     CLK = 1'b1;
+    //     #(CLK_PERIOD / 2);
+    // end
+
     StateTable _state();
     `ifdef DDR4_2G
         parameter UTYPE_density CONFIGURED_DENSITY = _2G;
@@ -65,7 +83,8 @@ module tb;
         DDR4_if #(.CONFIGURED_DQ_BITS(16)) iDDR4();
     `endif
     reg clk_val, clk_enb;
-    bit[159:0] func_str;
+    string func_str;
+    var_t timing_trk; 
     UTYPE_dutconfig _dut_config;
     DDR4_cmd active_cmd = new();
     UTYPE_TimingParameters timing;
@@ -73,6 +92,8 @@ module tb;
     reg model_enable_val;
     wire odt_wire;
     UTYPE_cmdtype driving_cmd;
+    integer timing_trck;
+    string  timing_string;
 
     // DQ transmit
     reg dq_en;
@@ -155,6 +176,8 @@ module tb;
     // Component instantiation
     ddr4_model #(.CONFIGURED_DQ_BITS(CONFIGURED_DQ_BITS), .CONFIGURED_DENSITY(CONFIGURED_DENSITY), .CONFIGURED_RANKS(CONFIGURED_RANKS))
                  golden_model(.model_enable(model_enable), .iDDR4(iDDR4));
+
+    
     // Clock generator
     always @(posedge clk_val && clk_enb) begin
       clk_val <= #(timing.tCK/2) 1'b0;
@@ -164,6 +187,8 @@ module tb;
       iDDR4.CK[0] <= #(timing.tCK/2) 1'b1;
       iDDR4.CK[0] <= #(timing.tCK) 1'b0;
     end
+
+    socetlib_counter counter (.CLK (clk_val), .nRST(nRST), .clear(timing_trk.clear), .count_enable(iDDR4.CK[1]), .overflow_val(32'd 3000), .count_out(count_out), .overflow_flag());
 
     // NCVerilog requires local references to structures.
     UTYPE_DutModeConfig _dut_mode_config;
@@ -217,21 +242,37 @@ module tb;
         iDDR4.PWR <= 0;
         iDDR4.VREF_CA <= 0;
         iDDR4.VREF_DQ <= 0;
+        timing_trk.timing_name = "timing tRESET";
+
+        timing_trck = timing.tRESET; 
         #(timing.tRESET);
+        timing_trk.clear = 1'b1;
         iDDR4.PWR <= 1;
         iDDR4.VREF_CA <= 1;
         iDDR4.VREF_DQ <= 1;
+
+        
+        timing_trk.timing_name = "timing tPWRUP";
+        timing_trck = timing.tPWRUP;
+        timing_trk.clear = 1'b0;
         #(timing.tPWRUP);
+        timing_trk.clear = 1'b1;
         iDDR4.RESET_n <= 1;
 
+        timing_trk.clear = 1'b0;
         #(timing.tRESETCKE);
+        
+        timing_trk.timing_name = "timing.tPDc";
+        timing_trk.timing_name = "timing.tPDc";
         deselect(timing.tPDc);
         odt_out <= 1'b0;
         // After CKE is registered HIGH and after tXPR has been satisfied, MRS commands may be issued.
+        timing_trk.timing_name = "timing.tXPR";
         @(negedge clk_val) deselect(timing.tXPR/timing.tCK);
         active_cmd.cmd = cmdPDX;
         active_cmd.tCK = timing.tCK;
         _state.UpdateTable(active_cmd);
+        timing_trk.timing_name = "Done power up";
     endtask
 
     task precharge_power_down(int count);
@@ -438,7 +479,7 @@ module tb;
     endtask
 
     task zq_cl(reg[MAX_ADDR_BITS-1:0] addr = '0);
-        func_str = "zq_cs";
+        func_str = "zq_cl";
         iDDR4.CKE <= 1'b1;
         iDDR4.CS_n  <= 1'b0;
         iDDR4.ACT_n <= 1'b1;
@@ -476,8 +517,10 @@ module tb;
         iDDR4.WE_n_A14  <= 1'b1;
         active_cmd.cmd = cmdNOP;
         active_cmd.tCK = timing.tCK;
+        timing_trk.clear = 1'b0;
         repeat(count) _state.UpdateTable(active_cmd);
         repeat(count) @(negedge clk_val);
+        timing_trk.clear = 1'b1;
     endtask
 
     task deselect_cs_cke(int count, logic cs, logic cke);

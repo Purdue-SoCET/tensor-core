@@ -18,8 +18,8 @@ interface DDR4_if #(parameter CONFIGURED_DQ_BITS = 8) ();
     logic CKE;
     logic ODT;
     logic[MAX_RANK_BITS-1:0] C;
-    logic[MAX_BANK_GROUP_BITS-1:0] BG;
-    logic[MAX_BANK_BITS-1:0] BA;
+    logic[MAX_BANK_GROUP_BITS-1:0] BG; //Bank groups
+    logic[MAX_BANK_BITS-1:0] BA;       //Bank
     logic[13:0] ADDR;
     logic ADDR_17;
     wire[CONFIGURED_DM_BITS-1:0] DM_n;
