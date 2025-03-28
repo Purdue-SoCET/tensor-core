@@ -1,0 +1,2 @@
+var g_data = {"data":[{"n":"work.confirm_lru_age","id":9,"zf":1,"tc":100.00,"a":100.00},{"n":"work.confirm_replacement_mshr","id":8,"zf":1,"tc":0.00,"a":0.00},{"n":"work.confirm_replacement_singlecycle","id":7,"zf":1,"tc":0.00,"a":0.00}]};
+processDuData(g_data);

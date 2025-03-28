@@ -25,8 +25,8 @@ add wave -noupdate -expand -group {PROG Outputs} /cache_bank_tb/PROG/tb_ram_mem_
 add wave -noupdate -expand -group {PROG Outputs} /cache_bank_tb/PROG/tb_ram_mem_complete
 add wave -noupdate -divider FSM
 add wave -noupdate /cache_bank_tb/dut/wrong_state
-add wave -noupdate -group Bank /cache_bank_tb/dut/bank
-add wave -noupdate -group Bank /cache_bank_tb/dut/next_bank
+add wave -noupdate -expand -group Bank -expand -subitemconfig {{/cache_bank_tb/dut/bank[3]} -expand {/cache_bank_tb/dut/bank[2]} -expand {/cache_bank_tb/dut/bank[1]} -expand {/cache_bank_tb/dut/bank[0]} -expand} /cache_bank_tb/dut/bank
+add wave -noupdate -expand -group Bank /cache_bank_tb/dut/next_bank
 add wave -noupdate -group {Cache Controller Logic} /cache_bank_tb/dut/set_index
 add wave -noupdate -group {Cache Controller Logic} /cache_bank_tb/dut/hit_way_index
 add wave -noupdate -group {FSM State Logic} /cache_bank_tb/dut/latched_block_pull_buffer
@@ -41,14 +41,14 @@ add wave -noupdate -group {FSM State Logic} /cache_bank_tb/dut/next_state
 add wave -noupdate -group {FSM State Logic} /cache_bank_tb/dut/count_enable
 add wave -noupdate -group {FSM State Logic} /cache_bank_tb/dut/count_flush
 add wave -noupdate -group {FSM State Logic} /cache_bank_tb/dut/mshr_entry
-add wave -noupdate -group {LRU Logic} /cache_bank_tb/dut/lru
-add wave -noupdate -group {LRU Logic} -childformat {{{/cache_bank_tb/dut/next_lru[3]} -radix decimal -childformat {{lru_way -radix decimal} {age -radix decimal}}} {{/cache_bank_tb/dut/next_lru[2]} -radix decimal -childformat {{lru_way -radix decimal} {age -radix decimal}}} {{/cache_bank_tb/dut/next_lru[1]} -radix decimal -childformat {{lru_way -radix decimal} {age -radix decimal}}} {{/cache_bank_tb/dut/next_lru[0]} -radix decimal -childformat {{lru_way -radix decimal} {age -radix decimal}}}} -expand -subitemconfig {{/cache_bank_tb/dut/next_lru[3]} {-height 16 -radix decimal -childformat {{lru_way -radix decimal} {age -radix decimal}}} {/cache_bank_tb/dut/next_lru[3].lru_way} {-radix decimal} {/cache_bank_tb/dut/next_lru[3].age} {-radix decimal} {/cache_bank_tb/dut/next_lru[2]} {-height 16 -radix decimal -childformat {{lru_way -radix decimal} {age -radix decimal}}} {/cache_bank_tb/dut/next_lru[2].lru_way} {-radix decimal} {/cache_bank_tb/dut/next_lru[2].age} {-radix decimal} {/cache_bank_tb/dut/next_lru[1]} {-height 16 -radix decimal -childformat {{lru_way -radix decimal} {age -radix decimal}}} {/cache_bank_tb/dut/next_lru[1].lru_way} {-radix decimal} {/cache_bank_tb/dut/next_lru[1].age} {-radix decimal} {/cache_bank_tb/dut/next_lru[0]} {-height 16 -radix decimal -childformat {{lru_way -radix decimal} {age -radix decimal}}} {/cache_bank_tb/dut/next_lru[0].lru_way} {-radix decimal} {/cache_bank_tb/dut/next_lru[0].age} {-radix decimal}} /cache_bank_tb/dut/next_lru
-add wave -noupdate -group {LRU Logic} /cache_bank_tb/dut/max_age
-add wave -noupdate -group {LRU Logic} /cache_bank_tb/dut/max_way
-add wave -noupdate -group {LRU Logic} /cache_bank_tb/dut/latched_victim_way_index
-add wave -noupdate -group {LRU Logic} /cache_bank_tb/dut/latched_victim_set_index
-add wave -noupdate -group {LRU Logic} /cache_bank_tb/dut/hit_way_index
-add wave -noupdate -group {LRU Logic} /cache_bank_tb/dut/set_index
+add wave -noupdate -expand -group {LRU Logic} /cache_bank_tb/dut/lru
+add wave -noupdate -expand -group {LRU Logic} -childformat {{{/cache_bank_tb/dut/next_lru[3]} -radix decimal -childformat {{lru_way -radix unsigned} {age -radix decimal}}} {{/cache_bank_tb/dut/next_lru[2]} -radix decimal -childformat {{lru_way -radix unsigned} {age -radix decimal}}} {{/cache_bank_tb/dut/next_lru[1]} -radix decimal -childformat {{lru_way -radix unsigned} {age -radix decimal}}} {{/cache_bank_tb/dut/next_lru[0]} -radix decimal -childformat {{lru_way -radix unsigned} {age -radix decimal}}}} -expand -subitemconfig {{/cache_bank_tb/dut/next_lru[3]} {-height 16 -radix decimal -childformat {{lru_way -radix unsigned} {age -radix decimal}} -expand} {/cache_bank_tb/dut/next_lru[3].lru_way} {-radix unsigned} {/cache_bank_tb/dut/next_lru[3].age} {-radix decimal} {/cache_bank_tb/dut/next_lru[2]} {-height 16 -radix decimal -childformat {{lru_way -radix unsigned} {age -radix decimal}} -expand} {/cache_bank_tb/dut/next_lru[2].lru_way} {-radix unsigned} {/cache_bank_tb/dut/next_lru[2].age} {-radix decimal} {/cache_bank_tb/dut/next_lru[1]} {-height 16 -radix decimal -childformat {{lru_way -radix unsigned} {age -radix decimal}} -expand} {/cache_bank_tb/dut/next_lru[1].lru_way} {-radix unsigned} {/cache_bank_tb/dut/next_lru[1].age} {-radix decimal} {/cache_bank_tb/dut/next_lru[0]} {-height 16 -radix decimal -childformat {{lru_way -radix unsigned} {age -radix decimal}} -expand} {/cache_bank_tb/dut/next_lru[0].lru_way} {-radix unsigned} {/cache_bank_tb/dut/next_lru[0].age} {-radix decimal}} /cache_bank_tb/dut/next_lru
+add wave -noupdate -expand -group {LRU Logic} /cache_bank_tb/dut/max_age
+add wave -noupdate -expand -group {LRU Logic} /cache_bank_tb/dut/max_way
+add wave -noupdate -expand -group {LRU Logic} /cache_bank_tb/dut/latched_victim_way_index
+add wave -noupdate -expand -group {LRU Logic} /cache_bank_tb/dut/latched_victim_set_index
+add wave -noupdate -expand -group {LRU Logic} /cache_bank_tb/dut/hit_way_index
+add wave -noupdate -expand -group {LRU Logic} /cache_bank_tb/dut/set_index
 add wave -noupdate -divider RAM
 add wave -noupdate /cache_bank_tb/u_RAM/ram_addr
 add wave -noupdate /cache_bank_tb/u_RAM/ram_store
@@ -63,10 +63,10 @@ add wave -noupdate /cache_bank_tb/u_RAM/next_counter
 add wave -noupdate /cache_bank_tb/u_RAM/state
 add wave -noupdate /cache_bank_tb/u_RAM/next_state
 TreeUpdate [SetDefaultTree]
-WaveRestoreCursors {{Cursor 1} {20 ps} 0}
+WaveRestoreCursors {{Cursor 1} {5345 ps} 0}
 quietly wave cursor active 1
 configure wave -namecolwidth 228
-configure wave -valuecolwidth 88
+configure wave -valuecolwidth 171
 configure wave -justifyvalue left
 configure wave -signalnamewidth 1
 configure wave -snapdistance 10
@@ -79,4 +79,4 @@ configure wave -griddelta 40
 configure wave -timeline 0
 configure wave -timelineunits ps
 update
-WaveRestoreZoom {0 ps} {168 ps}
+WaveRestoreZoom {0 ps} {19586 ps}

@@ -38,8 +38,8 @@ module cache_bank (
     lru_frame [NUM_SETS_PER_BANK-1:0] lru, next_lru;
     int max_age;
 
-    assign set_index = mem_instr_in.addr.index >> BANKS_LEN;    
-    assign victim_set_index = mshr_entry.block_addr.index >> BANKS_LEN; 
+    assign set_index = mem_instr_in.addr.index;    
+    assign victim_set_index = mshr_entry.block_addr.index; 
     assign victim_way_index = lru[victim_set_index].lru_way;
 
     always_ff @ (posedge CLK, negedge nRST) begin : sequential_update
@@ -97,8 +97,8 @@ module cache_bank (
                 max_way = 0;
 
                 for (int j = 0; j < NUM_WAYS; j++) begin
-                    if (scheduler_hit) next_lru[set_index].age[hit_way_index] = 0;
-                    else if (curr_state == FINISH) next_lru[latched_victim_set_index].age[latched_victim_way_index] = 0;
+                    if (scheduler_hit && (set_index == i) && (hit_way_index == j)) next_lru[set_index].age[hit_way_index] = 0;
+                    else if ((curr_state == FINISH) && (latched_victim_set_index == i) && (latched_victim_way_index == j)) next_lru[latched_victim_set_index].age[latched_victim_way_index] = 0;
                     else next_lru[i].age[j] = lru[i].age[j] + 1;
 
                     if (next_lru[i].age[j] > max_age) begin

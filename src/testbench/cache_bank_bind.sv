@@ -78,3 +78,33 @@ module confirm_replacement_singlecycle (
     else $error("ASSERTIONERROR: Word not replaced properly within block");
 
 endmodule 
+
+module cache_bank_monitor (
+  input logic CLK,
+  input logic nRST,
+  input cache_set [NUM_SETS_PER_BANK-1:0] bank, 
+  input logic cache_bank_busy
+);
+
+  integer set, way;
+  integer full_sets;
+  integer filled_ways;
+
+  always @(posedge CLK, negedge nRST) begin
+    if (!cache_bank_busy) begin
+      full_sets = 0;
+      for (set = 0; set < NUM_SETS_PER_BANK; set = set + 1) begin
+        filled_ways = 0;
+        for (way = 0; way < NUM_WAYS; way = way + 1) begin
+          if (bank[set][way].valid)
+            filled_ways = filled_ways + 1;
+        end
+        $display("    Time %0t: Set %0d has %0d filled ways", $time, set, filled_ways);
+        if (filled_ways == NUM_WAYS)
+          full_sets = full_sets + 1;
+      end
+      $display("Time %0t: Total full sets in bank: %0d", $time, full_sets);
+    end
+  end
+
+endmodule

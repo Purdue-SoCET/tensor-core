@@ -26,7 +26,7 @@ module RAM (
             counter <= 0;
             state <= start;
             prev_addr <= 0;
-            ram_data <= '{default: '{default: 0}}; 
+            ram_data <= '{default: '{default: 1}}; 
         end else begin
             counter <= next_counter;
             state <= next_state;
@@ -81,7 +81,7 @@ module RAM (
                 end else if (counter == cycle_delay) begin
                     ram_ready = 1;
                     ram_load = ram_data[current_addr];               
-                    $display("read from %08x: %08x", current_addr, ram_load);     
+                    // $display("read from %08x: %08x", current_addr, ram_load);     
                 end else begin
                     next_counter = counter + 1;
                 end
@@ -92,7 +92,7 @@ module RAM (
                 end else if (counter == cycle_delay) begin
                     ram_ready = 1;
                     next_ram_data[current_addr] = ram_store;
-                    $display("write %08x: %08x", current_addr, ram_store);     
+                    // $display("write %08x: %08x", current_addr, ram_store);     
                 end else begin
                     next_counter = counter + 1;
                 end
@@ -125,7 +125,6 @@ module cache_bank_tb;
     logic [31:0] tb_scheduler_data_out;
     logic [3:0] tb_scheduler_uuid_out;
     logic tb_scheduler_uuid_ready; 
-    logic [31:0] zero_val = 32'd0;
 
     always begin
         tb_clk = 1'b0;
@@ -136,7 +135,6 @@ module cache_bank_tb;
 
 
     initial begin 
-        // u_RAM.ram_data = 
         $dumpfile("waveforms/cache_bank_tb.vcd");
         $dumpvars(0);
     end 
@@ -151,17 +149,6 @@ module cache_bank_tb;
         .ram_load(tb_ram_mem_data),
         .ram_ready(tb_ram_mem_complete)
     );
-
-
-    // genvar addr;
-    // generate
-    // for (addr = 0; addr < MAX_INIT_ADDR; addr = addr + 1) begin : force_ram_data
-    //     initial begin
-    //         @(posedge tb_nrst);
-    //         force u_RAM.ram_data[addr] = zero_val;
-    //     end
-    // end
-    // endgenerate
 
     cache_bank dut (
         .CLK(tb_clk),
@@ -214,6 +201,14 @@ module cache_bank_tb;
         .hit_way_index(hit_way_index),
         .bank(bank)
     );
+
+    cache_bank_monitor monitor_inst (
+        .CLK(tb_clk),
+        .nRST(tb_nrst),
+        .bank(dut.bank), 
+        .cache_bank_busy(tb_cache_bank_busy)
+    );
+
 
     test PROG (
         .tb_clk(tb_clk),
@@ -296,12 +291,17 @@ program test (
         tb_instr_valid = 0;
         log_ram_inputs(1, tb_ram_mem_complete, tb_ram_mem_addr, tb_ram_mem_store, tb_ram_mem_WEN, tb_ram_mem_REN, tb_cache_bank_busy, tb_scheduler_data_out, tb_scheduler_uuid_out, tb_scheduler_hit, tb_scheduler_uuid_ready);
         @(posedge tb_clk);
+        @(posedge tb_clk);
     endtask
 
     task automatic set_mshr(
-        mshr_reg _tb_mshr_entry
+        logic valid,
+        logic [UUID_SIZE-1:0] uuid,
+        addr_t block_addr,
+        logic [BLOCK_SIZE-1:0] write_status,
+        cache_block write_block
     );
-        tb_mshr_entry = _tb_mshr_entry;
+        tb_mshr_entry = {valid, uuid, block_addr, write_status, write_block};
         @(posedge tb_clk);
     endtask
 
@@ -381,6 +381,7 @@ program test (
         @(posedge tb_clk);
         wait(tb_ram_mem_complete == 1);
         @(posedge tb_clk);
+        @(posedge tb_clk); // maintain till FINISH, top_level will deal with this
     endtask
 
     initial begin
@@ -400,14 +401,26 @@ program test (
         );
 
 
-        set_test_id("-------> Sending in MSHR Entry");
+        set_test_id("-------> Filling MSHR Entry");
         set_mshr(
-            {1'b1, 4'd9, address, BLOCK_SIZE'('0), cache_block'('0)}
+            .valid(1'b1), 
+            .uuid(4'd9),
+            .block_addr(address), 
+            .write_status(BLOCK_SIZE'('0)), 
+            .write_block(cache_block'('0))
         );
+
         set_test_id("-------> FSM Initiated");
         stall_for_ram();
 
-        set_mshr('0);
+        set_test_id("-------> Clearing MSHR Entry");
+        set_mshr(
+            .valid('0), 
+            .uuid('0),
+            .block_addr('0), 
+            .write_status('0), 
+            .write_block('0)
+        );
 
         set_test_id("-------> Trying a READ - HIT");
         initiate_read_write(
@@ -419,70 +432,141 @@ program test (
             .store_value(32'd0)
         );
 
-        set_test_id("-------> FILL BANK");
-
-        set_test_id("-------> RANDOMIZED SIMULATION");
+        set_test_id("-------> LOAD and FILL BANK");
         @(posedge tb_clk);
-
+        // fill_bank(0, 0);
 
         MSHR_Thread_Done = 1; 
-        SingleCycle_RW_Done = 1; 
         @(posedge tb_clk);
 
         MSHR_Thread_Done = 0; 
+        @(posedge tb_clk);
+
+        for (int way = 0; way < NUM_WAYS; way++) begin
+            for (int set = 0; set < NUM_SETS_PER_BANK; set++) begin
+                for (int blk_offset = 0; blk_offset < BLOCK_SIZE; blk_offset++) begin 
+                    for (int byte_offset = 0; byte_offset < WORD_SIZE; byte_offset++) begin 
+                        MSHR_Thread_Done = 0; 
+
+                        set_mshr(
+                            .valid(1'b1), // 0 gets tested in top_level 
+                            .uuid(('1)), // Helps to check request number in the waves.
+                            .block_addr(addr_t'{ 
+                                (set * NUM_SETS_PER_BANK + blk_offset), 
+                                set[BLOCK_INDEX_BIT_LEN-1:0], 
+                                blk_offset[BLOCK_OFF_BIT_LEN-1:0],
+                                byte_offset[BYTE_OFF_BIT_LEN-1:0]
+                            }), 
+                            .write_status(BLOCK_SIZE'('0)), 
+                            .write_block(cache_block'('0))
+                        );
+
+                        stall_for_ram();
+
+                        set_mshr(
+                            .valid('0), 
+                            .uuid('0),
+                            .block_addr('0), 
+                            .write_status('0), 
+                            .write_block('0)
+                        );
+
+                        MSHR_Thread_Done = 1; 
+                        @(posedge tb_clk);
+                    end
+                end 
+            end
+        end
+
+        set_test_id("-------> STORE and FILL BANK");
         SingleCycle_RW_Done = 0; 
         @(posedge tb_clk);
 
-        
-        fork
-        begin : mshr_process
-            for (int set = 0; set < NUM_SETS; set++) begin
-                for (int way = 0; way < NUM_WAYS; way++) begin
-                    MSHR_Thread_Done = 0; 
+        for (int way = 0; way < NUM_WAYS; way++) begin
+            for (int set = 0; set < NUM_SETS_PER_BANK; set++) begin
+                for (int blk_offset = 0; blk_offset < BLOCK_SIZE; blk_offset++) begin 
+                    for (int byte_offset = 0; byte_offset < WORD_SIZE; byte_offset++) begin 
+                        SingleCycle_RW_Done = 0; 
 
-                    tmp_mshr.valid = 1'b1;
-                    tmp_mshr.uuid = (set * NUM_WAYS + way) % 16;
-                    tmp_mshr.block_addr = addr_t'{ 
-                        {TAG_BIT_LEN{1'b1}}, 
-                        set[BLOCK_INDEX_BIT_LEN-1:0], 
-                        BLOCK_OFF_BIT_LEN'('0),
-                        BYTE_OFF_BIT_LEN'('0)
-                    };
+                        initiate_read_write(
+                            .tag(set * NUM_SETS_PER_BANK + blk_offset), 
+                            .index(set[BLOCK_INDEX_BIT_LEN-1:0]), 
+                            .block_offset(blk_offset[BLOCK_OFF_BIT_LEN-1:0]), 
+                            .byte_offset(byte_offset[BYTE_OFF_BIT_LEN-1:0]), 
+                            .rw_mode(1'b1), 
+                            .store_value($urandom_range(0, (1<<CACHE_RW_SIZE - 1)))
+                        );
 
-                    tmp_mshr.write_status = { BLOCK_SIZE{1'b0} };
-                    tmp_mshr.write_block  = '0;
-
-                    set_mshr(tmp_mshr);
-                    stall_for_ram();
-                    set_mshr('0);
-                    MSHR_Thread_Done = 1; 
-
-                    @(posedge tb_clk);
+                        SingleCycle_RW_Done = 1; 
+                        @(posedge tb_clk);
+                    end
                 end
             end
         end
 
-        begin : rw_process
-            for (int set = 0; set < NUM_SETS; set++) begin
-            for (int block_offset = 0; block_offset < BLOCK_SIZE; block_offset++) begin
-                SingleCycle_RW_Done = 0; 
+        // fork
+        // begin : mshr_process
+        //     for (int way = 0; way < NUM_WAYS; way++) begin
+        //         for (int set = 0; set < NUM_SETS_PER_BANK; set++) begin
+        //             for (int blk_offset = 0; blk_offset < BLOCK_SIZE; blk_offset++) begin 
+        //                 for (int byte_offset = 0; byte_offset < WORD_SIZE; byte_offset++) begin 
+        //                     MSHR_Thread_Done = 0; 
 
-                initiate_read_write(
-                    1'b1,                
-                    set,               
-                    block_offset,        
-                    1'b0,               
-                    1'b0,              
-                    CACHE_RW_SIZE'(32'hBEEFDEAD)
-                );
+        //                     set_mshr(
+        //                         .valid(1'b1), // 0 gets tested in top_level 
+        //                         .uuid(('1)), // Helps to check request number in the waves.
+        //                         .block_addr(addr_t'{ 
+        //                             $urandom_range(0, (1<<TAG_BIT_LEN - 1)), 
+        //                             set[BLOCK_INDEX_BIT_LEN-1:0], 
+        //                             blk_offset[BLOCK_OFF_BIT_LEN-1:0],
+        //                             byte_offset[BYTE_OFF_BIT_LEN-1:0]
+        //                         }), 
+        //                         .write_status(BLOCK_SIZE'('0)), 
+        //                         .write_block(cache_block'('0))
+        //                     );
 
-                @(posedge tb_clk);
-                SingleCycle_RW_Done = 1; 
-                @(posedge tb_clk);
-            end
-            end
-        end
-        join
+        //                     stall_for_ram();
+
+        //                     set_mshr(
+        //                         .valid('0), 
+        //                         .uuid('0),
+        //                         .block_addr('0), 
+        //                         .write_status('0), 
+        //                         .write_block('0)
+        //                     );
+
+        //                     MSHR_Thread_Done = 1; 
+        //                     @(posedge tb_clk);
+        //                 end
+        //             end 
+        //         end
+        //     end
+        // end
+
+        // begin : rw_process
+        //     for (int way = 0; way < NUM_WAYS; way++) begin
+        //         for (int set = 0; set < NUM_SETS_PER_BANK; set++) begin
+        //             for (int blk_offset = 0; blk_offset < BLOCK_SIZE; blk_offset++) begin 
+        //                 for (int byte_offset = 0; byte_offset < WORD_SIZE; byte_offset++) begin 
+        //                     SingleCycle_RW_Done = 0; 
+
+        //                     initiate_read_write(
+        //                         .tag($urandom_range(0, (1<<TAG_BIT_LEN - 1))), 
+        //                         .index(set[BLOCK_INDEX_BIT_LEN-1:0]), 
+        //                         .block_offset(blk_offset[BLOCK_OFF_BIT_LEN-1:0]), 
+        //                         .byte_offset(byte_offset[BYTE_OFF_BIT_LEN-1:0]), 
+        //                         .rw_mode(1'b0), 
+        //                         .store_value($urandom_range(0, (1<<CACHE_RW_SIZE - 1)))
+        //                     );
+
+        //                     SingleCycle_RW_Done = 1; 
+        //                     @(posedge tb_clk);
+        //                 end
+        //             end
+        //         end
+        //     end
+        // end
+        // join
 
 
         MSHR_Thread_Done = 0; 
