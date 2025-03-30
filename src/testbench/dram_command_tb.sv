@@ -70,10 +70,12 @@ module dram_command_tb;
     always @(posedge clk_val && clk_enb) begin
       clk_val <= #(tCK/2) 1'b0;
       clk_val <= #(tCK) 1'b1;
-    //   iDDR4.CK[1] <= #(tCK/2) 1'b0;
-    //   iDDR4.CK[1] <= #(tCK) 1'b1;
-    //   iDDR4.CK[0] <= #(tCK/2) 1'b1;
-    //   iDDR4.CK[0] <= #(tCK) 1'b0;
+      iDDR4.CK[1] <= #(tCK/2) 1'b0;
+      iDDR4.CK[1] <= #(tCK) 1'b1;
+      iDDR4.CK[0] <= #(tCK/2) 1'b1;
+      iDDR4.CK[0] <= #(tCK) 1'b0;
     end
+
+
 
 endmodule

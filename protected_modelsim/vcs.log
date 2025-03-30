@@ -1,186 +1,28 @@
 QuestaSim-64 vlog 2021.4 Compiler 2021.10 Oct 13 2021
-Start time: 04:23:06 on Mar 23,2025
-vlog -reportprogress 300 -work work "+acc" -l vcs.log -sv "+define+DDR4_4G_X8" dram_command.sv arch_package.sv proj_package.sv interface.sv StateTable.svp MemoryArray.svp ddr4_model.svp dram_command_tb.sv 
--- Compiling interface dram_command_if
-** Error: ** while parsing file included at dram_command.sv(1)
-** at dram_command_if.vh(16): Enum literal name 'LOAD_BG0_REG1' already exists.
-** Error: (vlog-13069) ** while parsing file included at dram_command.sv(1)
-** at dram_command_if.vh(58): near "=": syntax error, unexpected '='.
-** Error: ** while parsing file included at dram_command.sv(1)
-** at dram_command_if.vh(58): (vlog-13205) Syntax error found in the scope following 'LOAD_MODE_CMD'. Is there a missing '::'?
+Start time: 02:04:17 on Mar 29,2025
+vlog -reportprogress 300 -work work "+acc" -l vcs.log -sv "+define+DDR4_4G_X8" arch_package.sv proj_package.sv interface.sv dram_command.sv StateTable.svp MemoryArray.svp ddr4_model.svp dram_command_tb.sv 
 -- Compiling package arch_package
--- Compiling module dram_command
-** Warning: dram_command.sv(285): (vlog-2600) [RDGN] - Redundant digits in numeric literal.
-** Error: dram_command.sv(11): 'dram_state_t' is an unknown type.
-Or did you omit the '()' for an instantiation?
-** Error: dram_command.sv(11): 'dram_state_t' is an unknown type.
-Or did you omit the '()' for an instantiation?
-** Error: dram_command.sv(39): 'state' is not a variable
-** Error: dram_command.sv(39): Illegal LHS of assignment.
-** Error (suppressible): dram_command.sv(39): (vlog-2997) Cannot assign a packed type 'wire' to an unpacked type 'interface dram_state_t'.
-** Error: dram_command.sv(41): 'state' is not a variable
-** Error: dram_command.sv(41): Illegal LHS of assignment.
-** Error: dram_command.sv(47): 'n_state' is not a variable
-** Error: dram_command.sv(47): Illegal LHS of assignment.
-** Error: dram_command.sv(49): (vlog-2110) Illegal reference to net "act_not_5".
-** Error: dram_command.sv(54): (vlog-2110) Illegal reference to net "act_not_5".
-** Error: dram_command.sv(60): 'n_state' is not a variable
-** Error: dram_command.sv(60): Illegal LHS of assignment.
-** Error (suppressible): dram_command.sv(60): (vlog-2997) Case item comparison:  Cannot assign a packed type 'wire' to an unpacked type 'interface dram_state_t'.
-** Error (suppressible): dram_command.sv(59): (vlog-2998) Case item comparison:  Cannot mix packed and unpacked types in this operation.
-** Error: dram_command.sv(64): 'n_state' is not a variable
-** Error: dram_command.sv(64): Illegal LHS of assignment.
-** Error (suppressible): dram_command.sv(64): (vlog-2997) Case item comparison:  Cannot assign a packed type 'wire' to an unpacked type 'interface dram_state_t'.
-** Error (suppressible): dram_command.sv(63): (vlog-2998) Case item comparison:  Cannot mix packed and unpacked types in this operation.
-** Error: dram_command.sv(68): 'n_state' is not a variable
-** Error: dram_command.sv(68): Illegal LHS of assignment.
-** Error (suppressible): dram_command.sv(68): (vlog-2997) Case item comparison:  Cannot assign a packed type 'wire' to an unpacked type 'interface dram_state_t'.
-** Error (suppressible): dram_command.sv(67): (vlog-2998) Case item comparison:  Cannot mix packed and unpacked types in this operation.
-** Error: dram_command.sv(71): 'n_state' is not a variable
-** Error: dram_command.sv(71): Illegal LHS of assignment.
-** Error (suppressible): dram_command.sv(71): (vlog-2997) Case item comparison:  Cannot assign a packed type 'wire' to an unpacked type 'interface dram_state_t'.
-** Error (suppressible): dram_command.sv(70): (vlog-2998) Case item comparison:  Cannot mix packed and unpacked types in this operation.
-** Error: dram_command.sv(74): 'n_state' is not a variable
-** Error: dram_command.sv(74): Illegal LHS of assignment.
-** Error (suppressible): dram_command.sv(74): (vlog-2997) Case item comparison:  Cannot assign a packed type 'wire' to an unpacked type 'interface dram_state_t'.
-** Error (suppressible): dram_command.sv(73): (vlog-2998) Case item comparison:  Cannot mix packed and unpacked types in this operation.
-** Error: dram_command.sv(77): 'n_state' is not a variable
-** Error: dram_command.sv(77): Illegal LHS of assignment.
-** Error (suppressible): dram_command.sv(77): (vlog-2997) Case item comparison:  Cannot assign a packed type 'wire' to an unpacked type 'interface dram_state_t'.
-** Error (suppressible): dram_command.sv(76): (vlog-2998) Case item comparison:  Cannot mix packed and unpacked types in this operation.
-** Error: dram_command.sv(81): 'n_state' is not a variable
-** Error: dram_command.sv(81): Illegal LHS of assignment.
-** Error (suppressible): dram_command.sv(81): (vlog-2997) Case item comparison:  Cannot assign a packed type 'wire' to an unpacked type 'interface dram_state_t'.
-** Error (suppressible): dram_command.sv(80): (vlog-2998) Case item comparison:  Cannot mix packed and unpacked types in this operation.
-** Error: dram_command.sv(84): 'n_state' is not a variable
-** Error: dram_command.sv(84): Illegal LHS of assignment.
-** Error (suppressible): dram_command.sv(84): (vlog-2997) Case item comparison:  Cannot assign a packed type 'wire' to an unpacked type 'interface dram_state_t'.
-** Error (suppressible): dram_command.sv(83): (vlog-2998) Case item comparison:  Cannot mix packed and unpacked types in this operation.
-** Error: dram_command.sv(87): 'n_state' is not a variable
-** Error: dram_command.sv(87): Illegal LHS of assignment.
-** Error (suppressible): dram_command.sv(87): (vlog-2997) Case item comparison:  Cannot assign a packed type 'wire' to an unpacked type 'interface dram_state_t'.
-** Error (suppressible): dram_command.sv(86): (vlog-2998) Case item comparison:  Cannot mix packed and unpacked types in this operation.
-** Error: dram_command.sv(90): 'n_state' is not a variable
-** Error: dram_command.sv(90): Illegal LHS of assignment.
-** Error (suppressible): dram_command.sv(90): (vlog-2997) Case item comparison:  Cannot assign a packed type 'wire' to an unpacked type 'interface dram_state_t'.
-** Error (suppressible): dram_command.sv(89): (vlog-2998) Case item comparison:  Cannot mix packed and unpacked types in this operation.
-** Error: dram_command.sv(93): 'n_state' is not a variable
-** Error: dram_command.sv(93): Illegal LHS of assignment.
-** Error (suppressible): dram_command.sv(93): (vlog-2997) Case item comparison:  Cannot assign a packed type 'wire' to an unpacked type 'interface dram_state_t'.
-** Error (suppressible): dram_command.sv(92): (vlog-2998) Case item comparison:  Cannot mix packed and unpacked types in this operation.
-** Error: dram_command.sv(96): 'n_state' is not a variable
-** Error: dram_command.sv(96): Illegal LHS of assignment.
-** Error (suppressible): dram_command.sv(96): (vlog-2997) Case item comparison:  Cannot assign a packed type 'wire' to an unpacked type 'interface dram_state_t'.
-** Error (suppressible): dram_command.sv(95): (vlog-2998) Case item comparison:  Cannot mix packed and unpacked types in this operation.
-** Error: dram_command.sv(99): 'n_state' is not a variable
-** Error: dram_command.sv(99): Illegal LHS of assignment.
-** Error (suppressible): dram_command.sv(99): (vlog-2997) Case item comparison:  Cannot assign a packed type 'wire' to an unpacked type 'interface dram_state_t'.
-** Error (suppressible): dram_command.sv(98): (vlog-2998) Case item comparison:  Cannot mix packed and unpacked types in this operation.
-** Error: dram_command.sv(106): 'n_state' is not a variable
-** Error: dram_command.sv(106): Illegal LHS of assignment.
-** Error (suppressible): dram_command.sv(106): (vlog-2997) Case item comparison:  Cannot assign a packed type 'wire' to an unpacked type 'interface dram_state_t'.
-** Error: dram_command.sv(108): 'n_state' is not a variable
-** Error: dram_command.sv(108): Illegal LHS of assignment.
-** Error (suppressible): dram_command.sv(108): (vlog-2997) Case item comparison:  Cannot assign a packed type 'wire' to an unpacked type 'interface dram_state_t'.
-** Error (suppressible): dram_command.sv(104): (vlog-2998) Case item comparison:  Cannot mix packed and unpacked types in this operation.
-** Error: dram_command.sv(113): 'n_state' is not a variable
-** Error: dram_command.sv(113): Illegal LHS of assignment.
-** Error (suppressible): dram_command.sv(113): (vlog-2997) Case item comparison:  Cannot assign a packed type 'wire' to an unpacked type 'interface dram_state_t'.
-** Error: dram_command.sv(117): 'n_state' is not a variable
-** Error: dram_command.sv(117): Illegal LHS of assignment.
-** Error (suppressible): dram_command.sv(117): (vlog-2997) Case item comparison:  Cannot assign a packed type 'wire' to an unpacked type 'interface dram_state_t'.
-** Error: dram_command.sv(120): 'n_state' is not a variable
-** Error: dram_command.sv(120): Illegal LHS of assignment.
-** Error (suppressible): dram_command.sv(120): (vlog-2997) Case item comparison:  Cannot assign a packed type 'wire' to an unpacked type 'interface dram_state_t'.
-** Error: dram_command.sv(123): 'n_state' is not a variable
-** Error: dram_command.sv(123): Illegal LHS of assignment.
-** Error (suppressible): dram_command.sv(123): (vlog-2997) Case item comparison:  Cannot assign a packed type 'wire' to an unpacked type 'interface dram_state_t'.
-** Error: dram_command.sv(127): 'n_state' is not a variable
-** Error: dram_command.sv(127): Illegal LHS of assignment.
-** Error (suppressible): dram_command.sv(111): (vlog-2998) Case item comparison:  Cannot mix packed and unpacked types in this operation.
-** Error: dram_command.sv(132): 'n_state' is not a variable
-** Error: dram_command.sv(132): Illegal LHS of assignment.
-** Error (suppressible): dram_command.sv(132): (vlog-2997) Case item comparison:  Cannot assign a packed type 'wire' to an unpacked type 'interface dram_state_t'.
-** Error: dram_command.sv(134): 'n_state' is not a variable
-** Error: dram_command.sv(134): Illegal LHS of assignment.
-** Error (suppressible): dram_command.sv(134): (vlog-2997) Case item comparison:  Cannot assign a packed type 'wire' to an unpacked type 'interface dram_state_t'.
-** Error: dram_command.sv(136): 'n_state' is not a variable
-** Error: dram_command.sv(136): Illegal LHS of assignment.
-** Error (suppressible): dram_command.sv(136): (vlog-2997) Case item comparison:  Cannot assign a packed type 'wire' to an unpacked type 'interface dram_state_t'.
-** Error: dram_command.sv(139): 'n_state' is not a variable
-** Error: dram_command.sv(139): Illegal LHS of assignment.
-** Error (suppressible): dram_command.sv(139): (vlog-2997) Case item comparison:  Cannot assign a packed type 'wire' to an unpacked type 'interface dram_state_t'.
-** Error (suppressible): dram_command.sv(130): (vlog-2998) Case item comparison:  Cannot mix packed and unpacked types in this operation.
-** Error: dram_command.sv(145): 'n_state' is not a variable
-** Error: dram_command.sv(145): Illegal LHS of assignment.
-** Error (suppressible): dram_command.sv(145): (vlog-2997) Case item comparison:  Cannot assign a packed type 'wire' to an unpacked type 'interface dram_state_t'.
-** Error: dram_command.sv(147): 'n_state' is not a variable
-** Error: dram_command.sv(147): Illegal LHS of assignment.
-** Error (suppressible): dram_command.sv(147): (vlog-2997) Case item comparison:  Cannot assign a packed type 'wire' to an unpacked type 'interface dram_state_t'.
-** Error: dram_command.sv(149): 'n_state' is not a variable
-** Error: dram_command.sv(149): Illegal LHS of assignment.
-** Error: dram_command.sv(152): 'n_state' is not a variable
-** Error: dram_command.sv(152): Illegal LHS of assignment.
-** Error (suppressible): dram_command.sv(152): (vlog-2997) Case item comparison:  Cannot assign a packed type 'wire' to an unpacked type 'interface dram_state_t'.
-** Error (suppressible): dram_command.sv(143): (vlog-2998) Case item comparison:  Cannot mix packed and unpacked types in this operation.
-** Error: dram_command.sv(159): 'n_state' is not a variable
-** Error: dram_command.sv(159): Illegal LHS of assignment.
-** Error (suppressible): dram_command.sv(159): (vlog-2997) Case item comparison:  Cannot assign a packed type 'wire' to an unpacked type 'interface dram_state_t'.
-** Error: dram_command.sv(161): 'n_state' is not a variable
-** Error: dram_command.sv(161): Illegal LHS of assignment.
-** Error (suppressible): dram_command.sv(161): (vlog-2997) Case item comparison:  Cannot assign a packed type 'wire' to an unpacked type 'interface dram_state_t'.
-** Error (suppressible): dram_command.sv(156): (vlog-2998) Case item comparison:  Cannot mix packed and unpacked types in this operation.
-** Error: dram_command.sv(195): (vlog-2110) Illegal reference to net "cmd_ddr".
-** Error (suppressible): dram_command.sv(194): (vlog-2998) Case item comparison:  Cannot mix packed and unpacked types in this operation.
-** Error: dram_command.sv(207): (vlog-2110) Illegal reference to net "cmd_ddr".
-** Error (suppressible): dram_command.sv(206): (vlog-2998) Case item comparison:  Cannot mix packed and unpacked types in this operation.
-** Error (suppressible): dram_command.sv(218): (vlog-2998) Case item comparison:  Cannot mix packed and unpacked types in this operation.
-** Error (suppressible): dram_command.sv(221): (vlog-2998) Case item comparison:  Cannot mix packed and unpacked types in this operation.
-** Error (suppressible): dram_command.sv(224): (vlog-2998) Case item comparison:  Cannot mix packed and unpacked types in this operation.
-** Error (suppressible): dram_command.sv(232): (vlog-2998) Case item comparison:  Cannot mix packed and unpacked types in this operation.
-** Error (suppressible): dram_command.sv(240): (vlog-2998) Case item comparison:  Cannot mix packed and unpacked types in this operation.
-** Error (suppressible): dram_command.sv(248): (vlog-2998) Case item comparison:  Cannot mix packed and unpacked types in this operation.
-** Error (suppressible): dram_command.sv(256): (vlog-2998) Case item comparison:  Cannot mix packed and unpacked types in this operation.
-** Error: dram_command.sv(267): (vlog-2110) Illegal reference to net "BG".
-** Error: dram_command.sv(268): (vlog-2110) Illegal reference to net "BA".
-** Error: dram_command.sv(269): (vlog-2110) Illegal reference to net "ADDR".
-** Error (suppressible): dram_command.sv(264): (vlog-2998) Case item comparison:  Cannot mix packed and unpacked types in this operation.
-** Error (suppressible): dram_command.sv(272): (vlog-2998) Case item comparison:  Cannot mix packed and unpacked types in this operation.
-** Error (suppressible): dram_command.sv(280): (vlog-2998) Case item comparison:  Cannot mix packed and unpacked types in this operation.
-** Error (suppressible): dram_command.sv(288): (vlog-2998) Case item comparison:  Cannot mix packed and unpacked types in this operation.
-** Error (suppressible): dram_command.sv(294): (vlog-2998) Case item comparison:  Cannot mix packed and unpacked types in this operation.
-** Error (suppressible): dram_command.sv(297): (vlog-2998) Case item comparison:  Cannot mix packed and unpacked types in this operation.
-** Error (suppressible): dram_command.sv(308): (vlog-2998) Case item comparison:  Cannot mix packed and unpacked types in this operation.
-** Error (suppressible): dram_command.sv(319): (vlog-2998) Case item comparison:  Cannot mix packed and unpacked types in this operation.
-** Error (suppressible): dram_command.sv(331): (vlog-2998) Case item comparison:  Cannot mix packed and unpacked types in this operation.
-** Error (suppressible): dram_command.sv(348): (vlog-2998) Case item comparison:  Cannot mix packed and unpacked types in this operation.
-** Error (suppressible): dram_command.sv(348): (vlog-2998) Case item comparison:  Cannot mix packed and unpacked types in this operation.
-** Error (suppressible): dram_command.sv(348): (vlog-2998) Case item comparison:  Cannot mix packed and unpacked types in this operation.
-** Error (suppressible): dram_command.sv(349): (vlog-2998) Case item comparison:  Cannot mix packed and unpacked types in this operation.
-** Error (suppressible): dram_command.sv(350): (vlog-2998) Case item comparison:  Cannot mix packed and unpacked types in this operation.
-** Error (suppressible): dram_command.sv(351): (vlog-2998) Case item comparison:  Cannot mix packed and unpacked types in this operation.
-** Error (suppressible): dram_command.sv(352): (vlog-2998) Case item comparison:  Cannot mix packed and unpacked types in this operation.
-** Error (suppressible): dram_command.sv(353): (vlog-2998) Case item comparison:  Cannot mix packed and unpacked types in this operation.
-** Error (suppressible): dram_command.sv(354): (vlog-2998) Case item comparison:  Cannot mix packed and unpacked types in this operation.
-** Error (suppressible): dram_command.sv(355): (vlog-2998) Case item comparison:  Cannot mix packed and unpacked types in this operation.
-** Error (suppressible): dram_command.sv(356): (vlog-2998) Case item comparison:  Cannot mix packed and unpacked types in this operation.
-** Error (suppressible): dram_command.sv(357): (vlog-2998) Case item comparison:  Cannot mix packed and unpacked types in this operation.
-** Error (suppressible): dram_command.sv(358): (vlog-2998) Case item comparison:  Cannot mix packed and unpacked types in this operation.
-** Error (suppressible): dram_command.sv(361): (vlog-2998) Case item comparison:  Cannot mix packed and unpacked types in this operation.
-** Error (suppressible): dram_command.sv(375): (vlog-2998) Case item comparison:  Cannot mix packed and unpacked types in this operation.
-** Error (suppressible): dram_command.sv(390): (vlog-2998) Case item comparison:  Cannot mix packed and unpacked types in this operation.
-** Error (suppressible): dram_command.sv(411): (vlog-2998) Case item comparison:  Cannot mix packed and unpacked types in this operation.
 -- Compiling package proj_package
 -- Importing package arch_package
 -- Compiling interface DDR4_if
-** Error: StateTable.svp(110): End of source encountered before closing `ifdef region started at dram_command_if.vh(1).
-** Error: MemoryArray.svp(342): End of source encountered before closing `ifdef region started at dram_command_if.vh(1).
-** Error: ddr4_model.svp(3305): End of source encountered before closing `ifdef region started at dram_command_if.vh(1).
-** Error: ** while parsing file included at dram_command_tb.sv(1)
-** at dram_command_if.vh(16): Enum literal name 'LOAD_BG0_REG1' already exists.
-** Error: (vlog-13069) ** while parsing file included at dram_command_tb.sv(1)
-** at dram_command_if.vh(58): near "=": syntax error, unexpected '='.
-** Error: ** while parsing file included at dram_command_tb.sv(1)
-** at dram_command_if.vh(58): (vlog-13205) Syntax error found in the scope following 'LOAD_MODE_CMD'. Is there a missing '::'?
-End time: 04:23:07 on Mar 23,2025, Elapsed time: 0:00:01
-Errors: 166, Warnings: 1
+-- Compiling package dram_pack
+-- Compiling interface dram_command_if
+-- Importing package dram_pack
+-- Compiling module dram_command
+-- Importing package proj_package
+** Warning: ** while parsing file included at ddr4_model.svp(17)
+** at StateTable.svp(17): (vlog-2275) Existing <protected> '<protected>'<protected> will be overwritten<protected>.
+** Warning: ** while parsing file included at ddr4_model.svp(17)
+** at MemoryArray.svp(17): (vlog-2275) Existing <protected> '<protected>'<protected> will be overwritten<protected>.
+-- Compiling package dram_pack
+** Warning: ** while parsing file included at dram_command_tb.sv(1)
+** at dram_command_if.vh(4): (vlog-2275) Existing package 'dram_pack' at line 4 will be overwritten.
+-- Compiling interface dram_command_if
+** Warning: ** while parsing file included at dram_command_tb.sv(1)
+** at dram_command_if.vh(144): (vlog-2275) Existing interface 'dram_command_if' at line 144 will be overwritten.
+-- Compiling module dram_command_tb
+
+Top level modules:
+	dram_command_tb
+End time: 02:04:18 on Mar 29,2025, Elapsed time: 0:00:01
+Errors: 0, Warnings: 4

@@ -1,13 +1,14 @@
 `ifndef DRAM_COMMAND_IF
 `define DRAM_COMMAND_IF
 
-interface dram_command_if();
-    typedef enum logic [4:0] {
+package dram_pack;
+
+typedef enum logic [4:0] {
         POWER_UP,
         PRE_RESET,
         RESET,
         NOP,
-        LOAD_BG0_REG1,
+        LOAD_MODE_DLL,
         LOAD_BG0_REG3,
         LOAD_BG1_REG6,
         LOAD_BG1_REG5,
@@ -53,8 +54,22 @@ interface dram_command_if();
     parameter FLY_BY = 0;
     parameter NO_AUTO_PRE = 0;
 
-    parameter     // {cs, act, ras, cas, we}
-        POWER_UP_PRG  = 5'b01111;
+    // parameter     
+    //     POWER_UP_PRG  = 5'b01111,
+    //     LOAD_MODE_CMD = 5'b01000,
+    //     REFRESH_CMD   = 5'b01001,
+    //     PRECHARGE_CMD = 5'b01010,
+    //     ACTIVATE_CMD  = 5'b00xxx,
+    //     WRITE_CMD     = 5'b01100,
+    //     READ_CMD      = 5'b01101,
+    //     ZQ_CMD        = 5'b01110,
+    //     NOP_CMD       = 5'b01111,
+    //     SELF_REF_CMD  = 5'b01001,
+    //     DESEL_CMD     = 5'b10000
+    // ;
+    // {cs, act, ras, cas, we}
+    typedef enum logic [4:0] {
+        POWER_UP_PRG  = 5'b01111,
         LOAD_MODE_CMD = 5'b01000,
         REFRESH_CMD   = 5'b01001,
         PRECHARGE_CMD = 5'b01010,
@@ -62,14 +77,14 @@ interface dram_command_if();
         WRITE_CMD     = 5'b01100,
         READ_CMD      = 5'b01101,
         ZQ_CMD        = 5'b01110,
-        NOP_CMD       = 5'b01111,
-        SELF_REF_CMD  = 5'b01001,
-        DESEL_CMD     = 5'b1xxxx
-    ;
-
+        DESEL_CMD     = 5'b10000
+    } cmd_t;
     ////////////////// Parameters DDR4 Speed 1600 ///////////////
     parameter BURST_LENGTH  = 4;
     parameter CONFIGURED_DQ_BITS     = 16;
+    parameter CONFIGURED_DQS_BITS     = 16;
+    parameter CONFIGURED_DM_BITS     = 16;
+
     parameter CONFIGURED_RANKS = 1;
     parameter DM_BITS       = 16;
     parameter tRESET        = 80;
@@ -109,6 +124,7 @@ interface dram_command_if();
     //WRITING TIMING
     parameter  tAL = 0; //Only for SDRAM but will change later if something is weird
     parameter tCWD = 12; // Put 12 for now due to the micron testing [9, 20]
+    parameter tWTR = 12; //pur 12 for now due to micron testing [10, 28] 
     parameter tWR = 12; //pur 12 for now due to micron testing [10, 28] 
     parameter tWL = tAL + tCWD;
 
@@ -124,6 +140,9 @@ interface dram_command_if();
     
 
 
+endpackage: dram_pack
+interface dram_command_if();
+    import dram_pack::*;
     //Signals from command generator to DRAM
     logic[1:0] CK; // CK[0]==CK_c CK[1]==CK_t
     logic ACT_n;
@@ -153,12 +172,12 @@ interface dram_command_if();
 
 
     //Signals command from Scheduler buffer to command generator
-    logic [MAX_RANKS_BITS - 1 : 0]Ra0, Ra1; //Rank prev and curr
-    logic [MAX_BANKS_BITS - 1 : 0] BA0, BA1; //bank prev and curr
-    logic [MAX_ROW_ADDR_BITS - 1 : 0] RO, R1; //Rol prev and curr
+    logic [MAX_RANK_BITS - 1 : 0]Ra0, Ra1; //Rank prev and curr
+    logic [MAX_BANK_BITS - 1 : 0] BA0, BA1; //bank prev and curr
+    logic [MAX_ROW_ADDR_BITS - 1 : 0] R0, R1; //Rol prev and curr
     logic [MAX_COL_ADDR_BITS - 1 : 0]COL0, COL1; //Col prev and curr
     logic [MAX_BANK_GROUP_BITS - 1: 0] BG0, BG1;
-    logic dREN_curr, dWEN_curr, dREN_ftr, dWEN_ftr;
+    logic ramREN_curr, ramWEN_curr, ramREN_ftrt, ramWEN_ftrt;
     
     logic [31:0] data_callback, write_data;
     logic request_done;
@@ -166,15 +185,17 @@ interface dram_command_if();
     //Timing counter REFRESH
     logic REFRESH;
     modport dram_command_sche_buff(
-        input Ra0, Ra1, BG0, BG1, BA0, BA1, R0, R1, COL0, COL1, dREN_curr, dWEN_curr, dREN_ftr, dWEN_ftr, REFRESH, write_data,
+        input Ra0, Ra1, BG0, BG1, BA0, BA1, R0, R1, COL0, COL1, ramREN_curr, ramWEN_curr, ramREN_ftrt, ramWEN_ftrt, REFRESH, write_data,
         output data_callback, request_done
     );
 
-    modport dram_command_DRAM (
+    modport dram_command_RAM (
         input DM_n, DQ, DQS_t, DQS_c,
-        output ACT_n, RAS_n_A16, CAS_n_A15, WE_n_A14, ALERT_n, PARITY, RESET_n, TEN, CS_n, CKE, ODT, C, BG, BA, ADDR, ADDR_17
+        output ACT_n, RAS_n_A16, CAS_n_A15, WE_n_A14, ALERT_n, PARITY, RESET_n, TEN, CS_n, CKE, ODT, C, BG, BA, ADDR, ADDR_17, PWR, VREF_CA, VREF_DQ, ZQ
 
     );
+
+    
 
 endinterface
 

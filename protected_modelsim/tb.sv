@@ -186,6 +186,7 @@ module tb;
       iDDR4.CK[1] <= #(timing.tCK) 1'b1;
       iDDR4.CK[0] <= #(timing.tCK/2) 1'b1;
       iDDR4.CK[0] <= #(timing.tCK) 1'b0;
+      
     end
 
     socetlib_counter counter (.CLK (clk_val), .nRST(nRST), .clear(timing_trk.clear), .count_enable(iDDR4.CK[1]), .overflow_val(32'd 3000), .count_out(count_out), .overflow_flag());

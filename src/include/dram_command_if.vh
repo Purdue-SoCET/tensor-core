@@ -65,7 +65,7 @@ typedef enum logic [4:0] {
         ZQ_CMD        = 5'b01110,
         NOP_CMD       = 5'b01111,
         SELF_REF_CMD  = 5'b01001,
-        DESEL_CMD     = 5'b1xxxx
+        DESEL_CMD     = 5'b10000
     ;
 
     ////////////////// Parameters DDR4 Speed 1600 ///////////////

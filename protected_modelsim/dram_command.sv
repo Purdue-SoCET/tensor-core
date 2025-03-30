@@ -8,13 +8,17 @@ module dram_command (
     dram_command_if.dram_command_sche_buff dr_sche
 );
 
+    import dram_pack::*;
+
     dram_state_t state, n_state;
     logic [11:0] rollover_value;
 
     logic [11:0] timing_count, n_timing_count;
-    logic [4:0] cmd_addr;
+    cmd_t cmd_addr;
 
     logic [2:0] count_act, n_count_act;
+    logic act_not_5;
+    logic issue_cmd;
 
     always_ff @(posedge CLK, negedge nRST) begin: ACT_n
         if(!nRST) begin
@@ -34,7 +38,7 @@ module dram_command (
     end
 
     //The tb update every negative edge of the clock not so sure why
-    always_ff @(posedge CLK, negedge nRST) begin: dram_state_t
+    always_ff @(posedge CLK, negedge nRST) begin: dram_state_t_logic
         if (!nRST) begin
             state <= POWER_UP;
         end else begin
@@ -68,10 +72,10 @@ module dram_command (
                 n_state = timing_count == rollover_value ? NOP : RESET; 
             end
             NOP: begin 
-                n_state = timing_count == rollover_value ? LOAD_BG1_REG1 : NOP; 
+                n_state = timing_count == rollover_value ? LOAD_MODE_DLL : NOP; 
             end
-            LOAD_BG0_REG1: begin 
-                n_state = timing_count == rollover_value ? LOAD_BG0_REG3 : LOAD_BG0_REG1; 
+            LOAD_MODE_DLL: begin 
+                n_state = timing_count == rollover_value ? LOAD_BG0_REG3 : LOAD_MODE_DLL; 
             end
             LOAD_BG0_REG3: begin 
                 n_state = timing_count == rollover_value ? LOAD_BG1_REG6 : LOAD_BG0_REG3; 
@@ -102,7 +106,7 @@ module dram_command (
 
             //Start to working on between IDLE, ACTIVATE, WRITE, PRECHARGE, WRITE_COMMAND, READ_COMMAND
             IDLE: begin
-                if (!dr_sche.REFRESH && dr_sche.dWEN_curr || dr_sche.dREN_curr) begin
+                if (!dr_sche.REFRESH && dr_sche.ramWEN_curr || dr_sche.ramREN_curr) begin
                     n_state = ACTIVATE;
                 end else if (dr_sche.REFRESH) begin
                     n_state = IDLE; //This shoudl be refresh case
@@ -116,13 +120,13 @@ module dram_command (
                 else if (!act_not_5) begin
                     n_state = PRECHARGE;
                 end
-                else if (dr_sche.dWEN_curr && timing_count == rollover_value) begin
+                else if (dr_sche.ramWEN_curr && timing_count == rollover_value) begin
                     n_state = WRITE_COMMAND;
                     n_count_act = 3'd1;
-                end else if (dr_sche.dREN_curr && timing_count == rollover_value) begin
+                end else if (dr_sche.ramREN_curr && timing_count == rollover_value) begin
                     n_state = READ_COMMAND;
                     n_count_act = 3'd1;
-                end else if (dr_sche.B0 != dr_sche.B1) begin
+                end else if (dr_sche.BA0 != dr_sche.BA1) begin
                     n_count_act = count_act + 3'd1;
                     n_state = state;
                 end
@@ -130,9 +134,9 @@ module dram_command (
             WRITE_COMMAND: begin
                 if (dr_sche.REFRESH && timing_count == rollover_value) begin
                     n_state = PRECHARGE;
-                end else if (dr_sche.dREN_curr && timing_count == rollover_value) begin
+                end else if (dr_sche.ramREN_curr && timing_count == rollover_value) begin
                     n_state = READ_COMMAND;
-                end else if ((dr_sche.Ra0 != dr_sche.Ra1 && dr_sche.R0 == dr_sche.R1) || (dr_sche.B0 == dr_sche.B1 && dr_sche.Ra0 == dr_sche.Ra1) && (timing_count == rollover_value) && dr_sche.dWEN_ftrt) begin
+                end else if ((dr_sche.Ra0 != dr_sche.Ra1 && dr_sche.R0 == dr_sche.R1) || (dr_sche.BA0 == dr_sche.BA1 && dr_sche.Ra0 == dr_sche.Ra1) && (timing_count == rollover_value) && dr_sche.ramWEN_ftrt) begin
                     n_state = WRITE_COMMAND;
                 end
                 else if (timing_count == rollover_value) begin
@@ -142,20 +146,20 @@ module dram_command (
 
             READ_COMMAND: begin 
                 if (dr_sche.REFRESH && timing_count == rollover_value) begin
-                    n_state = PRE_CHARGE;
-                end else if (dr_sche.dWEN_curr && timing_count == rollover_value) begin
+                    n_state = PRECHARGE;
+                end else if (dr_sche.ramWEN_curr && timing_count == rollover_value) begin
                     n_state = WRITE_COMMAND;
-                end else if (dr_sche.dREN_ftrt && (dr_sche.R0 == dr_sche.R1 && dr_sche.B0 == dr_sche.B1 && dr_sche.Ra0 == dr_sche.Ra1)) begin
+                end else if (dr_sche.ramREN_ftrt && (dr_sche.R0 == dr_sche.R1 && dr_sche.BA0 == dr_sche.BA1 && dr_sche.Ra0 == dr_sche.Ra1)) begin
                     n_state = state;
                 end
                 else if (timing_count == rollover_value) begin
-                    n_state = PRE_CHARGE;
+                    n_state = PRECHARGE;
                 end
             end 
 
             PRECHARGE: begin
                 n_count_act = 3'd0;
-                if ((dr_sche.dREN_curr || dr_sche.dWEN_curr) && (timing_count == rollover_value) && !dr_sche.REFRESH) begin
+                if ((dr_sche.ramREN_curr || dr_sche.ramWEN_curr) && (timing_count == rollover_value) && !dr_sche.REFRESH) begin
                     n_state = ACTIVATE;
                 end else if (timing_count == rollover_value) begin
                     n_state = IDLE;
@@ -163,7 +167,7 @@ module dram_command (
             end
         endcase
 
-        if (state != n_state) begin
+        if (state != n_state || state == IDLE) begin
             n_timing_count = 12'd1;
         end
     end
@@ -181,18 +185,26 @@ module dram_command (
         dr_ram.BG = '0;
         dr_ram.BA = '0;
         dr_ram.ADDR =  '0;
-        dr_ram.RAS_n_A16 = '1;
-        dr_ram.CAS_n_A15 = '1;
-        dr_ram.WE_n_A14 = '1;
+        // dr_ram.RAS_n_A16 = '1;
+        // dr_ram.CAS_n_A15 = '1;
+        // dr_ram.WE_n_A14 = '1;
         dr_ram.ADDR_17 = '0;
+
+        dr_ram.ZQ = 0;
+        dr_ram.PWR = 0;
+        dr_ram.VREF_CA = 0;
+        dr_ram.VREF_DQ = 0;
+        
 
         dr_sche.data_callback = '0;
         dr_sche.request_done = 1'b0;
+        issue_cmd = 1'b0;
         
 
         case (state)
             POWER_UP: begin
-                cmd_ddr = POWER_UP_PRG;
+                
+                cmd_addr = POWER_UP_PRG;
                 dr_ram.CKE = 0;
                 dr_ram.TEN = 0;
                 dr_ram.PARITY = 0;
@@ -202,9 +214,11 @@ module dram_command (
                 dr_ram.PWR = 0;
                 dr_ram.VREF_CA = 0;
                 dr_ram.VREF_DQ = 0;
+                
             end
             PRE_RESET: begin
-                cmd_ddr = POWER_UP_PRG;
+                
+                cmd_addr = POWER_UP_PRG;
                 dr_ram.CKE = 0;
                 dr_ram.TEN = 0;
                 dr_ram.PARITY = 0;
@@ -214,6 +228,7 @@ module dram_command (
                 dr_ram.PWR = 1;
                 dr_ram.VREF_CA = 1;
                 dr_ram.VREF_DQ = 1;
+                
             end
             RESET: begin
                 dr_ram.RESET_n = 1;
@@ -221,7 +236,7 @@ module dram_command (
             NOP: begin
                 cmd_addr = DESEL_CMD;
             end
-            LOAD_BG0_REG1: begin
+            LOAD_MODE_DLL: begin
                 if (timing_count < 2) begin
                     cmd_addr = LOAD_MODE_CMD;
                     dr_ram.BG       = 2'h0;
@@ -264,9 +279,9 @@ module dram_command (
             LOAD_BG0_REG2: begin
                 if (timing_count < 2) begin
                     cmd_addr = LOAD_MODE_CMD;
-                    BG       = 2'h0;
-                    BA       = 2'h2;
-                    ADDR     = 14'h0088;
+                    dr_ram.BG       = 2'h0;
+                    dr_ram.BA       = 2'h2;
+                    dr_ram.ADDR     = 14'h0088;
                 end
             end
             LOAD_BG0_REG1: begin 
@@ -282,7 +297,7 @@ module dram_command (
                     cmd_addr = LOAD_MODE_CMD;
                     dr_ram.BG       = 2'h0;
                     dr_ram.BA       = 2'h0;
-                    dr_ram.ADDR     = 14'h0041d;
+                    dr_ram.ADDR     = 14'h041d;
                 end
             end
             ZQ_CL: begin
@@ -292,7 +307,7 @@ module dram_command (
                 end
             end
             IDLE: begin
-                cmd_addr = NOP_CMD;
+                cmd_addr = DESEL_CMD;
             end
             ACTIVATE: begin
                 if (timing_count < 2) begin
@@ -330,7 +345,7 @@ module dram_command (
             end
             PRECHARGE: begin
                 if (timing_count < 2) begin
-                    cmd_addr = PRE_CMD;
+                    cmd_addr = PRECHARGE_CMD;
                     dr_ram.BG = dr_sche.BG0;
                     dr_ram.BA = dr_sche.BA0;
                     dr_ram.ADDR[10] = 1'b0;
@@ -339,19 +354,24 @@ module dram_command (
 
             default: ;
             
-        endcase        
+        endcase 
+        
+        {dr_ram.CS_n, dr_ram.ACT_n, dr_ram.RAS_n_A16, dr_ram.CAS_n_A15, dr_ram.WE_n_A14} = (!nRST) ? DESEL_CMD : cmd_addr;       
     end
+
+
+
 
     always_comb begin : CONTROL_TIME
         rollover_value = 32'd3000;
         case (state)
             POWER_UP, PRE_RESET, RESET: begin rollover_value = tPWUP; end
-            NOP: begin rollover_value = tPDc; end
+            NOP: begin rollover_value = tPDc + tXPR; end
+            LOAD_MODE_DLL: begin rollover_value = tDLLKc; end
             LOAD_BG0_REG0,
             LOAD_BG0_REG1,
             LOAD_BG0_REG2,
             LOAD_BG0_REG3,
-            LOAD_BG1_REG1,
             LOAD_BG1_REG4,
             LOAD_BG1_REG5,
             LOAD_BG1_REG6: begin rollover_value = tMOD; end
@@ -360,7 +380,7 @@ module dram_command (
 
             ACTIVATE: begin
                 if (act_not_5) begin
-                    if (dr_sche.dREN_curr || dr_sche.dWEN_curr) begin
+                    if (dr_sche.ramREN_curr || dr_sche.ramWEN_curr) begin
                         rollover_value = tRCD;
                     end 
                     else if (dr_sche.BG0 != dr_sche.BG1) begin
@@ -373,13 +393,13 @@ module dram_command (
                 end
             end            //Read and write and activation command
             READ_COMMAND: begin
-                if (dr_sche.dREN_ftrt && dr_sche.Ra0 != dr_sche.Ra1) begin
+                if (dr_sche.ramREN_ftrt && dr_sche.Ra0 != dr_sche.Ra1) begin
                     rollover_value = tBURST + tRTRS;
                 end
-                else if (dr_sche.dWEN_ftrt && dr_sche.R0 == dr_sche.R1) begin
+                else if (dr_sche.ramWEN_ftrt && dr_sche.R0 == dr_sche.R1) begin
                     rollover_value = tCAS + tBURST + tRTRS - tCWD;     
                 end
-                else if (dr_sche.B0 != dr_sche.B1 && dr_sche.R0 != dr_sche.R1) begin
+                else if (dr_sche.BA0 != dr_sche.BA1 && dr_sche.R0 != dr_sche.R1) begin
                     rollover_value = 2;
                 end
                 else begin
@@ -388,19 +408,19 @@ module dram_command (
             end
 
             WRITE_COMMAND: begin
-                if (dr_sche.BG0 != dr_sche.BG1 && dr_sche.Ra0 == dr_sche.Ra1 && dr_sche.dWEN_ftrt) begin
+                if (dr_sche.BG0 != dr_sche.BG1 && dr_sche.Ra0 == dr_sche.Ra1 && dr_sche.ramWEN_ftrt) begin
                     rollover_value = tCCD_S;
-                end else if (dr_sche.BG0 != dr_sche.BG1 && dr_sche.Ra0 == dr_sche.Ra1 && dr_sche.dWEN_ftrt) begin
+                end else if (dr_sche.BG0 != dr_sche.BG1 && dr_sche.Ra0 == dr_sche.Ra1 && dr_sche.ramWEN_ftrt) begin
                     rollover_value = tCCD_L;
                 end
-                else if (dr_sche.Ra0 != dr_sche.Ra1 && dr_sche.R0 == dr_sche.R1 && dr_sche.dWEN_ftrt) begin
+                else if (dr_sche.Ra0 != dr_sche.Ra1 && dr_sche.R0 == dr_sche.R1 && dr_sche.ramWEN_ftrt) begin
                     rollover_value = tCWD + tBURST + tOST + tBURST;
-                end else if (dr_sche.Ra0 != dr_sche.Ra1 && dr_sche.R0 != dr_sche.R1 && dr_sche.dWEN_ftrt) begin
+                end else if (dr_sche.Ra0 != dr_sche.Ra1 && dr_sche.R0 != dr_sche.R1 && dr_sche.ramWEN_ftrt) begin
                     rollover_value = tCWD;
 
-                end else if (dr_sche.Ra1 == dr_sche.Ra0 && dr_sche.R0 == dr_sche.R1 && dr_sche.dREN_ftrt) begin
+                end else if (dr_sche.Ra1 == dr_sche.Ra0 && dr_sche.R0 == dr_sche.R1 && dr_sche.ramREN_ftrt) begin
                     rollover_value = tCWD + tBURST + tWTR;
-                end else if (dr_sche.Ra1 != dr_sche.Ra0 && dr_sche.R0 == dr_sche.R1 && dr_sche.dREN_ftrt) begin
+                end else if (dr_sche.Ra1 != dr_sche.Ra0 && dr_sche.R0 == dr_sche.R1 && dr_sche.ramREN_ftrt) begin
                     rollover_value = tCWD + tBURST + tRTRS;
                 end
                 else begin 
@@ -408,7 +428,7 @@ module dram_command (
                 end
             end
 
-            PRE_CHARGE: begin
+            PRECHARGE: begin
                 rollover_value = tRP;
             end
 
@@ -418,7 +438,7 @@ module dram_command (
         
     end
 
-    assign {dr_ram.CK_n, dr_ram.ACT_n, dr_ram.RAS_n_A16, dr_ram.CAS_n_A15, dr_ram.WE_n_A14} = cmd_addr;
+    
 
 
 endmodule

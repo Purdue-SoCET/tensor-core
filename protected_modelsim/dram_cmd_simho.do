@@ -27,5 +27,5 @@
 
 vlib work
 vlog -work work +acc -l vcs.log -sv +define+DDR4_4G_X8 arch_package.sv proj_package.sv interface.sv dram_command.sv  StateTable.svp MemoryArray.svp ddr4_model.svp dram_command_tb.sv
-vsim dram_command_tb -do "do ./scripts/dram_sim.do"
+vsim dram_command_tb
 run -all
