@@ -1,0 +1,391 @@
+import numpy as np
+import pandas as pd
+import re
+from typing import List, Optional
+pd.set_option('display.max_rows', None)
+# 4x4, 4x4, 0, 1 -> 10
+# 5x5, 4x4, 0, 1 -> 22 
+# 6x6, 4x4, 0, 1 -> 42
+# 7x7, 4x4, 0, 1 -> 70
+# 5x5, 3x3, 0, 1 -> 31
+# 5x5, 3x3, 0, 2 -> 16
+def _output_size(I, K, P, S): 
+    return int((I - K + 2*P)/(S)) + 1
+
+kernel_size = 4
+padding = 0
+stride = 1
+
+activations_size = 7
+output_size = _output_size(activations_size, kernel_size, padding, stride)
+num_patches = output_size ** 2
+f"{output_size}x{output_size}"
+I, J = np.indices((activations_size, activations_size))
+activations = np.char.add(np.char.add('A', I.astype(str)), J.astype(str))
+I, J = np.indices((kernel_size, kernel_size))
+kernel = np.char.add(np.char.add('K', I.astype(str)), J.astype(str))
+equations = []
+patches = [] 
+inv_patches = [] 
+
+num_rows = (activations_size - kernel_size) // stride + 1
+num_cols = (activations_size - kernel_size) // stride + 1
+
+equations_matrix = [[None for _ in range(num_cols)] for _ in range(num_rows)]
+
+for i in range(0, activations_size - kernel_size + 1, stride):
+    for j in range(0, activations_size - kernel_size + 1, stride):
+        patch = activations[i:i+kernel_size, j:j+kernel_size]
+        inv_patch = activations[i:i+kernel_size, j:j+kernel_size].T
+        patches.append(patch)
+        inv_patches.append(inv_patch)
+        
+        terms = []
+        for a in range(kernel_size):
+            for b in range(kernel_size):
+                terms.append(f"{patch[a, b]}*{kernel[a, b]}")
+        equation = " + ".join(terms)
+        
+        row_idx = i // stride
+        col_idx = j // stride
+        equations_matrix[row_idx][col_idx] = equation
+split_equations_dict = {'0': '000_0'}
+
+for row_id in range(len(equations_matrix)):
+    for col_id in range(len(equations_matrix[row_id])):
+        equation = equations_matrix[row_id][col_id]
+        terms = equation.split(" + ")
+        split_eq = []
+
+        for i in range(kernel_size):
+            split_eq.append(" + ".join(terms[i*kernel_size : (i+1)*kernel_size]))
+        
+        for i, eq in enumerate(split_eq):
+            key = f"C{row_id}{col_id}_{i}"
+            split_equations_dict[eq] = key
+patches = np.array(patches)
+inv_patches = np.array(inv_patches)
+class PE:
+    # links: [0: left, 1: up, 2: right, 3: down]
+    def __init__(self, links: Optional[List['PE']] = None):
+        if links is None:
+            links = [None, None, None, None]
+        self.links = links
+        self.activation = "0"
+        self.weight = '--'
+        self.accumulation: str = "0"
+    
+    def _input(self, activation: str):
+        self.activation = activation
+    
+    def _weight(self, weight: str):
+        self.weight = weight
+    
+    def shift(self, shift_direction: int, activation_flag: bool):
+        neighbor = self.links[shift_direction]
+        if neighbor is not None:
+            if activation_flag:
+                neighbor._input(self.activation)
+            else:
+                neighbor._weight(self.weight)
+
+class SystolicArray:
+    def __init__(self, size: int):
+        self.size = size
+        self.buffer = []  
+        self.array = self._setup_array()
+    
+    def _setup_array(self):
+        array = [[PE() for _ in range(self.size)] for _ in range(self.size)]
+        for i in range(self.size):
+            for j in range(self.size):
+                left = array[i][j-1] if j > 0 else None
+                up = array[i-1][j] if i > 0 else None
+                right = array[i][j+1] if j < self.size - 1 else None
+                down = array[i+1][j] if i < self.size - 1 else None
+                array[i][j].links = [left, up, right, down]
+        return array
+
+    def print_array(self):
+        for i in range(self.size):
+            row_parts = []
+            for pe in self.array[i]:
+                act_str = str(pe.activation).ljust(4)  # Convert activation to string
+                weight_str = str(pe.weight).ljust(4)   # Convert weight to string
+                
+                if str(pe.accumulation).strip() == "0":
+                    parts = ["0", "0", "0", "0"]
+                else:
+                    parts = [p.strip() for p in str(pe.accumulation).split('+')]
+                    while len(parts) < 4:  # Ensure at least 4 elements
+                        parts.append("0")
+                    parts = parts[:4]
+                parts = [p.ljust(8) for p in parts]
+                acc_str = " + ".join(parts)
+                
+                row_parts.append(f"[A:{act_str} | W:{weight_str} | Acc:{acc_str}]")
+            print(" | ".join(row_parts))
+
+    def cycle(self, new_activations: Optional[List[str]] = None):
+        if new_activations:
+            for i in range(self.size):
+                #  shift activations rightward
+                for j in range(self.size - 1, 0, -1):
+                    self.array[i][j].activation = self.array[i][j-1].activation
+                # shift the new activation into column 0.
+                self.array[i][0].activation = new_activations[i]
+        
+        bottom_row = [self.array[self.size - 1][j].accumulation for j in range(self.size)]
+        self.buffer.append(bottom_row)
+        # Look to get the equations
+        
+        for j in range(self.size):
+            # save previous cycle's accumulations for column j
+            prev_acc = [self.array[i][j].accumulation for i in range(self.size)]
+            
+            # Update the accumulation in row 0 for column j.
+            cell0 = self.array[0][j]
+            prod0 = f"{cell0.activation}*{cell0.weight}" if cell0.activation not in ["0", "--"] else "0"
+            cell0.accumulation = prod0
+            
+            for i in range(1, self.size):
+                cell = self.array[i][j]
+                prod = f"{cell.activation}*{cell.weight}" if cell.activation not in ["0", "--"] else "0"
+                inherited = prev_acc[i-1]
+                if inherited == "0":
+                    new_acc = prod
+                else:
+                    new_acc = inherited + (f" + {prod}" if prod != "0" else "")
+                cell.accumulation = new_acc if new_acc != "" else "0"
+class Conv2dSimulator:
+    def __init__(self, input_height: int, input_width: int, kernel_size: int):
+        """
+        Initializes the systolic array for a given input matrix size and kernel size.
+        :param input_height: Number of rows in the input matrix
+        :param input_width: Number of columns in the input matrix
+        :param kernel_size: Size of the convolution kernel (assumes square kernel)
+        """
+        self.input_buffers = [
+            [],              
+            ["0"],           
+            ["0", "0"],      
+            ["0", "0", "0"] 
+        ]
+
+        self.input_height = input_height
+        self.input_width = input_width
+        self.kernel_size = kernel_size
+
+        # The systolic array size is determined by the kernel size
+        self.systolic_size = kernel_size  # Matches the kernel dimensions
+        self.systolic_array = SystolicArray(self.systolic_size)
+
+        # Dynamically create input buffers based on input height
+        self.outputs = []  
+
+    def add_patches(self, patches: List[np.ndarray]):
+        for patch in patches:
+            N = 1  # batch size
+            C = 1  # input channels
+            H, W = patch.shape  # height and width from patch shape
+            N_idx, H_idx, W_idx, C_idx = np.indices((N, H, W, C))
+
+            # Generate the activations as strings using np.char.add
+            activations = np.char.add(
+                np.char.add(
+                    np.char.add(
+                        np.char.add('A', N_idx.astype(str)),
+                        H_idx.astype(str)
+                    ),
+                    W_idx.astype(str)
+                ),
+                C_idx.astype(str)
+            )
+            flat_patch = activations.flatten().tolist()
+            
+            # Ensure we are only working within the bounds of the kernel_size
+            for i in range(0, len(flat_patch), self.kernel_size):
+                if i < len(self.input_buffers):
+                    chunk = flat_patch[i:i+self.kernel_size]
+                
+                for j in range(self.kernel_size):
+                    if j < len(self.input_buffers):  # Ensure buffer index exists
+                        self.input_buffers[j].append(chunk[j])
+                    else:
+                        # If there are fewer buffers than required, add a new empty buffer
+                        self.input_buffers.append([chunk[j]])
+                        
+    def cycle(self):
+        """
+        Runs one cycle of the systolic array, shifting activations into it.
+        """
+        new_activations = []
+        for i in range(self.systolic_size):  # Read from the first `systolic_size` rows
+            if self.input_buffers[i]:  # Ensure within bounds
+                new_act = self.input_buffers[i].pop(0)  
+            else:
+                new_act = "0"  # Fill with zero if buffer is empty
+            new_activations.append(new_act)
+
+        print("New activations:", new_activations)
+        self.systolic_array.cycle(new_activations=new_activations)
+        self.systolic_array.print_array()
+
+        output = self.systolic_array.buffer[-1]
+        translated_equations = [] 
+        for _out in output: 
+            try: 
+                translated_equations.append(split_equations_dict[_out])
+            except:
+                translated_equations.append('Cxx_x')
+        self.outputs.append(translated_equations)
+        print("Output: ", translated_equations)
+        return translated_equations
+    
+    def validate_output(self):
+        """
+        Uses regex to check if all expected C00_x values exist in the output.
+        """
+        output_str = " ".join([str(out) for out in self.outputs])
+        missing_values = []
+        
+        for x in range(self.kernel_size):
+            pattern = rf"C00_{x}"
+            if not re.search(pattern, output_str):
+                missing_values.append(f"C00_{x}")
+
+        if missing_values:
+            print(f"Missing values: {', '.join(missing_values)}")
+        else:
+            print("All expected C00_x values found in the output.")
+N = 1  # batch size
+H = 8  # activation height
+W = 9  # activation width
+C = 1  # input channels
+
+R = S = kernel_size = 4  # kernel size
+K = 1  # number of output channels
+
+# Create a random input matrix with the specified shape
+input_matrix_8x9 = np.random.randint(1, 10, (H, W)).astype(str)
+
+conv_sim_8x9 = Conv2dSimulator(H, W, kernel_size)
+conv_sim_8x9.add_patches([input_matrix_8x9])
+print(conv_sim_8x9.input_buffers[0])
+
+
+kernel_test = kernel.T
+for i in range(kernel_size):
+    for j in range(kernel_size):
+        conv_sim_8x9.systolic_array.array[i][j].weight = kernel_test[i, j]
+
+# Run multiple cycles
+for cycle_num in range(100):
+    out = conv_sim_8x9.cycle()
+    conv_sim_8x9.validate_output()
+    print()
+pd.DataFrame(conv_sim_8x9.outputs)
+for a in equations_matrix: 
+    for b in a: 
+        print(b)
+split_equations_dict
+patches
+# Cxx = kernel_size*[TimeStep,BufferIndex + ]
+# Each TimeStep,BufferIndex represents a PSUM output at TimeStep
+# KernelSize = 3x3
+# ActivationSize = 5x5
+# OutputSize = 3x3
+# Stride = 1
+
+
+# C00 = 3,0 + 5,1 + 7,2
+# C01 = 6,0 + 8,1 + 10,2 
+# C02 = 9,0 + 11,1 + 13,2 
+
+# C10 = 12,0 + 14,1 + 16,2 
+# C11 = 15,0 + 17,1 + 19,2 
+# C12 = 18,0 + 20,1 + 22,2 
+
+# C20 = 21,0 + 23,1 + 25,2 
+# C21 = 24,0 + 26,1 + 28,2 
+# C22 = 27,0 + 29,1 + 31,2 
+# KernelSize = 4x4 
+# ActivationSize = 6x6
+# OutputSize = 3x3
+# Stride = 1
+
+
+# C00 = 4,0 + 6,1 + 8,2 + 10,3a
+# C01 = 8,0 + 10,1 + 12,2 + 14,3
+# C02 = 12,0 + 14,1 + 16,2 + 18,3
+
+# C10 = 16,0 + 18,1 + 20,2 + 22,3
+# C11 = 20,0 + 22,1 + 24,2 + 26,3
+# C12 = 24,0 + 26,1 + 28,2 + 30,3
+
+# C20 = 28,0 + 30,1 + 32,2 + 34,3
+# C21 = 32,0 + 34,1 + 36,2 + 38,3
+# C22 = 36,0 + 38,1 + 40,2 + 42,3
+# KernelSize = 4x4 
+# ActivationSize = 7x7
+# OutputSize = 4x4
+# Stride = 1
+
+
+# C00 = 4,0 + 6,1 + 8,2 + 10,3
+# C01 = 8,0 + 10,1 + 12,2 + 14,3
+# C02 = 12,0 + 14,1 + 16,2 + 18,3
+# C03 = 16,0 + 18,1 + 20,2 + 22,3
+
+# C10 = 20,0 + 22,1 + 24,2 + 26,3
+# C11 = 24,0 + 26,1 + 28,2 + 30,3
+# C12 = 28,0 + 30,1 + 32,2 + 34,3
+# C13 = 32,0 + 34,1 + 36,2 + 38,3
+
+# C20 = 36,0 + 38,1 + 40,2 + 42,3
+# C21 = 40,0 + 42,1 + 44,2 + 46,3
+# C22 = 44,0 + 46,1 + 48,2 + 50,3
+# C23 = 48,0 + 50,1 + 52,2 + 54,3
+
+# C30 = 52,0 + 54,1 + 56,2 + 58,3
+# C31 = 56,0 + 58,1 + 60,2 + 62,3
+# C32 = 60,0 + 62,1 + 64,2 + 66,3
+# C33 = 64,0 + 66,1 + 68,2 + 70,3
+# KernelSize = 4x4 
+# ActivationSize = 7x7
+# OutputSize = 2x2
+# Stride = 2
+
+
+# C00 = 4,0 + 6,1 + 8,2 + 10,3
+# C01 = 8,0 + 10,1 + 12,2 + 14,3
+
+# C10 = 12,0 + 14,1 + 16,2 + 18,3
+# C11 = 16,0 + 18,1 + 20,2 + 22,3
+def route_time(T, activation_size, output_size, kernel_size, stride, delay):
+    """
+    For every time step T, we get to choose which psums to mask out, and mask in 
+    We get the i and j indices out, then we can put it back into scratchpad 
+    WE CAN USE THIS AS A SCRATCHPAD_OUTPUT_BUFFER ENABLE VECTOR to mask values, then use the I and J indices to decide where to put stuff
+    """
+
+    routing = {}
+    for k in range(kernel_size):
+        remainder = T - kernel_size - (delay * k)
+        if remainder < 0 or remainder % kernel_size != 0:
+            routing[k] = None
+            continue
+        
+        Q = remainder // kernel_size
+        i = Q // output_size
+        j = Q % output_size
+        
+        if i < output_size and j < output_size:
+            routing[k] = (i, j)
+        else:
+            routing[k] = None
+    return routing
+delay = 2
+# Not sure why this is constantly 2? Basically in every 2 cycles, one of them is useless.. but is needed to propagate
+for i in range(0, 10): 
+    print(route_time(i, activations_size, output_size, kernel_size, stride, delay))
