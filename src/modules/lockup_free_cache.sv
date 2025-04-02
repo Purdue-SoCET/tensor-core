@@ -29,7 +29,6 @@ module lockup_free_cache (
     assign hit_check_instr.rw_mode = mem_in_rw_mode;
     assign hit_check_instr.store_value = mem_in_store_value;
  
-
     logic [NUM_BANKS-1:0] miss;
     in_mem_instr new_miss;
     logic [NUM_BANKS-1:0] bank_hit;

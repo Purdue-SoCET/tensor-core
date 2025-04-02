@@ -3,7 +3,7 @@
 module confirm_lru_age (
     input logic CLK, 
     input logic nRST,
-    input logic [2:0] curr_state,
+    input logic [3:0] curr_state,
     input lru_frame [NUM_SETS_PER_BANK-1:0] lru,
     input logic [BLOCK_INDEX_BIT_LEN-1:0] latched_victim_set_index,
     input logic [WAYS_LEN-1:0] latched_victim_way_index
@@ -33,7 +33,7 @@ endmodule
 module confirm_replacement_mshr (
     input logic CLK,
     input logic nRST,
-    input logic [2:0] curr_state, 
+    input logic [3:0] curr_state, 
     input logic [BLOCK_OFF_BIT_LEN-1:0] count_FSM,
     input logic [BLOCK_INDEX_BIT_LEN-1:0] latched_victim_set_index,
     input logic [WAYS_LEN-1:0] latched_victim_way_index,

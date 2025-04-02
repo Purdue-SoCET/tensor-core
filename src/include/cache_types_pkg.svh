@@ -12,13 +12,13 @@ parameter UUID_SIZE = 4;
 
 localparam NUM_SETS = (CACHE_SIZE / 4) / (BLOCK_SIZE * NUM_WAYS);
 localparam NUM_SETS_PER_BANK = NUM_SETS / NUM_BANKS;
+localparam NUM_BLOCKS_PER_BANK = NUM_SETS_PER_BANK * NUM_WAYS; 
 localparam BYTE_OFF_BIT_LEN = 2;
 localparam BLOCK_OFF_BIT_LEN = $clog2(BLOCK_SIZE); // choose which block within the bank
 localparam BLOCK_INDEX_BIT_LEN = $clog2(NUM_SETS_PER_BANK); // chose the set
 localparam WAYS_LEN = $clog2(NUM_WAYS); 
 localparam BANKS_LEN = $clog2(NUM_BANKS); 
 localparam TAG_BIT_LEN = 32 - BLOCK_INDEX_BIT_LEN - BLOCK_OFF_BIT_LEN - BYTE_OFF_BIT_LEN;
-localparam UUID_MAX = UUID_SIZE'('1);
 
 typedef struct packed {
     logic [TAG_BIT_LEN-1:0] tag;
@@ -55,8 +55,8 @@ typedef struct packed {
     cache_block block; // 1 word -> 4 bytes -> 32 bits, each block is X words
 } cache_frame;
 
-typedef enum logic [2:0] { 
-    START, BLOCK_PULL, VICTIM_EJECT, FINISH 
+typedef enum logic [3:0] { 
+    START, BLOCK_PULL, VICTIM_EJECT, FINISH, FLUSH, WRITEBACK, HALT
 } bank_fsm_states; 
 
 typedef cache_frame [NUM_WAYS-1:0] cache_set;

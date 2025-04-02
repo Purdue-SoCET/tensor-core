@@ -125,6 +125,8 @@ module cache_bank_tb;
     logic [31:0] tb_scheduler_data_out;
     logic [3:0] tb_scheduler_uuid_out;
     logic tb_scheduler_uuid_ready; 
+    logic tb_halt; 
+    logic tb_flushed; 
 
     always begin
         tb_clk = 1'b0;
@@ -159,6 +161,7 @@ module cache_bank_tb;
         .mshr_entry(tb_mshr_entry),
         .mem_instr_in(tb_mem_instr),
         .ram_mem_complete(tb_ram_mem_complete),
+        .halt(tb_halt),
         .cache_bank_busy(tb_cache_bank_busy),
         .scheduler_hit(tb_scheduler_hit),
         .ram_mem_REN(tb_ram_mem_REN),
@@ -167,7 +170,8 @@ module cache_bank_tb;
         .ram_mem_addr(tb_ram_mem_addr),
         .scheduler_data_out(tb_scheduler_data_out),
         .scheduler_uuid_out(tb_scheduler_uuid_out),
-        .scheduler_uuid_ready(tb_scheduler_uuid_ready)
+        .scheduler_uuid_ready(tb_scheduler_uuid_ready),
+        .flushed(tb_flushed)
     );
 
 
@@ -218,6 +222,7 @@ module cache_bank_tb;
         .tb_ram_mem_data(tb_ram_mem_data),
         .tb_mshr_entry(tb_mshr_entry),
         .tb_mem_instr(tb_mem_instr),
+        .tb_halt(tb_halt),
         .tb_ram_mem_complete(tb_ram_mem_complete),
         .tb_cache_bank_busy(tb_cache_bank_busy),
         .tb_scheduler_hit(tb_scheduler_hit),
@@ -227,7 +232,8 @@ module cache_bank_tb;
         .tb_ram_mem_addr(tb_ram_mem_addr),
         .tb_scheduler_data_out(tb_scheduler_data_out),
         .tb_scheduler_uuid_out(tb_scheduler_uuid_out), 
-        .tb_scheduler_uuid_ready(tb_scheduler_uuid_ready)
+        .tb_scheduler_uuid_ready(tb_scheduler_uuid_ready),
+        .tb_flushed(tb_flushed)
     );
 
 endmodule
@@ -257,6 +263,7 @@ program test (
     output logic  tb_instr_valid,
     output mshr_reg  tb_mshr_entry,
     output in_mem_instr  tb_mem_instr,
+    output logic tb_halt, 
     input logic [CACHE_RW_SIZE-1:0] tb_ram_mem_data,
     input logic  tb_ram_mem_complete,
     input logic  tb_cache_bank_busy,
@@ -267,7 +274,8 @@ program test (
     input logic [31:0] tb_scheduler_data_out,
     input logic [3:0] tb_scheduler_uuid_out,
     input logic  tb_scheduler_hit,
-    input logic  tb_scheduler_uuid_ready
+    input logic  tb_scheduler_uuid_ready,
+    input logic tb_flushed
 );
 
     addr_t address;
@@ -572,6 +580,11 @@ program test (
         MSHR_Thread_Done = 0; 
         SingleCycle_RW_Done = 0; 
         @(posedge tb_clk);
+
+        set_test_id("-------> FLUSHING");
+
+        tb_halt = 1; 
+        wait(tb_flushed);
 
         set_test_id("-------> FINISH");
 
