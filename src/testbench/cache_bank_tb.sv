@@ -127,6 +127,7 @@ module cache_bank_tb;
     logic tb_scheduler_uuid_ready; 
     logic tb_halt; 
     logic tb_flushed; 
+    logic monitor_enable; 
 
     always begin
         tb_clk = 1'b0;
@@ -210,7 +211,7 @@ module cache_bank_tb;
         .CLK(tb_clk),
         .nRST(tb_nrst),
         .bank(dut.bank), 
-        .cache_bank_busy(tb_cache_bank_busy)
+        .enable(monitor_enable)
     );
 
 
@@ -223,6 +224,7 @@ module cache_bank_tb;
         .tb_mshr_entry(tb_mshr_entry),
         .tb_mem_instr(tb_mem_instr),
         .tb_halt(tb_halt),
+        .monitor_enable(monitor_enable),
         .tb_ram_mem_complete(tb_ram_mem_complete),
         .tb_cache_bank_busy(tb_cache_bank_busy),
         .tb_scheduler_hit(tb_scheduler_hit),
@@ -264,6 +266,7 @@ program test (
     output mshr_reg  tb_mshr_entry,
     output in_mem_instr  tb_mem_instr,
     output logic tb_halt, 
+    output logic monitor_enable, 
     input logic [CACHE_RW_SIZE-1:0] tb_ram_mem_data,
     input logic  tb_ram_mem_complete,
     input logic  tb_cache_bank_busy,
@@ -283,6 +286,7 @@ program test (
     string test_id; 
     logic SingleCycle_RW_Done, MSHR_Thread_Done;
     integer display_bit = 0; 
+
 
     task automatic initiate_read_write(
         logic [TAG_BIT_LEN-1:0] tag,
@@ -342,6 +346,7 @@ program test (
         tb_mem_instr  = '0;
         SingleCycle_RW_Done = 1'b0; 
         MSHR_Thread_Done = 1'b0;
+        monitor_enable = 1'b0; 
         @(posedge tb_clk);
         @(posedge tb_clk);
         tb_nrst = 1;
@@ -485,6 +490,11 @@ program test (
                 end 
             end
         end
+        
+        monitor_enable = 1'b1; 
+        @(posedge tb_clk);
+        monitor_enable = 1'b0; 
+        @(posedge tb_clk);
 
         set_test_id("-------> STORE and FILL BANK");
         SingleCycle_RW_Done = 0; 
@@ -576,6 +586,10 @@ program test (
         // end
         // join
 
+        monitor_enable = 1'b1; 
+        @(posedge tb_clk);
+        monitor_enable = 1'b0; 
+        @(posedge tb_clk);
 
         MSHR_Thread_Done = 0; 
         SingleCycle_RW_Done = 0; 
@@ -585,6 +599,11 @@ program test (
 
         tb_halt = 1; 
         wait(tb_flushed);
+
+        monitor_enable = 1'b1; 
+        @(posedge tb_clk);
+        monitor_enable = 1'b0; 
+        @(posedge tb_clk);
 
         set_test_id("-------> FINISH");
 

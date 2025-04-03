@@ -24,15 +24,16 @@ add wave -noupdate -group {PROG Outputs} /cache_bank_tb/PROG/tb_instr_valid
 add wave -noupdate -group {PROG Outputs} /cache_bank_tb/PROG/tb_ram_mem_data
 add wave -noupdate -group {PROG Outputs} /cache_bank_tb/PROG/tb_ram_mem_complete
 add wave -noupdate -divider FSM
-add wave -noupdate /cache_bank_tb/dut/wrong_state
+add wave -noupdate /cache_bank_tb/dut/curr_state
+add wave -noupdate /cache_bank_tb/dut/next_state
 add wave -noupdate -group Bank -expand -subitemconfig {{/cache_bank_tb/dut/bank[3]} -expand {/cache_bank_tb/dut/bank[2]} -expand {/cache_bank_tb/dut/bank[1]} -expand {/cache_bank_tb/dut/bank[0]} -expand} /cache_bank_tb/dut/bank
 add wave -noupdate -group Bank /cache_bank_tb/dut/next_bank
 add wave -noupdate -expand -group {Cache Controller Logic} /cache_bank_tb/dut/flush_count
+add wave -noupdate -expand -group {Cache Controller Logic} /cache_bank_tb/dut/flush_way
+add wave -noupdate -expand -group {Cache Controller Logic} /cache_bank_tb/dut/flush_set
 add wave -noupdate -expand -group {Cache Controller Logic} /cache_bank_tb/dut/next_flush_count
 add wave -noupdate -expand -group {Cache Controller Logic} /cache_bank_tb/dut/next_flush_way
-add wave -noupdate -expand -group {Cache Controller Logic} /cache_bank_tb/dut/flush_way
 add wave -noupdate -expand -group {Cache Controller Logic} /cache_bank_tb/dut/next_flush_set
-add wave -noupdate -expand -group {Cache Controller Logic} /cache_bank_tb/dut/flush_set
 add wave -noupdate -expand -group {Cache Controller Logic} /cache_bank_tb/dut/set_index
 add wave -noupdate -expand -group {Cache Controller Logic} /cache_bank_tb/dut/hit_way_index
 add wave -noupdate -expand -group {FSM State Logic} /cache_bank_tb/dut/latched_block_pull_buffer
@@ -42,8 +43,7 @@ add wave -noupdate -expand -group {FSM State Logic} /cache_bank_tb/dut/latched_v
 add wave -noupdate -expand -group {FSM State Logic} /cache_bank_tb/dut/victim_set_index
 add wave -noupdate -expand -group {FSM State Logic} /cache_bank_tb/dut/victim_way_index
 add wave -noupdate -expand -group {FSM State Logic} /cache_bank_tb/dut/count_FSM
-add wave -noupdate -expand -group {FSM State Logic} /cache_bank_tb/dut/curr_state
-add wave -noupdate -expand -group {FSM State Logic} /cache_bank_tb/dut/next_state
+add wave -noupdate -expand -group {FSM State Logic} /cache_bank_tb/dut/next_count_FSM
 add wave -noupdate -expand -group {FSM State Logic} /cache_bank_tb/dut/count_enable
 add wave -noupdate -expand -group {FSM State Logic} /cache_bank_tb/dut/count_flush
 add wave -noupdate -expand -group {FSM State Logic} /cache_bank_tb/dut/mshr_entry
@@ -69,7 +69,7 @@ add wave -noupdate /cache_bank_tb/u_RAM/next_counter
 add wave -noupdate /cache_bank_tb/u_RAM/state
 add wave -noupdate /cache_bank_tb/u_RAM/next_state
 TreeUpdate [SetDefaultTree]
-WaveRestoreCursors {{Cursor 1} {24177 ps} 0}
+WaveRestoreCursors {{Cursor 1} {24312 ps} 0}
 quietly wave cursor active 1
 configure wave -namecolwidth 228
 configure wave -valuecolwidth 171
@@ -85,4 +85,4 @@ configure wave -griddelta 40
 configure wave -timeline 0
 configure wave -timelineunits ps
 update
-WaveRestoreZoom {23875 ps} {25153 ps}
+WaveRestoreZoom {24220 ps} {24484 ps}

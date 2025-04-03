@@ -83,7 +83,7 @@ module cache_bank_monitor (
   input logic CLK,
   input logic nRST,
   input cache_set [NUM_SETS_PER_BANK-1:0] bank, 
-  input logic cache_bank_busy
+  input logic enable
 );
 
   integer set, way;
@@ -91,7 +91,7 @@ module cache_bank_monitor (
   integer filled_ways;
 
   always @(posedge CLK, negedge nRST) begin
-    if (!cache_bank_busy) begin
+    if (enable) begin
       full_sets = 0;
       for (set = 0; set < NUM_SETS_PER_BANK; set = set + 1) begin
         filled_ways = 0;

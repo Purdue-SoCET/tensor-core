@@ -18,6 +18,7 @@ localparam BLOCK_OFF_BIT_LEN = $clog2(BLOCK_SIZE); // choose which block within 
 localparam BLOCK_INDEX_BIT_LEN = $clog2(NUM_SETS_PER_BANK); // chose the set
 localparam WAYS_LEN = $clog2(NUM_WAYS); 
 localparam BANKS_LEN = $clog2(NUM_BANKS); 
+localparam NUM_BLOCKS_PER_BANK_LEN = $clog2(NUM_BLOCKS_PER_BANK);
 localparam TAG_BIT_LEN = 32 - BLOCK_INDEX_BIT_LEN - BLOCK_OFF_BIT_LEN - BYTE_OFF_BIT_LEN;
 
 typedef struct packed {

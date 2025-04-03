@@ -21,24 +21,21 @@ module cache_bank (
     output logic flushed
 );
 
-    logic [BLOCK_OFF_BIT_LEN-1:0] count_FSM, next_count_FSM;
-    bank_fsm_states curr_state, next_state; 
-    logic count_enable; 
-    logic count_flush; 
-    logic wrong_state; // Debugging?
-    logic [31:0] flush_count, next_flush_count, next_flush_way, flush_way;
-
-    cache_frame latched_block_pull_buffer;
-    cache_frame latched_victim_eject_buffer;
-    
+    logic wrong_state;
     cache_set [NUM_SETS_PER_BANK-1:0] bank, next_bank;
-    
-    logic [WAYS_LEN-1:0] latched_victim_way_index, victim_way_index, hit_way_index, max_way;
+
+    // FSM
+    bank_fsm_states curr_state, next_state; 
+    logic [BLOCK_OFF_BIT_LEN-1:0] count_FSM, next_count_FSM;
+    logic count_flush;
+    cache_frame latched_block_pull_buffer, latched_victim_eject_buffer;
+    logic [NUM_BLOCKS_PER_BANK_LEN:0] flush_count, next_flush_count;
+    logic [WAYS_LEN-1:0] latched_victim_way_index, victim_way_index, hit_way_index, max_way, next_flush_way, flush_way;
     logic [BLOCK_INDEX_BIT_LEN-1:0] latched_victim_set_index, set_index, victim_set_index, next_flush_set, flush_set; 
 
+    // LRU 
     lru_frame [NUM_SETS_PER_BANK-1:0] lru, next_lru;
     int max_age;
-
 
     assign set_index = mem_instr_in.addr.index;    
     assign victim_set_index = mshr_entry.block_addr.index; 
@@ -49,6 +46,7 @@ module cache_bank (
             curr_state <= START;
             bank <= '0; 
             lru <= '0; 
+            count_FSM <= '0;
             latched_victim_way_index <= '0; 
             latched_victim_set_index <= '0; 
             latched_victim_eject_buffer <= '0;
@@ -63,6 +61,7 @@ module cache_bank (
             flush_set <= next_flush_set; 
             flush_way <= next_flush_way;
             flush_count <= next_flush_count; 
+            count_FSM <= next_count_FSM; 
 
             if (curr_state == START) begin
                 if (mshr_entry.valid) begin 
@@ -80,7 +79,7 @@ module cache_bank (
                 end 
             end else if ((curr_state == BLOCK_PULL)) begin 
                 if (mshr_entry.write_status[count_FSM]) begin 
-                latched_block_pull_buffer.block[count_FSM] <= mshr_entry.write_block[count_FSM];
+                    latched_block_pull_buffer.block[count_FSM] <= mshr_entry.write_block[count_FSM];
                 end else if (ram_mem_complete) begin 
                     latched_block_pull_buffer.block[count_FSM] <= ram_mem_data;
                 end 
@@ -88,15 +87,10 @@ module cache_bank (
         end 
     end 
 
-    always_ff @(posedge CLK, negedge nRST) begin : counter
-        if (!nRST) count_FSM <= '0;
-        else if (count_enable) count_FSM <= next_count_FSM; 
-    end
-
     always_comb begin : age_based_lru
         next_lru = lru;
         next_count_FSM = count_FSM;
-        if (count_enable) next_count_FSM = count_FSM + 1; 
+        if (ram_mem_complete) next_count_FSM = count_FSM + 1; 
         if (count_flush) next_count_FSM = 0; 
 
         if (scheduler_hit || (curr_state == FINISH)) begin
@@ -122,7 +116,6 @@ module cache_bank (
 
     always_comb begin : cache_controller_logic
         count_flush = 1'b0; 
-        count_enable = 1'b0;
         scheduler_uuid_out = '0; 
         ram_mem_REN = 1'b0; 
         ram_mem_WEN = 1'b0; 
@@ -160,27 +153,26 @@ module cache_bank (
             START: begin 
                 count_flush = 1; 
                 if (mshr_entry.valid) begin 
-                    next_bank[latched_victim_set_index][latched_victim_way_index].valid = 1'b0;
+                    next_bank[victim_set_index][victim_way_index].valid = 1'b0;
                     cache_bank_busy = 1; 
                 end
             end 
             BLOCK_PULL: begin 
                 cache_bank_busy = 1; 
-                if (ram_mem_complete) count_enable = 1'b1;
 
                 ram_mem_REN = 1;
-                ram_mem_addr = addr_t'{mshr_entry.block_addr.tag, mshr_entry.block_addr.index, BLOCK_INDEX_BIT_LEN'(count_FSM), BYTE_OFF_BIT_LEN'('0)};
-                if ((count_FSM == BLOCK_OFF_BIT_LEN'(BLOCK_SIZE - 1)) && count_enable) count_flush = 1'b1; 
+                ram_mem_addr = addr_t'{mshr_entry.block_addr.tag, latched_victim_set_index, BLOCK_INDEX_BIT_LEN'(count_FSM), BYTE_OFF_BIT_LEN'('0)};
+                
+                if ((count_FSM == BLOCK_OFF_BIT_LEN'(BLOCK_SIZE - 1)) && ram_mem_complete) count_flush = 1'b1; 
             end 
             VICTIM_EJECT: begin 
                 cache_bank_busy = 1; 
-                if (ram_mem_complete) count_enable = 1'b1;
 
                 ram_mem_WEN = 1'b1; 
                 ram_mem_addr = addr_t'{latched_victim_eject_buffer.tag, latched_victim_set_index, BLOCK_INDEX_BIT_LEN'(count_FSM), BYTE_OFF_BIT_LEN'('0)};
                 ram_mem_store = latched_victim_eject_buffer.block[count_FSM];
 
-                if ((count_FSM == BLOCK_OFF_BIT_LEN'(BLOCK_SIZE - 1)) && count_enable) count_flush = 1'b1; 
+                if ((count_FSM == BLOCK_OFF_BIT_LEN'(BLOCK_SIZE - 1)) && ram_mem_complete) count_flush = 1'b1; 
             end
             FINISH: begin 
                 cache_bank_busy = 0; 
@@ -192,29 +184,30 @@ module cache_bank (
                 scheduler_uuid_ready = 1;
             end
             FLUSH: begin 
-                next_flush_set = BLOCK_INDEX_BIT_LEN'(flush_count);
-                if (flush_set == (NUM_SETS_PER_BANK - 1)) next_flush_way = flush_way + 1; 
-
-                if (!bank[flush_set][flush_way].dirty) next_flush_count = flush_count + 1; 
+                if (next_state != WRITEBACK) begin 
+                    next_flush_set = BLOCK_INDEX_BIT_LEN'(flush_count);
+                    if (flush_set == (NUM_SETS_PER_BANK - 1)) next_flush_way = flush_way + 1; 
+                    if (!bank[flush_set][flush_way].dirty) next_flush_count = flush_count + 1; 
+                end 
             end 
             WRITEBACK: begin 
                 ram_mem_WEN = 1'b1; 
-                ram_mem_addr = addr_t'{bank[next_flush_set][flush_way].tag, next_flush_set, BLOCK_INDEX_BIT_LEN'(count_FSM), BYTE_OFF_BIT_LEN'('0)};
-                ram_mem_store = bank[next_flush_set][flush_way].block[BLOCK_INDEX_BIT_LEN'(count_FSM)];
+                ram_mem_addr = addr_t'{bank[next_flush_set][next_flush_way].tag, next_flush_set, BLOCK_INDEX_BIT_LEN'(count_FSM), BYTE_OFF_BIT_LEN'('0)};
+                ram_mem_store = bank[next_flush_set][next_flush_way].block[BLOCK_INDEX_BIT_LEN'(count_FSM)];
 
                 if (ram_mem_complete) begin 
-                    count_enable = 1'b1; 
                     if (count_FSM == BLOCK_OFF_BIT_LEN'(BLOCK_SIZE - 1)) begin 
                         count_flush = 1'b1; 
-                        next_bank[next_flush_set][flush_way].dirty = 1'b0;
-                        next_bank[next_flush_set][flush_way].valid = 1'b0;
+                        next_bank[next_flush_set][next_flush_way].dirty = 1'b0;
+                        next_bank[next_flush_set][next_flush_way].valid = 1'b0;
+                        next_bank[next_flush_set][next_flush_way].block = '0; // Don't really need this? 
                     end  
                 end 
+        
             end
             HALT: flushed = 1; 
         endcase
     end 
-
 
     always_comb begin : fsm_state_logic
         next_state = curr_state; 
@@ -223,19 +216,17 @@ module cache_bank (
                 if (mshr_entry.valid) next_state = BLOCK_PULL;
                 else if (halt) next_state = FLUSH; 
             end 
-            BLOCK_PULL:  if ((count_FSM == BLOCK_SIZE - 1) && count_enable) next_state = (bank[latched_victim_set_index][latched_victim_way_index].dirty) ? VICTIM_EJECT : FINISH;  
-            VICTIM_EJECT: if ((count_FSM == BLOCK_SIZE - 1) && count_enable) next_state = FINISH; 
+            BLOCK_PULL:  if (count_FSM == (BLOCK_SIZE - 1) && (next_count_FSM == 0)) next_state = (bank[latched_victim_set_index][latched_victim_way_index].dirty) ? VICTIM_EJECT : FINISH;  
+            VICTIM_EJECT: if (count_FSM == (BLOCK_SIZE - 1) && (next_count_FSM == 0)) next_state = FINISH; 
             FINISH: next_state = START; 
             FLUSH: begin 
-                if (flush_count == (NUM_BLOCKS_PER_BANK - 1)) next_state = HALT;
+                if (flush_count == (NUM_BLOCKS_PER_BANK + 1)) next_state = HALT;
                 else if (bank[flush_set][flush_way].dirty) next_state = WRITEBACK;
             end
-            WRITEBACK: if ((count_FSM == BLOCK_SIZE - 1) && count_enable) next_state = FLUSH; 
+            WRITEBACK: if (count_FSM == (BLOCK_SIZE - 1) && (next_count_FSM == 0)) next_state = FLUSH; 
             HALT: next_state = START; 
             default: next_state = START;  
         endcase
     end 
-
-
 
 endmodule
