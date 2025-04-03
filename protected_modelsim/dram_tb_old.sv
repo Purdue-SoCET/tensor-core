@@ -1,7 +1,7 @@
 `include "dram_command_if.vh"
-`include "scheduler_buffer_if.vh"
-`include "data_transfer_if.vh"
-`include "arch_defines.v"
+// `include "scheduler_buffer_if.vh"
+// `include "data_transfer_if.vh"
+//`include "arch_defines.v"
 //`include "StateTable.svp"
 `timescale 1 ns / 1 ps
 
@@ -31,49 +31,46 @@ module dram_command_tb;
     
 
     dram_command DUT (.CLK(CLK), .nRST(nRST), .dr_ram(dc_if), .dr_sche(dc_if));
-    scheduler_buffer SCH_BUFF (.CLK(CLK), .nRST(nRST), .mysche(sch_if));
-    data_transfer DT (.CLK(CLK), .nRST(nRST), .mydata(dt_if));
+    // scheduler_buffer SCH_BUFF (.CLK(CLK), .nRST(nRST), .mysche(sch_if));
+    // data_transfer DT (.CLK(CLK), .nRST(nRST), .mydata(dt_if));
 
-    DDR4_if #(.CONFIGURED_DQ_BITS(8)) iDDR4();
+    DDR4_if #(.CONFIGURED_DQ_BITS(16)) iDDR4();
 
     ddr4_model #(.CONFIGURED_DQ_BITS(CONFIGURED_DQ_BITS), .CONFIGURED_RANKS(CONFIGURED_RANKS))
                  golden_model(.model_enable(model_enable), .iDDR4(iDDR4));
 
 
-    // /Interface between iDDR4 and data transfer
-
-    assign iDDR4.DQ = dq_en ?     dt_if.DQ : {MAX_DQ_BITS{1'bz}};
-    assign iDDR4.DQS_t = dqs_en ? dt_if.DQS_t : {MAX_DQS_BITS{1'bz}};
-    assign iDDR4.DQS_c = dqs_en ? dt_if.DQS_c : {MAX_DQS_BITS{1'bz}};
-
-    assign dt_if.DQ = ~dq_en ? iDDR4.DQ : {MAX_DQ_BITS{1'bz}};
-    assign dt_if.DQS_t = ~dq_en ? iDDR4.DQS_t : {MAX_DQS_BITS{1'bz}};
-    assign dt_if.DQS_c = ~dq_en ? iDDR4.DQS_c : {MAX_DQS_BITS{1'bz}};
-
-
     always_comb begin
       //Interface of schduler buffer
-      ramaddr_phy = addr_x4_t'(sch_if.ramaddr_rq);
-      ramaddr_phy_ft = addr_x4_t'(sch_if.ramaddr_rq_ft);
+      // ramaddr_phy = addr_x4_t'(sch_if.ramaddr_rq);
+      // ramaddr_phy_ft = addr_x4_t'(sch_if.ramaddr_rq_ft);
       
-      dc_if.Ra0 = {'0, ramaddr_phy.rank};
-      dc_if.Ra1 = {'0, ramaddr_phy_ft.rank};
-      dc_if.BA0 = {'0, ramaddr_phy.bank};
-      dc_if.BA1 =  {'0, ramaddr_phy_ft.bank};
-      dc_if.R0 = {'0, ramaddr_phy.row};
-      dc_if.R1 = {'0, ramaddr_phy_ft.row};
-      dc_if.COL0 = {'0, ramaddr_phy.col_1, ramaddr_phy.col_0};
-      dc_if.COL1  = {'0, ramaddr_phy_ft.col_1, ramaddr_phy_ft.col_0};
-      dc_if.BG0   = {'0, ramaddr_phy.bg1, ramaddr_phy.bg0};
-      dc_if.BG1   = {'0, ramaddr_phy_ft.bg1, ramaddr_phy_ft.bg0};
+      // dc_if.Ra0 = {'0, ramaddr_phy.rank};
+      // dc_if.Ra1 = {'0, ramaddr_phy_ft.rank};
+      // dc_if.BA0 = {'0, ramaddr_phy.bank};
+      // dc_if.BA1 =  {'0, ramaddr_phy_ft.bank};
+      // dc_if.R0 = {'0, ramaddr_phy.row};
+      // dc_if.R1 = {'0, ramaddr_phy_ft.row};
+      // dc_if.COL0 = {'0, ramaddr_phy.col_1, ramaddr_phy.col_0};
+      // dc_if.COL1  = {'0, ramaddr_phy_ft.col_1, ramaddr_phy_ft.col_0};
+      // dc_if.BG0   = {'0, ramaddr_phy.bg1, ramaddr_phy.bg0};
+      // dc_if.BG1   = {'0, ramaddr_phy_ft.bg1, ramaddr_phy_ft.bg0};
 
-      dc_if.ramREN_curr = sch_if.ramREN_curr;
-      dc_if.ramREN_ftrt = sch_if.ramREN_ftrt;
-      dc_if.ramWEN_curr = sch_if.ramWEN_curr;
-      dc_if.ramWEN_ftrt = sch_if.ramWEN_ftrt;
+      // dc_if.ramREN_curr = sch_if.ramREN_curr;
+      // dc_if.ramREN_ftrt = sch_if.ramREN_ftrt;
+      // dc_if.ramWEN_curr = sch_if.ramWEN_curr;
+      // dc_if.ramWEN_ftrt = sch_if.ramWEN_ftrt;
       
 
-      
+      ///Interface between iDDR4 and data transfer
+
+      // iDDR4.DQ = dq_en ?     dt_if.DQ : {MAX_DQ_BITS{1'bz}};
+      // iDDR4.DQS_t = dqs_en ? dt_if.DQS_t : {MAX_DQS_BITS{1'bz}};
+      // iDDR4.DQS_c = dqs_en ? dt_if.DQS_c : {MAX_DQS_BITS{1'bz}};
+
+      // dt_if.DQ = ~dq_en ? iDDR4.DQ : {MAX_DQ_BITS{1'bz}};
+      // dt_if.DQS_t = ~dq_en ? iDDR4.DQS_t : {MAX_DQS_BITS{1'bz}};
+      // dt_if.DQS_c = ~dq_en ? iDDR4.DQS_c : {MAX_DQS_BITS{1'bz}};
 
 
     end
@@ -85,16 +82,15 @@ module dram_command_tb;
     // assign iDDR4.DQ = dq_en ? dq_out : {MAX_DQ_BITS{1'bz}};
     // assign iDDR4.DQS_t = dqs_en ? dqs_out : {MAX_DQS_BITS{1'bz}};
     // assign iDDR4.DQS_c = dqs_en ? ~dqs_out : {MAX_DQS_BITS{1'bz}};
-    assign model_enable = model_enable_val;
+    // assign model_enable = model_enable_val;
 
     initial begin
       iDDR4.CK <= 2'b01;
       clk_enb <= 1'b1;
       clk_val <= 1'b1;  
       model_enable_val = 1;
-      dc_if.REFRESH = 1'b0;
 
-      dq_en = 1'b1;
+      dq_en = 1'b0;
 
       nRST = 1'b0;
       @(posedge CLK);
@@ -102,9 +98,6 @@ module dram_command_tb;
       nRST = 1'b1;
       task_name = "Power_up";
       repeat (300) @(posedge CLK);
-
-      //Add request
-      add_request(.addr(32'hAAAA_BBBB), .write(1'b1), .data(32'hBBBB_AAAA));
 
 
 
@@ -115,21 +108,21 @@ module dram_command_tb;
 
     end
 
-    task add_request(input logic [31:0] addr, input logic write, input logic [31:0] data);
-      if (write) begin
-          sch_if.dWEN = 1'b1;
-          sch_if.dREN = 1'b0;
-          sch_if.ramaddr = addr;
-          sch_if.memstore = data;
-      end else begin
-          sch_if.dWEN = 1'b0;
-          sch_if.dREN = 1'b1;
-          sch_if.ramaddr = addr;
-      end
-      #(PERIOD);
-      sch_if.dWEN = 1'b0;
-      sch_if.dREN = 1'b0;
-    endtask
+    // task add_request(input logic [31:0] addr, input logic write, input logic [31:0] data);
+    //   if (write) begin
+    //       sch_if.dWEN = 1'b1;
+    //       sch_if.dREN = 1'b0;
+    //       sch_if.ramaddr = addr;
+    //       sch_if.memstore = data;
+    //   end else begin
+    //       sch_if.dWEN = 1'b0;
+    //       sch_if.dREN = 1'b1;
+    //       sch_if.ramaddr = addr;
+    //   end
+    //   #(PERIOD);
+    //   sch_if.dWEN = 1'b0;
+    //   sch_if.dREN = 1'b0;
+    // endtask
     
     
     always @(posedge clk_val && clk_enb) begin

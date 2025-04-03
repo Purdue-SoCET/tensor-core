@@ -8,13 +8,13 @@ typedef enum logic [4:0] {
         PRE_RESET,
         RESET,
         NOP,
-        LOAD_BG0_REG1,
+        LOAD_MODE_DLL,
         LOAD_BG0_REG3,
         LOAD_BG1_REG6,
         LOAD_BG1_REG5,
         LOAD_BG1_REG4,
         LOAD_BG0_REG2,
-        LOAD_BG0_REG1_SEC,
+        LOAD_BG0_REG1,
         LOAD_BG0_REG0,
         ZQ_CL,
         IDLE,
@@ -54,7 +54,21 @@ typedef enum logic [4:0] {
     parameter FLY_BY = 0;
     parameter NO_AUTO_PRE = 0;
 
-    parameter     // {cs, act, ras, cas, we}
+    // parameter     
+    //     POWER_UP_PRG  = 5'b01111,
+    //     LOAD_MODE_CMD = 5'b01000,
+    //     REFRESH_CMD   = 5'b01001,
+    //     PRECHARGE_CMD = 5'b01010,
+    //     ACTIVATE_CMD  = 5'b00xxx,
+    //     WRITE_CMD     = 5'b01100,
+    //     READ_CMD      = 5'b01101,
+    //     ZQ_CMD        = 5'b01110,
+    //     NOP_CMD       = 5'b01111,
+    //     SELF_REF_CMD  = 5'b01001,
+    //     DESEL_CMD     = 5'b10000
+    // ;
+    // {cs, act, ras, cas, we}
+    typedef enum logic [4:0] {
         POWER_UP_PRG  = 5'b01111,
         LOAD_MODE_CMD = 5'b01000,
         REFRESH_CMD   = 5'b01001,
@@ -63,16 +77,13 @@ typedef enum logic [4:0] {
         WRITE_CMD     = 5'b01100,
         READ_CMD      = 5'b01101,
         ZQ_CMD        = 5'b01110,
-        NOP_CMD       = 5'b01111,
-        SELF_REF_CMD  = 5'b01001,
         DESEL_CMD     = 5'b10000
-    ;
-
+    } cmd_t;
     ////////////////// Parameters DDR4 Speed 1600 ///////////////
     parameter BURST_LENGTH  = 4;
-    parameter CONFIGURED_DQ_BITS     = 16;
-    parameter CONFIGURED_DQS_BITS     = 16;
-    parameter CONFIGURED_DM_BITS     = 16;
+    parameter CONFIGURED_DQ_BITS     = 8;
+    parameter CONFIGURED_DQS_BITS     = (16 == CONFIGURED_DQ_BITS) ? 2 : 1;
+    parameter CONFIGURED_DM_BITS     = (16 == CONFIGURED_DQ_BITS) ? 2 : 1;
 
     parameter CONFIGURED_RANKS = 1;
     parameter DM_BITS       = 16;
@@ -166,7 +177,7 @@ interface dram_command_if();
     logic [MAX_ROW_ADDR_BITS - 1 : 0] R0, R1; //Rol prev and curr
     logic [MAX_COL_ADDR_BITS - 1 : 0]COL0, COL1; //Col prev and curr
     logic [MAX_BANK_GROUP_BITS - 1: 0] BG0, BG1;
-    logic dREN_curr, dWEN_curr, dREN_ftrt, dWEN_ftrt;
+    logic ramREN_curr, ramWEN_curr, ramREN_ftrt, ramWEN_ftrt;
     
     logic [31:0] data_callback, write_data;
     logic request_done;
@@ -174,7 +185,7 @@ interface dram_command_if();
     //Timing counter REFRESH
     logic REFRESH;
     modport dram_command_sche_buff(
-        input Ra0, Ra1, BG0, BG1, BA0, BA1, R0, R1, COL0, COL1, dREN_curr, dWEN_curr, dREN_ftrt, dWEN_ftrt, REFRESH, write_data,
+        input Ra0, Ra1, BG0, BG1, BA0, BA1, R0, R1, COL0, COL1, ramREN_curr, ramWEN_curr, ramREN_ftrt, ramWEN_ftrt, REFRESH, write_data,
         output data_callback, request_done
     );
 

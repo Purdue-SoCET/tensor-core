@@ -24,6 +24,19 @@ typedef enum logic [4:0] {
         READ_COMMAND
     } dram_state_t;
 
+    //Format for addressing mapping testing
+    typedef struct packed {
+        logic rank;
+        logic blank;
+        logic [14:0] row;
+        logic [1:0] bank;
+        logic bg1;
+        logic [6:0] col_1;
+        logic bg0;
+        logic [2:0] col_0;
+        logic [1:0] offset;
+    } addr_x4_t;
+
 
     //CONFIGURABLE MODE (define by MICRON arch_defines.v)
 
@@ -79,11 +92,13 @@ typedef enum logic [4:0] {
         ZQ_CMD        = 5'b01110,
         DESEL_CMD     = 5'b10000
     } cmd_t;
+
+    
     ////////////////// Parameters DDR4 Speed 1600 ///////////////
     parameter BURST_LENGTH  = 4;
-    parameter CONFIGURED_DQ_BITS     = 16;
-    parameter CONFIGURED_DQS_BITS     = 16;
-    parameter CONFIGURED_DM_BITS     = 16;
+    parameter CONFIGURED_DQ_BITS     = 8;
+    parameter CONFIGURED_DQS_BITS     = (16 == CONFIGURED_DQ_BITS) ? 2 : 1;
+    parameter CONFIGURED_DM_BITS     = (16 == CONFIGURED_DQ_BITS) ? 2 : 1;
 
     parameter CONFIGURED_RANKS = 1;
     parameter DM_BITS       = 16;
@@ -182,11 +197,13 @@ interface dram_command_if();
     logic [31:0] data_callback, write_data;
     logic request_done;
 
+    logic wr_en, rd_en;
+
     //Timing counter REFRESH
     logic REFRESH;
     modport dram_command_sche_buff(
         input Ra0, Ra1, BG0, BG1, BA0, BA1, R0, R1, COL0, COL1, ramREN_curr, ramWEN_curr, ramREN_ftrt, ramWEN_ftrt, REFRESH, write_data,
-        output data_callback, request_done
+        output data_callback, request_done, wr_en, rd_en
     );
 
     modport dram_command_RAM (
