@@ -115,9 +115,9 @@ module execute (
     assign fugif.rs3_in = eif.gemm_rs3_in;  // from sb
     assign fugif.rd_in = eif.gemm_rd_in;    // from sb
     // Outputs
-    assign eif.eif_output.gemm_new_weight_out = fugif.new_weight_out; // to mem (scratchpad)
-    assign eif.eif_output.gemm_matrix_num = fugif.gemm_matrix_num;    // to mem (scratchpad)
-    assign eif.eif_output.fu_ex[4] = eif.gemm_done;
+    // assign eif.eif_output.gemm_new_weight_out = fugif.new_weight_out; // to mem (scratchpad)
+    // assign eif.eif_output.gemm_matrix_num = fugif.gemm_matrix_num;    // to mem (scratchpad)
+    assign eif.eif_output.gemm_out = fugif.gemm_out; 
     // TODO: need some sort of done signal
     // assign eif.eif_output.fu_ex[4] = fugif.done; <- something like this
 
