@@ -26,6 +26,8 @@ sim_%:
 	./obj_dir/V$*_tb
 	gtkwave waveforms/$*_tb.fst
 
+
+
 sf:
 	vlog -sv -svstrict -pedanticerrors -lint +incdir+./src/include/ \
 	     ./src/modules/sysarr_FIFO.sv \

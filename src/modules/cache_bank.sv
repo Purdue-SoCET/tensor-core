@@ -129,7 +129,7 @@ module cache_bank (
         scheduler_uuid_ready = 0;
         cache_bank_busy = 0;
         next_flush_set = flush_set; 
-        next_flush_count = flush_count ;
+        next_flush_count = flush_count;
         next_flush_set = flush_set; 
         next_flush_way = flush_way; 
 
@@ -149,7 +149,6 @@ module cache_bank (
         end 
 
         case (curr_state) 
-            default: wrong_state = 1'b1; 
             START: begin 
                 count_flush = 1; 
                 if (mshr_entry.valid) begin 

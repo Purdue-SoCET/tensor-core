@@ -194,6 +194,7 @@ module cache_bank_tb;
         .bank(bank), 
         .mshr_entry(mshr_entry), 
         .count_FSM(count_FSM),
+        .next_count_FSM(next_count_FSM),
         .latched_block_pull_buffer(latched_block_pull_buffer)
     );
 
@@ -286,7 +287,8 @@ program test (
     string test_id; 
     logic SingleCycle_RW_Done, MSHR_Thread_Done;
     integer display_bit = 0; 
-
+    logic [BLOCK_SIZE-1:0] write_status; 
+    cache_block write_block;
 
     task automatic initiate_read_write(
         logic [TAG_BIT_LEN-1:0] tag,
@@ -445,12 +447,18 @@ program test (
             .store_value(32'd0)
         );
 
-        set_test_id("-------> LOAD and FILL BANK");
-        @(posedge tb_clk);
+        // set_test_id("-------> PRE-FILL BANK");
+
         // fill_bank(0, 0);
 
-        MSHR_Thread_Done = 1; 
-        @(posedge tb_clk);
+        // monitor_enable = 1'b1; 
+        // @(posedge tb_clk);
+        // monitor_enable = 1'b0; 
+        // @(posedge tb_clk);
+
+        //////////////////////////////////////////////////////
+
+        set_test_id("-------> LOAD (WITHOUT SW MISSES) (INTO EMPTY) BANK");
 
         MSHR_Thread_Done = 0; 
         @(posedge tb_clk);
@@ -490,14 +498,20 @@ program test (
                 end 
             end
         end
-        
+
+        MSHR_Thread_Done = 0; 
+        @(posedge tb_clk);
+
         monitor_enable = 1'b1; 
         @(posedge tb_clk);
         monitor_enable = 1'b0; 
         @(posedge tb_clk);
 
-        set_test_id("-------> STORE and FILL BANK");
-        SingleCycle_RW_Done = 0; 
+        //////////////////////////////////////////////////////
+
+        set_test_id("-------> OVERWRITE (INTO FULL, UNDIRTY) BANK");
+
+        MSHR_Thread_Done = 0; 
         @(posedge tb_clk);
 
         for (int way = 0; way < NUM_WAYS; way++) begin
@@ -522,78 +536,108 @@ program test (
             end
         end
 
-        // fork
-        // begin : mshr_process
-        //     for (int way = 0; way < NUM_WAYS; way++) begin
-        //         for (int set = 0; set < NUM_SETS_PER_BANK; set++) begin
-        //             for (int blk_offset = 0; blk_offset < BLOCK_SIZE; blk_offset++) begin 
-        //                 for (int byte_offset = 0; byte_offset < WORD_SIZE; byte_offset++) begin 
-        //                     MSHR_Thread_Done = 0; 
-
-        //                     set_mshr(
-        //                         .valid(1'b1), // 0 gets tested in top_level 
-        //                         .uuid(('1)), // Helps to check request number in the waves.
-        //                         .block_addr(addr_t'{ 
-        //                             $urandom_range(0, (1<<TAG_BIT_LEN - 1)), 
-        //                             set[BLOCK_INDEX_BIT_LEN-1:0], 
-        //                             blk_offset[BLOCK_OFF_BIT_LEN-1:0],
-        //                             byte_offset[BYTE_OFF_BIT_LEN-1:0]
-        //                         }), 
-        //                         .write_status(BLOCK_SIZE'('0)), 
-        //                         .write_block(cache_block'('0))
-        //                     );
-
-        //                     stall_for_ram();
-
-        //                     set_mshr(
-        //                         .valid('0), 
-        //                         .uuid('0),
-        //                         .block_addr('0), 
-        //                         .write_status('0), 
-        //                         .write_block('0)
-        //                     );
-
-        //                     MSHR_Thread_Done = 1; 
-        //                     @(posedge tb_clk);
-        //                 end
-        //             end 
-        //         end
-        //     end
-        // end
-
-        // begin : rw_process
-        //     for (int way = 0; way < NUM_WAYS; way++) begin
-        //         for (int set = 0; set < NUM_SETS_PER_BANK; set++) begin
-        //             for (int blk_offset = 0; blk_offset < BLOCK_SIZE; blk_offset++) begin 
-        //                 for (int byte_offset = 0; byte_offset < WORD_SIZE; byte_offset++) begin 
-        //                     SingleCycle_RW_Done = 0; 
-
-        //                     initiate_read_write(
-        //                         .tag($urandom_range(0, (1<<TAG_BIT_LEN - 1))), 
-        //                         .index(set[BLOCK_INDEX_BIT_LEN-1:0]), 
-        //                         .block_offset(blk_offset[BLOCK_OFF_BIT_LEN-1:0]), 
-        //                         .byte_offset(byte_offset[BYTE_OFF_BIT_LEN-1:0]), 
-        //                         .rw_mode(1'b0), 
-        //                         .store_value($urandom_range(0, (1<<CACHE_RW_SIZE - 1)))
-        //                     );
-
-        //                     SingleCycle_RW_Done = 1; 
-        //                     @(posedge tb_clk);
-        //                 end
-        //             end
-        //         end
-        //     end
-        // end
-        // join
+        MSHR_Thread_Done = 0; 
+        @(posedge tb_clk);
 
         monitor_enable = 1'b1; 
         @(posedge tb_clk);
         monitor_enable = 1'b0; 
         @(posedge tb_clk);
 
+        //////////////////////////////////////////////////////
+
+        set_test_id("-------> OVERWRITE (INTO FULL, DIRTY) BANK");
+
         MSHR_Thread_Done = 0; 
-        SingleCycle_RW_Done = 0; 
         @(posedge tb_clk);
+
+        for (int way = 0; way < NUM_WAYS; way++) begin
+            for (int set = 0; set < NUM_SETS_PER_BANK; set++) begin
+                for (int blk_offset = 0; blk_offset < BLOCK_SIZE; blk_offset++) begin 
+                    for (int byte_offset = 0; byte_offset < WORD_SIZE; byte_offset++) begin 
+                        SingleCycle_RW_Done = 0; 
+
+                        initiate_read_write(
+                            .tag(set * NUM_SETS_PER_BANK + blk_offset), 
+                            .index(set[BLOCK_INDEX_BIT_LEN-1:0]), 
+                            .block_offset(blk_offset[BLOCK_OFF_BIT_LEN-1:0]), 
+                            .byte_offset(byte_offset[BYTE_OFF_BIT_LEN-1:0]), 
+                            .rw_mode(1'b1), 
+                            .store_value($urandom_range(0, (1<<CACHE_RW_SIZE - 1)))
+                        );
+
+                        SingleCycle_RW_Done = 1; 
+                        @(posedge tb_clk);
+                    end
+                end
+            end
+        end
+
+        MSHR_Thread_Done = 0; 
+        @(posedge tb_clk);
+
+        monitor_enable = 1'b1; 
+        @(posedge tb_clk);
+        monitor_enable = 1'b0; 
+        @(posedge tb_clk);
+
+        //////////////////////////////////////////////////////
+
+        set_test_id("-------> LOAD (WITH SW MISSES) (INTO FULL, DIRTY) BANK");
+
+        MSHR_Thread_Done = 0; 
+        @(posedge tb_clk);
+
+        for (int way = 0; way < NUM_WAYS; way++) begin
+            for (int set = 0; set < NUM_SETS_PER_BANK; set++) begin
+                write_block = '0; 
+                write_status = '0; 
+                for (int blk_offset = 0; blk_offset < BLOCK_SIZE; blk_offset++) begin 
+                    write_status[blk_offset] = 1'b1; 
+                    write_block[blk_offset] = $urandom_range(0, 32'hFFFFFFFF); 
+
+                    for (int byte_offset = 0; byte_offset < WORD_SIZE; byte_offset++) begin 
+                        MSHR_Thread_Done = 0; 
+
+                        set_mshr(
+                            .valid(1'b1), // 0 gets tested in top_level 
+                            .uuid(('1)), // Helps to check request number in the waves.
+                            .block_addr(addr_t'{ 
+                                (set * NUM_SETS_PER_BANK + blk_offset), 
+                                set[BLOCK_INDEX_BIT_LEN-1:0], 
+                                blk_offset[BLOCK_OFF_BIT_LEN-1:0],
+                                byte_offset[BYTE_OFF_BIT_LEN-1:0]
+                            }), 
+                            .write_status(write_status), 
+                            .write_block(write_block)
+                        );
+
+                        stall_for_ram();
+
+                        set_mshr(
+                            .valid('0), 
+                            .uuid('0),
+                            .block_addr('0), 
+                            .write_status('0), 
+                            .write_block('0)
+                        );
+
+                        MSHR_Thread_Done = 1; 
+                        @(posedge tb_clk);
+                    end
+                end 
+            end
+        end
+
+        MSHR_Thread_Done = 0; 
+        @(posedge tb_clk);
+
+        monitor_enable = 1'b1; 
+        @(posedge tb_clk);
+        monitor_enable = 1'b0; 
+        @(posedge tb_clk);
+
+        //////////////////////////////////////////////////////
 
         set_test_id("-------> FLUSHING");
 
@@ -604,6 +648,8 @@ program test (
         @(posedge tb_clk);
         monitor_enable = 1'b0; 
         @(posedge tb_clk);
+
+        //////////////////////////////////////////////////////
 
         set_test_id("-------> FINISH");
 

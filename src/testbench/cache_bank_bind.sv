@@ -35,6 +35,7 @@ module confirm_replacement_mshr (
     input logic nRST,
     input logic [3:0] curr_state, 
     input logic [BLOCK_OFF_BIT_LEN-1:0] count_FSM,
+    input logic [BLOCK_OFF_BIT_LEN-1:0] next_count_FSM,
     input logic [BLOCK_INDEX_BIT_LEN-1:0] latched_victim_set_index,
     input logic [WAYS_LEN-1:0] latched_victim_way_index,
     input cache_set [NUM_SETS_PER_BANK-1:0] bank, 
@@ -44,7 +45,7 @@ module confirm_replacement_mshr (
 
   property block_pull_replacement;
     @(posedge CLK) disable iff (!nRST)
-    ((curr_state == VICTIM_EJECT) && (count_FSM == BLOCK_OFF_BIT_LEN'(BLOCK_SIZE - 1))) |=> 
+    ((curr_state == VICTIM_EJECT) && (count_FSM == (BLOCK_SIZE - 1) && (next_count_FSM == 0))) |=> 
       ## 2 ( 
             (bank[$past(latched_victim_set_index, 2)][$past(latched_victim_way_index, 2)].valid == 1) &&
             (bank[$past(latched_victim_set_index, 2)][$past(latched_victim_way_index, 2)].tag == $past(mshr_entry.block_addr.tag, 2)) &&
@@ -53,7 +54,7 @@ module confirm_replacement_mshr (
   endproperty
 
   assert property (block_pull_replacement)
-      else $error("ASSERTIONERROR: Block not replaced properly");
+      else $error("ASSERTIONERROR: Block not replaced properly, ");
 
 endmodule
 
