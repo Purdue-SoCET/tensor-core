@@ -228,9 +228,26 @@ program test(input logic CLK, output logic nrst, datapath_cache_if.tb dcif);
         dcif.dmemload = '0;
         @(posedge CLK);
         
-        tb_test_case = "JTYPE";
-        jtype_instr(5'd20, 'd110);
+        // tb_test_case = "JTYPE";
+        // jtype_instr(5'd20, 'd110);
+        // repeat (3) @(posedge CLK);
+
+        tb_test_case = "BEQ";
+        btype_instr(11, 12, BEQ, 13'hBAC);
         repeat (3) @(posedge CLK);
+
+        tb_test_case = "ADDI";
+        itype_instr(5, 7, 12'h0A0, ADDI);
+        repeat (10) @(posedge CLK);
+
+        tb_test_case = "ADDI 2";
+        itype_instr(6, 7, 12'h0B0, ADDI);
+        repeat (10) @(posedge CLK);
+
+        tb_test_case = "BNE";
+        btype_instr(5, 6, BNE, 13'hBA0);
+        repeat (10) @(posedge CLK);
+
         tb_test_case = "HALT";
         halt();
         
