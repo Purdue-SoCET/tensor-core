@@ -200,33 +200,34 @@
 
         $display("Consecutive Reads");
         read_verify(.bg(0), .ba(0), .col(0), .ap(0), .bc(1), .dm(0), .dq(b0to7));
-//         deselect(timing.tCCD_L/timing.tCK);
-//         read_verify(.bg(0), .ba(1), .col(0), .ap(0), .bc(1), .dm(0), .dq(b8tof));
-//         deselect(timing.tCCD_L/timing.tCK);
-//         read_verify(.bg(0), .ba(2), .col(0), .ap(0), .bc(1), .dm(0), .dq(b7to0));
-//         deselect(timing.tCCD_L/timing.tCK);
-//         read_verify(.bg(0), .ba(3), .col(0), .ap(0), .bc(1), .dm(0), .dq(bfto8));
-//         deselect(timing.tCCD_L/timing.tCK + _dut_mode_config.RL + _dut_mode_config.BL/2);
+        deselect(timing.tCCD_L/timing.tCK);
+        read_verify(.bg(0), .ba(1), .col(0), .ap(0), .bc(1), .dm(0), .dq(b8tof));
+        deselect(timing.tCCD_L/timing.tCK);
+        read_verify(.bg(0), .ba(2), .col(0), .ap(0), .bc(1), .dm(0), .dq(b7to0));
+        deselect(timing.tCCD_L/timing.tCK);
+        read_verify(.bg(0), .ba(3), .col(0), .ap(0), .bc(1), .dm(0), .dq(bfto8));
+        deselect(timing.tCCD_L/timing.tCK + _dut_mode_config.RL + _dut_mode_config.BL/2);
 
-//         $display("Non Consecutive Writes");
-//         write(.bg(0), .ba(0), .col(0), .ap(0), .bc(1), .dm('1), .dq(b0to7));
-//         deselect(timing.tCCD_L/timing.tCK);
-//         write(.bg(0), .ba(1), .col(0), .ap(0), .bc(1), .dm('1), .dq(b8tof));
-//         deselect(timing.tCCD_L/timing.tCK);
-//         write(.bg(0), .ba(2), .col(0), .ap(0), .bc(1), .dm('1), .dq(b7to0));
-//         deselect(timing.tCCD_L/timing.tCK);
-//         write(.bg(0), .ba(3), .col(0), .ap(0), .bc(1), .dm('1), .dq(bfto8));
-//         deselect(_dut_mode_config.WL_calculated + _dut_mode_config.BL/2 + timing.tWTR_L/timing.tCK + _dut_mode_config.write_recovery);
+        $display("Non Consecutive Writes");
+        write(.bg(0), .ba(0), .col(0), .ap(0), .bc(1), .dm('1), .dq(b0to7));
+        deselect(timing.tCCD_L/timing.tCK);
+        write(.bg(0), .ba(1), .col(0), .ap(0), .bc(1), .dm('1), .dq(b8tof));
+        deselect(timing.tCCD_L/timing.tCK);
+        write(.bg(0), .ba(2), .col(0), .ap(0), .bc(1), .dm('1), .dq(b7to0));
+        deselect(timing.tCCD_L/timing.tCK);
+        write(.bg(0), .ba(3), .col(0), .ap(0), .bc(1), .dm('1), .dq(bfto8));
+        deselect(_dut_mode_config.WL_calculated + _dut_mode_config.BL/2 + timing.tWTR_L/timing.tCK + _dut_mode_config.write_recovery);
 
-//         $display("Non Consecutive Reads");
-//         read_verify(.bg(0), .ba(0), .col(0), .ap(1), .bc(1), .dm(0), .dq(b0to7));
-//         deselect(timing.tCCD_L/timing.tCK);
-//         read_verify(.bg(0), .ba(1), .col(0), .ap(1), .bc(1), .dm(0), .dq(b8tof));
-//         deselect(timing.tCCD_L/timing.tCK);
-//         read_verify(.bg(0), .ba(2), .col(0), .ap(1), .bc(1), .dm(0), .dq(b7to0));
-//         deselect(timing.tCCD_L/timing.tCK);
-//         read_verify(.bg(0), .ba(3), .col(0), .ap(1), .bc(1), .dm(0), .dq(bfto8));
-//         deselect(_dut_mode_config.AL + timing.tRTP/timing.tCK + timing.tRP/timing.tCK);
+        $display("Non Consecutive Reads");
+        read_verify(.bg(0), .ba(0), .col(0), .ap(1), .bc(1), .dm(0), .dq(b0to7));
+        deselect(timing.tCCD_L/timing.tCK);
+        read_verify(.bg(0), .ba(1), .col(0), .ap(1), .bc(1), .dm(0), .dq(b8tof));
+        deselect(timing.tCCD_L/timing.tCK);
+        read_verify(.bg(0), .ba(2), .col(0), .ap(1), .bc(1), .dm(0), .dq(b7to0));
+        deselect(timing.tCCD_L/timing.tCK);
+        read_verify(.bg(0), .ba(3), .col(0), .ap(1), .bc(1), .dm(0), .dq(bfto8));
+        timing_trk.timing_name = "Reading";
+        deselect(_dut_mode_config.AL + timing.tRTP/timing.tCK + timing.tRP/timing.tCK);
 
 //         for (UTYPE_TS ts = min_ts.first(); ts < min_ts.last(); ts = ts.next()) begin
 //             if (1 == tt_timesets[ts][TS_LOADED]) begin

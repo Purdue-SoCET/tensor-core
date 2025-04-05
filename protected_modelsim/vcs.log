@@ -1,5 +1,5 @@
 QuestaSim-64 vlog 2021.4 Compiler 2021.10 Oct 13 2021
-Start time: 12:23:15 on Apr 03,2025
+Start time: 02:15:17 on Apr 05,2025
 vlog -reportprogress 300 -work work "+acc" -l vcs.log -sv "+define+DDR4_4G_X8" dram_command.sv arch_package.sv proj_package.sv interface.sv ddr4_model.svp dram_command_tb.sv scheduler_buffer.sv data_transfer.sv socetlib_counter.sv 
 -- Compiling package dram_pack
 -- Compiling interface dram_command_if
@@ -43,9 +43,10 @@ vlog -reportprogress 300 -work work "+acc" -l vcs.log -sv "+define+DDR4_4G_X8" d
 ** Warning: ** while parsing file included at data_transfer.sv(1)
 ** at data_transfer_if.vh(6): (vlog-2275) Existing interface 'data_transfer_if' at line 6 will be overwritten.
 -- Compiling module data_transfer
+** Warning: data_transfer.sv(64): (vlog-2600) [RDGN] - Redundant digits in numeric literal.
 -- Compiling module socetlib_counter
 
 Top level modules:
 	dram_command_tb
-End time: 12:23:15 on Apr 03,2025, Elapsed time: 0:00:00
-Errors: 0, Warnings: 8
+End time: 02:15:18 on Apr 05,2025, Elapsed time: 0:00:01
+Errors: 0, Warnings: 9

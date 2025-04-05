@@ -27,5 +27,5 @@
 
 vlib work
 vlog -work work +acc -l vcs.log -sv +define+DDR4_4G_X8 arch_package.sv proj_package.sv interface.sv flexcounter.sv StateTable.svp MemoryArray.svp ddr4_model.svp tb.sv
-vsim tb
+vsim -do ./scripts/tb.do tb
 run -all

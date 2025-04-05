@@ -34,7 +34,7 @@ module dram_command_tb;
     scheduler_buffer SCH_BUFF (.CLK(CLK), .nRST(nRST), .mysche(sch_if));
     data_transfer DT (.CLK(CLK), .nRST(nRST), .mydata(dt_if));
 
-    DDR4_if #(.CONFIGURED_DQ_BITS(8)) iDDR4();
+    DDR4_if #(.CONFIGURED_DQ_BITS(CONFIGURED_DQ_BITS)) iDDR4();
 
     ddr4_model #(.CONFIGURED_DQ_BITS(CONFIGURED_DQ_BITS), .CONFIGURED_RANKS(CONFIGURED_RANKS))
                  golden_model(.model_enable(model_enable), .iDDR4(iDDR4));
@@ -43,8 +43,8 @@ module dram_command_tb;
     // /Interface between iDDR4 and data transfer
 
     assign iDDR4.DQ = dq_en ?     dt_if.DQ : {MAX_DQ_BITS{1'bz}};
-    assign iDDR4.DQS_t = dqs_en ? dt_if.DQS_t : {MAX_DQS_BITS{1'bz}};
-    assign iDDR4.DQS_c = dqs_en ? dt_if.DQS_c : {MAX_DQS_BITS{1'bz}};
+    assign iDDR4.DQS_t = dq_en ? dt_if.DQS_t : {MAX_DQS_BITS{1'bz}};
+    assign iDDR4.DQS_c = dq_en ? dt_if.DQS_c : {MAX_DQS_BITS{1'bz}};
 
     assign dt_if.DQ = ~dq_en ? iDDR4.DQ : {MAX_DQ_BITS{1'bz}};
     assign dt_if.DQS_t = ~dq_en ? iDDR4.DQS_t : {MAX_DQS_BITS{1'bz}};
@@ -71,8 +71,17 @@ module dram_command_tb;
       dc_if.ramREN_ftrt = sch_if.ramREN_ftrt;
       dc_if.ramWEN_curr = sch_if.ramWEN_curr;
       dc_if.ramWEN_ftrt = sch_if.ramWEN_ftrt;
+      sch_if.request_done = dc_if.request_done;
       
 
+      //Interface between dram command and the data_transfer
+
+      dt_if.wr_en = dc_if.wr_en;
+      dt_if.rd_en = dc_if.rd_en;
+      
+
+
+      dt_if.memstore = sch_if.ramstore_rq;
       
 
 
@@ -101,16 +110,25 @@ module dram_command_tb;
       @(posedge CLK);
       nRST = 1'b1;
       task_name = "Power_up";
-      repeat (300) @(posedge CLK);
+      // repeat (2254) @(posedge CLK);
+      #((tRESET + tPWUP + tRESETCKE + tPDc + tXPR + tDLLKc + tMOD * 7 + tZQinitc) * PERIOD);
+
+
 
       //Add request
-      add_request(.addr(32'hAAAA_BBBB), .write(1'b1), .data(32'hBBBB_AAAA));
+      //add_request(.addr(32'hAAAA_BBBB), .write(1'b1), .data(32'hDDCC_BBAA));
+      add_request(.addr(32'h0), .write(1'b1), .data(32'hDDCC_BBAA));
+      repeat (200) @(posedge CLK);
 
+      task_name = "Add Read";
+      add_request(.addr(32'h0), .write(1'b0), .data(32'hDDCC_BBAA));
+      dq_en = 1'b0;
+      task_name = "Done add Read";
+      repeat (200) @(posedge CLK);
 
-
-
-
-      #(10000);
+      
+      task_name = "After 400 cycle Read";
+      // #(10000);
       $finish;
 
     end
@@ -127,6 +145,7 @@ module dram_command_tb;
           sch_if.ramaddr = addr;
       end
       #(PERIOD);
+      // @(posedge CLK);
       sch_if.dWEN = 1'b0;
       sch_if.dREN = 1'b0;
     endtask

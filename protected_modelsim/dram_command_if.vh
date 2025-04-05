@@ -64,7 +64,7 @@ typedef enum logic [4:0] {
     parameter int MAX_BANK_GROUPS     = 2**(MAX_BANK_GROUP_BITS);
     parameter int MAX_RANKS           = 2**(MAX_RANK_BITS);
     parameter int RTT_BITS = 16;
-    parameter FLY_BY = 0;
+    parameter FLY_BY = 1;
     parameter NO_AUTO_PRE = 0;
 
     // parameter     
@@ -90,12 +90,12 @@ typedef enum logic [4:0] {
         WRITE_CMD     = 5'b01100,
         READ_CMD      = 5'b01101,
         ZQ_CMD        = 5'b01110,
-        DESEL_CMD     = 5'b10000
+        DESEL_CMD     = 5'b11000
     } cmd_t;
 
     
     ////////////////// Parameters DDR4 Speed 1600 ///////////////
-    parameter BURST_LENGTH  = 4;
+    parameter BURST_LENGTH  = 8;
     parameter CONFIGURED_DQ_BITS     = 8;
     parameter CONFIGURED_DQS_BITS     = (16 == CONFIGURED_DQ_BITS) ? 2 : 1;
     parameter CONFIGURED_DM_BITS     = (16 == CONFIGURED_DQ_BITS) ? 2 : 1;
@@ -106,7 +106,7 @@ typedef enum logic [4:0] {
     parameter tPWUP         = 80;
     parameter tRESETCKE     = 80;
     parameter tPDc          = 3;
-    parameter tXPR          = 215;
+    parameter tXPR          = 217;
     parameter tDLLKc        = 597;
     parameter tZQinitc      = 1024;
     parameter tMOD          = 25;

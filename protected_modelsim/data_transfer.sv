@@ -61,7 +61,7 @@ module data_transfer (
             ncount_burst = count_burst + 1;
             // nDQ_latch = mydata.memstore;
             if (count_burst > 1) begin
-                nDQ_latch = {8'b0, DQ_latch[31:8]};
+                nDQ_latch = {8'hDDDD_ABCF, DQ_latch[31:8]};
                 nDQS_t_latch = ~DQS_t_latch;
                 nDQS_c_latch = ~DQS_c_latch;
             end
