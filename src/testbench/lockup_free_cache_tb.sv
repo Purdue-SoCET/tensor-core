@@ -7,6 +7,7 @@ module RAM (
     input logic [31:0] ram_addr,
     input logic [31:0] ram_store,
     input logic ram_REN, ram_WEN,
+    input logic [BANKS_LEN-1:0] bank_id,
     output logic [31:0] ram_load,
     output logic ram_ready
 );
@@ -82,7 +83,7 @@ module RAM (
                     end else begin
                         ram_load = 32'd0;
                     end            
-                    $display("RAM -- read from %08x: %08x", current_addr, ram_load);     
+                    $display("RAM ID:%d -- read from %08x: %08x", bank_id, current_addr, ram_load);     
                 end else begin
                     next_counter = counter + 1;
                 end
@@ -93,7 +94,7 @@ module RAM (
                 end else if (counter == cycle_delay) begin
                     ram_ready = 1;
                     ram_data[current_addr] = ram_store;
-                    $display("RAM -- write to %08x: %08x", current_addr, ram_store);
+                    $display("RAM ID:%d -- write to %08x: %08x", bank_id, current_addr, ram_store);
                 end else begin
                     next_counter = counter + 1;
                 end
@@ -104,6 +105,24 @@ module RAM (
 
 endmodule
 
+class cache_line;
+    logic [BLOCK_INDEX_BIT_LEN-1:0] set_index;
+    rand logic [TAG_BIT_LEN-1:0] tag;
+    addr_t [BLOCK_SIZE-1:0] addr;
+    rand logic [BLOCK_SIZE-1:0][31:0] data;
+    integer i;
+
+    function new(logic [BLOCK_INDEX_BIT_LEN-1:0] set_index);
+        this.set_index = set_index;
+        randomize();
+        for (i = 0; i < BLOCK_SIZE; i++) begin
+            addr[i].tag = tag;
+            addr[i].index = set_index;
+            addr[i].block_offset = i;
+            addr[i].byte_offset = 0;
+        end
+    endfunction
+endclass
 
 module lockup_free_cache_tb;
     localparam CLK_PERIOD = 1;
@@ -170,7 +189,8 @@ module lockup_free_cache_tb;
                 .ram_REN      (tb_ram_mem_REN[i]),
                 .ram_WEN      (tb_ram_mem_WEN[i]),
                 .ram_load     (tb_ram_mem_data[i]),
-                .ram_ready    (tb_ram_mem_complete[i])
+                .ram_ready    (tb_ram_mem_complete[i]),
+                .bank_id (i)
             );
         end
     endgenerate
@@ -201,15 +221,27 @@ module lockup_free_cache_tb;
     endtask
 
     task data_write(input logic [31:0] addr, input logic [31:0] data);
+        $display("Starting data write: %08x", addr);
         @(posedge tb_clk);
         tb_mem_in = 1;
         tb_mem_in_addr = addr;
         tb_mem_in_rw_mode = 1;
         tb_mem_in_store_value = data;
+        while (tb_stall) begin
+            @(posedge tb_clk);
+        end
     endtask
 
 
     logic [31:0] data_out;
+
+    cache_line line;
+
+    integer current_set_index;
+    integer current_block_offset;
+    integer current_way;
+
+    integer cycle_count;
 
     initial begin
         tb_nrst = 0;
@@ -221,17 +253,24 @@ module lockup_free_cache_tb;
         tb_nrst = 1;
         @(posedge tb_clk);
         $display("starting!");
-        data_write(32'h4560, 4'd5, 32'h5678);
-        data_write(32'h4564, 4'd5, 32'h6789);
-        while (tb_block_status == 0) begin
+        
+        for (current_set_index = 0; current_set_index < 1; current_set_index++) begin
+            for (current_way = 0; current_way < 2*NUM_WAYS; current_way++) begin
+                $display("writing way %d", current_way);
+                line = new(current_set_index);
+                for (current_block_offset = 0; current_block_offset < BLOCK_SIZE; current_block_offset++) begin
+                    data_write(line.addr[current_block_offset], line.data[current_block_offset]);                
+                end
+                tb_mem_in = 0;
+                for (cycle_count = 0; cycle_count < 100; cycle_count++) begin
+                    @(posedge tb_clk);
+                end
+            end
+        end
+
+        for (cycle_count = 0; cycle_count < 10000; cycle_count++) begin
             @(posedge tb_clk);
         end
-        tb_mem_in = 0;
-        @(posedge tb_clk);
-        @(posedge tb_clk);
-        @(posedge tb_clk);
-        @(posedge tb_clk);
-        data_read(32'h4560, 4'd6, data_out);
         $finish;
     end
 

@@ -12,7 +12,7 @@ fc:
 	     ./src/testbench/$*_bind.sv 
 
 %.sim: %.log
-	vsim -c -voptargs="+acc" work.$*_tb -do  "run -all; quit"
+	vsim -c -voptargs="+acc" work.$*_tb -do  "run -all; quit" > ./simout/simout.txt
 
 %.wav: %.log
 	vsim -voptargs="+acc" work.$*_tb -do "view objects; do ./waveforms/$*.do; run -all;" -onfinish stop

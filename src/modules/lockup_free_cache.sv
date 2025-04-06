@@ -40,7 +40,7 @@ module lockup_free_cache (
     mshr_reg [NUM_BANKS-1:0] mshr_out;
 
     logic [BANKS_LEN-1:0] bank_id;
-    assign bank_id = (mem_in_addr >> (BYTE_OFF_BIT_LEN + BLOCK_INDEX_BIT_LEN)) & (NUM_BANKS - 1);
+    assign bank_id = (mem_in_addr >> (BYTE_OFF_BIT_LEN + BLOCK_OFF_BIT_LEN)) & (NUM_BANKS - 1);
     
     assign new_miss.addr = addr_t'(mem_in_addr);
     assign new_miss.rw_mode = mem_in_rw_mode;
@@ -54,7 +54,7 @@ module lockup_free_cache (
                 .nRST          (nRST),
                 .miss          (miss[i]),
                 .mem_instr     (new_miss),
-                .bank_empty    (~bank_busy[i]),
+                .bank_empty    (!bank_busy[i]),
                 .mshr_out      (mshr_out[i]),
                 .stall         (bank_stall[i]),
                 .uuid_out      (bank_uuids[i])

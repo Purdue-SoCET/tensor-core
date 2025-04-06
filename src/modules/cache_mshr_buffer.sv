@@ -82,12 +82,10 @@ module cache_mshr_buffer (
             end else begin
                 stall = 1;
             end
-        end else begin
-            if (buffer[1].valid || bank_empty) begin
-                next_buffer[0] = 0;
-            end
         end
-
+        if (secondary_misses != 0) begin
+            next_buffer[0] = 0;
+        end
     end
 
 endmodule

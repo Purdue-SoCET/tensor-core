@@ -1,0 +1,150 @@
+Reading pref.tcl
+
+# 2021.4
+
+# vsim -c -voptargs="+acc" work.lockup_free_cache_tb -do "run -all; quit" 
+# Start time: 18:12:05 on Apr 06,2025
+# ** Note: (vsim-3813) Design is being optimized due to module recompilation...
+# ** Warning: ./src/testbench/lockup_free_cache_tb.sv(117): (vopt-2240) Treating stand-alone use of function 'randomize' as an implicit VOID cast.
+# ** Note: (vopt-143) Recognized 1 FSM in module "cache_bank(fast)".
+# ** Warning: ./src/modules/lockup_free_cache.sv(62): (vopt-2685) [TFMPC] - Too few port connections for 'u_cache_bank'.  Expected 19, found 17.
+# ** Warning: ./src/modules/lockup_free_cache.sv(62): (vopt-2718) [TFMPC] - Missing connection for port 'flushed'.
+# ** Warning: ./src/modules/lockup_free_cache.sv(62): (vopt-2718) [TFMPC] - Missing connection for port 'halt'.
+# ** Warning: ./src/modules/lockup_free_cache.sv(62): (vopt-2685) [TFMPC] - Too few port connections for 'u_cache_bank'.  Expected 19, found 17.
+# ** Warning: ./src/modules/lockup_free_cache.sv(62): (vopt-2718) [TFMPC] - Missing connection for port 'flushed'.
+# ** Warning: ./src/modules/lockup_free_cache.sv(62): (vopt-2718) [TFMPC] - Missing connection for port 'halt'.
+# ** Warning: ./src/modules/lockup_free_cache.sv(62): (vopt-2685) [TFMPC] - Too few port connections for 'u_cache_bank'.  Expected 19, found 17.
+# ** Warning: ./src/modules/lockup_free_cache.sv(62): (vopt-2718) [TFMPC] - Missing connection for port 'flushed'.
+# ** Warning: ./src/modules/lockup_free_cache.sv(62): (vopt-2718) [TFMPC] - Missing connection for port 'halt'.
+# ** Warning: ./src/modules/lockup_free_cache.sv(62): (vopt-2685) [TFMPC] - Too few port connections for 'u_cache_bank'.  Expected 19, found 17.
+# ** Warning: ./src/modules/lockup_free_cache.sv(62): (vopt-2718) [TFMPC] - Missing connection for port 'flushed'.
+# ** Warning: ./src/modules/lockup_free_cache.sv(62): (vopt-2718) [TFMPC] - Missing connection for port 'halt'.
+# ** Warning: ./src/testbench/lockup_free_cache_tb.sv(82): (vopt-2182) 'ram_data' might be read before written in always_comb or always @* block.
+# ** Note: (vopt-143) Recognized 1 FSM in module "RAM(fast)".
+# ** Note: (vsim-12126) Error and warning message counts have been restored: Errors=0, Warnings=14.
+# //  Questa Sim-64
+# //  Version 2021.4 linux_x86_64 Oct 13 2021
+# //
+# //  Copyright 1991-2021 Mentor Graphics Corporation
+# //  All Rights Reserved.
+# //
+# //  QuestaSim and its associated documentation contain trade
+# //  secrets and commercial or financial information that are the property of
+# //  Mentor Graphics Corporation and are privileged, confidential,
+# //  and exempt from disclosure under the Freedom of Information Act,
+# //  5 U.S.C. Section 552. Furthermore, this information
+# //  is prohibited from disclosure under the Trade Secrets Act,
+# //  18 U.S.C. Section 1905.
+# //
+# Loading sv_std.std
+# Loading work.lockup_free_cache_tb_sv_unit(fast)
+# Loading work.lockup_free_cache_tb(fast)
+# Loading work.lockup_free_cache_sv_unit(fast)
+# Loading work.lockup_free_cache(fast)
+# Loading work.cache_mshr_buffer_sv_unit(fast)
+# Loading work.cache_mshr_buffer(fast)
+# Loading work.cache_bank_sv_unit(fast)
+# Loading work.cache_bank(fast)
+# Loading work.RAM(fast)
+# ** Warning: (vsim-3015) [PCDPC] - Port size (2) does not match connection size (32) for port 'bank_id'. The port definition is at: ./src/testbench/lockup_free_cache_tb.sv(10).
+#    Time: 0 ps  Iteration: 0  Instance: /lockup_free_cache_tb/RAM_GEN[0]/u_RAM File: ./src/testbench/lockup_free_cache_tb.sv Line: 184
+# ** Warning: (vsim-3015) [PCDPC] - Port size (2) does not match connection size (32) for port 'bank_id'. The port definition is at: ./src/testbench/lockup_free_cache_tb.sv(10).
+#    Time: 0 ps  Iteration: 0  Instance: /lockup_free_cache_tb/RAM_GEN[1]/u_RAM File: ./src/testbench/lockup_free_cache_tb.sv Line: 184
+# ** Warning: (vsim-3015) [PCDPC] - Port size (2) does not match connection size (32) for port 'bank_id'. The port definition is at: ./src/testbench/lockup_free_cache_tb.sv(10).
+#    Time: 0 ps  Iteration: 0  Instance: /lockup_free_cache_tb/RAM_GEN[2]/u_RAM File: ./src/testbench/lockup_free_cache_tb.sv Line: 184
+# ** Warning: (vsim-3015) [PCDPC] - Port size (2) does not match connection size (32) for port 'bank_id'. The port definition is at: ./src/testbench/lockup_free_cache_tb.sv(10).
+#    Time: 0 ps  Iteration: 0  Instance: /lockup_free_cache_tb/RAM_GEN[3]/u_RAM File: ./src/testbench/lockup_free_cache_tb.sv Line: 184
+# run -all
+# starting!
+# writing way           0
+# Starting data write: 4b193000
+# Starting data write: 4b193004
+# Starting data write: 4b193008
+# Starting data write: 4b19300c
+# RAM ID:0 -- read from 4b193000: 00000000
+# RAM ID:0 -- read from 4b193004: 00000000
+# RAM ID:0 -- read from 4b193008: 00000000
+# RAM ID:0 -- read from 4b19300c: 00000000
+# writing way           1
+# Starting data write: 75c44400
+# Starting data write: 75c44404
+# Starting data write: 75c44408
+# Starting data write: 75c4440c
+# RAM ID:0 -- read from 75c44400: 00000000
+# RAM ID:0 -- read from 75c44404: 00000000
+# RAM ID:0 -- read from 75c44408: 00000000
+# RAM ID:0 -- read from 75c4440c: 00000000
+# writing way           2
+# Starting data write: d1820800
+# Starting data write: d1820804
+# Starting data write: d1820808
+# Starting data write: d182080c
+# RAM ID:0 -- read from d1820800: 00000000
+# RAM ID:0 -- read from d1820804: 00000000
+# RAM ID:0 -- read from d1820808: 00000000
+# RAM ID:0 -- read from d182080c: 00000000
+# writing way           3
+# Starting data write: 210d9400
+# Starting data write: 210d9404
+# Starting data write: 210d9408
+# Starting data write: 210d940c
+# RAM ID:0 -- read from 210d9400: 00000000
+# RAM ID:0 -- read from 210d9404: 00000000
+# RAM ID:0 -- read from 210d9408: 00000000
+# RAM ID:0 -- read from 210d940c: 00000000
+# writing way           4
+# Starting data write: 11448400
+# Starting data write: 11448404
+# Starting data write: 11448408
+# Starting data write: 1144840c
+# RAM ID:0 -- read from 11448400: 00000000
+# RAM ID:0 -- read from 11448404: 00000000
+# RAM ID:0 -- read from 11448408: 00000000
+# RAM ID:0 -- read from 1144840c: 00000000
+# RAM ID:0 -- write to 4b193000: 8697bff3
+# RAM ID:0 -- write to 4b193004: 1620f14e
+# RAM ID:0 -- write to 4b193008: 9094f634
+# RAM ID:0 -- write to 4b19300c: c9be92a1
+# writing way           5
+# Starting data write: 168df000
+# Starting data write: 168df004
+# Starting data write: 168df008
+# Starting data write: 168df00c
+# RAM ID:0 -- read from 168df000: 00000000
+# RAM ID:0 -- read from 168df004: 00000000
+# RAM ID:0 -- read from 168df008: 00000000
+# RAM ID:0 -- read from 168df00c: 00000000
+# RAM ID:0 -- write to 75c44400: e9ff4877
+# RAM ID:0 -- write to 75c44404: a8eba771
+# RAM ID:0 -- write to 75c44408: e6777570
+# RAM ID:0 -- write to 75c4440c: 0563fe96
+# writing way           6
+# Starting data write: 6fb25800
+# Starting data write: 6fb25804
+# Starting data write: 6fb25808
+# Starting data write: 6fb2580c
+# RAM ID:0 -- read from 6fb25800: 00000000
+# RAM ID:0 -- read from 6fb25804: 00000000
+# RAM ID:0 -- read from 6fb25808: 00000000
+# RAM ID:0 -- read from 6fb2580c: 00000000
+# RAM ID:0 -- write to d1820800: a60f75f8
+# RAM ID:0 -- write to d1820804: 0182b574
+# RAM ID:0 -- write to d1820808: c917259e
+# RAM ID:0 -- write to d182080c: c28c3e0a
+# writing way           7
+# Starting data write: c900bc00
+# Starting data write: c900bc04
+# Starting data write: c900bc08
+# Starting data write: c900bc0c
+# RAM ID:0 -- read from c900bc00: 00000000
+# RAM ID:0 -- read from c900bc04: 00000000
+# RAM ID:0 -- read from c900bc08: 00000000
+# RAM ID:0 -- read from c900bc0c: 00000000
+# RAM ID:0 -- write to 210d9400: 2424c9ee
+# RAM ID:0 -- write to 210d9404: 34dc0893
+# RAM ID:0 -- write to 210d9408: da569573
+# RAM ID:0 -- write to 210d940c: 7bbf6ed2
+# ** Note: $finish    : ./src/testbench/lockup_free_cache_tb.sv(274)
+#    Time: 21667 ps  Iteration: 1  Instance: /lockup_free_cache_tb
+# End time: 18:12:06 on Apr 06,2025, Elapsed time: 0:00:01
+# Errors: 0, Warnings: 18

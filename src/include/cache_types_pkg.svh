@@ -10,18 +10,19 @@
     parameter CACHE_RW_SIZE = 32; 
     parameter UUID_SIZE = 4; 
 
-    localparam NUM_SETS = (CACHE_SIZE / 4) / (BLOCK_SIZE * NUM_WAYS);
+    localparam NUM_SETS = (CACHE_SIZE / 4) / (BLOCK_SIZE);
     localparam NUM_SETS_PER_BANK = NUM_SETS / NUM_BANKS;
     localparam NUM_BLOCKS_PER_BANK = NUM_SETS_PER_BANK * NUM_WAYS; 
     localparam BYTE_OFF_BIT_LEN = 2;
     localparam BLOCK_OFF_BIT_LEN = $clog2(BLOCK_SIZE); // choose which block within the bank
-    localparam BLOCK_INDEX_BIT_LEN = $clog2(NUM_SETS_PER_BANK); // chose the set
+    localparam BLOCK_INDEX_BIT_LEN = $clog2(NUM_SETS); // chose the set
     localparam WAYS_LEN = $clog2(NUM_WAYS); 
     localparam BANKS_LEN = $clog2(NUM_BANKS); 
     localparam NUM_BLOCKS_PER_BANK_LEN = $clog2(NUM_BLOCKS_PER_BANK);
     localparam TAG_BIT_LEN = 32 - BLOCK_INDEX_BIT_LEN - BLOCK_OFF_BIT_LEN - BYTE_OFF_BIT_LEN;
     localparam AGE_WIDTH = 32;          
     localparam SET_INDEX_WIDTH = $clog2(NUM_SETS);   
+    localparam UUID_MAX = (1 << UUID_SIZE) - 1;
 
     typedef struct packed {
         logic [TAG_BIT_LEN-1:0] tag;
