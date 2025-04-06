@@ -5,3 +5,7 @@ vsim.*
 obj_dir/ 
 obj_dir/*
 *.cpp
+work/
+transcript
+vsim.vlf
+waveform.vcd

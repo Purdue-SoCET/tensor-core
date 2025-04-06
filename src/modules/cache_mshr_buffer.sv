@@ -6,16 +6,26 @@ module cache_mshr_buffer (
     input in_mem_instr mem_instr,
     input logic bank_empty,
     output mshr_reg mshr_out,
-    output logic stall
+    output logic stall, 
+    output logic [UUID_SIZE-1:0] uuid_out
 );
     mshr_reg [MSHR_BUFFER_LEN-1:0] buffer, next_buffer;
     mshr_reg [MSHR_BUFFER_LEN-2:0] buffer_copy;
     logic [MSHR_BUFFER_LEN-2:0] secondary_misses;
-
     mshr_reg mshr_new_miss;
+    logic [UUID_SIZE-1:0] uuid, next_uuid;
+
+    assign next_uuid = (uuid == UUID_MAX) ? 8'd0 : (uuid + 1);
+
     always_comb begin
         mshr_new_miss.valid = miss;
-        mshr_new_miss.uuid = mem_instr.uuid;
+        if ((secondary_misses == 0) && miss) begin
+            mshr_new_miss.uuid = next_uuid;
+            uuid_out = next_uuid;
+        end else begin
+            mshr_new_miss.uuid = uuid;
+            uuid_out = buffer[0].uuid;
+        end
         mshr_new_miss.block_addr = {mem_instr.addr.tag, mem_instr.addr.index, BLOCK_OFF_BIT_LEN'(0), BYTE_OFF_BIT_LEN'(0)};
         mshr_new_miss.write_status = 0;
         mshr_new_miss.write_status[mem_instr.addr.block_offset] = mem_instr.rw_mode;
@@ -23,12 +33,13 @@ module cache_mshr_buffer (
         mshr_new_miss.write_block[mem_instr.addr.block_offset] = mem_instr.store_value;
     end
 
-
     always_ff @( posedge CLK, negedge nRST ) begin
         if (!nRST) begin
             buffer <= 0;
+            uuid <= 0;
         end else begin
             buffer <= next_buffer;
+            if (miss && (secondary_misses == 0) && (!buffer[0].valid || bank_empty)) uuid <= next_uuid;
         end
     end
 
@@ -66,7 +77,7 @@ module cache_mshr_buffer (
         next_buffer[0] = buffer_copy[0];
 
         if ((secondary_misses == 0) && mshr_new_miss.valid) begin
-            if (!buffer[0].valid || bank_empty) begin
+            if (!buffer[0].valid || bank_empty) begin // .valid checks if the slot is free, and shifts
                 next_buffer[0] = mshr_new_miss;
             end else begin
                 stall = 1;
