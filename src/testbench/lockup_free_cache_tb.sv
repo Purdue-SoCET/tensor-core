@@ -78,8 +78,12 @@ module RAM (
                     next_counter = 0;
                 end else if (counter == cycle_delay) begin
                     ram_ready = 1;
-                    ram_load = ram_data[current_addr];               
-                    $display("read from %08x: %08x", current_addr, ram_load);     
+                    if (ram_data.exists(current_addr)) begin
+                        ram_load = ram_data[current_addr]; 
+                    end else begin
+                        ram_load = 32'd0;
+                    end            
+                    $display("RAM -- read from %08x: %08x", current_addr, ram_load);     
                 end else begin
                     next_counter = counter + 1;
                 end
@@ -90,6 +94,7 @@ module RAM (
                 end else if (counter == cycle_delay) begin
                     ram_ready = 1;
                     ram_data[current_addr] = ram_store;
+                    $display("RAM -- write to %08x: %08x", current_addr, ram_store);
                 end else begin
                     next_counter = counter + 1;
                 end
@@ -180,7 +185,6 @@ module lockup_free_cache_tb;
         tb_mem_in_rw_mode = 0;
         tb_mem_in_store_value = 0;
         @(negedge tb_clk);
-        $display("hit status: %d", tb_hit);
         if (!tb_hit) begin
             $display("miss!");
             @(posedge tb_clk);
@@ -188,11 +192,14 @@ module lockup_free_cache_tb;
             tb_mem_in_uuid = uuid;
             tb_mem_in_addr = addr;
             tb_mem_in_rw_mode = 0;
+            @(negedge tb_clk);
             while (tb_block_status == 0) begin
                 @(posedge tb_clk);
             end
+            $display("block status: %b", tb_block_status);
+            @(posedge tb_clk);
         end else begin
-            $display("hit!");
+            $display("read hit on %08x: %08x!", addr, tb_hit_load);
             data = tb_hit_load;
         end
     endtask
@@ -204,17 +211,6 @@ module lockup_free_cache_tb;
         tb_mem_in_addr = addr;
         tb_mem_in_rw_mode = 1;
         tb_mem_in_store_value = data;
-        if (!tb_hit) begin
-            $display("write miss!");
-            @(posedge tb_clk);
-            tb_mem_in = 0;
-            while (tb_block_status == 0) begin
-                @(posedge tb_clk);
-            end
-            $display("miss finished!");
-        end else begin
-            $display("hit!");
-        end
     endtask
 
 
@@ -231,8 +227,17 @@ module lockup_free_cache_tb;
         tb_nrst = 1;
         @(posedge tb_clk);
         $display("starting!");
-        data_write(32'h4567, 4'd5, 32'h5678);
-        data_read(32'h4567, 4'd6, data_out);
+        data_write(32'h4560, 4'd5, 32'h5678);
+        data_write(32'h4564, 4'd5, 32'h6789);
+        while (tb_block_status == 0) begin
+            @(posedge tb_clk);
+        end
+        tb_mem_in = 0;
+        @(posedge tb_clk);
+        @(posedge tb_clk);
+        @(posedge tb_clk);
+        @(posedge tb_clk);
+        data_read(32'h4560, 4'd6, data_out);
         $finish;
     end
 

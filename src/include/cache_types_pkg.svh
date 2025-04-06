@@ -7,6 +7,7 @@ parameter NUM_WAYS = 4;
 parameter NUM_BANKS = 4;
 parameter MSHR_BUFFER_LEN = 8;
 parameter CACHE_RW_SIZE = 32; 
+parameter UUID_SIZE = 4;
 
 localparam NUM_SETS = (CACHE_SIZE / 4) / (BLOCK_SIZE * NUM_WAYS);
 localparam NUM_SETS_PER_BANK = NUM_SETS / NUM_BANKS;
@@ -25,7 +26,7 @@ typedef struct packed {
 } addr_t;
 
 typedef struct packed {
-    logic [3:0] uuid;
+    logic [UUID_SIZE-1:0] uuid;
     addr_t addr;
     logic rw_mode; // 0 = read, 1 = write
     logic [31:0] store_value;
@@ -40,7 +41,7 @@ typedef logic [BLOCK_SIZE-1:0][31:0] cache_block;
 
 typedef struct packed {
     logic valid;
-    logic [3:0] uuid;
+    logic [UUID_SIZE-1:0] uuid;
     addr_t block_addr;
     logic [BLOCK_SIZE-1:0] write_status; // assuming 1 means WEN and 0 means REN
     cache_block write_block;

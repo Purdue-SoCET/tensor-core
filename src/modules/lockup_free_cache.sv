@@ -3,7 +3,7 @@
 module lockup_free_cache (
     input logic CLK, nRST,
     input logic mem_in,
-    input logic [3:0] mem_in_uuid,
+    input logic [UUID_SIZE-1:0] mem_in_uuid,
     input logic [31:0] mem_in_addr,
     input logic mem_in_rw_mode, // 0 = read, 1 = write
     input logic [31:0] mem_in_store_value,
@@ -11,7 +11,7 @@ module lockup_free_cache (
     output logic hit,
     output logic [31:0] hit_load,
     output logic [NUM_BANKS-1:0] block_status,
-    output logic [NUM_BANKS-1:0][3:0] uuid_block,
+    output logic [NUM_BANKS-1:0][UUID_SIZE-1:0] uuid_block,
 
     // RAM Signals
     output logic [NUM_BANKS-1:0] ram_mem_REN,
@@ -41,7 +41,7 @@ module lockup_free_cache (
     mshr_reg [NUM_BANKS-1:0] mshr_out;
 
     logic [BANKS_LEN-1:0] bank_id;
-    assign bank_id = mem_in_addr & (NUM_BANKS - 1);
+    assign bank_id = (mem_in_addr >> (BYTE_OFF_BIT_LEN + BLOCK_INDEX_BIT_LEN)) & (NUM_BANKS - 1);
     
     assign new_miss.uuid = mem_in_uuid;
     assign new_miss.addr = addr_t'(mem_in_addr);
