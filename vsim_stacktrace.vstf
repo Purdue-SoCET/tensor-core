@@ -1,0 +1,451 @@
+# Current time Sun Mar  2 17:13:10 2025
+# Program = vsim
+# Id = "2021.4"
+# Version = "2021.10"
+# Date = "Oct 13 2021"
+# Platform = "linux_x86_64"
+# Signature = 1b982dbb9a4f11c9c04324db1a232ab9
+# 0    0x00007fefec334692: './src/include//cache_types_pkg.svh:74'
+# 1    0x00007fefec335492: './src/testbench/lockup_free_cache_tb.sv:22'
+# 2    0x00000000035000a2: '<unknown (@0x35000a2)>'
+# 3    0x00000000004ca29c: '<unknown (@0x4ca29c)>'
+# 4    0x00000000006f03f3: '<unknown (@0x6f03f3)>'
+# 5    0x0000000000c1f585: '<unknown (@0xc1f585)>'
+# 6    0x0000000000c246ab: '<unknown (@0xc246ab)>'
+# 7    0x0000000000c2640e: '<unknown (@0xc2640e)>'
+# 8    0x0000000000ef7b0d: '<unknown (@0xef7b0d)>'
+# 9    0x00000000039ac90d: '<unknown (@0x39ac90d)>'
+# 10   0x00000000039b0d66: '<unknown (@0x39b0d66)>'
+# 11   0x00000000039b2451: '<unknown (@0x39b2451)>'
+# 12   0x00000000039b27b6: '<unknown (@0x39b27b6)>'
+# 13   0x000000000117fd59: '<unknown (@0x117fd59)>'
+# 14   0x0000000003a526bf: '<unknown (@0x3a526bf)>'
+# 15   0x0000000003aa6237: '<unknown (@0x3aa6237)>'
+# 16   0x0000000003a69127: '<unknown (@0x3a69127)>'
+# 17   0x0000000003a69409: '<unknown (@0x3a69409)>'
+# 18   0x0000000003848a6d: '<unknown (@0x3848a6d)>'
+# 19   0x0000000000be9efc: '<unknown (@0xbe9efc)>'
+# End of Stack Trace
+
+
+# Current time Sun Mar  2 17:14:53 2025
+# Program = vsim
+# Id = "2021.4"
+# Version = "2021.10"
+# Date = "Oct 13 2021"
+# Platform = "linux_x86_64"
+# Signature = 1b982dbb9a4f11c9c04324db1a232ab9
+# 0    0x00007fefec334645: './src/include//cache_types_pkg.svh:74'
+# 1    0x00007fefec3353f0: './src/testbench/lockup_free_cache_tb.sv:22'
+# 2    0x00000000035000a2: '<unknown (@0x35000a2)>'
+# 3    0x00000000004ca29c: '<unknown (@0x4ca29c)>'
+# 4    0x00000000006f03f3: '<unknown (@0x6f03f3)>'
+# 5    0x0000000000c1f585: '<unknown (@0xc1f585)>'
+# 6    0x0000000000c246ab: '<unknown (@0xc246ab)>'
+# 7    0x0000000000c2640e: '<unknown (@0xc2640e)>'
+# 8    0x0000000000ef7b0d: '<unknown (@0xef7b0d)>'
+# 9    0x00000000039ac90d: '<unknown (@0x39ac90d)>'
+# 10   0x00000000039b0d66: '<unknown (@0x39b0d66)>'
+# 11   0x00000000039b2451: '<unknown (@0x39b2451)>'
+# 12   0x00000000039b27b6: '<unknown (@0x39b27b6)>'
+# 13   0x000000000117fd59: '<unknown (@0x117fd59)>'
+# 14   0x0000000003a526bf: '<unknown (@0x3a526bf)>'
+# 15   0x0000000003aa6237: '<unknown (@0x3aa6237)>'
+# 16   0x0000000003a69127: '<unknown (@0x3a69127)>'
+# 17   0x0000000003a69409: '<unknown (@0x3a69409)>'
+# 18   0x0000000003848a6d: '<unknown (@0x3848a6d)>'
+# 19   0x0000000000be9efc: '<unknown (@0xbe9efc)>'
+# End of Stack Trace
+
+
+# Current time Sun Mar  2 17:15:04 2025
+# Program = vsim
+# Id = "2021.4"
+# Version = "2021.10"
+# Date = "Oct 13 2021"
+# Platform = "linux_x86_64"
+# Signature = 1b982dbb9a4f11c9c04324db1a232ab9
+# 0    0x00007fefec334645: './src/include//cache_types_pkg.svh:74'
+# 1    0x00007fefec3353f0: './src/testbench/lockup_free_cache_tb.sv:22'
+# 2    0x00000000035000a2: '<unknown (@0x35000a2)>'
+# 3    0x00000000004ca29c: '<unknown (@0x4ca29c)>'
+# 4    0x00000000006f03f3: '<unknown (@0x6f03f3)>'
+# 5    0x0000000000c1f585: '<unknown (@0xc1f585)>'
+# 6    0x0000000000c246ab: '<unknown (@0xc246ab)>'
+# 7    0x0000000000c2640e: '<unknown (@0xc2640e)>'
+# 8    0x0000000000ef7b0d: '<unknown (@0xef7b0d)>'
+# 9    0x00000000039ac90d: '<unknown (@0x39ac90d)>'
+# 10   0x00000000039b0d66: '<unknown (@0x39b0d66)>'
+# 11   0x00000000039b2451: '<unknown (@0x39b2451)>'
+# 12   0x00000000039b27b6: '<unknown (@0x39b27b6)>'
+# 13   0x000000000117fd59: '<unknown (@0x117fd59)>'
+# 14   0x0000000003a526bf: '<unknown (@0x3a526bf)>'
+# 15   0x0000000003aa6237: '<unknown (@0x3aa6237)>'
+# 16   0x0000000003a69127: '<unknown (@0x3a69127)>'
+# 17   0x0000000003a69409: '<unknown (@0x3a69409)>'
+# 18   0x0000000003848a6d: '<unknown (@0x3848a6d)>'
+# 19   0x0000000000be9efc: '<unknown (@0xbe9efc)>'
+# End of Stack Trace
+
+
+# Current time Sun Mar  2 17:15:36 2025
+# Program = vsim
+# Id = "2021.4"
+# Version = "2021.10"
+# Date = "Oct 13 2021"
+# Platform = "linux_x86_64"
+# Signature = 1b982dbb9a4f11c9c04324db1a232ab9
+# 0    0x00007fefec334645: './src/include//cache_types_pkg.svh:74'
+# 1    0x00007fefec3353f0: './src/testbench/lockup_free_cache_tb.sv:22'
+# 2    0x00000000035000a2: '<unknown (@0x35000a2)>'
+# 3    0x00000000004ca29c: '<unknown (@0x4ca29c)>'
+# 4    0x00000000006f03f3: '<unknown (@0x6f03f3)>'
+# 5    0x0000000000c1f585: '<unknown (@0xc1f585)>'
+# 6    0x0000000000c246ab: '<unknown (@0xc246ab)>'
+# 7    0x0000000000c2640e: '<unknown (@0xc2640e)>'
+# 8    0x0000000000ef7b0d: '<unknown (@0xef7b0d)>'
+# 9    0x00000000039ac90d: '<unknown (@0x39ac90d)>'
+# 10   0x00000000039b0d66: '<unknown (@0x39b0d66)>'
+# 11   0x00000000039b2451: '<unknown (@0x39b2451)>'
+# 12   0x00000000039b27b6: '<unknown (@0x39b27b6)>'
+# 13   0x000000000117fd59: '<unknown (@0x117fd59)>'
+# 14   0x0000000003a526bf: '<unknown (@0x3a526bf)>'
+# 15   0x0000000003aa6237: '<unknown (@0x3aa6237)>'
+# 16   0x0000000003a69127: '<unknown (@0x3a69127)>'
+# 17   0x0000000003a69409: '<unknown (@0x3a69409)>'
+# 18   0x0000000003848a6d: '<unknown (@0x3848a6d)>'
+# 19   0x0000000000be9efc: '<unknown (@0xbe9efc)>'
+# End of Stack Trace
+
+
+# Current time Sun Mar  2 17:19:42 2025
+# Program = vsim
+# Id = "2021.4"
+# Version = "2021.10"
+# Date = "Oct 13 2021"
+# Platform = "linux_x86_64"
+# Signature = 1b982dbb9a4f11c9c04324db1a232ab9
+# 0    0x00007fefec334645: './src/include//cache_types_pkg.svh:74'
+# 1    0x00007fefec3353f0: './src/testbench/lockup_free_cache_tb.sv:22'
+# 2    0x00000000035000a2: '<unknown (@0x35000a2)>'
+# 3    0x00000000004ca29c: '<unknown (@0x4ca29c)>'
+# 4    0x00000000006f03f3: '<unknown (@0x6f03f3)>'
+# 5    0x0000000000c1f585: '<unknown (@0xc1f585)>'
+# 6    0x0000000000c246ab: '<unknown (@0xc246ab)>'
+# 7    0x0000000000c2640e: '<unknown (@0xc2640e)>'
+# 8    0x0000000000ef7b0d: '<unknown (@0xef7b0d)>'
+# 9    0x00000000039ac90d: '<unknown (@0x39ac90d)>'
+# 10   0x00000000039b0d66: '<unknown (@0x39b0d66)>'
+# 11   0x00000000039b2451: '<unknown (@0x39b2451)>'
+# 12   0x00000000039b27b6: '<unknown (@0x39b27b6)>'
+# 13   0x000000000117fd59: '<unknown (@0x117fd59)>'
+# 14   0x0000000003a526bf: '<unknown (@0x3a526bf)>'
+# 15   0x0000000003aa6237: '<unknown (@0x3aa6237)>'
+# 16   0x0000000003a69127: '<unknown (@0x3a69127)>'
+# 17   0x0000000003a69409: '<unknown (@0x3a69409)>'
+# 18   0x0000000003848a6d: '<unknown (@0x3848a6d)>'
+# 19   0x0000000000be9efc: '<unknown (@0xbe9efc)>'
+# End of Stack Trace
+
+
+# Current time Sun Mar  2 17:22:45 2025
+# Program = vsim
+# Id = "2021.4"
+# Version = "2021.10"
+# Date = "Oct 13 2021"
+# Platform = "linux_x86_64"
+# Signature = 1b982dbb9a4f11c9c04324db1a232ab9
+# 0    0x00007fefec33466d: './src/include//cache_types_pkg.svh:74'
+# 1    0x00007fefec335420: './src/testbench/lockup_free_cache_tb.sv:22'
+# 2    0x00000000035000a2: '<unknown (@0x35000a2)>'
+# 3    0x00000000004ca29c: '<unknown (@0x4ca29c)>'
+# 4    0x00000000006f03f3: '<unknown (@0x6f03f3)>'
+# 5    0x0000000000c1f585: '<unknown (@0xc1f585)>'
+# 6    0x0000000000c246ab: '<unknown (@0xc246ab)>'
+# 7    0x0000000000c2640e: '<unknown (@0xc2640e)>'
+# 8    0x0000000000ef7b0d: '<unknown (@0xef7b0d)>'
+# 9    0x00000000039ac90d: '<unknown (@0x39ac90d)>'
+# 10   0x00000000039b0d66: '<unknown (@0x39b0d66)>'
+# 11   0x00000000039b2451: '<unknown (@0x39b2451)>'
+# 12   0x00000000039b27b6: '<unknown (@0x39b27b6)>'
+# 13   0x000000000117fd59: '<unknown (@0x117fd59)>'
+# 14   0x0000000003a526bf: '<unknown (@0x3a526bf)>'
+# 15   0x0000000003aa6237: '<unknown (@0x3aa6237)>'
+# 16   0x0000000003a69127: '<unknown (@0x3a69127)>'
+# 17   0x0000000003a69409: '<unknown (@0x3a69409)>'
+# 18   0x0000000003848a6d: '<unknown (@0x3848a6d)>'
+# 19   0x0000000000be9efc: '<unknown (@0xbe9efc)>'
+# End of Stack Trace
+
+
+# Current time Sun Mar  2 17:24:42 2025
+# Program = vsim
+# Id = "2021.4"
+# Version = "2021.10"
+# Date = "Oct 13 2021"
+# Platform = "linux_x86_64"
+# Signature = 1b982dbb9a4f11c9c04324db1a232ab9
+# 0    0x00007fefec334607: './src/include//cache_types_pkg.svh:74'
+# 1    0x00007fefec335380: './src/testbench/lockup_free_cache_tb.sv:22'
+# 2    0x00000000035000a2: '<unknown (@0x35000a2)>'
+# 3    0x00000000004ca29c: '<unknown (@0x4ca29c)>'
+# 4    0x00000000006f03f3: '<unknown (@0x6f03f3)>'
+# 5    0x0000000000c1f585: '<unknown (@0xc1f585)>'
+# 6    0x0000000000c246ab: '<unknown (@0xc246ab)>'
+# 7    0x0000000000c2640e: '<unknown (@0xc2640e)>'
+# 8    0x0000000000ef7b0d: '<unknown (@0xef7b0d)>'
+# 9    0x00000000039ac90d: '<unknown (@0x39ac90d)>'
+# 10   0x00000000039b0d66: '<unknown (@0x39b0d66)>'
+# 11   0x00000000039b2451: '<unknown (@0x39b2451)>'
+# 12   0x00000000039b27b6: '<unknown (@0x39b27b6)>'
+# 13   0x000000000117fd59: '<unknown (@0x117fd59)>'
+# 14   0x0000000003a526bf: '<unknown (@0x3a526bf)>'
+# 15   0x0000000003aa6237: '<unknown (@0x3aa6237)>'
+# 16   0x0000000003a69127: '<unknown (@0x3a69127)>'
+# 17   0x0000000003a69409: '<unknown (@0x3a69409)>'
+# 18   0x0000000003848a6d: '<unknown (@0x3848a6d)>'
+# 19   0x0000000000be9efc: '<unknown (@0xbe9efc)>'
+# End of Stack Trace
+
+
+# Current time Sun Mar  2 17:27:38 2025
+# Program = vsim
+# Id = "2021.4"
+# Version = "2021.10"
+# Date = "Oct 13 2021"
+# Platform = "linux_x86_64"
+# Signature = 1b982dbb9a4f11c9c04324db1a232ab9
+# 0    0x00007fefec3345df: './src/include//cache_types_pkg.svh:74'
+# 1    0x00007fefec335340: './src/testbench/lockup_free_cache_tb.sv:22'
+# 2    0x00000000035000a2: '<unknown (@0x35000a2)>'
+# 3    0x00000000004ca29c: '<unknown (@0x4ca29c)>'
+# 4    0x00000000006f03f3: '<unknown (@0x6f03f3)>'
+# 5    0x0000000000c1f585: '<unknown (@0xc1f585)>'
+# 6    0x0000000000c246ab: '<unknown (@0xc246ab)>'
+# 7    0x0000000000c2640e: '<unknown (@0xc2640e)>'
+# 8    0x0000000000ef7b0d: '<unknown (@0xef7b0d)>'
+# 9    0x00000000039ac90d: '<unknown (@0x39ac90d)>'
+# 10   0x00000000039b0d66: '<unknown (@0x39b0d66)>'
+# 11   0x00000000039b2451: '<unknown (@0x39b2451)>'
+# 12   0x00000000039b27b6: '<unknown (@0x39b27b6)>'
+# 13   0x000000000117fd59: '<unknown (@0x117fd59)>'
+# 14   0x0000000003a526bf: '<unknown (@0x3a526bf)>'
+# 15   0x0000000003aa6237: '<unknown (@0x3aa6237)>'
+# 16   0x0000000003a69127: '<unknown (@0x3a69127)>'
+# 17   0x0000000003a69409: '<unknown (@0x3a69409)>'
+# 18   0x0000000003848a6d: '<unknown (@0x3848a6d)>'
+# 19   0x0000000000be9efc: '<unknown (@0xbe9efc)>'
+# End of Stack Trace
+
+
+# Current time Sun Mar  2 17:28:02 2025
+# Program = vsim
+# Id = "2021.4"
+# Version = "2021.10"
+# Date = "Oct 13 2021"
+# Platform = "linux_x86_64"
+# Signature = 1b982dbb9a4f11c9c04324db1a232ab9
+# 0    0x00007fefec3345ef: './src/include//cache_types_pkg.svh:74'
+# 1    0x00007fefec335350: './src/testbench/lockup_free_cache_tb.sv:22'
+# 2    0x00000000035000a2: '<unknown (@0x35000a2)>'
+# 3    0x00000000004ca29c: '<unknown (@0x4ca29c)>'
+# 4    0x00000000006f03f3: '<unknown (@0x6f03f3)>'
+# 5    0x0000000000c1f585: '<unknown (@0xc1f585)>'
+# 6    0x0000000000c246ab: '<unknown (@0xc246ab)>'
+# 7    0x0000000000c2640e: '<unknown (@0xc2640e)>'
+# 8    0x0000000000ef7b0d: '<unknown (@0xef7b0d)>'
+# 9    0x00000000039ac90d: '<unknown (@0x39ac90d)>'
+# 10   0x00000000039b0d66: '<unknown (@0x39b0d66)>'
+# 11   0x00000000039b2451: '<unknown (@0x39b2451)>'
+# 12   0x00000000039b27b6: '<unknown (@0x39b27b6)>'
+# 13   0x000000000117fd59: '<unknown (@0x117fd59)>'
+# 14   0x0000000003a526bf: '<unknown (@0x3a526bf)>'
+# 15   0x0000000003aa6237: '<unknown (@0x3aa6237)>'
+# 16   0x0000000003a69127: '<unknown (@0x3a69127)>'
+# 17   0x0000000003a69409: '<unknown (@0x3a69409)>'
+# 18   0x0000000003848a6d: '<unknown (@0x3848a6d)>'
+# 19   0x0000000000be9efc: '<unknown (@0xbe9efc)>'
+# End of Stack Trace
+
+
+# Current time Sun Mar  2 17:28:44 2025
+# Program = vsim
+# Id = "2021.4"
+# Version = "2021.10"
+# Date = "Oct 13 2021"
+# Platform = "linux_x86_64"
+# Signature = 1b982dbb9a4f11c9c04324db1a232ab9
+# 0    0x00007fefec3345ef: './src/include//cache_types_pkg.svh:74'
+# 1    0x00007fefec335350: './src/testbench/lockup_free_cache_tb.sv:22'
+# 2    0x00000000035000a2: '<unknown (@0x35000a2)>'
+# 3    0x00000000004ca29c: '<unknown (@0x4ca29c)>'
+# 4    0x00000000006f03f3: '<unknown (@0x6f03f3)>'
+# 5    0x0000000000c1f585: '<unknown (@0xc1f585)>'
+# 6    0x0000000000c246ab: '<unknown (@0xc246ab)>'
+# 7    0x0000000000c2640e: '<unknown (@0xc2640e)>'
+# 8    0x0000000000ef7b0d: '<unknown (@0xef7b0d)>'
+# 9    0x00000000039ac90d: '<unknown (@0x39ac90d)>'
+# 10   0x00000000039b0d66: '<unknown (@0x39b0d66)>'
+# 11   0x00000000039b2451: '<unknown (@0x39b2451)>'
+# 12   0x00000000039b27b6: '<unknown (@0x39b27b6)>'
+# 13   0x000000000117fd59: '<unknown (@0x117fd59)>'
+# 14   0x0000000003a526bf: '<unknown (@0x3a526bf)>'
+# 15   0x0000000003aa6237: '<unknown (@0x3aa6237)>'
+# 16   0x0000000003a69127: '<unknown (@0x3a69127)>'
+# 17   0x0000000003a69409: '<unknown (@0x3a69409)>'
+# 18   0x0000000003848a6d: '<unknown (@0x3848a6d)>'
+# 19   0x0000000000be9efc: '<unknown (@0xbe9efc)>'
+# End of Stack Trace
+
+
+# Current time Sun Mar  2 17:29:11 2025
+# Program = vsim
+# Id = "2021.4"
+# Version = "2021.10"
+# Date = "Oct 13 2021"
+# Platform = "linux_x86_64"
+# Signature = 1b982dbb9a4f11c9c04324db1a232ab9
+# 0    0x00007fefec3346bf: './src/include//cache_types_pkg.svh:75'
+# 1    0x00007fefec335420: './src/testbench/lockup_free_cache_tb.sv:22'
+# 2    0x00000000035000a2: '<unknown (@0x35000a2)>'
+# 3    0x00000000004ca29c: '<unknown (@0x4ca29c)>'
+# 4    0x00000000006f03f3: '<unknown (@0x6f03f3)>'
+# 5    0x0000000000c1f585: '<unknown (@0xc1f585)>'
+# 6    0x0000000000c246ab: '<unknown (@0xc246ab)>'
+# 7    0x0000000000c2640e: '<unknown (@0xc2640e)>'
+# 8    0x0000000000ef7b0d: '<unknown (@0xef7b0d)>'
+# 9    0x00000000039ac90d: '<unknown (@0x39ac90d)>'
+# 10   0x00000000039b0d66: '<unknown (@0x39b0d66)>'
+# 11   0x00000000039b2451: '<unknown (@0x39b2451)>'
+# 12   0x00000000039b27b6: '<unknown (@0x39b27b6)>'
+# 13   0x000000000117fd59: '<unknown (@0x117fd59)>'
+# 14   0x0000000003a526bf: '<unknown (@0x3a526bf)>'
+# 15   0x0000000003aa6237: '<unknown (@0x3aa6237)>'
+# 16   0x0000000003a69127: '<unknown (@0x3a69127)>'
+# 17   0x0000000003a69409: '<unknown (@0x3a69409)>'
+# 18   0x0000000003848a6d: '<unknown (@0x3848a6d)>'
+# 19   0x0000000000be9efc: '<unknown (@0xbe9efc)>'
+# End of Stack Trace
+
+
+# Current time Sun Mar  2 17:30:44 2025
+# Program = vsim
+# Id = "2021.4"
+# Version = "2021.10"
+# Date = "Oct 13 2021"
+# Platform = "linux_x86_64"
+# Signature = 1b982dbb9a4f11c9c04324db1a232ab9
+# 0    0x00007fefec3346bf: './src/include//cache_types_pkg.svh:75'
+# 1    0x00007fefec335430: './src/testbench/lockup_free_cache_tb.sv:22'
+# 2    0x00000000035000a2: '<unknown (@0x35000a2)>'
+# 3    0x00000000004ca29c: '<unknown (@0x4ca29c)>'
+# 4    0x00000000006f03f3: '<unknown (@0x6f03f3)>'
+# 5    0x0000000000c1f585: '<unknown (@0xc1f585)>'
+# 6    0x0000000000c246ab: '<unknown (@0xc246ab)>'
+# 7    0x0000000000c2640e: '<unknown (@0xc2640e)>'
+# 8    0x0000000000ef7b0d: '<unknown (@0xef7b0d)>'
+# 9    0x00000000039ac90d: '<unknown (@0x39ac90d)>'
+# 10   0x00000000039b0d66: '<unknown (@0x39b0d66)>'
+# 11   0x00000000039b2451: '<unknown (@0x39b2451)>'
+# 12   0x00000000039b27b6: '<unknown (@0x39b27b6)>'
+# 13   0x000000000117fd59: '<unknown (@0x117fd59)>'
+# 14   0x0000000003a526bf: '<unknown (@0x3a526bf)>'
+# 15   0x0000000003aa6237: '<unknown (@0x3aa6237)>'
+# 16   0x0000000003a69127: '<unknown (@0x3a69127)>'
+# 17   0x0000000003a69409: '<unknown (@0x3a69409)>'
+# 18   0x0000000003848a6d: '<unknown (@0x3848a6d)>'
+# 19   0x0000000000be9efc: '<unknown (@0xbe9efc)>'
+# End of Stack Trace
+
+
+# Current time Sun Mar  2 17:30:58 2025
+# Program = vsim
+# Id = "2021.4"
+# Version = "2021.10"
+# Date = "Oct 13 2021"
+# Platform = "linux_x86_64"
+# Signature = 1b982dbb9a4f11c9c04324db1a232ab9
+# 0    0x00007fefec3346bf: './src/include//cache_types_pkg.svh:75'
+# 1    0x00007fefec335430: './src/testbench/lockup_free_cache_tb.sv:22'
+# 2    0x00000000035000a2: '<unknown (@0x35000a2)>'
+# 3    0x00000000004ca29c: '<unknown (@0x4ca29c)>'
+# 4    0x00000000006f03f3: '<unknown (@0x6f03f3)>'
+# 5    0x0000000000c1f585: '<unknown (@0xc1f585)>'
+# 6    0x0000000000c246ab: '<unknown (@0xc246ab)>'
+# 7    0x0000000000c2640e: '<unknown (@0xc2640e)>'
+# 8    0x0000000000ef7b0d: '<unknown (@0xef7b0d)>'
+# 9    0x00000000039ac90d: '<unknown (@0x39ac90d)>'
+# 10   0x00000000039b0d66: '<unknown (@0x39b0d66)>'
+# 11   0x00000000039b2451: '<unknown (@0x39b2451)>'
+# 12   0x00000000039b27b6: '<unknown (@0x39b27b6)>'
+# 13   0x000000000117fd59: '<unknown (@0x117fd59)>'
+# 14   0x0000000003a526bf: '<unknown (@0x3a526bf)>'
+# 15   0x0000000003aa6237: '<unknown (@0x3aa6237)>'
+# 16   0x0000000003a69127: '<unknown (@0x3a69127)>'
+# 17   0x0000000003a69409: '<unknown (@0x3a69409)>'
+# 18   0x0000000003848a6d: '<unknown (@0x3848a6d)>'
+# 19   0x0000000000be9efc: '<unknown (@0xbe9efc)>'
+# End of Stack Trace
+
+
+# Current time Sun Mar  2 17:31:08 2025
+# Program = vsim
+# Id = "2021.4"
+# Version = "2021.10"
+# Date = "Oct 13 2021"
+# Platform = "linux_x86_64"
+# Signature = 1b982dbb9a4f11c9c04324db1a232ab9
+# 0    0x00007fefec3346bf: './src/include//cache_types_pkg.svh:75'
+# 1    0x00007fefec335420: './src/testbench/lockup_free_cache_tb.sv:22'
+# 2    0x00000000035000a2: '<unknown (@0x35000a2)>'
+# 3    0x00000000004ca29c: '<unknown (@0x4ca29c)>'
+# 4    0x00000000006f03f3: '<unknown (@0x6f03f3)>'
+# 5    0x0000000000c1f585: '<unknown (@0xc1f585)>'
+# 6    0x0000000000c246ab: '<unknown (@0xc246ab)>'
+# 7    0x0000000000c2640e: '<unknown (@0xc2640e)>'
+# 8    0x0000000000ef7b0d: '<unknown (@0xef7b0d)>'
+# 9    0x00000000039ac90d: '<unknown (@0x39ac90d)>'
+# 10   0x00000000039b0d66: '<unknown (@0x39b0d66)>'
+# 11   0x00000000039b2451: '<unknown (@0x39b2451)>'
+# 12   0x00000000039b27b6: '<unknown (@0x39b27b6)>'
+# 13   0x000000000117fd59: '<unknown (@0x117fd59)>'
+# 14   0x0000000003a526bf: '<unknown (@0x3a526bf)>'
+# 15   0x0000000003aa6237: '<unknown (@0x3aa6237)>'
+# 16   0x0000000003a69127: '<unknown (@0x3a69127)>'
+# 17   0x0000000003a69409: '<unknown (@0x3a69409)>'
+# 18   0x0000000003848a6d: '<unknown (@0x3848a6d)>'
+# 19   0x0000000000be9efc: '<unknown (@0xbe9efc)>'
+# End of Stack Trace
+
+
+# Current time Sun Mar  2 17:31:26 2025
+# Program = vsim
+# Id = "2021.4"
+# Version = "2021.10"
+# Date = "Oct 13 2021"
+# Platform = "linux_x86_64"
+# Signature = 1b982dbb9a4f11c9c04324db1a232ab9
+# 0    0x00000000005b0c40: '<unknown (@0x5b0c40)>'
+# 1    0x00007fefec334405: './src/include//cache_types_pkg.svh:67'
+# 2    0x00007fefec33541e: './src/testbench/lockup_free_cache_tb.sv:22'
+# 3    0x00000000035000a2: '<unknown (@0x35000a2)>'
+# 4    0x00000000004ca29c: '<unknown (@0x4ca29c)>'
+# 5    0x00000000006f03f3: '<unknown (@0x6f03f3)>'
+# 6    0x0000000000c1f585: '<unknown (@0xc1f585)>'
+# 7    0x0000000000c246ab: '<unknown (@0xc246ab)>'
+# 8    0x0000000000c2640e: '<unknown (@0xc2640e)>'
+# 9    0x0000000000ef7b0d: '<unknown (@0xef7b0d)>'
+# 10   0x00000000039ac90d: '<unknown (@0x39ac90d)>'
+# 11   0x00000000039b0d66: '<unknown (@0x39b0d66)>'
+# 12   0x00000000039b2451: '<unknown (@0x39b2451)>'
+# 13   0x00000000039b27b6: '<unknown (@0x39b27b6)>'
+# 14   0x000000000117fd59: '<unknown (@0x117fd59)>'
+# 15   0x0000000003a526bf: '<unknown (@0x3a526bf)>'
+# 16   0x0000000003aa6237: '<unknown (@0x3aa6237)>'
+# 17   0x0000000003a69127: '<unknown (@0x3a69127)>'
+# 18   0x0000000003a69409: '<unknown (@0x3a69409)>'
+# 19   0x0000000003848a6d: '<unknown (@0x3848a6d)>'
+# 20   0x0000000000be9efc: '<unknown (@0xbe9efc)>'
+# End of Stack Trace
+
+

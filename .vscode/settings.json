@@ -1,0 +1,7 @@
+{
+    "verilog.linting.verilator.includePath": [
+        "./src/include",
+        "./src/modules"
+    ],
+    "verilog.ctags.path": "/usr/bin/ctags --langmap=verilog:+.sv"
+}
