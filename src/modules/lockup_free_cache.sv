@@ -52,6 +52,7 @@ module lockup_free_cache (
             cache_mshr_buffer mshr_buffer_i (
                 .CLK           (CLK),
                 .nRST          (nRST),
+                .bank_id       (i),
                 .miss          (miss[i]),
                 .mem_instr     (new_miss),
                 .bank_empty    (!bank_busy[i]),
@@ -62,7 +63,7 @@ module lockup_free_cache (
             cache_bank u_cache_bank (
                 .CLK                   (CLK),
                 .nRST                  (nRST),
-                .bank_id               (bank_id),
+                .bank_id               (i),
                 // for requesting RAM
                 .instr_valid           (hit_check[i]),
                 // valid single-cycle request 

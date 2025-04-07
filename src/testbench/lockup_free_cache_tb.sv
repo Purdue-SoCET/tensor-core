@@ -110,6 +110,7 @@ class cache_line;
     rand logic [TAG_BIT_LEN-1:0] tag;
     addr_t [BLOCK_SIZE-1:0] addr;
     rand logic [BLOCK_SIZE-1:0][31:0] data;
+    rand logic [BLOCK_SIZE-1:0][31:0] data2;
     integer i;
 
     function new(logic [BLOCK_INDEX_BIT_LEN-1:0] set_index);
@@ -196,38 +197,48 @@ module lockup_free_cache_tb;
     endgenerate
 
     task data_read(input logic [31:0] addr, output logic [31:0] data);
+        $display("Starting data read: %08x", addr);
         @(posedge tb_clk);
         tb_mem_in = 1;
         tb_mem_in_addr = addr;
         tb_mem_in_rw_mode = 0;
         tb_mem_in_store_value = 0;
         @(negedge tb_clk);
-        if (!tb_hit) begin
-            $display("miss!");
-            @(posedge tb_clk);
-            tb_mem_in = 0;
-            tb_mem_in_addr = addr;
-            tb_mem_in_rw_mode = 0;
-            @(negedge tb_clk);
-            while (tb_block_status == 0) begin
-                @(posedge tb_clk);
-            end
-            $display("block status: %b", tb_block_status);
-            @(posedge tb_clk);
-        end else begin
-            $display("read hit on %08x: %08x!", addr, tb_hit_load);
+        if (tb_hit) begin
+            $display("Read hit on %08x! -> %08x", addr, tb_hit_load);
             data = tb_hit_load;
+        end else begin
+            $display("Read miss on %08x!", addr);
+            while (tb_stall) begin
+                $display("Cache stall!");
+                @(posedge tb_clk);
+                @(negedge tb_clk);
+            end
         end
     endtask
 
     task data_write(input logic [31:0] addr, input logic [31:0] data);
-        $display("Starting data write: %08x", addr);
+        $display("Starting data write: %08x,%08x", addr, data);
         @(posedge tb_clk);
         tb_mem_in = 1;
         tb_mem_in_addr = addr;
         tb_mem_in_rw_mode = 1;
         tb_mem_in_store_value = data;
-        while (tb_stall) begin
+        @(negedge tb_clk);
+        if (tb_hit) begin
+            $display("Write hit on %08x!", addr);
+        end else begin
+            $display("Write miss on %08x!", addr);
+            while (tb_stall) begin
+                $display("Cache stall!");
+                @(posedge tb_clk);
+                @(negedge tb_clk);
+            end
+        end
+    endtask
+
+    task cycle_wait(input integer cycle_count);
+        for (cycle_count = 0; cycle_count < 100000; cycle_count++) begin
             @(posedge tb_clk);
         end
     endtask
@@ -235,13 +246,13 @@ module lockup_free_cache_tb;
 
     logic [31:0] data_out;
 
-    cache_line line;
-
     integer current_set_index;
     integer current_block_offset;
     integer current_way;
 
-    integer cycle_count;
+    cache_line line [3:0];
+
+    localparam test_set_num = 4;
 
     initial begin
         tb_nrst = 0;
@@ -251,25 +262,64 @@ module lockup_free_cache_tb;
         tb_mem_in_store_value = 0;
         @(negedge tb_clk);
         tb_nrst = 1;
-        @(posedge tb_clk);
-        $display("starting!");
-        
-        for (current_set_index = 0; current_set_index < 1; current_set_index++) begin
-            for (current_way = 0; current_way < 2*NUM_WAYS; current_way++) begin
-                $display("writing way %d", current_way);
-                line = new(current_set_index);
-                for (current_block_offset = 0; current_block_offset < BLOCK_SIZE; current_block_offset++) begin
-                    data_write(line.addr[current_block_offset], line.data[current_block_offset]);                
+        @(posedge tb_clk);        
+        for (current_way = 0; current_way < NUM_WAYS; current_way++) begin
+            for (current_set_index = 0; current_set_index < test_set_num; current_set_index++) begin
+                line[current_set_index] = new(current_set_index);
+
+                if (current_way % 2 == 0) begin
+                    // Write miss
+                    for (current_block_offset = 0; current_block_offset < 1; current_block_offset++) begin
+                        data_write(line[current_set_index].addr[current_block_offset], 32'h88888888);                
+                    end
+                end else begin
+                    // Read miss
+                    for (current_block_offset = 0; current_block_offset < 1; current_block_offset++) begin
+                        data_read(line[current_set_index].addr[current_block_offset], data_out);                
+                    end
                 end
-                tb_mem_in = 0;
-                for (cycle_count = 0; cycle_count < 100; cycle_count++) begin
-                    @(posedge tb_clk);
+            end
+            @(posedge tb_clk);
+            tb_mem_in = 0;
+            @(negedge tb_clk);
+            while (tb_block_status[NUM_BANKS-1] == 0) begin
+                @(posedge tb_clk);
+                @(negedge tb_clk);
+                $display("Waiting for misses to finish!");
+            end
+            for (current_set_index = 0; current_set_index < test_set_num; current_set_index++) begin
+                // Write hit
+                for (current_block_offset = 0; current_block_offset < BLOCK_SIZE; current_block_offset++) begin
+                    data_write(line[current_set_index].addr[current_block_offset], line[current_set_index].data[current_block_offset]);
+                end
+                // Read hit
+                for (current_block_offset = 0; current_block_offset < BLOCK_SIZE; current_block_offset++) begin
+                    data_read(line[current_set_index].addr[current_block_offset], data_out);
                 end
             end
         end
-
-        for (cycle_count = 0; cycle_count < 10000; cycle_count++) begin
+        @(posedge tb_clk);
+        tb_mem_in = 0;
+        for (current_way = 0; current_way < NUM_WAYS; current_way++) begin
+            for (current_set_index = 0; current_set_index < test_set_num; current_set_index++) begin
+                line[current_set_index] = new(current_set_index);
+                for (current_block_offset = 0; current_block_offset < BLOCK_SIZE; current_block_offset++) begin
+                    // Read miss
+                    data_read(line[current_set_index].addr[current_block_offset], data_out);
+                end
+                for (current_block_offset = 0; current_block_offset < BLOCK_SIZE; current_block_offset++) begin
+                    // Write miss coalescing
+                    data_write(line[current_set_index].addr[current_block_offset], line[current_set_index].data[current_block_offset]);
+                end
+                cycle_wait(1);
+                for (current_block_offset = 0; current_block_offset < BLOCK_SIZE; current_block_offset++) begin
+                    // Read mshr (miss->hit) coalescing
+                    data_read(line[current_set_index].addr[current_block_offset], data_out);
+                end
+            end
             @(posedge tb_clk);
+            tb_mem_in = 0;
+            cycle_wait(4 * 100);
         end
         $finish;
     end

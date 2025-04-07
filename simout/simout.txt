@@ -2,26 +2,9 @@ Reading pref.tcl
 
 # 2021.4
 
-# vsim -c -voptargs="+acc" work.lockup_free_cache_tb -do "run -all; quit" 
-# Start time: 18:12:05 on Apr 06,2025
+# vsim -coverage -c -voptargs="+acc" work.lockup_free_cache_tb -do "coverage save -onexit lockup_free_cache_coverage.ucdb; run -all; quit" 
+# Start time: 16:28:43 on Apr 07,2025
 # ** Note: (vsim-3813) Design is being optimized due to module recompilation...
-# ** Warning: ./src/testbench/lockup_free_cache_tb.sv(117): (vopt-2240) Treating stand-alone use of function 'randomize' as an implicit VOID cast.
-# ** Note: (vopt-143) Recognized 1 FSM in module "cache_bank(fast)".
-# ** Warning: ./src/modules/lockup_free_cache.sv(62): (vopt-2685) [TFMPC] - Too few port connections for 'u_cache_bank'.  Expected 19, found 17.
-# ** Warning: ./src/modules/lockup_free_cache.sv(62): (vopt-2718) [TFMPC] - Missing connection for port 'flushed'.
-# ** Warning: ./src/modules/lockup_free_cache.sv(62): (vopt-2718) [TFMPC] - Missing connection for port 'halt'.
-# ** Warning: ./src/modules/lockup_free_cache.sv(62): (vopt-2685) [TFMPC] - Too few port connections for 'u_cache_bank'.  Expected 19, found 17.
-# ** Warning: ./src/modules/lockup_free_cache.sv(62): (vopt-2718) [TFMPC] - Missing connection for port 'flushed'.
-# ** Warning: ./src/modules/lockup_free_cache.sv(62): (vopt-2718) [TFMPC] - Missing connection for port 'halt'.
-# ** Warning: ./src/modules/lockup_free_cache.sv(62): (vopt-2685) [TFMPC] - Too few port connections for 'u_cache_bank'.  Expected 19, found 17.
-# ** Warning: ./src/modules/lockup_free_cache.sv(62): (vopt-2718) [TFMPC] - Missing connection for port 'flushed'.
-# ** Warning: ./src/modules/lockup_free_cache.sv(62): (vopt-2718) [TFMPC] - Missing connection for port 'halt'.
-# ** Warning: ./src/modules/lockup_free_cache.sv(62): (vopt-2685) [TFMPC] - Too few port connections for 'u_cache_bank'.  Expected 19, found 17.
-# ** Warning: ./src/modules/lockup_free_cache.sv(62): (vopt-2718) [TFMPC] - Missing connection for port 'flushed'.
-# ** Warning: ./src/modules/lockup_free_cache.sv(62): (vopt-2718) [TFMPC] - Missing connection for port 'halt'.
-# ** Warning: ./src/testbench/lockup_free_cache_tb.sv(82): (vopt-2182) 'ram_data' might be read before written in always_comb or always @* block.
-# ** Note: (vopt-143) Recognized 1 FSM in module "RAM(fast)".
-# ** Note: (vsim-12126) Error and warning message counts have been restored: Errors=0, Warnings=14.
 # //  Questa Sim-64
 # //  Version 2021.4 linux_x86_64 Oct 13 2021
 # //
@@ -46,105 +29,451 @@ Reading pref.tcl
 # Loading work.cache_bank_sv_unit(fast)
 # Loading work.cache_bank(fast)
 # Loading work.RAM(fast)
+# ** Warning: (vsim-3015) [PCDPC] - Port size (2) does not match connection size (32) for port 'bank_id'. The port definition is at: ./src/modules/cache_mshr_buffer.sv(6).
+#    Time: 0 ps  Iteration: 0  Instance: /lockup_free_cache_tb/u_lockup_free_cache/BANK_GEN[0]/mshr_buffer_i File: ./src/modules/lockup_free_cache.sv Line: 52
+# ** Warning: (vsim-3015) [PCDPC] - Port size (2) does not match connection size (32) for port 'bank_id'. The port definition is at: ./src/modules/cache_bank.sv(5).
+#    Time: 0 ps  Iteration: 0  Instance: /lockup_free_cache_tb/u_lockup_free_cache/BANK_GEN[0]/u_cache_bank File: ./src/modules/lockup_free_cache.sv Line: 63
+# ** Warning: (vsim-3015) [PCDPC] - Port size (2) does not match connection size (32) for port 'bank_id'. The port definition is at: ./src/modules/cache_mshr_buffer.sv(6).
+#    Time: 0 ps  Iteration: 0  Instance: /lockup_free_cache_tb/u_lockup_free_cache/BANK_GEN[1]/mshr_buffer_i File: ./src/modules/lockup_free_cache.sv Line: 52
+# ** Warning: (vsim-3015) [PCDPC] - Port size (2) does not match connection size (32) for port 'bank_id'. The port definition is at: ./src/modules/cache_bank.sv(5).
+#    Time: 0 ps  Iteration: 0  Instance: /lockup_free_cache_tb/u_lockup_free_cache/BANK_GEN[1]/u_cache_bank File: ./src/modules/lockup_free_cache.sv Line: 63
+# ** Warning: (vsim-3015) [PCDPC] - Port size (2) does not match connection size (32) for port 'bank_id'. The port definition is at: ./src/modules/cache_mshr_buffer.sv(6).
+#    Time: 0 ps  Iteration: 0  Instance: /lockup_free_cache_tb/u_lockup_free_cache/BANK_GEN[2]/mshr_buffer_i File: ./src/modules/lockup_free_cache.sv Line: 52
+# ** Warning: (vsim-3015) [PCDPC] - Port size (2) does not match connection size (32) for port 'bank_id'. The port definition is at: ./src/modules/cache_bank.sv(5).
+#    Time: 0 ps  Iteration: 0  Instance: /lockup_free_cache_tb/u_lockup_free_cache/BANK_GEN[2]/u_cache_bank File: ./src/modules/lockup_free_cache.sv Line: 63
+# ** Warning: (vsim-3015) [PCDPC] - Port size (2) does not match connection size (32) for port 'bank_id'. The port definition is at: ./src/modules/cache_mshr_buffer.sv(6).
+#    Time: 0 ps  Iteration: 0  Instance: /lockup_free_cache_tb/u_lockup_free_cache/BANK_GEN[3]/mshr_buffer_i File: ./src/modules/lockup_free_cache.sv Line: 52
+# ** Warning: (vsim-3015) [PCDPC] - Port size (2) does not match connection size (32) for port 'bank_id'. The port definition is at: ./src/modules/cache_bank.sv(5).
+#    Time: 0 ps  Iteration: 0  Instance: /lockup_free_cache_tb/u_lockup_free_cache/BANK_GEN[3]/u_cache_bank File: ./src/modules/lockup_free_cache.sv Line: 63
 # ** Warning: (vsim-3015) [PCDPC] - Port size (2) does not match connection size (32) for port 'bank_id'. The port definition is at: ./src/testbench/lockup_free_cache_tb.sv(10).
-#    Time: 0 ps  Iteration: 0  Instance: /lockup_free_cache_tb/RAM_GEN[0]/u_RAM File: ./src/testbench/lockup_free_cache_tb.sv Line: 184
+#    Time: 0 ps  Iteration: 0  Instance: /lockup_free_cache_tb/RAM_GEN[0]/u_RAM File: ./src/testbench/lockup_free_cache_tb.sv Line: 185
 # ** Warning: (vsim-3015) [PCDPC] - Port size (2) does not match connection size (32) for port 'bank_id'. The port definition is at: ./src/testbench/lockup_free_cache_tb.sv(10).
-#    Time: 0 ps  Iteration: 0  Instance: /lockup_free_cache_tb/RAM_GEN[1]/u_RAM File: ./src/testbench/lockup_free_cache_tb.sv Line: 184
+#    Time: 0 ps  Iteration: 0  Instance: /lockup_free_cache_tb/RAM_GEN[1]/u_RAM File: ./src/testbench/lockup_free_cache_tb.sv Line: 185
 # ** Warning: (vsim-3015) [PCDPC] - Port size (2) does not match connection size (32) for port 'bank_id'. The port definition is at: ./src/testbench/lockup_free_cache_tb.sv(10).
-#    Time: 0 ps  Iteration: 0  Instance: /lockup_free_cache_tb/RAM_GEN[2]/u_RAM File: ./src/testbench/lockup_free_cache_tb.sv Line: 184
+#    Time: 0 ps  Iteration: 0  Instance: /lockup_free_cache_tb/RAM_GEN[2]/u_RAM File: ./src/testbench/lockup_free_cache_tb.sv Line: 185
 # ** Warning: (vsim-3015) [PCDPC] - Port size (2) does not match connection size (32) for port 'bank_id'. The port definition is at: ./src/testbench/lockup_free_cache_tb.sv(10).
-#    Time: 0 ps  Iteration: 0  Instance: /lockup_free_cache_tb/RAM_GEN[3]/u_RAM File: ./src/testbench/lockup_free_cache_tb.sv Line: 184
-# run -all
-# starting!
-# writing way           0
-# Starting data write: 4b193000
-# Starting data write: 4b193004
-# Starting data write: 4b193008
-# Starting data write: 4b19300c
-# RAM ID:0 -- read from 4b193000: 00000000
-# RAM ID:0 -- read from 4b193004: 00000000
-# RAM ID:0 -- read from 4b193008: 00000000
-# RAM ID:0 -- read from 4b19300c: 00000000
-# writing way           1
-# Starting data write: 75c44400
-# Starting data write: 75c44404
-# Starting data write: 75c44408
-# Starting data write: 75c4440c
-# RAM ID:0 -- read from 75c44400: 00000000
-# RAM ID:0 -- read from 75c44404: 00000000
-# RAM ID:0 -- read from 75c44408: 00000000
-# RAM ID:0 -- read from 75c4440c: 00000000
-# writing way           2
-# Starting data write: d1820800
-# Starting data write: d1820804
-# Starting data write: d1820808
-# Starting data write: d182080c
-# RAM ID:0 -- read from d1820800: 00000000
-# RAM ID:0 -- read from d1820804: 00000000
-# RAM ID:0 -- read from d1820808: 00000000
-# RAM ID:0 -- read from d182080c: 00000000
-# writing way           3
-# Starting data write: 210d9400
-# Starting data write: 210d9404
-# Starting data write: 210d9408
-# Starting data write: 210d940c
-# RAM ID:0 -- read from 210d9400: 00000000
-# RAM ID:0 -- read from 210d9404: 00000000
-# RAM ID:0 -- read from 210d9408: 00000000
-# RAM ID:0 -- read from 210d940c: 00000000
-# writing way           4
-# Starting data write: 11448400
-# Starting data write: 11448404
-# Starting data write: 11448408
-# Starting data write: 1144840c
-# RAM ID:0 -- read from 11448400: 00000000
-# RAM ID:0 -- read from 11448404: 00000000
-# RAM ID:0 -- read from 11448408: 00000000
-# RAM ID:0 -- read from 1144840c: 00000000
-# RAM ID:0 -- write to 4b193000: 8697bff3
-# RAM ID:0 -- write to 4b193004: 1620f14e
-# RAM ID:0 -- write to 4b193008: 9094f634
-# RAM ID:0 -- write to 4b19300c: c9be92a1
-# writing way           5
-# Starting data write: 168df000
-# Starting data write: 168df004
-# Starting data write: 168df008
-# Starting data write: 168df00c
-# RAM ID:0 -- read from 168df000: 00000000
-# RAM ID:0 -- read from 168df004: 00000000
-# RAM ID:0 -- read from 168df008: 00000000
-# RAM ID:0 -- read from 168df00c: 00000000
-# RAM ID:0 -- write to 75c44400: e9ff4877
-# RAM ID:0 -- write to 75c44404: a8eba771
-# RAM ID:0 -- write to 75c44408: e6777570
-# RAM ID:0 -- write to 75c4440c: 0563fe96
-# writing way           6
-# Starting data write: 6fb25800
-# Starting data write: 6fb25804
-# Starting data write: 6fb25808
-# Starting data write: 6fb2580c
-# RAM ID:0 -- read from 6fb25800: 00000000
-# RAM ID:0 -- read from 6fb25804: 00000000
-# RAM ID:0 -- read from 6fb25808: 00000000
-# RAM ID:0 -- read from 6fb2580c: 00000000
-# RAM ID:0 -- write to d1820800: a60f75f8
-# RAM ID:0 -- write to d1820804: 0182b574
-# RAM ID:0 -- write to d1820808: c917259e
-# RAM ID:0 -- write to d182080c: c28c3e0a
-# writing way           7
-# Starting data write: c900bc00
-# Starting data write: c900bc04
-# Starting data write: c900bc08
-# Starting data write: c900bc0c
-# RAM ID:0 -- read from c900bc00: 00000000
-# RAM ID:0 -- read from c900bc04: 00000000
-# RAM ID:0 -- read from c900bc08: 00000000
-# RAM ID:0 -- read from c900bc0c: 00000000
-# RAM ID:0 -- write to 210d9400: 2424c9ee
-# RAM ID:0 -- write to 210d9404: 34dc0893
-# RAM ID:0 -- write to 210d9408: da569573
-# RAM ID:0 -- write to 210d940c: 7bbf6ed2
-# ** Note: $finish    : ./src/testbench/lockup_free_cache_tb.sv(274)
-#    Time: 21667 ps  Iteration: 1  Instance: /lockup_free_cache_tb
-# End time: 18:12:06 on Apr 06,2025, Elapsed time: 0:00:01
-# Errors: 0, Warnings: 18
+#    Time: 0 ps  Iteration: 0  Instance: /lockup_free_cache_tb/RAM_GEN[3]/u_RAM File: ./src/testbench/lockup_free_cache_tb.sv Line: 185
+# coverage save -onexit lockup_free_cache_coverage.ucdb
+#  run -all
+# starting work on          64 sets!
+# Starting data read: 4b193000
+# Read miss on 4b193000!
+# Starting data read: 4b193004
+# Read miss on 4b193004!
+# Starting data read: 4b193008
+# Read miss on 4b193008!
+# Starting data read: 4b19300c
+# Read miss on 4b19300c!
+# Starting data write: 4b193000,8697bff3
+# Write miss on 4b193000!
+# Starting data write: 4b193004,1620f14e
+# Write miss on 4b193004!
+# Starting data write: 4b193008,9094f634
+# Write miss on 4b193008!
+# Starting data write: 4b19300c,c9be92a1
+# Write miss on 4b19300c!
+# bank id 0 new mshr!
+# bank id 0 new mshr!
+# Starting data read: 4b193000
+# Read hit on 4b193000! -> 8697bff3
+# Starting data read: 4b193004
+# Read hit on 4b193004! -> 1620f14e
+# Starting data read: 4b193008
+# Read hit on 4b193008! -> 9094f634
+# Starting data read: 4b19300c
+# Read hit on 4b19300c! -> c9be92a1
+# Starting data read: 75c44410
+# Read miss on 75c44410!
+# Starting data read: 75c44414
+# Read miss on 75c44414!
+# Starting data read: 75c44418
+# Read miss on 75c44418!
+# Starting data read: 75c4441c
+# Read miss on 75c4441c!
+# Starting data write: 75c44410,e9ff4877
+# Write miss on 75c44410!
+# Starting data write: 75c44414,a8eba771
+# Write miss on 75c44414!
+# Starting data write: 75c44418,e6777570
+# Write miss on 75c44418!
+# Starting data write: 75c4441c,0563fe96
+# Write miss on 75c4441c!
+# bank id 1 new mshr!
+# bank id 1 new mshr!
+# Starting data read: 75c44410
+# Read hit on 75c44410! -> e9ff4877
+# Starting data read: 75c44414
+# Read hit on 75c44414! -> a8eba771
+# Starting data read: 75c44418
+# Read hit on 75c44418! -> e6777570
+# Starting data read: 75c4441c
+# Read hit on 75c4441c! -> 0563fe96
+# Starting data read: d1820820
+# Read miss on d1820820!
+# Starting data read: d1820824
+# Read miss on d1820824!
+# Starting data read: d1820828
+# Read miss on d1820828!
+# Starting data read: d182082c
+# Read miss on d182082c!
+# Starting data write: d1820820,a60f75f8
+# Write miss on d1820820!
+# Starting data write: d1820824,0182b574
+# Write miss on d1820824!
+# Starting data write: d1820828,c917259e
+# Write miss on d1820828!
+# Starting data write: d182082c,c28c3e0a
+# Write miss on d182082c!
+# bank id 2 new mshr!
+# bank id 2 new mshr!
+# Starting data read: d1820820
+# Read hit on d1820820! -> a60f75f8
+# Starting data read: d1820824
+# Read hit on d1820824! -> 0182b574
+# Starting data read: d1820828
+# Read hit on d1820828! -> c917259e
+# Starting data read: d182082c
+# Read hit on d182082c! -> c28c3e0a
+# Starting data read: 210d9430
+# Read miss on 210d9430!
+# Starting data read: 210d9434
+# Read miss on 210d9434!
+# Starting data read: 210d9438
+# Read miss on 210d9438!
+# Starting data read: 210d943c
+# Read miss on 210d943c!
+# Starting data write: 210d9430,2424c9ee
+# Write miss on 210d9430!
+# Starting data write: 210d9434,34dc0893
+# Write miss on 210d9434!
+# Starting data write: 210d9438,da569573
+# Write miss on 210d9438!
+# Starting data write: 210d943c,7bbf6ed2
+# Write miss on 210d943c!
+# bank id 3 new mshr!
+# bank id 3 new mshr!
+# Starting data read: 210d9430
+# Read hit on 210d9430! -> 2424c9ee
+# Starting data read: 210d9434
+# Read hit on 210d9434! -> 34dc0893
+# Starting data read: 210d9438
+# Read hit on 210d9438! -> da569573
+# Starting data read: 210d943c
+# Read hit on 210d943c! -> 7bbf6ed2
+# Starting data read: 11448400
+# Read miss on 11448400!
+# Starting data read: 11448404
+# Read miss on 11448404!
+# Starting data read: 11448408
+# Read miss on 11448408!
+# Starting data read: 1144840c
+# Read miss on 1144840c!
+# Starting data write: 11448400,8e96762c
+# Write miss on 11448400!
+# Starting data write: 11448404,68b58e8d
+# Write miss on 11448404!
+# Starting data write: 11448408,d7eb0d2d
+# Write miss on 11448408!
+# Starting data write: 1144840c,397be9c5
+# Write miss on 1144840c!
+# bank id 0 new mshr!
+# bank id 0 new mshr!
+# Starting data read: 11448400
+# Read hit on 11448400! -> 8e96762c
+# Starting data read: 11448404
+# Read hit on 11448404! -> 68b58e8d
+# Starting data read: 11448408
+# Read hit on 11448408! -> d7eb0d2d
+# Starting data read: 1144840c
+# Read hit on 1144840c! -> 397be9c5
+# Starting data read: 168df010
+# Read miss on 168df010!
+# Starting data read: 168df014
+# Read miss on 168df014!
+# Starting data read: 168df018
+# Read miss on 168df018!
+# Starting data read: 168df01c
+# Read miss on 168df01c!
+# Starting data write: 168df010,c0bcf059
+# Write miss on 168df010!
+# Starting data write: 168df014,c1da3650
+# Write miss on 168df014!
+# Starting data write: 168df018,be6dea85
+# Write miss on 168df018!
+# Starting data write: 168df01c,01d2d263
+# Write miss on 168df01c!
+# bank id 1 new mshr!
+# bank id 1 new mshr!
+# Starting data read: 168df010
+# Read hit on 168df010! -> c0bcf059
+# Starting data read: 168df014
+# Read hit on 168df014! -> c1da3650
+# Starting data read: 168df018
+# Read hit on 168df018! -> be6dea85
+# Starting data read: 168df01c
+# Read hit on 168df01c! -> 01d2d263
+# Starting data read: 6fb25820
+# Read miss on 6fb25820!
+# Starting data read: 6fb25824
+# Read miss on 6fb25824!
+# Starting data read: 6fb25828
+# Read miss on 6fb25828!
+# Starting data read: 6fb2582c
+# Read miss on 6fb2582c!
+# Starting data write: 6fb25820,8ef90678
+# Write miss on 6fb25820!
+# Starting data write: 6fb25824,5f94bded
+# Write miss on 6fb25824!
+# Starting data write: 6fb25828,b00504ad
+# Write miss on 6fb25828!
+# Starting data write: 6fb2582c,f16b10da
+# Write miss on 6fb2582c!
+# bank id 2 new mshr!
+# bank id 2 new mshr!
+# Starting data read: 6fb25820
+# Read hit on 6fb25820! -> 8ef90678
+# Starting data read: 6fb25824
+# Read hit on 6fb25824! -> 5f94bded
+# Starting data read: 6fb25828
+# Read hit on 6fb25828! -> b00504ad
+# Starting data read: 6fb2582c
+# Read hit on 6fb2582c! -> f16b10da
+# Starting data read: c900bc30
+# Read miss on c900bc30!
+# Starting data read: c900bc34
+# Read miss on c900bc34!
+# Starting data read: c900bc38
+# Read miss on c900bc38!
+# Starting data read: c900bc3c
+# Read miss on c900bc3c!
+# Starting data write: c900bc30,682f9d5b
+# Write miss on c900bc30!
+# Starting data write: c900bc34,6b79c132
+# Write miss on c900bc34!
+# Starting data write: c900bc38,76f52c9e
+# Write miss on c900bc38!
+# Starting data write: c900bc3c,1e4707db
+# Write miss on c900bc3c!
+# bank id 3 new mshr!
+# bank id 3 new mshr!
+# Starting data read: c900bc30
+# Read hit on c900bc30! -> 682f9d5b
+# Starting data read: c900bc34
+# Read hit on c900bc34! -> 6b79c132
+# Starting data read: c900bc38
+# Read hit on c900bc38! -> 76f52c9e
+# Starting data read: c900bc3c
+# Read hit on c900bc3c! -> 1e4707db
+# Starting data read: 4a63e000
+# Read miss on 4a63e000!
+# Starting data read: 4a63e004
+# Read miss on 4a63e004!
+# Starting data read: 4a63e008
+# Read miss on 4a63e008!
+# Starting data read: 4a63e00c
+# Read miss on 4a63e00c!
+# Starting data write: 4a63e000,8fbbbcc0
+# Write miss on 4a63e000!
+# Starting data write: 4a63e004,5f87cd0f
+# Write miss on 4a63e004!
+# Starting data write: 4a63e008,fef42d11
+# Write miss on 4a63e008!
+# Starting data write: 4a63e00c,499cc379
+# Write miss on 4a63e00c!
+# bank id 0 new mshr!
+# bank id 0 new mshr!
+# Starting data read: 4a63e000
+# Read hit on 4a63e000! -> 8fbbbcc0
+# Starting data read: 4a63e004
+# Read hit on 4a63e004! -> 5f87cd0f
+# Starting data read: 4a63e008
+# Read hit on 4a63e008! -> fef42d11
+# Starting data read: 4a63e00c
+# Read hit on 4a63e00c! -> 499cc379
+# Starting data read: 90d50810
+# Read miss on 90d50810!
+# Starting data read: 90d50814
+# Read miss on 90d50814!
+# Starting data read: 90d50818
+# Read miss on 90d50818!
+# Starting data read: 90d5081c
+# Read miss on 90d5081c!
+# Starting data write: 90d50810,98c335f2
+# Write miss on 90d50810!
+# Starting data write: 90d50814,6880d6fe
+# Write miss on 90d50814!
+# Starting data write: 90d50818,42758b99
+# Write miss on 90d50818!
+# Starting data write: 90d5081c,29577983
+# Write miss on 90d5081c!
+# bank id 1 new mshr!
+# bank id 1 new mshr!
+# Starting data read: 90d50810
+# Read hit on 90d50810! -> 98c335f2
+# Starting data read: 90d50814
+# Read hit on 90d50814! -> 6880d6fe
+# Starting data read: 90d50818
+# Read hit on 90d50818! -> 42758b99
+# Starting data read: 90d5081c
+# Read hit on 90d5081c! -> 29577983
+# Starting data read: 5eaa3c20
+# Read miss on 5eaa3c20!
+# Starting data read: 5eaa3c24
+# Read miss on 5eaa3c24!
+# Starting data read: 5eaa3c28
+# Read miss on 5eaa3c28!
+# Starting data read: 5eaa3c2c
+# Read miss on 5eaa3c2c!
+# Starting data write: 5eaa3c20,28d6c6ee
+# Write miss on 5eaa3c20!
+# Starting data write: 5eaa3c24,0faa649b
+# Write miss on 5eaa3c24!
+# Starting data write: 5eaa3c28,62d57f5f
+# Write miss on 5eaa3c28!
+# Starting data write: 5eaa3c2c,763d3480
+# Write miss on 5eaa3c2c!
+# bank id 2 new mshr!
+# bank id 2 new mshr!
+# Starting data read: 5eaa3c20
+# Read hit on 5eaa3c20! -> 28d6c6ee
+# Starting data read: 5eaa3c24
+# Read hit on 5eaa3c24! -> 0faa649b
+# Starting data read: 5eaa3c28
+# Read hit on 5eaa3c28! -> 62d57f5f
+# Starting data read: 5eaa3c2c
+# Read hit on 5eaa3c2c! -> 763d3480
+# Starting data read: ac913c30
+# Read miss on ac913c30!
+# Starting data read: ac913c34
+# Read miss on ac913c34!
+# Starting data read: ac913c38
+# Read miss on ac913c38!
+# Starting data read: ac913c3c
+# Read miss on ac913c3c!
+# Starting data write: ac913c30,6860c35f
+# Write miss on ac913c30!
+# Starting data write: ac913c34,da8fe6b4
+# Write miss on ac913c34!
+# Starting data write: ac913c38,c9d8406d
+# Write miss on ac913c38!
+# Starting data write: ac913c3c,a6c73945
+# Write miss on ac913c3c!
+# bank id 3 new mshr!
+# bank id 3 new mshr!
+# Starting data read: ac913c30
+# Read hit on ac913c30! -> 6860c35f
+# Starting data read: ac913c34
+# Read hit on ac913c34! -> da8fe6b4
+# Starting data read: ac913c38
+# Read hit on ac913c38! -> c9d8406d
+# Starting data read: ac913c3c
+# Read hit on ac913c3c! -> a6c73945
+# Starting data read: aa87b800
+# Read miss on aa87b800!
+# Starting data read: aa87b804
+# Read miss on aa87b804!
+# Starting data read: aa87b808
+# Read miss on aa87b808!
+# Starting data read: aa87b80c
+# Read miss on aa87b80c!
+# Starting data write: aa87b800,5246b235
+# Write miss on aa87b800!
+# Starting data write: aa87b804,e4fe406f
+# Write miss on aa87b804!
+# Starting data write: aa87b808,1974226a
+# Write miss on aa87b808!
+# Starting data write: aa87b80c,c14502c3
+# Write miss on aa87b80c!
+# bank id 0 new mshr!
+# bank id 0 new mshr!
+# Starting data read: aa87b800
+# Read hit on aa87b800! -> 5246b235
+# Starting data read: aa87b804
+# Read hit on aa87b804! -> e4fe406f
+# Starting data read: aa87b808
+# Read hit on aa87b808! -> 1974226a
+# Starting data read: aa87b80c
+# Read hit on aa87b80c! -> c14502c3
+# Starting data read: 21833010
+# Read miss on 21833010!
+# Starting data read: 21833014
+# Read miss on 21833014!
+# Starting data read: 21833018
+# Read miss on 21833018!
+# Starting data read: 2183301c
+# Read miss on 2183301c!
+# Starting data write: 21833010,fafc3847
+# Write miss on 21833010!
+# Starting data write: 21833014,7f7583ae
+# Write miss on 21833014!
+# Starting data write: 21833018,f2facba8
+# Write miss on 21833018!
+# Starting data write: 2183301c,50f742c9
+# Write miss on 2183301c!
+# bank id 1 new mshr!
+# bank id 1 new mshr!
+# Starting data read: 21833010
+# Read hit on 21833010! -> fafc3847
+# Starting data read: 21833014
+# Read hit on 21833014! -> 7f7583ae
+# Starting data read: 21833018
+# Read hit on 21833018! -> f2facba8
+# Starting data read: 2183301c
+# Read hit on 2183301c! -> 50f742c9
+# Starting data read: e58c1420
+# Read miss on e58c1420!
+# Starting data read: e58c1424
+# Read miss on e58c1424!
+# Starting data read: e58c1428
+# Read miss on e58c1428!
+# Starting data read: e58c142c
+# Read miss on e58c142c!
+# Starting data write: e58c1420,878f3923
+# Write miss on e58c1420!
+# Starting data write: e58c1424,50904328
+# Write miss on e58c1424!
+# Starting data write: e58c1428,18eb15aa
+# Write miss on e58c1428!
+# Starting data write: e58c142c,1e09c1a6
+# Write miss on e58c142c!
+# bank id 2 new mshr!
+# bank id 2 new mshr!
+# Starting data read: e58c1420
+# Read hit on e58c1420! -> 878f3923
+# Starting data read: e58c1424
+# Read hit on e58c1424! -> 50904328
+# Starting data read: e58c1428
+# Read hit on e58c1428! -> 18eb15aa
+# Starting data read: e58c142c
+# Read hit on e58c142c! -> 1e09c1a6
+# Starting data read: 0e9a9030
+# Read miss on 0e9a9030!
+# Starting data read: 0e9a9034
+# Read miss on 0e9a9034!
+# Starting data read: 0e9a9038
+# Read miss on 0e9a9038!
+# Starting data read: 0e9a903c
+# Read miss on 0e9a903c!
+# Starting data write: 0e9a9030,48582812
+# Write miss on 0e9a9030!
+# Starting data write: 0e9a9034,a3443d25
+# Write miss on 0e9a9034!
+# Starting data write: 0e9a9038,6b14b316
+# Write miss on 0e9a9038!
+# Starting data write: 0e9a903c,5f7a6839
+# Write miss on 0e9a903c!
+# bank id 3 new mshr!
+# bank id 3 new mshr!
+# Starting data read: 0e9a9030
+# Read hit on 0e9a9030! -> 48582812
+# Starting data read: 0e9a9034
+# Read hit on 0e9a9034! -> a3443d25
+# Starting data read: 0e9a9038
+# Read hit on 0e9a9038! -> 6b14b316
+# Starting data read: 0e9a903c
+# Read hit on 0e9a903c! -> 5f7a6839
+# ** Note: $finish    : ./src/testbench/lockup_free_cache_tb.sv(326)
+#    Time: 4000397 ps  Iteration: 1  Instance: /lockup_free_cache_tb
+# Saving coverage database on exit...
+# End time: 16:28:57 on Apr 07,2025, Elapsed time: 0:00:14
+# Errors: 0, Warnings: 12
