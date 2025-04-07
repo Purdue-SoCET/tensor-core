@@ -155,6 +155,12 @@ module sc_datapath
     assign dcif.dmemstore  = eif.eif_output.sls_dmemstore;
     assign dcif.dmemaddr   = eif.eif_output.sls_dmemaddr;
 
+    assign dcif.matrix_ls  = eif.eif_output.fu_matls_out;
+
+    assign dcif.gemm_out   = eif.eif_output.gemm_out;
+
+
+
     // wb signals
 
     // inputs

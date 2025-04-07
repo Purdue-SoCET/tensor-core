@@ -19,17 +19,17 @@ always_comb begin : LOAD_STORE
     mlsif.fu_matls_out = '0;
     if (mlsif.enable) begin     // LOAD STORE ENABLE
         if (mlsif.ls_in == M_LOAD) begin   // LOAD
-            mlsif.fu_matls_out.ls_out[0] = 1;
-            mlsif.fu_matls_out.rd_out = mlsif.rd_in;
-            mlsif.fu_matls_out.stride_out = mlsif.stride_in;
-            mlsif.fu_matls_out.address = mlsif.rs_in + mlsif.imm_in;;
+            mlsif.fu_matls_out.ls_out.mat_op = M_LOAD;
+            mlsif.fu_matls_out.ls_out.mat_rd = mlsif.rd_in;
+            // mlsif.fu_matls_out.stride_out = mlsif.stride_in;
+            mlsif.fu_matls_out.ls_out.mat_addr = mlsif.rs_in + mlsif.imm_in;
         end
 
         else if (mlsif.ls_in == M_STORE) begin  // STORE
-            mlsif.fu_matls_out.ls_out[1] = 1;
-            mlsif.fu_matls_out.rd_out = mlsif.rd_in;
-            mlsif.fu_matls_out.stride_out = mlsif.stride_in;
-            mlsif.fu_matls_out.address = mlsif.rs_in + mlsif.imm_in;
+            mlsif.fu_matls_out.ls_out.mat_op = M_STORE;
+            mlsif.fu_matls_out.ls_out.mat_rd = mlsif.rd_in;
+            // mlsif.fu_matls_out.stride_out = mlsif.stride_in;
+            mlsif.fu_matls_out.ls_out.mat_addr = mlsif.rs_in + mlsif.imm_in;
         end
     end
 end

@@ -14,6 +14,8 @@ package datapath_pkg;
   typedef logic [FU_W-1:0]   fu_bits_t;
   typedef logic [FU_S_W-1:0] fu_sbits_t;
   typedef logic [FU_M_W-1:0] fu_mbits_t;
+
+
  
   typedef enum logic [1:0] {
     scalar_na = 2'd0,
@@ -30,8 +32,9 @@ package datapath_pkg;
   typedef enum logic [1:0] {
     matrix_na = 2'd0,
     M_STORE = 2'd2,
-    M_LOAD = 2'd1
-  } matrix_mem_t; // load or store for matrix ld_st fu
+    M_LOAD = 2'd1,
+    M_GEMM = 2'd3
+  } matrix_mem_t; // Load Store or GEMM from Func Units
 
   typedef enum logic [2:0] {
     FUST_EMPTY,
@@ -282,7 +285,12 @@ package datapath_pkg;
     logic halt;
   } issue_t;
 
-
+  typedef struct packed {
+    matrix_mem_t mat_op;  // 01 = load, 10 = store, 11 = gemm
+    matbits_t mat_rd;   // Normal for L and S, GEMM = {new weight?, 000}
+    word_t mat_addr;    
+    // Normal for LS, GEMM = {16'0, 16'Gemm_instruction (output weight, input, partial sums)} 
+  } scratch_input_t; // issue
   
   typedef struct packed {
     matbits_t rs1;
@@ -291,15 +299,9 @@ package datapath_pkg;
     matbits_t rd;
   } fu_gemm_t;
 
-
-
   typedef struct packed {
     logic           done;       // Done signal to Issue Queue
-    matrix_mem_t    ls_out;     // Load or store to Scratchpad [Load, Store]
-    matbits_t       rd_out;     // Matrix Reg destination (to Scratchpad)
-    // word_t          imm_out;    // Immediate to Scratchpad -> needed?
-    word_t          address;    // Address to Scratchpad   -> rs_in + imm
-    word_t          stride_out; // stride value
+    scratch_input_t ls_out;     // Struct to go to the FIFO in the Scratchpad
   } matrix_ls_t;
 
   typedef struct packed {
@@ -336,8 +338,9 @@ package datapath_pkg;
     matrix_ls_t fu_matls_out;  // to mem
     
     // Gemm FU
-    logic gemm_new_weight_out; // to mem
-    fu_gemm_t gemm_matrix_num; // to mem
+    // logic gemm_new_weight_out; // to mem
+    // fu_gemm_t gemm_matrix_num; // to mem
+    scratch_input_t gemm_out;
 
     logic [4:0] fu_ex; // to sb, fu_ex[0] (alu_done) to wb thru latch ***
     logic spec;
@@ -363,6 +366,10 @@ package datapath_pkg;
     regbits_t jump_reg_sel;
 
   } execute_t;
+
+
+
+
 
 
 endpackage
