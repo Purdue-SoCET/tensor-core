@@ -36,7 +36,11 @@ module cache_bank (
 
     // LRU 
     lru_frame [NUM_SETS_PER_BANK-1:0] lru, next_lru;
+    psuedo_lru_frame [NUM_SETS_PER_BANK-1:0] tree_lru, next_tree_lru;  
     int max_age;
+    logic [WAYS_LEN-1:0] way, victim;
+    logic hit_bit;
+    int node; 
 
     assign set_index = mem_instr_in.addr.index >> BANKS_LEN;    
     assign victim_set_index = mshr_entry.block_addr.index >> BANKS_LEN; 
@@ -47,6 +51,7 @@ module cache_bank (
             curr_state <= START;
             bank <= '0; 
             lru <= '0; 
+            tree_lru <= '0; 
             count_FSM <= '0;
             latched_victim_way_index <= '0; 
             latched_victim_set_index <= '0; 
@@ -60,6 +65,7 @@ module cache_bank (
             curr_state <= next_state; 
             bank <= next_bank; 
             lru <= next_lru;
+            tree_lru <= next_tree_lru;
             flush_set <= next_flush_set; 
             flush_way <= next_flush_way;
             flush_count <= next_flush_count; 
@@ -104,14 +110,16 @@ module cache_bank (
         end
     end
 
-    always_comb begin : age_based_lru
-        next_lru = lru;
+
+    always_comb begin : do_count_FSM
         next_count_FSM = count_FSM;
-        max_age = 0;
-        
         if (count_flush) next_count_FSM = 0; 
         else if (((ram_mem_complete && !mshr_hit) || mshr_hit || ((mshr_entry.write_status[count_FSM] && (count_FSM != (BLOCK_SIZE - 1)))))) next_count_FSM = count_FSM + 1; 
+    end
 
+    always_comb begin : age_based_lru
+        next_lru = lru;
+        max_age = 0;
         if (scheduler_hit || (curr_state == FINISH)) begin
             for (int i = 0; i < NUM_SETS_PER_BANK; i++) begin
                 max_age = 0;
@@ -129,6 +137,32 @@ module cache_bank (
                 end
                 
                 next_lru[i].lru_way = max_way;
+            end
+        end
+    end
+
+    always_comb begin : tree_based_lru
+        next_tree_lru = tree_lru;
+        node = 0; 
+
+        if (scheduler_hit) begin
+            for (int level = 0; level < WAYS_LEN; level++) begin
+                hit_bit = hit_way_index[(WAYS_LEN-1) - level];
+                next_tree_lru[set_index].tree[node] = ~hit_bit;
+                next_tree_lru[set_index].lru_way[(WAYS_LEN-1) - level] = hit_bit;
+
+                if (!hit_bit) node = (2 * node) + 1;
+                else node = (2 * node) + 2;
+            end
+        end
+        else if (curr_state == FINISH) begin
+            for (int level = 0; level < WAYS_LEN; level++) begin
+                hit_bit = latched_victim_way_index[WAYS_LEN-1 - level];
+                next_tree_lru[latched_victim_set_index].tree[node] = ~hit_bit;
+                next_tree_lru[latched_victim_set_index].lru_way[(WAYS_LEN-1) - level] = hit_bit;
+
+                if (!hit_bit) node = (2 * node) + 1;
+                else node = (2 * node) + 2;
             end
         end
     end
@@ -219,7 +253,6 @@ module cache_bank (
             end
             HALT: flushed = 1; 
         endcase
-
     end 
 
     always_comb begin : fsm_state_logic

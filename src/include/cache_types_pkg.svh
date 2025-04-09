@@ -22,9 +22,10 @@
     localparam NUM_BLOCKS_LEN = $clog2(BLOCK_SIZE);
     localparam NUM_BLOCKS_PER_BANK_LEN = $clog2(NUM_BLOCKS_PER_BANK);
     localparam TAG_BIT_LEN = 32 - BLOCK_INDEX_BIT_LEN - BLOCK_OFF_BIT_LEN - BYTE_OFF_BIT_LEN;
-    localparam AGE_WIDTH = 32;          
+    localparam AGE_WIDTH = 8;          
     localparam SET_INDEX_WIDTH = $clog2(NUM_SETS);   
     localparam UUID_MAX = (1 << UUID_SIZE) - 1;
+    localparam int TREE_BITS = NUM_WAYS - 1;              
 
     typedef struct packed {
         logic [TAG_BIT_LEN-1:0] tag;
@@ -41,8 +42,13 @@
 
     typedef struct packed {
         logic [WAYS_LEN-1:0] lru_way;
-        logic [NUM_WAYS-1:0][31:0] age;
+        logic [NUM_WAYS-1:0][AGE_WIDTH-1:0] age;
     } lru_frame;
+
+    typedef struct packed {
+        logic [WAYS_LEN-1:0] lru_way;
+        logic [TREE_BITS-1:0] tree;
+    } psuedo_lru_frame;
 
     typedef logic [BLOCK_SIZE-1:0][31:0] cache_block;
 
@@ -66,6 +72,9 @@
     } bank_fsm_states; 
 
     typedef cache_frame [NUM_WAYS-1:0] cache_set;
+
+
+
 
 `endif
 

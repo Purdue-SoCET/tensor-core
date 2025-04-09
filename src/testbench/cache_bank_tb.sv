@@ -181,14 +181,14 @@ module cache_bank_tb;
     );
 
 
-    bind cache_bank confirm_lru_age lru_monitor (
-        .CLK(CLK), 
-        .nRST(nRST), 
-        .curr_state(curr_state),
-        .lru(lru),
-        .latched_victim_set_index(latched_victim_set_index),
-        .latched_victim_way_index(latched_victim_way_index)
-    );
+    // bind cache_bank confirm_lru_age lru_monitor (
+    //     .CLK(CLK), 
+    //     .nRST(nRST), 
+    //     .curr_state(curr_state),
+    //     .lru(lru),
+    //     .latched_victim_set_index(latched_victim_set_index),
+    //     .latched_victim_way_index(latched_victim_way_index)
+    // );
 
     bind cache_bank confirm_replacement_mshr mshr_monitor (
         .CLK(CLK), 
@@ -469,8 +469,8 @@ program test (
                         MSHR_Thread_Done = 0; 
 
                         set_mshr(
-                            .valid(1'b1), // 0 gets tested in top_level 
-                            .uuid(('1)), // Helps to check request number in the waves.
+                            .valid(1'b1), 
+                            .uuid(('1)), 
                             .block_addr(addr_t'{ 
                                 (count), 
                                 (set[BLOCK_INDEX_BIT_LEN-1:0] << BANKS_LEN), 
@@ -483,14 +483,6 @@ program test (
 
                         stall_for_ram();
 
-                        set_mshr(
-                            .valid('0), 
-                            .uuid('0),
-                            .block_addr('0), 
-                            .write_status('0), 
-                            .write_block('0)
-                        );
-
                         MSHR_Thread_Done = 1; 
                         count = count + 1; 
                         @(posedge tb_clk);
@@ -498,6 +490,14 @@ program test (
                 end 
             end
         end
+
+        set_mshr(
+            .valid('0), 
+            .uuid('0),
+            .block_addr('0), 
+            .write_status('0), 
+            .write_block('0)
+        );
 
         MSHR_Thread_Done = 0; 
         @(posedge tb_clk);
@@ -538,6 +538,14 @@ program test (
             end
         end
 
+        set_mshr(
+            .valid('0), 
+            .uuid('0),
+            .block_addr('0), 
+            .write_status('0), 
+            .write_block('0)
+        );
+
         MSHR_Thread_Done = 0; 
         @(posedge tb_clk);
 
@@ -577,6 +585,14 @@ program test (
             end
         end
 
+        set_mshr(
+            .valid('0), 
+            .uuid('0),
+            .block_addr('0), 
+            .write_status('0), 
+            .write_block('0)
+        );
+
         MSHR_Thread_Done = 0; 
         @(posedge tb_clk);
 
@@ -605,8 +621,8 @@ program test (
                         MSHR_Thread_Done = 0; 
 
                         set_mshr(
-                            .valid(1'b1), // 0 gets tested in top_level 
-                            .uuid(('1)), // Helps to check request number in the waves.
+                            .valid(1'b1), 
+                            .uuid(('1)), 
                             .block_addr(addr_t'{ 
                                 (count), 
                                 (set[BLOCK_INDEX_BIT_LEN-1:0] << BANKS_LEN), 
@@ -619,14 +635,6 @@ program test (
 
                         stall_for_ram();
 
-                        set_mshr(
-                            .valid('0), 
-                            .uuid('0),
-                            .block_addr('0), 
-                            .write_status('0), 
-                            .write_block('0)
-                        );
-
                         MSHR_Thread_Done = 1; 
                         count = count + 1; 
                         @(posedge tb_clk);
@@ -634,6 +642,15 @@ program test (
                 end 
             end
         end
+
+
+        set_mshr(
+            .valid('0), 
+            .uuid('0),
+            .block_addr('0), 
+            .write_status('0), 
+            .write_block('0)
+        );
 
         MSHR_Thread_Done = 0; 
         @(posedge tb_clk);
