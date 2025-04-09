@@ -72,6 +72,7 @@ module RAM (
 
         case (state)
             start: begin
+                if (!ram_WEN && !ram_REN) ram_ready = 1; 
             end
             ram_read: begin
                 if (!ram_REN || current_addr != prev_addr) begin
@@ -83,18 +84,18 @@ module RAM (
                     end else begin
                         ram_load = 32'd0;
                     end            
-                    $display("RAM ID:%d -- read from %08x: %08x", bank_id, current_addr, ram_load);     
+                    // // $display("RAM ID:%d -- read from %08x: %08x", bank_id, current_addr, ram_load);     
                 end else begin
                     next_counter = counter + 1;
                 end
             end
             ram_write: begin
-                if (!ram_WEN || current_addr != prev_addr) begin
+                if (!ram_WEN || ram_REN || current_addr != prev_addr) begin
                     next_counter = 0;
                 end else if (counter == cycle_delay) begin
                     ram_ready = 1;
                     ram_data[current_addr] = ram_store;
-                    $display("RAM ID:%d -- write to %08x: %08x", bank_id, current_addr, ram_store);
+                    // // $display("RAM ID:%d -- write to %08x: %08x", bank_id, current_addr, ram_store);
                 end else begin
                     next_counter = counter + 1;
                 end
@@ -146,6 +147,8 @@ module lockup_free_cache_tb;
     logic [31:0] tb_mem_in_store_value;
     logic tb_stall;
     logic tb_hit;
+    logic tb_halt;
+    logic tb_flushed;
     logic [31:0] tb_hit_load;
     logic [NUM_BANKS-1:0] tb_block_status;
     logic [NUM_BANKS-1:0][3:0] tb_uuid_block;
@@ -165,11 +168,13 @@ module lockup_free_cache_tb;
         .mem_in_rw_mode        (tb_mem_in_rw_mode),
         // 0 = read, 1 = writetb_
         .mem_in_store_value    (tb_mem_in_store_value),
+        .dp_in_halt            (tb_halt),
         .stall                 (tb_stall),
         .hit                   (tb_hit),
         .hit_load              (tb_hit_load),
         .block_status          (tb_block_status),
         .uuid_block            (tb_uuid_block),
+        .dp_out_flushed        (tb_flushed),
         // RAM Signalstb_
         .ram_mem_REN           (tb_ram_mem_REN),
         .ram_mem_WEN           (tb_ram_mem_WEN),
@@ -191,13 +196,13 @@ module lockup_free_cache_tb;
                 .ram_WEN      (tb_ram_mem_WEN[i]),
                 .ram_load     (tb_ram_mem_data[i]),
                 .ram_ready    (tb_ram_mem_complete[i]),
-                .bank_id (i)
+                .bank_id (BANKS_LEN'(i))
             );
         end
     endgenerate
 
     task data_read(input logic [31:0] addr, output logic [31:0] data);
-        $display("Starting data read: %08x", addr);
+        // $display("Starting data read: %08x", addr);
         @(posedge tb_clk);
         tb_mem_in = 1;
         tb_mem_in_addr = addr;
@@ -205,12 +210,12 @@ module lockup_free_cache_tb;
         tb_mem_in_store_value = 0;
         @(negedge tb_clk);
         if (tb_hit) begin
-            $display("Read hit on %08x! -> %08x", addr, tb_hit_load);
+            // $display("Read hit on %08x! -> %08x", addr, tb_hit_load);
             data = tb_hit_load;
         end else begin
-            $display("Read miss on %08x!", addr);
+            // $display("Read miss on %08x!", addr);
             while (tb_stall) begin
-                $display("Cache stall!");
+                // $display("Cache stall!");
                 @(posedge tb_clk);
                 @(negedge tb_clk);
             end
@@ -218,7 +223,7 @@ module lockup_free_cache_tb;
     endtask
 
     task data_write(input logic [31:0] addr, input logic [31:0] data);
-        $display("Starting data write: %08x,%08x", addr, data);
+        // $display("Starting data write: %08x,%08x", addr, data);
         @(posedge tb_clk);
         tb_mem_in = 1;
         tb_mem_in_addr = addr;
@@ -226,11 +231,11 @@ module lockup_free_cache_tb;
         tb_mem_in_store_value = data;
         @(negedge tb_clk);
         if (tb_hit) begin
-            $display("Write hit on %08x!", addr);
+            // $display("Write hit on %08x!", addr);
         end else begin
-            $display("Write miss on %08x!", addr);
+            // $display("Write miss on %08x!", addr);
             while (tb_stall) begin
-                $display("Cache stall!");
+                // $display("Cache stall!");
                 @(posedge tb_clk);
                 @(negedge tb_clk);
             end
@@ -245,6 +250,7 @@ module lockup_free_cache_tb;
 
 
     logic [31:0] data_out;
+    string testcase; 
 
     integer current_set_index;
     integer current_block_offset;
@@ -262,6 +268,7 @@ module lockup_free_cache_tb;
         tb_mem_in_store_value = 0;
         @(negedge tb_clk);
         tb_nrst = 1;
+        testcase = "PART 1";
         @(posedge tb_clk);        
         for (current_way = 0; current_way < NUM_WAYS; current_way++) begin
             for (current_set_index = 0; current_set_index < test_set_num; current_set_index++) begin
@@ -285,7 +292,7 @@ module lockup_free_cache_tb;
             while (tb_block_status[NUM_BANKS-1] == 0) begin
                 @(posedge tb_clk);
                 @(negedge tb_clk);
-                $display("Waiting for misses to finish!");
+                // $display("Waiting for misses to finish!");
             end
             for (current_set_index = 0; current_set_index < test_set_num; current_set_index++) begin
                 // Write hit
@@ -300,6 +307,8 @@ module lockup_free_cache_tb;
         end
         @(posedge tb_clk);
         tb_mem_in = 0;
+        testcase = "PART 2";
+        @(posedge tb_clk);
         for (current_way = 0; current_way < NUM_WAYS; current_way++) begin
             for (current_set_index = 0; current_set_index < test_set_num; current_set_index++) begin
                 line[current_set_index] = new(current_set_index);

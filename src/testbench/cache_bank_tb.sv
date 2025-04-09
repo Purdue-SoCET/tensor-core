@@ -74,6 +74,13 @@ module RAM (
 
         case (state)
             start: begin
+                if (counter == cycle_delay) begin 
+                    ram_ready = 1;
+                    next_counter = 0;
+                end else begin 
+                    next_counter = counter + 1;
+                end  
+
             end
             ram_read: begin
                 if (!ram_REN || current_addr != prev_addr) begin
@@ -81,7 +88,6 @@ module RAM (
                 end else if (counter == cycle_delay) begin
                     ram_ready = 1;
                     ram_load = ram_data[current_addr];               
-                    // $display("read from %08x: %08x", current_addr, ram_load);     
                 end else begin
                     next_counter = counter + 1;
                 end
@@ -92,7 +98,6 @@ module RAM (
                 end else if (counter == cycle_delay) begin
                     ram_ready = 1;
                     next_ram_data[current_addr] = ram_store;
-                    // $display("write %08x: %08x", current_addr, ram_store);     
                 end else begin
                     next_counter = counter + 1;
                 end
@@ -289,6 +294,7 @@ program test (
     integer display_bit = 0; 
     logic [BLOCK_SIZE-1:0] write_status; 
     cache_block write_block;
+    int count; 
 
     task automatic initiate_read_write(
         logic [TAG_BIT_LEN-1:0] tag,
@@ -388,15 +394,7 @@ program test (
     endtask
 
     task stall_for_ram; 
-        wait(tb_ram_mem_complete == 1);
-        @(posedge tb_clk);
-        wait(tb_ram_mem_complete == 1);
-        @(posedge tb_clk);
-        wait(tb_ram_mem_complete == 1);
-        @(posedge tb_clk);
-        wait(tb_ram_mem_complete == 1);
-        @(posedge tb_clk);
-        @(posedge tb_clk); // maintain till FINISH, top_level will deal with this
+        wait(tb_scheduler_uuid_ready == 1); 
     endtask
 
     initial begin
@@ -463,6 +461,7 @@ program test (
         MSHR_Thread_Done = 0; 
         @(posedge tb_clk);
 
+        count = 0; 
         for (int way = 0; way < NUM_WAYS; way++) begin
             for (int set = 0; set < NUM_SETS_PER_BANK; set++) begin
                 for (int blk_offset = 0; blk_offset < BLOCK_SIZE; blk_offset++) begin 
@@ -473,8 +472,8 @@ program test (
                             .valid(1'b1), // 0 gets tested in top_level 
                             .uuid(('1)), // Helps to check request number in the waves.
                             .block_addr(addr_t'{ 
-                                (set * NUM_SETS_PER_BANK + blk_offset), 
-                                set[BLOCK_INDEX_BIT_LEN-1:0], 
+                                (count), 
+                                (set[BLOCK_INDEX_BIT_LEN-1:0] << BANKS_LEN), 
                                 blk_offset[BLOCK_OFF_BIT_LEN-1:0],
                                 byte_offset[BYTE_OFF_BIT_LEN-1:0]
                             }), 
@@ -493,6 +492,7 @@ program test (
                         );
 
                         MSHR_Thread_Done = 1; 
+                        count = count + 1; 
                         @(posedge tb_clk);
                     end
                 end 
@@ -514,6 +514,7 @@ program test (
         MSHR_Thread_Done = 0; 
         @(posedge tb_clk);
 
+        count = 0; 
         for (int way = 0; way < NUM_WAYS; way++) begin
             for (int set = 0; set < NUM_SETS_PER_BANK; set++) begin
                 for (int blk_offset = 0; blk_offset < BLOCK_SIZE; blk_offset++) begin 
@@ -521,8 +522,8 @@ program test (
                         SingleCycle_RW_Done = 0; 
 
                         initiate_read_write(
-                            .tag(set * NUM_SETS_PER_BANK + blk_offset), 
-                            .index(set[BLOCK_INDEX_BIT_LEN-1:0]), 
+                            .tag(count), 
+                            .index((set[BLOCK_INDEX_BIT_LEN-1:0] << BANKS_LEN)), 
                             .block_offset(blk_offset[BLOCK_OFF_BIT_LEN-1:0]), 
                             .byte_offset(byte_offset[BYTE_OFF_BIT_LEN-1:0]), 
                             .rw_mode(1'b1), 
@@ -530,6 +531,7 @@ program test (
                         );
 
                         SingleCycle_RW_Done = 1; 
+                        count = count + 1; 
                         @(posedge tb_clk);
                     end
                 end
@@ -551,6 +553,7 @@ program test (
         MSHR_Thread_Done = 0; 
         @(posedge tb_clk);
 
+        count = 0; 
         for (int way = 0; way < NUM_WAYS; way++) begin
             for (int set = 0; set < NUM_SETS_PER_BANK; set++) begin
                 for (int blk_offset = 0; blk_offset < BLOCK_SIZE; blk_offset++) begin 
@@ -558,8 +561,8 @@ program test (
                         SingleCycle_RW_Done = 0; 
 
                         initiate_read_write(
-                            .tag(set * NUM_SETS_PER_BANK + blk_offset), 
-                            .index(set[BLOCK_INDEX_BIT_LEN-1:0]), 
+                            .tag(count), 
+                            .index((set[BLOCK_INDEX_BIT_LEN-1:0] << BANKS_LEN)), 
                             .block_offset(blk_offset[BLOCK_OFF_BIT_LEN-1:0]), 
                             .byte_offset(byte_offset[BYTE_OFF_BIT_LEN-1:0]), 
                             .rw_mode(1'b1), 
@@ -567,6 +570,7 @@ program test (
                         );
 
                         SingleCycle_RW_Done = 1; 
+                        count = count + 1; 
                         @(posedge tb_clk);
                     end
                 end
@@ -588,6 +592,7 @@ program test (
         MSHR_Thread_Done = 0; 
         @(posedge tb_clk);
 
+        count = 0; 
         for (int way = 0; way < NUM_WAYS; way++) begin
             for (int set = 0; set < NUM_SETS_PER_BANK; set++) begin
                 write_block = '0; 
@@ -603,8 +608,8 @@ program test (
                             .valid(1'b1), // 0 gets tested in top_level 
                             .uuid(('1)), // Helps to check request number in the waves.
                             .block_addr(addr_t'{ 
-                                (set * NUM_SETS_PER_BANK + blk_offset), 
-                                set[BLOCK_INDEX_BIT_LEN-1:0], 
+                                (count), 
+                                (set[BLOCK_INDEX_BIT_LEN-1:0] << BANKS_LEN), 
                                 blk_offset[BLOCK_OFF_BIT_LEN-1:0],
                                 byte_offset[BYTE_OFF_BIT_LEN-1:0]
                             }), 
@@ -623,6 +628,7 @@ program test (
                         );
 
                         MSHR_Thread_Done = 1; 
+                        count = count + 1; 
                         @(posedge tb_clk);
                     end
                 end 

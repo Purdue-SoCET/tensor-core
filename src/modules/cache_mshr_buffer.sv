@@ -8,7 +8,8 @@ module cache_mshr_buffer (
     input logic bank_empty,
     output mshr_reg mshr_out,
     output logic stall, 
-    output logic [UUID_SIZE-1:0] uuid_out
+    output logic [UUID_SIZE-1:0] uuid_out, 
+    output logic buffer_empty
 );
     mshr_reg [MSHR_BUFFER_LEN-1:0] buffer, next_buffer;
     mshr_reg [MSHR_BUFFER_LEN-1:0] buffer_copy;
@@ -84,6 +85,15 @@ module cache_mshr_buffer (
                 end
             end
         end    
+    end
+
+    always_comb begin
+        buffer_empty = 1; 
+        for (int j = 0; j < MSHR_BUFFER_LEN; j++) begin
+            if (buffer[j].valid) begin
+                buffer_empty = 0;
+            end
+        end
     end
 
 endmodule

@@ -46,11 +46,7 @@ module confirm_replacement_mshr (
   property block_pull_replacement;
     @(posedge CLK) disable iff (!nRST)
     ((curr_state == VICTIM_EJECT) && (count_FSM == (BLOCK_SIZE - 1) && (next_count_FSM == 0))) |=> 
-      ## 2 ( 
-            (bank[$past(latched_victim_set_index, 2)][$past(latched_victim_way_index, 2)].valid == 1) &&
-            (bank[$past(latched_victim_set_index, 2)][$past(latched_victim_way_index, 2)].tag == $past(mshr_entry.block_addr.tag, 2)) &&
-            (bank[$past(latched_victim_set_index, 2)][$past(latched_victim_way_index, 2)].block === $past(latched_block_pull_buffer.block, 2)) 
-      );
+      ## 2 (bank[$past(latched_victim_set_index, 2)][$past(latched_victim_way_index, 2)] === $past(latched_block_pull_buffer, 2));
   endproperty
 
   assert property (block_pull_replacement)
@@ -89,22 +85,30 @@ module cache_bank_monitor (
 
   integer set, way;
   integer full_sets;
+  integer dirty_sets;
   integer filled_ways;
+  integer dirty_ways;
 
   always @(posedge CLK, negedge nRST) begin
     if (enable) begin
       full_sets = 0;
+      dirty_sets = 0;
       for (set = 0; set < NUM_SETS_PER_BANK; set = set + 1) begin
         filled_ways = 0;
+        dirty_ways = 0; 
         for (way = 0; way < NUM_WAYS; way = way + 1) begin
-          if (bank[set][way].valid)
-            filled_ways = filled_ways + 1;
+          if (bank[set][way].valid) filled_ways = filled_ways + 1;
+          if (bank[set][way].dirty) dirty_ways = dirty_ways + 1;
         end
-        $display("    Time %0t: Set %0d has %0d filled ways", $time, set, filled_ways);
-        if (filled_ways == NUM_WAYS)
+        
+        $display("    Time %0t: Set %0d has (%0d filled ways) | (%0d dirty ways)", $time, set, filled_ways, dirty_ways);
+        
+        if (filled_ways == NUM_WAYS) begin 
           full_sets = full_sets + 1;
+          dirty_sets = dirty_sets + 1;
+        end
       end
-      $display("Time %0t: Total full sets in bank: %0d", $time, full_sets);
+      $display("Time %0t: (Total full sets: %0d) | (dirty sets: %0d) ", $time, full_sets, dirty_sets);
     end
   end
 

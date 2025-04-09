@@ -6,12 +6,14 @@ module lockup_free_cache (
     input logic [31:0] mem_in_addr,
     input logic mem_in_rw_mode, // 0 = read, 1 = write
     input logic [31:0] mem_in_store_value,
+    input logic dp_in_halt, 
     output logic [3:0] mem_out_uuid,
     output logic stall,
     output logic hit,
     output logic [31:0] hit_load,
     output logic [NUM_BANKS-1:0] block_status,
     output logic [NUM_BANKS-1:0][UUID_SIZE-1:0] uuid_block,
+    output logic dp_out_flushed,
 
     // RAM Signals
     output logic [NUM_BANKS-1:0] ram_mem_REN,
@@ -31,9 +33,12 @@ module lockup_free_cache (
  
     logic [NUM_BANKS-1:0] miss;
     in_mem_instr new_miss;
+    logic internal_halt_banks; 
     logic [NUM_BANKS-1:0] bank_hit;
     logic [NUM_BANKS-1:0] bank_stall;
     logic [NUM_BANKS-1:0] bank_busy;
+    logic [NUM_BANKS-1:0] buffer_empty;
+    logic [NUM_BANKS-1:0] internal_flushed_banks;
     logic [NUM_BANKS-1:0][31:0] hit_return_load;
     logic [NUM_BANKS-1:0][UUID_SIZE-1:0] bank_uuids;
 
@@ -46,24 +51,28 @@ module lockup_free_cache (
     assign new_miss.rw_mode = mem_in_rw_mode;
     assign new_miss.store_value = mem_in_store_value;
 
+    assign internal_halt_banks = (&buffer_empty) && dp_in_halt; 
+    assign dp_out_flushed = (&internal_flushed_banks);
+
     genvar i;
     generate
         for (i = 0; i < NUM_BANKS; i++) begin : BANK_GEN
             cache_mshr_buffer mshr_buffer_i (
                 .CLK           (CLK),
                 .nRST          (nRST),
-                .bank_id       (i),
+                .bank_id       (BANKS_LEN'(i)),
                 .miss          (miss[i]),
                 .mem_instr     (new_miss),
                 .bank_empty    (!bank_busy[i]),
                 .mshr_out      (mshr_out[i]),
                 .stall         (bank_stall[i]),
-                .uuid_out      (bank_uuids[i])
+                .uuid_out      (bank_uuids[i]), 
+                .buffer_empty  (buffer_empty[i])
             );
             cache_bank u_cache_bank (
                 .CLK                   (CLK),
                 .nRST                  (nRST),
-                .bank_id               (i),
+                .bank_id               (BANKS_LEN'(i)),
                 // for requesting RAM
                 .instr_valid           (hit_check[i]),
                 // valid single-cycle request 
@@ -72,6 +81,7 @@ module lockup_free_cache (
                 .mshr_entry            (mshr_out[i]),
                 .mem_instr_in          (hit_check_instr),
                 .ram_mem_complete      (ram_mem_complete[i]),
+                .halt                  (internal_halt_banks),
                 // RAM completed operation
                 .cache_bank_busy       (bank_busy[i]),
                 // High when MSHR in-flight
@@ -82,7 +92,8 @@ module lockup_free_cache (
                 .ram_mem_addr          (ram_mem_addr[i]),
                 .scheduler_data_out    (hit_return_load[i]),
                 .scheduler_uuid_out    (uuid_block[i]),
-                .scheduler_uuid_ready  (block_status[i])
+                .scheduler_uuid_ready  (block_status[i]), 
+                .flushed               (internal_flushed_banks[i])
             );
         end
     endgenerate

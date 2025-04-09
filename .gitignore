@@ -9,3 +9,8 @@ work/
 transcript
 vsim.vlf
 waveform.vcd
+mti_uselibs/
+simout/
+covhtmlreport/
+.vscode/
+vsim_*
