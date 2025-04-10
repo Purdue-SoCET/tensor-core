@@ -12,18 +12,25 @@ module cache_mshr_buffer (
     output logic buffer_empty
 );
     mshr_reg [MSHR_BUFFER_LEN-1:0] buffer, next_buffer;
-    mshr_reg [MSHR_BUFFER_LEN-1:0] buffer_copy;
     logic [MSHR_BUFFER_LEN-2:0] secondary_misses;
     mshr_reg mshr_new_miss;
     logic [UUID_SIZE-1:0] uuid, next_uuid;
 
-    assign next_uuid = (uuid == UUID_MAX) ? 8'd0 : (uuid + 1);
+    logic [MSHR_BUFFER_BIT_LEN-1:0] lptr, rptr, next_lptr, next_rptr;
+
 
     always_comb begin
         mshr_new_miss.valid = miss;
+        next_uuid = uuid;
+
+        uuid_out = 0;
+
+        if (miss && (secondary_misses == 0) && (!buffer[lptr].valid || bank_empty)) 
+            next_uuid = uuid + 1;
+
         if ((secondary_misses == 0) && miss) begin
-            mshr_new_miss.uuid = next_uuid;
-            uuid_out = next_uuid;
+            mshr_new_miss.uuid = uuid;
+            uuid_out = uuid;
         end else begin
             mshr_new_miss.uuid = uuid;
             uuid_out = buffer[0].uuid;
@@ -39,52 +46,55 @@ module cache_mshr_buffer (
         if (!nRST) begin
             buffer <= 0;
             uuid <= 0;
+            lptr <= MSHR_BUFFER_LEN - 1;
+            rptr <= MSHR_BUFFER_LEN - 1;
         end else begin
             buffer <= next_buffer;
-            if (miss && (secondary_misses == 0) && (!buffer[0].valid || bank_empty)) uuid <= next_uuid;
+            uuid <= next_uuid;
+            
+            lptr <= next_lptr;
+            rptr <= next_rptr;
         end
     end
 
     always_comb begin
-        buffer_copy = buffer;
+        next_lptr = lptr;
+        next_rptr = rptr;
+        stall = 0;
+
+        if (bank_empty && buffer[rptr].valid) begin
+            next_rptr = rptr - 1;
+        end
+        if (miss && secondary_misses == 0) begin
+            if (lptr != rptr || (bank_empty && buffer[rptr].valid) || !buffer[rptr].valid) begin
+                next_lptr = lptr - 1;
+            end else begin
+                stall = 1;
+            end
+        end
+    end
+
+    always_comb begin
         secondary_misses = 0;
         next_buffer = buffer;
-        stall = 0;
-        mshr_out = buffer[MSHR_BUFFER_LEN - 1];
+        mshr_out = buffer[rptr];
 
-        for (int i = 0; i < MSHR_BUFFER_LEN - 1; i++) begin
-            if (mshr_new_miss.valid && buffer[i].block_addr == mshr_new_miss.block_addr && buffer[i].valid) begin
-                buffer_copy[i].write_status = buffer[i].write_status | mshr_new_miss.write_status;
-                buffer_copy[i].write_block[mem_instr.addr.block_offset] =  (mem_instr.rw_mode) ? mem_instr.store_value : buffer[i].write_block[mem_instr.addr.block_offset];
-                secondary_misses[i] = 1;
+        if (miss) begin
+            for (int i = 0; i < MSHR_BUFFER_LEN - 1; i++) begin
+                if (i != rptr && buffer[i].block_addr == mshr_new_miss.block_addr && buffer[i].valid) begin
+                    secondary_misses[i] = 1;
+                    next_buffer[i].write_status = buffer[i].write_status | mshr_new_miss.write_status;
+                    next_buffer[i].write_block[mem_instr.addr.block_offset] =  (mem_instr.rw_mode) ? mem_instr.store_value : buffer[i].write_block[mem_instr.addr.block_offset];
+                end
+            end
+            if (secondary_misses == 0) begin
+                next_buffer[lptr] = mshr_new_miss;
             end
         end
 
-        for (int i = 0; i < MSHR_BUFFER_LEN; i++) begin
-            if (i == 0) begin
-                if (secondary_misses == 0) begin
-                    if (!buffer[1].valid || bank_empty) begin
-                        next_buffer[i] = mshr_new_miss;
-                    end else begin
-                        stall = 1;
-                    end
-                end else begin
-                    if (!buffer[1].valid || bank_empty) begin
-                        next_buffer[i] = '0;
-                    end
-                end
-            end else if (i == MSHR_BUFFER_LEN - 1) begin
-                if (bank_empty) begin
-                    next_buffer[i] = buffer_copy[i - 1];
-                end else begin
-                    next_buffer[i] = buffer_copy[i];
-                end
-            end else begin
-                if (!buffer[i + 1].valid || bank_empty) begin
-                    next_buffer[i] = buffer_copy[i - 1];
-                end
-            end
-        end    
+        if (bank_empty && buffer[rptr].valid) begin
+            next_buffer[rptr].valid = 0;
+        end
     end
 
     always_comb begin

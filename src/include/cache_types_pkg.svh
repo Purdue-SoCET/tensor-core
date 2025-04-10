@@ -28,6 +28,8 @@
     localparam UUID_MAX = (1 << UUID_SIZE) - 1;
     localparam TREE_BITS = NUM_WAYS - 1;              
 
+    localparam MSHR_BUFFER_BIT_LEN = $clog2(MSHR_BUFFER_LEN);
+
     typedef struct packed {
         logic [TAG_BIT_LEN-1:0] tag;
         logic [BLOCK_INDEX_BIT_LEN-1:0] index;
@@ -64,7 +66,7 @@
     } cache_frame;
 
     typedef enum logic [3:0] { 
-        START, BLOCK_PULL, VICTIM_EJECT, FINISH, FLUSH, WRITEBACK, HALT
+        START, BLOCK_PULL, VICTIM_EJECT, FINISH, WRITEBACK, HALT
     } bank_fsm_states; 
 
     typedef cache_frame [NUM_WAYS-1:0] cache_set;
