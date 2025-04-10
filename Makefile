@@ -28,6 +28,8 @@ sim_%:
 
 cache_wav: cache_bank.log cache_mshr_buffer.log lockup_free_cache.wav
 cache_sim: cache_bank.log cache_mshr_buffer.log lockup_free_cache.sim
+cache_bank_wav: cache_bank.wav
+cache_bank_sim: cache_bank.sim
 
 sf:
 	vlog -sv -svstrict -pedanticerrors -lint +incdir+./src/include/ \

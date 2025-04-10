@@ -22,7 +22,6 @@ module cache_bank (
 );
 
     cache_set [NUM_SETS_PER_BANK-1:0] bank, next_bank;
-
     logic mshr_hit, next_mshr_hit;
 
     // FSM
@@ -35,22 +34,16 @@ module cache_bank (
     logic [BLOCK_INDEX_BIT_LEN-1:0] latched_victim_set_index, set_index, victim_set_index, next_flush_set, flush_set; 
 
     // LRU 
-    lru_frame [NUM_SETS_PER_BANK-1:0] lru, next_lru;
     psuedo_lru_frame [NUM_SETS_PER_BANK-1:0] tree_lru, next_tree_lru;  
-    int max_age;
-    logic [WAYS_LEN-1:0] way, victim;
-    logic hit_bit;
-    int node; 
+    logic [TREE_BITS-1:0] _node, __node;
 
     assign set_index = mem_instr_in.addr.index >> BANKS_LEN;    
     assign victim_set_index = mshr_entry.block_addr.index >> BANKS_LEN; 
-    assign victim_way_index = lru[victim_set_index].lru_way;
 
     always_ff @ (posedge CLK, negedge nRST) begin : sequential_update
         if (!nRST) begin 
             curr_state <= START;
             bank <= '0; 
-            lru <= '0; 
             tree_lru <= '0; 
             count_FSM <= '0;
             latched_victim_way_index <= '0; 
@@ -64,7 +57,6 @@ module cache_bank (
         end else begin 
             curr_state <= next_state; 
             bank <= next_bank; 
-            lru <= next_lru;
             tree_lru <= next_tree_lru;
             flush_set <= next_flush_set; 
             flush_way <= next_flush_way;
@@ -110,59 +102,44 @@ module cache_bank (
         end
     end
 
-
     always_comb begin : do_count_FSM
         next_count_FSM = count_FSM;
         if (count_flush) next_count_FSM = 0; 
         else if (((ram_mem_complete && !mshr_hit) || mshr_hit || ((mshr_entry.write_status[count_FSM] && (count_FSM != (BLOCK_SIZE - 1)))))) next_count_FSM = count_FSM + 1; 
     end
 
-    always_comb begin : age_based_lru
-        next_lru = lru;
-        max_age = 0;
-        if (scheduler_hit || (curr_state == FINISH)) begin
-            for (int i = 0; i < NUM_SETS_PER_BANK; i++) begin
-                max_age = 0;
-                max_way = 0;
+    always_comb begin : victim_way_index_selection
+        __node = 0; 
 
-                for (int j = 0; j < NUM_WAYS; j++) begin
-                    if (scheduler_hit && (set_index == i) && (hit_way_index == j)) next_lru[set_index].age[hit_way_index] = 0;
-                    else if ((curr_state == FINISH) && (latched_victim_set_index == i) && (latched_victim_way_index == j)) next_lru[latched_victim_set_index].age[latched_victim_way_index] = 0;
-                    else next_lru[i].age[j] = lru[i].age[j] + 1;
-
-                    if (next_lru[i].age[j] > max_age) begin
-                        max_age = next_lru[i].age[j];
-                        max_way = j[WAYS_LEN-1:0];
-                    end
-                end
-                
-                next_lru[i].lru_way = max_way;
+        for (int level = 0; level < WAYS_LEN; level++) begin
+            if (tree_lru[victim_set_index].tree[__node] == 0) begin
+                victim_way_index[WAYS_LEN-1 - level] = 0;
+                __node = 2 * __node + 1;
+            end else begin
+                victim_way_index[WAYS_LEN-1 - level] = 1;
+                __node = 2 * __node + 2;
             end
         end
-    end
+    end 
 
-    always_comb begin : tree_based_lru
+    always_comb begin : tree_based_lru_update
         next_tree_lru = tree_lru;
-        node = 0; 
+        _node = 0; 
 
         if (scheduler_hit) begin
             for (int level = 0; level < WAYS_LEN; level++) begin
-                hit_bit = hit_way_index[(WAYS_LEN-1) - level];
-                next_tree_lru[set_index].tree[node] = ~hit_bit;
-                next_tree_lru[set_index].lru_way[(WAYS_LEN-1) - level] = hit_bit;
+                next_tree_lru[set_index].tree[_node] = ~hit_way_index[(WAYS_LEN-1) - level];
 
-                if (!hit_bit) node = (2 * node) + 1;
-                else node = (2 * node) + 2;
+                if (!hit_way_index[(WAYS_LEN-1) - level]) _node = (2 * _node) + 1;
+                else _node = (2 * _node) + 2;
             end
         end
         else if (curr_state == FINISH) begin
             for (int level = 0; level < WAYS_LEN; level++) begin
-                hit_bit = latched_victim_way_index[WAYS_LEN-1 - level];
-                next_tree_lru[latched_victim_set_index].tree[node] = ~hit_bit;
-                next_tree_lru[latched_victim_set_index].lru_way[(WAYS_LEN-1) - level] = hit_bit;
+                next_tree_lru[latched_victim_set_index].tree[_node] = ~latched_victim_way_index[WAYS_LEN-1 - level];
 
-                if (!hit_bit) node = (2 * node) + 1;
-                else node = (2 * node) + 2;
+                if (!latched_victim_way_index[WAYS_LEN-1 - level]) _node = (2 * _node) + 1;
+                else _node = (2 * _node) + 2;
             end
         end
     end

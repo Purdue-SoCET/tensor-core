@@ -181,15 +181,6 @@ module cache_bank_tb;
     );
 
 
-    // bind cache_bank confirm_lru_age lru_monitor (
-    //     .CLK(CLK), 
-    //     .nRST(nRST), 
-    //     .curr_state(curr_state),
-    //     .lru(lru),
-    //     .latched_victim_set_index(latched_victim_set_index),
-    //     .latched_victim_way_index(latched_victim_way_index)
-    // );
-
     bind cache_bank confirm_replacement_mshr mshr_monitor (
         .CLK(CLK), 
         .nRST(nRST), 

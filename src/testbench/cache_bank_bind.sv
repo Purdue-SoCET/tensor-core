@@ -1,35 +1,5 @@
 `include "cache_types_pkg.svh"
 
-module confirm_lru_age (
-    input logic CLK, 
-    input logic nRST,
-    input logic [3:0] curr_state,
-    input lru_frame [NUM_SETS_PER_BANK-1:0] lru,
-    input logic [BLOCK_INDEX_BIT_LEN-1:0] latched_victim_set_index,
-    input logic [WAYS_LEN-1:0] latched_victim_way_index
-);
-
-  always @ (posedge CLK) begin 
-    for (integer set = 0; set < NUM_SETS_PER_BANK; set++) begin
-      for (integer j = 0; j < NUM_WAYS; j++) begin
-        assert (lru[set].age[lru[set].lru_way] >= lru[set].age[j])
-          else $error("ASSERTIONERROR: LRU Age is wrong set %0d - (LRU way %0d, age %0d) < (Way %0d, age %0d)!",
-                      set,  lru[set].lru_way, lru[set].age[lru[set].lru_way], j, lru[set].age[j]);
-      end
-    end
-  end
-
-  property lru_update;
-    @(posedge CLK) disable iff (!nRST)
-    (curr_state == FINISH) |=>
-      ## 1 (lru[$past(latched_victim_set_index, 1)].age[$past(latched_victim_way_index, 1)] == 0);
-  endproperty
-
-  assert property (lru_update)
-    else $error("ASSERTIONERROR: Victim way's (set: %0d, way: %0d) age was not reset in FINISH state", $past(latched_victim_set_index, 1), $past(latched_victim_way_index, 1));
-
-endmodule
-
 module confirm_replacement_mshr (
     input logic CLK,
     input logic nRST,

@@ -13,19 +13,20 @@
     localparam NUM_SETS = (CACHE_SIZE / 4) / (BLOCK_SIZE);
     localparam NUM_SETS_PER_BANK = NUM_SETS / NUM_BANKS;
     localparam NUM_BLOCKS_PER_BANK = NUM_SETS_PER_BANK * NUM_WAYS; 
+
     localparam BYTE_OFF_BIT_LEN = 2;
-    localparam BLOCK_OFF_BIT_LEN = $clog2(BLOCK_SIZE); // choose which block within the bank
-    localparam BLOCK_INDEX_BIT_LEN = $clog2(NUM_SETS); // chose the set
-    localparam NUM_SETS_PER_BANK_LEN = $clog2(NUM_SETS_PER_BANK); // chose the set
+    localparam BLOCK_OFF_BIT_LEN = $clog2(BLOCK_SIZE); 
+    localparam BLOCK_INDEX_BIT_LEN = $clog2(NUM_SETS); 
+    localparam NUM_SETS_PER_BANK_LEN = $clog2(NUM_SETS_PER_BANK); 
+    localparam NUM_BLOCKS_LEN = $clog2(BLOCK_SIZE);
     localparam WAYS_LEN = $clog2(NUM_WAYS); 
     localparam BANKS_LEN = $clog2(NUM_BANKS); 
-    localparam NUM_BLOCKS_LEN = $clog2(BLOCK_SIZE);
     localparam NUM_BLOCKS_PER_BANK_LEN = $clog2(NUM_BLOCKS_PER_BANK);
+
     localparam TAG_BIT_LEN = 32 - BLOCK_INDEX_BIT_LEN - BLOCK_OFF_BIT_LEN - BYTE_OFF_BIT_LEN;
-    localparam AGE_WIDTH = 8;          
-    localparam SET_INDEX_WIDTH = $clog2(NUM_SETS);   
+
     localparam UUID_MAX = (1 << UUID_SIZE) - 1;
-    localparam int TREE_BITS = NUM_WAYS - 1;              
+    localparam TREE_BITS = NUM_WAYS - 1;              
 
     typedef struct packed {
         logic [TAG_BIT_LEN-1:0] tag;
@@ -42,11 +43,6 @@
 
     typedef struct packed {
         logic [WAYS_LEN-1:0] lru_way;
-        logic [NUM_WAYS-1:0][AGE_WIDTH-1:0] age;
-    } lru_frame;
-
-    typedef struct packed {
-        logic [WAYS_LEN-1:0] lru_way;
         logic [TREE_BITS-1:0] tree;
     } psuedo_lru_frame;
 
@@ -56,7 +52,7 @@
         logic valid;
         logic [UUID_SIZE-1:0] uuid;
         addr_t block_addr;
-        logic [BLOCK_SIZE-1:0] write_status; // assuming 1 means WEN and 0 means REN
+        logic [BLOCK_SIZE-1:0] write_status; // WEN==1, REN==0
         cache_block write_block;
     } mshr_reg;
 
@@ -64,7 +60,7 @@
         logic valid;
         logic dirty;
         logic [TAG_BIT_LEN-1:0] tag;
-        cache_block block; // 1 word -> 4 bytes -> 32 bits, each block is X words
+        cache_block block; // 1 word -> 4 bytes -> 32 bits
     } cache_frame;
 
     typedef enum logic [3:0] { 
@@ -72,9 +68,6 @@
     } bank_fsm_states; 
 
     typedef cache_frame [NUM_WAYS-1:0] cache_set;
-
-
-
 
 `endif
 

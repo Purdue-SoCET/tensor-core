@@ -330,6 +330,13 @@ module lockup_free_cache_tb;
             tb_mem_in = 0;
             cycle_wait(4 * 100);
         end
+        tb_mem_in = 0;
+        testcase = "FLUSHING";
+        @(posedge tb_clk);
+        tb_halt = 1; 
+        wait(tb_flushed == 1);
+        testcase = "FINISHED";
+        @(posedge tb_clk);
         $finish;
     end
 
