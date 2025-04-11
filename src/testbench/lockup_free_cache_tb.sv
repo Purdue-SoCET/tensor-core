@@ -84,7 +84,7 @@ module RAM (
                     end else begin
                         ram_load = 32'd0;
                     end            
-                    // // $display("RAM ID:%d -- read from %08x: %08x", bank_id, current_addr, ram_load);     
+                    $display("RAM ID:%d -- read from %08x: %08x", bank_id, current_addr, ram_load);     
                 end else begin
                     next_counter = counter + 1;
                 end
@@ -95,7 +95,7 @@ module RAM (
                 end else if (counter == cycle_delay) begin
                     ram_ready = 1;
                     ram_data[current_addr] = ram_store;
-                    // // $display("RAM ID:%d -- write to %08x: %08x", bank_id, current_addr, ram_store);
+                    $display("RAM ID:%d -- write to %08x: %08x", bank_id, current_addr, ram_store);
                 end else begin
                     next_counter = counter + 1;
                 end
@@ -131,6 +131,7 @@ module lockup_free_cache_tb;
 
     logic tb_clk;
     logic tb_nrst;
+    logic monitor_enable; 
 
     always begin
         tb_clk = 1'b0;
@@ -197,11 +198,17 @@ module lockup_free_cache_tb;
                 .ram_ready    (tb_ram_mem_complete[i]),
                 .bank_id (BANKS_LEN'(i))
             );
+            cache_bank_monitor u_monitor_inst (
+                .CLK          (tb_clk),
+                .nRST         (tb_nrst),
+                .bank         (u_lockup_free_cache.BANK_GEN[i].cache_bank_i.bank), 
+                .enable       (monitor_enable)
+            );
         end
     endgenerate
 
     task data_read(input logic [31:0] addr, output logic [31:0] data);
-        // $display("Starting data read: %08x", addr);
+        $display("Starting data read: %08x", addr);
         @(posedge tb_clk);
         tb_mem_in = 1;
         tb_mem_in_addr = addr;
@@ -209,12 +216,12 @@ module lockup_free_cache_tb;
         tb_mem_in_store_value = 0;
         @(negedge tb_clk);
         if (tb_hit) begin
-            // $display("Read hit on %08x! -> %08x", addr, tb_hit_load);
+            $display("Read hit on %08x! -> %08x", addr, tb_hit_load);
             data = tb_hit_load;
         end else begin
-            // $display("Read miss on %08x!", addr);
+            $display("Read miss on %08x!", addr);
             while (tb_stall) begin
-                // $display("Cache stall!");
+                $display("Cache stall!");
                 @(posedge tb_clk);
                 @(negedge tb_clk);
             end
@@ -222,7 +229,7 @@ module lockup_free_cache_tb;
     endtask
 
     task data_write(input logic [31:0] addr, input logic [31:0] data);
-        // $display("Starting data write: %08x,%08x", addr, data);
+        $display("Starting data write: %08x,%08x", addr, data);
         @(posedge tb_clk);
         tb_mem_in = 1;
         tb_mem_in_addr = addr;
@@ -230,11 +237,11 @@ module lockup_free_cache_tb;
         tb_mem_in_store_value = data;
         @(negedge tb_clk);
         if (tb_hit) begin
-            // $display("Write hit on %08x!", addr);
+            $display("Write hit on %08x!", addr);
         end else begin
-            // $display("Write miss on %08x!", addr);
+            $display("Write miss on %08x!", addr);
             while (tb_stall) begin
-                // $display("Cache stall!");
+                $display("Cache stall!");
                 @(posedge tb_clk);
                 @(negedge tb_clk);
             end
@@ -304,7 +311,7 @@ module lockup_free_cache_tb;
             @(posedge tb_clk);
             tb_mem_in = 0;
             @(negedge tb_clk);
-            // $display("Waiting for misses to finish!");
+            $display("Waiting for misses to finish!");
         end
         for (current_set_index = 0; current_set_index < test_set_num; current_set_index++) begin
             // Write hit
@@ -327,6 +334,8 @@ module lockup_free_cache_tb;
         tb_halt = 1; 
         wait(tb_flushed == 1);
         testcase = "FINISHED";
+        @(posedge tb_clk);
+        monitor_enable = 1; 
         @(posedge tb_clk);
         $finish;
     end

@@ -142,10 +142,10 @@ module cache_bank_tb;
     end
 
 
-    initial begin 
-        $dumpfile("waveforms/cache_bank_tb.vcd");
-        $dumpvars(0);
-    end 
+    // initial begin 
+    //     $dumpfile("waveforms/cache_bank_tb.vcd");
+    //     $dumpvars(0);
+    // end 
     
     RAM u_RAM (
         .CLK(tb_clk),
@@ -651,7 +651,7 @@ program test (
         monitor_enable = 1'b0; 
         @(posedge tb_clk);
 
-        //////////////////////////////////////////////////////
+        ///////////////////////////////////////////////////////
 
         set_test_id("-------> FLUSHING");
 

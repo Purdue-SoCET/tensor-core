@@ -108,41 +108,34 @@ module cache_bank (
         else if (((ram_mem_complete && !mshr_hit) || mshr_hit || ((mshr_entry.write_status[count_FSM] && (count_FSM != (BLOCK_SIZE - 1)))))) next_count_FSM = count_FSM + 1; 
     end
 
-    always_comb begin : victim_way_index_selection
+    always_comb begin : tree_based_lru_update
+        next_tree_lru = tree_lru;
+        _node = 0; 
         __node = 0; 
 
         for (int level = 0; level < WAYS_LEN; level++) begin
             if (tree_lru[victim_set_index].tree[__node] == 0) begin
                 victim_way_index[WAYS_LEN-1 - level] = 0;
-                __node = 2 * __node + 1;
+                __node = (2 * __node) + 1;
             end else begin
                 victim_way_index[WAYS_LEN-1 - level] = 1;
-                __node = 2 * __node + 2;
+                __node = (2 * __node) + 2;
             end
-        end
-    end 
 
-    always_comb begin : tree_based_lru_update
-        next_tree_lru = tree_lru;
-        _node = 0; 
-
-        if (scheduler_hit) begin
-            for (int level = 0; level < WAYS_LEN; level++) begin
+            if (scheduler_hit) begin
                 next_tree_lru[set_index].tree[_node] = ~hit_way_index[(WAYS_LEN-1) - level];
 
                 if (!hit_way_index[(WAYS_LEN-1) - level]) _node = (2 * _node) + 1;
                 else _node = (2 * _node) + 2;
             end
-        end
-        else if (curr_state == FINISH) begin
-            for (int level = 0; level < WAYS_LEN; level++) begin
+            else if (curr_state == FINISH) begin
                 next_tree_lru[latched_victim_set_index].tree[_node] = ~latched_victim_way_index[WAYS_LEN-1 - level];
 
                 if (!latched_victim_way_index[WAYS_LEN-1 - level]) _node = (2 * _node) + 1;
                 else _node = (2 * _node) + 2;
             end
         end
-    end
+    end 
 
     always_comb begin : cache_controller_logic
         count_flush = 1'b0; 
@@ -160,7 +153,7 @@ module cache_bank (
         next_flush_count = flush_count;
         next_flush_set = flush_set; 
         next_flush_way = flush_way; 
-        flushed = 0;
+        flushed = 0; 
 
         if (instr_valid) begin
             for (int i = 0; i < NUM_WAYS; i++) begin 
@@ -191,13 +184,13 @@ module cache_bank (
                 cache_bank_busy = 1; 
 
                 ram_mem_REN = !mshr_hit && !mshr_entry.write_status[NUM_BLOCKS_LEN'(count_FSM)];
-                ram_mem_addr = addr_t'{mshr_entry.block_addr.tag, latched_victim_set_index, BLOCK_OFF_BIT_LEN'(count_FSM), BYTE_OFF_BIT_LEN'('0)};
+                ram_mem_addr = addr_t'{mshr_entry.block_addr.tag, ((latched_victim_set_index  << BANKS_LEN) | bank_id), BLOCK_OFF_BIT_LEN'(count_FSM), BYTE_OFF_BIT_LEN'('0)};
             end 
             VICTIM_EJECT: begin 
                 cache_bank_busy = 1; 
 
                 ram_mem_WEN = 1'b1; 
-                ram_mem_addr = addr_t'{latched_victim_eject_buffer.tag, latched_victim_set_index, NUM_BLOCKS_LEN'(count_FSM), BYTE_OFF_BIT_LEN'('0)};
+                ram_mem_addr = addr_t'{latched_victim_eject_buffer.tag, ((latched_victim_set_index  << BANKS_LEN) | bank_id), NUM_BLOCKS_LEN'(count_FSM), BYTE_OFF_BIT_LEN'('0)};
                 ram_mem_store = latched_victim_eject_buffer.block[count_FSM];
             end
             FINISH: begin 
@@ -206,22 +199,24 @@ module cache_bank (
                 scheduler_uuid_out = mshr_entry.uuid;
                 scheduler_uuid_ready = 1;
             end
+            FLUSH: begin 
+                if (next_state != WRITEBACK) begin 
+                    next_flush_set = NUM_SETS_PER_BANK_LEN'(flush_count);
+                    if (flush_set == (NUM_SETS_PER_BANK - 1)) next_flush_way = flush_way + 1; 
+                    if (!bank[flush_set][flush_way].dirty) next_flush_count = flush_count + 1; 
+                end 
+            end 
             WRITEBACK: begin 
-                ram_mem_WEN = bank[flush_set][flush_way].dirty; 
-                ram_mem_addr = addr_t'{bank[flush_set][flush_way].tag, flush_set, NUM_BLOCKS_LEN'(count_FSM), BYTE_OFF_BIT_LEN'('0)};
-                ram_mem_store = bank[flush_set][flush_way].block[NUM_BLOCKS_LEN'(count_FSM)];
+                ram_mem_WEN = 1'b1; 
+                ram_mem_addr = addr_t'{bank[next_flush_set][next_flush_way].tag, ((next_flush_set  << BANKS_LEN) | bank_id), NUM_BLOCKS_LEN'(count_FSM), BYTE_OFF_BIT_LEN'('0)};
+                ram_mem_store = bank[next_flush_set][next_flush_way].block[NUM_BLOCKS_LEN'(count_FSM)];
 
-                if (ram_mem_complete || !bank[flush_set][flush_way].dirty) begin
-                    next_flush_count = flush_count + 1;
+                if (ram_mem_complete) begin 
                     if (count_FSM == NUM_BLOCKS_LEN'(BLOCK_SIZE - 1)) begin 
                         count_flush = 1'b1; 
-                        next_bank[flush_set][flush_way].dirty = 1'b0;
-                        next_bank[flush_set][flush_way].valid = 1'b0;
-                        next_bank[flush_set][flush_way].block = '0;
-                        next_flush_way = flush_way + 1;
-                        if (flush_way == NUM_WAYS - 1) begin
-                            next_flush_set = flush_set + 1;
-                        end
+                        next_bank[next_flush_set][next_flush_way].dirty = 1'b0;
+                        next_bank[next_flush_set][next_flush_way].valid = 1'b0;
+                        next_bank[next_flush_set][next_flush_way].block = '0;
                     end  
                 end 
         
@@ -235,12 +230,16 @@ module cache_bank (
         case (curr_state) 
             START: begin 
                 if (mshr_entry.valid) next_state = BLOCK_PULL;
-                else if (halt) next_state = WRITEBACK; 
+                else if (halt) next_state = FLUSH; 
             end 
             BLOCK_PULL:  if ((count_FSM == (BLOCK_SIZE - 1)) && (next_count_FSM == 0)) next_state = (bank[latched_victim_set_index][latched_victim_way_index].dirty && !mshr_hit) ? VICTIM_EJECT : FINISH;  
             VICTIM_EJECT: if (count_FSM == (BLOCK_SIZE - 1) && (next_count_FSM == 0)) next_state = FINISH; 
             FINISH: next_state = START; 
-            WRITEBACK: if (flush_count == NUM_BLOCKS_PER_BANK - 1) next_state = HALT; 
+            FLUSH: begin 
+                if (flush_count == (NUM_BLOCKS_PER_BANK + 1)) next_state = HALT;
+                else if (bank[flush_set][flush_way].dirty) next_state = WRITEBACK;
+            end
+            WRITEBACK: if (count_FSM == (BLOCK_SIZE - 1) && (next_count_FSM == 0)) next_state = FLUSH; 
             HALT: next_state = HALT; 
         endcase
     end 
