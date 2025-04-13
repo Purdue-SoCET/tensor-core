@@ -1,0 +1,7 @@
+sudo apt install gcc-riscv64-unknown-elf
+
+
+riscv64-unknown-elf-gcc -march=rv32i -mabi=ilp32 -S -o mergesort.s mergesort.c
+riscv64-unknown-elf-gcc -march=rv32i -mabi=ilp32 -nostdlib -Ttext=0x0 -o mergesort.elf mergesort.s
+riscv64-unknown-elf-objcopy -O verilog mergesort.elf mergesort.hex
+python3 fix_hex.py
