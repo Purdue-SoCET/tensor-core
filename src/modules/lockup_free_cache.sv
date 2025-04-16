@@ -36,7 +36,7 @@ module lockup_free_cache (
     logic internal_halt_banks; 
     logic [NUM_BANKS-1:0] bank_hit;
     logic [NUM_BANKS-1:0] bank_stall;
-    logic [NUM_BANKS-1:0] bank_busy;
+    logic [NUM_BANKS-1:0] bank_free;
     logic [NUM_BANKS-1:0] buffer_empty;
     logic [NUM_BANKS-1:0] internal_flushed_banks;
     logic [NUM_BANKS-1:0][31:0] hit_return_load;
@@ -63,7 +63,7 @@ module lockup_free_cache (
                 .bank_id       (BANKS_LEN'(i)),
                 .miss          (miss[i]),
                 .mem_instr     (new_miss),
-                .bank_empty    (!bank_busy[i]),
+                .bank_free    (bank_free[i]),
                 .mshr_out      (mshr_out[i]),
                 .stall         (bank_stall[i]),
                 .uuid_out      (bank_uuids[i]), 
@@ -78,12 +78,12 @@ module lockup_free_cache (
                 // valid single-cycle request 
                 .ram_mem_data          (ram_mem_data[i]),
                 // data incoming from RAM
-                .mshr_entry            (mshr_out[i]),
+                .mshr_entry_in            (mshr_out[i]),
                 .mem_instr_in          (hit_check_instr),
                 .ram_mem_complete      (ram_mem_complete[i]),
                 .halt                  (internal_halt_banks),
                 // RAM completed operation
-                .cache_bank_busy       (bank_busy[i]),
+                .cache_bank_free       (bank_free[i]),
                 // High when MSHR in-flight
                 .scheduler_hit         (bank_hit[i]),
                 .ram_mem_REN           (ram_mem_REN[i]),

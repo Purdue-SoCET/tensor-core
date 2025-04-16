@@ -121,7 +121,7 @@ module cache_bank_tb;
     mshr_reg tb_mshr_entry;
     in_mem_instr tb_mem_instr;
     logic tb_ram_mem_complete;
-    logic tb_cache_bank_busy;
+    logic tb_cache_bank_free;
     logic tb_scheduler_hit;
     logic tb_ram_mem_REN;
     logic tb_ram_mem_WEN;
@@ -164,11 +164,11 @@ module cache_bank_tb;
         .bank_id(tb_bank_id),
         .instr_valid(tb_instr_valid),
         .ram_mem_data(tb_ram_mem_data),
-        .mshr_entry(tb_mshr_entry),
+        .mshr_entry_in(tb_mshr_entry),
         .mem_instr_in(tb_mem_instr),
         .ram_mem_complete(tb_ram_mem_complete),
         .halt(tb_halt),
-        .cache_bank_busy(tb_cache_bank_busy),
+        .cache_bank_free(tb_cache_bank_free),
         .scheduler_hit(tb_scheduler_hit),
         .ram_mem_REN(tb_ram_mem_REN),
         .ram_mem_WEN(tb_ram_mem_WEN),
@@ -223,7 +223,7 @@ module cache_bank_tb;
         .tb_halt(tb_halt),
         .monitor_enable(monitor_enable),
         .tb_ram_mem_complete(tb_ram_mem_complete),
-        .tb_cache_bank_busy(tb_cache_bank_busy),
+        .tb_cache_bank_free(tb_cache_bank_free),
         .tb_scheduler_hit(tb_scheduler_hit),
         .tb_ram_mem_REN(tb_ram_mem_REN),
         .tb_ram_mem_WEN(tb_ram_mem_WEN),
@@ -266,7 +266,7 @@ program test (
     output logic monitor_enable, 
     input logic [CACHE_RW_SIZE-1:0] tb_ram_mem_data,
     input logic  tb_ram_mem_complete,
-    input logic  tb_cache_bank_busy,
+    input logic  tb_cache_bank_free,
     input logic  tb_ram_mem_REN,
     input logic  tb_ram_mem_WEN,
     input logic [CACHE_RW_SIZE-1:0] tb_ram_mem_store,
@@ -300,7 +300,7 @@ program test (
         tb_mem_instr  = in_mem_instr'{ address, rw_mode, store_value };
         @(posedge tb_clk);
         tb_instr_valid = 0;
-        log_ram_inputs(1, tb_ram_mem_complete, tb_ram_mem_addr, tb_ram_mem_store, tb_ram_mem_WEN, tb_ram_mem_REN, tb_cache_bank_busy, tb_scheduler_data_out, tb_scheduler_uuid_out, tb_scheduler_hit, tb_scheduler_uuid_ready);
+        log_ram_inputs(1, tb_ram_mem_complete, tb_ram_mem_addr, tb_ram_mem_store, tb_ram_mem_WEN, tb_ram_mem_REN, tb_cache_bank_free, tb_scheduler_data_out, tb_scheduler_uuid_out, tb_scheduler_hit, tb_scheduler_uuid_ready);
         @(posedge tb_clk);
         @(posedge tb_clk);
     endtask
@@ -323,14 +323,14 @@ program test (
         logic [CACHE_RW_SIZE-1:0] _tb_ram_mem_store,
         logic _tb_ram_mem_WEN,
         logic _tb_ram_mem_REN,
-        logic _tb_cache_bank_busy, 
+        logic _tb_cache_bank_free, 
         logic [31:0] _tb_scheduler_data_out,
         logic [3:0] _tb_scheduler_uuid_out,
         logic  _tb_scheduler_hit, 
         logic _tb_scheduler_uuid_ready
     );
         for (integer i = 0; i < cycles; i++) begin 
-            if (display_bit) $display("--> ram_mem_complete: %b, ram_mem_addr: %h, ram_mem_store: %h, ram_mem_WEN: %b, ram_mem_REN: %b, tb_cache_bank_busy: %b", _tb_ram_mem_complete, _tb_ram_mem_addr, _tb_ram_mem_store, _tb_ram_mem_WEN, _tb_ram_mem_REN, _tb_cache_bank_busy);
+            if (display_bit) $display("--> ram_mem_complete: %b, ram_mem_addr: %h, ram_mem_store: %h, ram_mem_WEN: %b, ram_mem_REN: %b, tb_cache_bank_free: %b", _tb_ram_mem_complete, _tb_ram_mem_addr, _tb_ram_mem_store, _tb_ram_mem_WEN, _tb_ram_mem_REN, _tb_cache_bank_free);
             if (display_bit) $display("      tb_scheduler_data_out: %d, tb_scheduler_uuid_out: %h, tb_scheduler_hit: %b, _tb_scheduler_uuid_ready: %b", _tb_scheduler_data_out, _tb_scheduler_uuid_out, _tb_scheduler_hit, _tb_scheduler_uuid_ready);
             @(posedge tb_clk);
         end 
@@ -445,7 +445,7 @@ program test (
         // monitor_enable = 1'b0; 
         // @(posedge tb_clk);
 
-        //////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////
 
         set_test_id("-------> LOAD (WITHOUT SW MISSES) (INTO EMPTY) BANK");
 

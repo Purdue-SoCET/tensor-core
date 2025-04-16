@@ -5,7 +5,7 @@ module cache_mshr_buffer (
     input logic miss,
     input logic [BANKS_LEN-1:0] bank_id,
     input in_mem_instr mem_instr,
-    input logic bank_empty,
+    input logic bank_free,
     output mshr_reg mshr_out,
     output logic stall, 
     output logic [UUID_SIZE-1:0] uuid_out, 
@@ -25,16 +25,12 @@ module cache_mshr_buffer (
 
         uuid_out = 0;
 
-        if (miss && (secondary_misses == 0) && (!buffer[lptr].valid || bank_empty)) 
+        if (miss && !stall) begin 
             next_uuid = uuid + 1;
-
-        if ((secondary_misses == 0) && miss) begin
-            mshr_new_miss.uuid = uuid;
             uuid_out = uuid;
-        end else begin
             mshr_new_miss.uuid = uuid;
-            uuid_out = buffer[0].uuid;
         end
+
         mshr_new_miss.block_addr = {mem_instr.addr.tag, mem_instr.addr.index, BLOCK_OFF_BIT_LEN'(0), BYTE_OFF_BIT_LEN'(0)};
         mshr_new_miss.write_status = 0;
         mshr_new_miss.write_status[mem_instr.addr.block_offset] = mem_instr.rw_mode;
@@ -62,11 +58,11 @@ module cache_mshr_buffer (
         next_rptr = rptr;
         stall = 0;
 
-        if (bank_empty && buffer[rptr].valid) begin
+        if (bank_free && buffer[rptr].valid) begin
             next_rptr = rptr - 1;
         end
         if (miss && secondary_misses == 0) begin
-            if (lptr != rptr || (bank_empty && buffer[rptr].valid) || !buffer[rptr].valid) begin
+            if (lptr != rptr || (bank_free && buffer[rptr].valid) || !buffer[rptr].valid) begin
                 next_lptr = lptr - 1;
             end else begin
                 stall = 1;
@@ -85,6 +81,7 @@ module cache_mshr_buffer (
                     secondary_misses[i] = 1;
                     next_buffer[i].write_status = buffer[i].write_status | mshr_new_miss.write_status;
                     next_buffer[i].write_block[mem_instr.addr.block_offset] =  (mem_instr.rw_mode) ? mem_instr.store_value : buffer[i].write_block[mem_instr.addr.block_offset];
+                    next_buffer[i].uuid = uuid;
                 end
             end
             if (secondary_misses == 0) begin
@@ -92,7 +89,7 @@ module cache_mshr_buffer (
             end
         end
 
-        if (bank_empty && buffer[rptr].valid) begin
+        if (bank_free && buffer[rptr].valid) begin
             next_buffer[rptr].valid = 0;
         end
     end

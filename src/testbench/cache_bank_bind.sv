@@ -3,7 +3,7 @@
 module confirm_replacement_mshr (
     input logic CLK,
     input logic nRST,
-    input logic [3:0] curr_state, 
+    input logic [4:0] curr_state, 
     input logic [BLOCK_OFF_BIT_LEN-1:0] count_FSM,
     input logic [BLOCK_OFF_BIT_LEN-1:0] next_count_FSM,
     input logic [BLOCK_INDEX_BIT_LEN-1:0] latched_victim_set_index,
@@ -75,6 +75,8 @@ module cache_bank_monitor (
         
         if (filled_ways == NUM_WAYS) begin 
           full_sets = full_sets + 1;
+        end
+        if (dirty_ways == NUM_WAYS) begin 
           dirty_sets = dirty_sets + 1;
         end
       end

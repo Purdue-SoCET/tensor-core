@@ -201,7 +201,7 @@ module lockup_free_cache_tb;
             cache_bank_monitor u_monitor_inst (
                 .CLK          (tb_clk),
                 .nRST         (tb_nrst),
-                .bank         (u_lockup_free_cache.BANK_GEN[i].cache_bank_i.bank), 
+                .bank         (u_lockup_free_cache.BANK_GEN[i].u_cache_bank.bank), 
                 .enable       (monitor_enable)
             );
         end
