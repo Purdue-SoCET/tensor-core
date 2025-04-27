@@ -5,12 +5,11 @@
 
   package sp_types_pkg;
   import isa_pkg::*;
-  
+
   parameter WORD_W = 32;
   parameter REG_W  = 5;
   parameter MATRIX_W = 4;
   parameter VALUE_BITS = 16;
-  parameter BITS_PER_ROW = 64;
   parameter BITS_PER_ROW = 64;
 
   parameter MAT_S_W = 4;
@@ -49,7 +48,7 @@
 
   typedef struct packed {
     logic [1:0] opcode;
-    matbit_t ls_matrix_rd_gemm_new_weight;
+    matbits_t ls_matrix_rd_gemm_new_weight;
     word_t ls_addr_gemm_gemm_sel;
   } instrFIFO_t;
 
