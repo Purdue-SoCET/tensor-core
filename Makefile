@@ -1,5 +1,5 @@
-SCRDIR = /home/asicfab/a/rrbathin/socet/amp/tensor-core/src/scripts
-# SCRDIR = /home/asicfab/a/wong371/william_pr/tensor-core/src/scripts
+# SCRDIR = /home/asicfab/a/rrbathin/socet/amp/tensor-core/src/scripts
+SCRDIR = /home/asicfab/a/wong371/william_pr/tensor-core/src/scripts
 
 SOURCE_FILES = \
 	./src/modules/system.sv \

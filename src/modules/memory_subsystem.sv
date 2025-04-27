@@ -27,7 +27,8 @@ module memory_subsystem (
         .CLK(CLK),
         .nRST(nRST),
         .cif(cif),
-        .dcif(dcif)
+        .dcif(dcif),
+        .acif(acif)
     );
 
     // Data cache

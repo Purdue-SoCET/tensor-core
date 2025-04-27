@@ -134,6 +134,7 @@ always_comb begin
   next_flush_idx = flush_idx;
   next_lru = lru;
   dcif.flushed = '0;
+  acif.drecvhit = '0;
 
   case(dcache_state)
     IDLE: begin
@@ -142,6 +143,7 @@ always_comb begin
         if (dcache[dcache_format.idx][0].valid && 
             (dcache_format.tag == dcache[dcache_format.idx][0].tag)) begin
           dcif.dhit = 1'b1;
+          acif.drecvhit = 1'b1;
           next_hit_count = hit_count + 1;
           next_lru[dcache_format.idx] = 1'b1;
           if (dcif.dmemWEN) begin
@@ -155,6 +157,7 @@ always_comb begin
         else if (dcache[dcache_format.idx][1].valid && 
                  (dcache_format.tag == dcache[dcache_format.idx][1].tag)) begin
           dcif.dhit = 1'b1;
+          acif.drecvhit = 1'b1;
           next_hit_count = hit_count + 1;
           next_lru[dcache_format.idx] = 1'b0;
           if (dcif.dmemWEN) begin
