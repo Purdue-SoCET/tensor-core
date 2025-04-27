@@ -19,17 +19,17 @@ always_comb begin : LOAD_STORE
     mlsif.fu_matls_out = '0;
     if (mlsif.enable) begin     // LOAD STORE ENABLE
         if (mlsif.ls_in == M_LOAD) begin   // LOAD
-            mlsif.fu_matls_out.ls_out.mat_op = M_LOAD;
-            mlsif.fu_matls_out.ls_out.mat_rd = mlsif.rd_in;
+            mlsif.fu_matls_out.ls_out.opcode = matrix_mem_t'(M_LOAD);
+            mlsif.fu_matls_out.ls_out.ls_matrix_rd_gemm_new_weight = mlsif.rd_in;
             // mlsif.fu_matls_out.stride_out = mlsif.stride_in;
-            mlsif.fu_matls_out.ls_out.mat_addr = mlsif.rs_in + mlsif.imm_in;
+            mlsif.fu_matls_out.ls_out.ls_addr_gemm_gemm_sel = mlsif.rs_in + mlsif.imm_in;
         end
 
         else if (mlsif.ls_in == M_STORE) begin  // STORE
-            mlsif.fu_matls_out.ls_out.mat_op = M_STORE;
-            mlsif.fu_matls_out.ls_out.mat_rd = mlsif.rd_in;
+            mlsif.fu_matls_out.ls_out.opcode = matrix_mem_t'(M_STORE);
+            mlsif.fu_matls_out.ls_out.ls_matrix_rd_gemm_new_weight = mlsif.rd_in;
             // mlsif.fu_matls_out.stride_out = mlsif.stride_in;
-            mlsif.fu_matls_out.ls_out.mat_addr = mlsif.rs_in + mlsif.imm_in;
+            mlsif.fu_matls_out.ls_out.ls_addr_gemm_gemm_sel = mlsif.rs_in + mlsif.imm_in;
         end
     end
 end

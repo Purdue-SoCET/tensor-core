@@ -1,7 +1,11 @@
 `ifndef SP_TYPES_PKG_VH
 `define SP_TYPES_PKG_VH
 
-package types_pkg;
+`include "isa_types.vh"
+
+  package sp_types_pkg;
+  import isa_pkg::*;
+  
   parameter WORD_W = 32;
   parameter REG_W  = 5;
   parameter MATRIX_W = 4;
@@ -45,8 +49,8 @@ package types_pkg;
 
   typedef struct packed {
     logic [1:0] opcode;
-    logic [MAT_S_W+2-1:0] ls_matrix_rd_gemm_new_weight;
-    logic [WORD_W-1:0] ls_addr_gemm_gemm_sel;
+    matbit_t ls_matrix_rd_gemm_new_weight;
+    word_t ls_addr_gemm_gemm_sel;
   } instrFIFO_t;
 
   /*

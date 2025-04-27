@@ -10,7 +10,7 @@ package isa_pkg;
   parameter OP_W      = 7;
 
   parameter REG_W     = 5;
-  parameter MATRIX_W  = 4;
+  parameter MATRIX_W  = 6;
   parameter FUNC7_W   = OP_W;
   parameter FUNC3_W   = 3;
   parameter IMM_W_I   = 12;
