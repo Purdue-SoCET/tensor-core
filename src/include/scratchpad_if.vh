@@ -1,6 +1,6 @@
 `ifndef  SCRATCHPAD_IF_VH
 `define SCRATCHPAD_IF_VH
-`include "types_pkg.vh"
+`include "sp_types_pkg.vh"
 import sp_types_pkg::*;
 
 interface scratchpad_if;

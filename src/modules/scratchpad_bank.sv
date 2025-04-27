@@ -1,7 +1,7 @@
 `include "sp_types_pkg.vh"
 `include "scratchpad_bank_if.vh"
-`include "types_pkg.vh"
-import types_pkg::*;
+`include "sp_types_pkg.vh"
+import sp_types_pkg::*;
 
 module scratchpad_bank (
     input logic CLK, nRST,

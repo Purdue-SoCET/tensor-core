@@ -1,7 +1,7 @@
 `ifndef  LOAD_FSM_IF_VH
 `define LOAD_FSM_IF_VH
-`include "types_pkg.vh"
-import types_pkg::*;
+`include "sp_types_pkg.vh"
+import sp_types_pkg::*;
 
 interface load_FSM_if;
     

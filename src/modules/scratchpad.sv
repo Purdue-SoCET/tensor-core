@@ -5,7 +5,7 @@
 `include "dramstore_FSM_if.vh"
 `include "bank_access_FSM_if.vh"
 
-import types_pkg::*;
+import sp_types_pkg::*;
 
 module scratchpad (
     input logic CLK, nRST,

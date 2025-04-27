@@ -1,8 +1,8 @@
 
 `ifndef  GEMM_FSM_IF_VH
 `define GEMM_FSM_IF_VH
-`include "types_pkg.vh"
-import types_pkg::*;
+`include "sp_types_pkg.vh"
+import sp_types_pkg::*;
 
 
 interface gemm_FSM_if;

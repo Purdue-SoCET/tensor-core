@@ -3,7 +3,7 @@
 /*
 ***** Fifo has space not implemented.
 */
-import types_pkg::*;
+import sp_types_pkg::*;
 
 module gemm_FSM (
     input logic CLK, nRST,

@@ -1,9 +1,9 @@
 `ifndef  SCRATCHPAD_BANK_IF_VH
 `define SCRATCHPAD_BANK_IF_VH
-`include "types_pkg.vh"
+`include "sp_types_pkg.vh"
 
 interface scratchpad_bank_if;
-    import types_pkg::*;
+    import sp_types_pkg::*;
     logic wFIFO_WEN, rFIFO_WEN, dramFIFO_REN, gemmFIFO_REN;
     wFIFO_t wFIFO_wdata;
     rFIFO_t rFIFO_wdata;

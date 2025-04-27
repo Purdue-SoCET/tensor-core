@@ -1,7 +1,7 @@
 `ifndef BANK_ACCESS_FM_IF
 `define BANK_ACCESS_FM_IF
-`include "types_pkg.vh"
-import types_pkg::*;
+`include "sp_types_pkg.vh"
+import sp_types_pkg::*;
 
 interface bank_access_FSM_if;
 

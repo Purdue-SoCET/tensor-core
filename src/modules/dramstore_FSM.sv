@@ -1,6 +1,6 @@
 `include "sp_types_pkg.vh"
 `include "dramstore_FSM_if.vh"
-import types_pkg::*;
+import sp_types_pkg::*;
 
 module dramstore_FSM (
     input logic CLK, nRST,

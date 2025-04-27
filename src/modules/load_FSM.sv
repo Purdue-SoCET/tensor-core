@@ -1,6 +1,6 @@
 `include "sp_types_pkg.vh"
 `include "load_FSM_if.vh"
-import types_pkg::*;
+import sp_types_pkg::*;
 
 module load_FSM (
     input logic CLK, nRST,
