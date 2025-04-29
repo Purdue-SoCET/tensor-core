@@ -1,6 +1,7 @@
 QuestaSim-64 vlog 2021.4 Compiler 2021.10 Oct 13 2021
-Start time: 02:15:17 on Apr 05,2025
-vlog -reportprogress 300 -work work "+acc" -l vcs.log -sv "+define+DDR4_4G_X8" dram_command.sv arch_package.sv proj_package.sv interface.sv ddr4_model.svp dram_command_tb.sv scheduler_buffer.sv data_transfer.sv socetlib_counter.sv 
+Start time: 17:09:09 on Apr 27,2025
+vlog -reportprogress 300 -work work "+acc" -l vcs.log -sv "+define+DDR4_4G_X8" arch_defines.v dimm.vh dram_command.sv arch_package.sv proj_package.sv interface.sv ddr4_model.svp dram_cmd_dimm_tb.sv scheduler_buffer.sv data_transfer.sv socetlib_counter.sv edge_det.sv edge_det_if.vh 
+-- Compiling package dimm_vh_unit
 -- Compiling package dram_pack
 -- Compiling interface dram_command_if
 -- Importing package dram_pack
@@ -11,14 +12,15 @@ vlog -reportprogress 300 -work work "+acc" -l vcs.log -sv "+define+DDR4_4G_X8" d
 -- Compiling interface DDR4_if
 -- Importing package proj_package
 -- Compiling package dram_pack
-** Warning: ** while parsing file included at dram_command_tb.sv(1)
+** Warning: ** while parsing file included at dram_cmd_dimm_tb.sv(1)
 ** at dram_command_if.vh(4): (vlog-2275) Existing package 'dram_pack' at line 4 will be overwritten.
 -- Compiling interface dram_command_if
-** Warning: ** while parsing file included at dram_command_tb.sv(1)
+** Warning: ** while parsing file included at dram_cmd_dimm_tb.sv(1)
 ** at dram_command_if.vh(159): (vlog-2275) Existing interface 'dram_command_if' at line 159 will be overwritten.
 -- Compiling interface scheduler_buffer_if
 -- Compiling interface data_transfer_if
--- Compiling module dram_command_tb
+-- Compiling package dram_cmd_dimm_tb_sv_unit
+-- Compiling module dram_cmd_dimm_tb
 -- Compiling package dram_pack
 ** Warning: ** while parsing file included at scheduler_buffer.sv(1)
 ** while parsing file included at scheduler_buffer_if.vh(3)
@@ -42,11 +44,31 @@ vlog -reportprogress 300 -work work "+acc" -l vcs.log -sv "+define+DDR4_4G_X8" d
 -- Compiling interface data_transfer_if
 ** Warning: ** while parsing file included at data_transfer.sv(1)
 ** at data_transfer_if.vh(6): (vlog-2275) Existing interface 'data_transfer_if' at line 6 will be overwritten.
+-- Compiling interface edge_det_if
 -- Compiling module data_transfer
-** Warning: data_transfer.sv(64): (vlog-2600) [RDGN] - Redundant digits in numeric literal.
 -- Compiling module socetlib_counter
+-- Compiling package dram_pack
+** Warning: ** while parsing file included at edge_det.sv(1)
+** while parsing file included at edge_det_if.vh(3)
+** at dram_command_if.vh(4): (vlog-2275) Existing package 'dram_pack' at line 4 will be overwritten.
+-- Compiling interface dram_command_if
+** Warning: ** while parsing file included at edge_det.sv(1)
+** while parsing file included at edge_det_if.vh(3)
+** at dram_command_if.vh(159): (vlog-2275) Existing interface 'dram_command_if' at line 159 will be overwritten.
+-- Compiling interface edge_det_if
+** Warning: ** while parsing file included at edge_det.sv(1)
+** at edge_det_if.vh(4): (vlog-2275) Existing interface 'edge_det_if' at line 4 will be overwritten.
+-- Compiling module edge_det
+-- Compiling package dram_pack
+** Warning: ** while parsing file included at edge_det_if.vh(3)
+** at dram_command_if.vh(4): (vlog-2275) Existing package 'dram_pack' at line 4 will be overwritten.
+-- Compiling interface dram_command_if
+** Warning: ** while parsing file included at edge_det_if.vh(3)
+** at dram_command_if.vh(159): (vlog-2275) Existing interface 'dram_command_if' at line 159 will be overwritten.
+-- Compiling interface edge_det_if
+** Warning: edge_det_if.vh(4): (vlog-2275) Existing interface 'edge_det_if' at line 4 will be overwritten.
 
 Top level modules:
-	dram_command_tb
-End time: 02:15:18 on Apr 05,2025, Elapsed time: 0:00:01
-Errors: 0, Warnings: 9
+	dram_cmd_dimm_tb
+End time: 17:09:09 on Apr 27,2025, Elapsed time: 0:00:00
+Errors: 0, Warnings: 14

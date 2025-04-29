@@ -31,7 +31,7 @@ icache:
 	vsim $(SIMTERM) -voptargs="+acc" work.$*_tb -do $(SIMDO)
 
 %.wav:
-	vlog -sv +incdir+./src/include ./src/testbench/$*_tb.sv ./src/modules/socetlib_counter.sv ./src/modules/$*.sv
+	vlog -sv +incdir+./src/include ./src/testbench/$*_tb.sv ./src/modules/socetlib_counter.sv ./src/modules/edge_det.sv ./src/modules/$*.sv
 	vsim -voptargs="+acc" work.$*_tb -do "do $(SCRDIR)/$*.do; run $(SIMTIME);" -suppress 2275
 
 

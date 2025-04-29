@@ -40,8 +40,7 @@ module dram_command_tb;
                  golden_model(.model_enable(model_enable), .iDDR4(iDDR4));
 
 
-    // /Interface between iDDR4 and data transfer
-
+    //Interface between iDDR4 and data transfer
     assign iDDR4.DQ = dq_en ?     dt_if.DQ : {MAX_DQ_BITS{1'bz}};
     assign iDDR4.DQS_t = dq_en ? dt_if.DQS_t : {MAX_DQS_BITS{1'bz}};
     assign iDDR4.DQS_c = dq_en ? dt_if.DQS_c : {MAX_DQS_BITS{1'bz}};
@@ -63,6 +62,7 @@ module dram_command_tb;
       dc_if.R0 = {'0, ramaddr_phy.row};
       dc_if.R1 = {'0, ramaddr_phy_ft.row};
       dc_if.COL0 = {'0, ramaddr_phy.col_1, ramaddr_phy.col_0};
+      // dc_if.COL0 = {'0, ramaddr_phy.col_1, 3'b10};
       dc_if.COL1  = {'0, ramaddr_phy_ft.col_1, ramaddr_phy_ft.col_0};
       dc_if.BG0   = {'0, ramaddr_phy.bg1, ramaddr_phy.bg0};
       dc_if.BG1   = {'0, ramaddr_phy_ft.bg1, ramaddr_phy_ft.bg0};
@@ -117,11 +117,11 @@ module dram_command_tb;
 
       //Add request
       //add_request(.addr(32'hAAAA_BBBB), .write(1'b1), .data(32'hDDCC_BBAA));
-      add_request(.addr(32'h0), .write(1'b1), .data(32'hDDCC_BBAA));
+      add_request(.addr({'0, 3'd2,2'b00}), .write(1'b1), .data(32'hDDCC_BBAA));
       repeat (200) @(posedge CLK);
 
       task_name = "Add Read";
-      add_request(.addr(32'h0), .write(1'b0), .data(32'hDDCC_BBAA));
+      add_request(.addr({'0, 3'd1,2'b00}), .write(1'b0), .data(32'hDDCC_BBAA));
       dq_en = 1'b0;
       task_name = "Done add Read";
       repeat (200) @(posedge CLK);

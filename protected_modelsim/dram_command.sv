@@ -818,21 +818,23 @@ module dram_command (
                     dr_ram.RAS_n_A16 = 1'b1; 
                     dr_ram.CAS_n_A15 = 1'b0;
                     dr_ram.WE_n_A14 =  1'b0;
-                    dr_ram.ADDR = {1'b0, FLY_BY, 1'b0, NO_AUTO_PRE, dr_sche.COL0};
+                    // dr_ram.ADDR = {1'b0, ~FLY_BY, 1'b0, NO_AUTO_PRE, dr_sche.COL0};
+                    dr_ram.ADDR = {1'b0, 1'b1, 1'b0, 1'b0, dr_sche.COL0};
                 end else begin
                     cmd_addr = DESEL_CMD;
                     dr_ram.BG = dr_sche.BG0;
                     dr_ram.BA = dr_sche.BA0;
-                    dr_ram.ADDR = {1'b0, FLY_BY, 1'b0, NO_AUTO_PRE, dr_sche.COL0};
+                    // dr_ram.ADDR = {1'b0, ~FLY_BY, 1'b0, NO_AUTO_PRE, dr_sche.COL0};
+                    dr_ram.ADDR = {1'b0, 1'b1, 1'b0, 1'b0, dr_sche.COL0};
                 end
-                dr_sche.wr_en = 1'b1;
-                // if (timing_count > tWL + tBURST) begin
-                //     dr_sche.wr_en = 1'b0;
-                // end
-                // else if (timing_count > tWL) begin
-                //     time_bug = 1'b1;
-                //     dr_sche.wr_en = 1'b1;
-                // end
+                // dr_sche.wr_en = 1'b1;
+                if (timing_count > 16) begin
+                    dr_sche.wr_en = 1'b0;
+                end
+                else if (timing_count > 10) begin
+                    time_bug = 1'b1;
+                    dr_sche.wr_en = 1'b1;
+                end
 
                 if (timing_count == rollover_value) begin
                     dr_sche.request_done = 1'b1;
@@ -844,20 +846,24 @@ module dram_command (
                     dr_ram.BG = dr_sche.BG0;
                     dr_ram.BA = dr_sche.BA0;
                     
-                    dr_ram.ADDR = {1'b0, FLY_BY, 1'b0, NO_AUTO_PRE, dr_sche.COL0};
+                    // dr_ram.ADDR = {1'b0, FLY_BY, 1'b0, NO_AUTO_PRE, dr_sche.COL0};
+                    // dr_ram.ADDR = {1'b0, ~FLY_BY, 1'b0, NO_AUTO_PRE, dr_sche.COL0};
+                    dr_ram.ADDR = {1'b0, 1'b1, 1'b0, 1'b0, dr_sche.COL0};
                 end else begin
                     cmd_addr = DESEL_CMD;
                     dr_ram.BG = dr_sche.BG0;
                     dr_ram.BA = dr_sche.BA0;
-                    dr_ram.ADDR = {1'b0, FLY_BY, 1'b0, NO_AUTO_PRE, dr_sche.COL0};
+                    dr_ram.ADDR = {1'b0, 1'b1, 1'b0, 1'b0, dr_sche.COL0};
+                    // dr_ram.ADDR = {1'b0, FLY_BY, 1'b0, NO_AUTO_PRE, dr_sche.COL0};
                 end
 
-                if (timing_count > tCAS + tBURST) begin
-                    dr_sche.rd_en = 1'b0;
-                end else if (timing_count > tCAS) begin
-                    time_bug = 1'b1;
-                    dr_sche.rd_en = 1'b1;
-                end
+                dr_sche.rd_en = 1'b1;
+                // if (timing_count > tCAS + tBURST + 2) begin
+                //     dr_sche.rd_en = 1'b0;
+                // end else if (timing_count > tCAS) begin
+                //     time_bug = 1'b1;
+                //     dr_sche.rd_en = 1'b1;
+                // end
 
                 if (timing_count == rollover_value) begin
                     dr_sche.request_done = 1'b1;

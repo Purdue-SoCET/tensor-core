@@ -190,7 +190,7 @@ interface dram_command_if();
     logic [MAX_RANK_BITS - 1 : 0]Ra0, Ra1; //Rank prev and curr
     logic [MAX_BANK_BITS - 1 : 0] BA0, BA1; //bank prev and curr
     logic [MAX_ROW_ADDR_BITS - 1 : 0] R0, R1; //Rol prev and curr
-    logic [MAX_COL_ADDR_BITS - 1 : 0]COL0, COL1; //Col prev and curr
+    logic [10 - 1 : 0]COL0, COL1; //Col prev and curr
     logic [MAX_BANK_GROUP_BITS - 1: 0] BG0, BG1;
     logic ramREN_curr, ramWEN_curr, ramREN_ftrt, ramWEN_ftrt;
     
