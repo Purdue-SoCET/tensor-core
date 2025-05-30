@@ -1,5 +1,5 @@
 QuestaSim-64 vlog 2021.4 Compiler 2021.10 Oct 13 2021
-Start time: 17:09:09 on Apr 27,2025
+Start time: 00:32:05 on May 02,2025
 vlog -reportprogress 300 -work work "+acc" -l vcs.log -sv "+define+DDR4_4G_X8" arch_defines.v dimm.vh dram_command.sv arch_package.sv proj_package.sv interface.sv ddr4_model.svp dram_cmd_dimm_tb.sv scheduler_buffer.sv data_transfer.sv socetlib_counter.sv edge_det.sv edge_det_if.vh 
 -- Compiling package dimm_vh_unit
 -- Compiling package dram_pack
@@ -70,5 +70,5 @@ vlog -reportprogress 300 -work work "+acc" -l vcs.log -sv "+define+DDR4_4G_X8" a
 
 Top level modules:
 	dram_cmd_dimm_tb
-End time: 17:09:09 on Apr 27,2025, Elapsed time: 0:00:00
+End time: 00:32:06 on May 02,2025, Elapsed time: 0:00:01
 Errors: 0, Warnings: 14
