@@ -52,6 +52,7 @@ module issue(
     logic i_type;
     logic lui_type;
     logic n_halt;
+    fust_s_row_t [2:0] out_op;
 
     // incoming_instr signal holds what fu is needed by that instr
     always_comb begin : Incoming_Instr_Logic
@@ -95,6 +96,10 @@ module issue(
       rfif.rsel1 = s_rs1;
       rfif.rsel2 = s_rs2;
     end
+
+    assign out_op[0] = fusif.out_op_alu;
+    assign out_op[1] = fusif.out_op_sls;
+    assign out_op[2] = fusif.out_op_br;
 
     // writing the fust logic from dispatch combinationally - key area for speed up but possible loss in cycles
     always_comb begin : FUST
@@ -193,7 +198,7 @@ module issue(
           FUST_EMPTY: n_rdy[i] = 1'b0;
           FUST_WAIT: begin // implies instruction is already loaded
             if (i < 3) begin // Scalar FUST
-              n_rdy[i] = (!(|fusif.fust.t1[i]) && !(|fusif.fust.t2[i]));
+              n_rdy[i] = (!(|fusif.out_t1[i]) && !(|fusif.out_t2[i]));
             end else if (i == 3) begin // Matrix LD/ST FUST
               n_rdy[i] = (!(|fumif.fust.t1) && !(|fumif.fust.t2));
             end else if (i == 4) begin // GEMM FUST
@@ -249,7 +254,7 @@ module issue(
         for (int i = 0; i < 5; i++) begin
           if (isif.branch_miss) begin
             next_fust_state[2] = FUST_EMPTY;
-            if ((i < 3) && fusif.fust.op[i].spec) begin
+            if ((i < 3) && out_op[i].spec) begin
               next_fust_state[i] = FUST_EMPTY;
             end
             else if ((i == 3) && fumif.fust.op.spec) begin
@@ -266,7 +271,7 @@ module issue(
               end
               FUST_WAIT: begin
                 if (n_rdy[i]) begin
-                  if ((i==3 || i==4 || i==1) && fusif.fust.op[i].spec) begin
+                  if (((out_op[1].spec && i==1) || (fumif.fust.op.spec && i==3) || (fugif.fust.op.spec && i==4))) begin
                     next_fust_state[i] = FUST_RDY;
                   end 
                   else begin
@@ -275,7 +280,7 @@ module issue(
                 end
               end
               FUST_RDY: begin
-                if ((i==3 || i==4 || i==1) && fusif.fust.op[i].spec) begin 
+                if (((out_op[1].spec && i==1) || (fumif.fust.op.spec && i==3) || (fugif.fust.op.spec && i==4))) begin 
                     next_fust_state[i] = FUST_RDY;
                 end 
                 else begin 
@@ -331,7 +336,7 @@ module issue(
       lui_type = '0;
       issue.halt = '0;
       // halt is only set when all instructions that come before are done and there is no branch miss
-      if (!(|isif.fust_s.busy || isif.fust_m.busy || isif.fust_g.busy || isif.branch_miss)) begin
+      if (!(|isif.fust_s_out_busy || isif.fust_m.busy || isif.fust_g.busy || isif.branch_miss)) begin
         issue.halt = halt;
       end
       for (int i = 0; i < 5; i++) begin
@@ -340,20 +345,20 @@ module issue(
         end
         if (fust_state[i] != FUST_EX && next_fust_state[i] == FUST_EX) begin // state going from either wait or rdy to ex
           if (i < 3) begin // scakar alu, scalar ld/st, br
-            s_rs1 = fusif.fust.op[i].rs1;
-            s_rs2 = fusif.fust.op[i].rs2;
-            i_type = fusif.fust.op[i].i_type;
-            lui_type = fusif.fust.op[i].lui;
+            s_rs1 = out_op[i].rs1;
+            s_rs2 = out_op[i].rs2;
+            i_type = out_op[i].i_type;
+            lui_type = out_op[i].lui;
             issue.fu_en[i] = 1'b1;
-            imm = fusif.fust.op[i].imm;
-            issue.alu_op = aluop_t'(fusif.fust.op[i].op_type);
-            issue.mem_type = scalar_mem_t'(fusif.fust.op[i].mem_type);
-            issue.branch_type = branch_t'(fusif.fust.op[i].op_type);
+            imm = out_op[i].imm;
+            issue.alu_op = aluop_t'(out_op[i].op_type);
+            issue.mem_type = scalar_mem_t'(out_op[i].mem_type);
+            issue.branch_type = branch_t'(out_op[i].op_type);
             issue.branch_pc = isif.dispatch.n_br_pc;
             issue.branch_pred_pc = isif.dispatch.n_br_pred;
-            issue.rd = fusif.fust.op[i].rd;
-            issue.spec = ((i==0 || i==1) && !isif.branch_resolved && !isif.branch_miss) ? fusif.fust.op[i].spec : '0; // pretty sure only on alu instr
-            issue.j_type = fusif.fust.op[i].j_type;
+            issue.rd = out_op[i].rd;
+            issue.spec = ((i==0 || i==1) && !isif.branch_resolved && !isif.branch_miss) ? out_op[i].spec : '0; // pretty sure only on alu instr
+            issue.j_type = out_op[i].j_type;
           end else if (i == 3) begin // matrix ld/st
             issue.md = fumif.fust.op.md;
             issue.ls_in = fumif.fust.op.mem_type;
@@ -369,7 +374,7 @@ module issue(
             issue.fu_en[i] = 1'b1;
           end
           issue.rdat1 = (lui_type) ? '0 : rfif.rdat1;
-          issue.rdat2 = (i_type && (fusif.fust.op[i].mem_type == scalar_na) && (issue.fu_en[2] != 1'b1)) ? imm : rfif.rdat2;
+          issue.rdat2 = (i_type) ? imm : rfif.rdat2;
           issue.imm = imm;
         end
       end
@@ -377,7 +382,12 @@ module issue(
 
     // fusts are sent back to dispatch - connected in scoreboard.sv
     always_comb begin : Dispatch_Loopback
-      isif.fust_s = fusif.fust;
+      isif.fust_s_out_busy = fusif.out_busy;
+      isif.fust_s_out_t1   = fusif.out_t1;
+      isif.fust_s_out_t2   = fusif.out_t2;
+      isif.fust_s_out_op_alu   = out_op[0];
+      isif.fust_s_out_op_sls   = out_op[1];
+      isif.fust_s_out_op_br    = out_op[2];
       isif.fust_m = fumif.fust;
       isif.fust_g = fugif.fust;
     end

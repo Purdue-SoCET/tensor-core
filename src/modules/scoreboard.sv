@@ -25,7 +25,14 @@ module scoreboard(
       diif.fetch = sbif.fetch;
 
       // fusts coming from issue to dispatch
-      diif.fust_s = isif.fust_s;
+      // diif.fust_s = isif.fust_s;
+      diif.fust_s_out_busy = isif.fust_s_out_busy;
+      diif.fust_s_out_t1 = isif.fust_s_out_t1;  
+      diif.fust_s_out_t2 = isif.fust_s_out_t2;  
+      diif.fust_s_out_op_alu = isif.fust_s_out_op_alu;
+      diif.fust_s_out_op_sls = isif.fust_s_out_op_sls;
+      diif.fust_s_out_op_br = isif.fust_s_out_op_br;
+
       diif.fust_m = isif.fust_m;
       diif.fust_g = isif.fust_g;
       diif.fust_state = isif.fust_state;

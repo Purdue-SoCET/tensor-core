@@ -51,7 +51,6 @@ module control_unit(
                     XOR: cu_if.alu_op = ALU_XOR;
                     SLT: cu_if.alu_op = ALU_SLT;
                     SLTU: cu_if.alu_op = ALU_SLTU;
-                    default: cu_if.alu_op = aluop_t'('0);
                 endcase
             end
         ITYPE: 
@@ -69,7 +68,6 @@ module control_unit(
                     SRLI_SRAI: cu_if.alu_op = (instr[31:25] == 7'h20) ? ALU_SRA : ALU_SRL;
                     SLTI: cu_if.alu_op = ALU_SLT;
                     SLTIU: cu_if.alu_op = ALU_SLTU;
-                    default: cu_if.alu_op = aluop_t'('0);
                 endcase
             end
         ITYPE_LW:
@@ -87,7 +85,7 @@ module control_unit(
             begin
                 if (instr[14:12] == 3'h2) begin 
                     cu_if.imm = {{20{instr[31]}},instr[31:25],instr[11:7]};
-                    cu_if.i_flag = '1;
+                    // cu_if.i_flag = '1;
                     // cu_if.alu_op = ALU_ADD
                     cu_if.s_mem_type = STORE;
                     cu_if.fu_s = FU_S_LD_ST;
@@ -183,7 +181,7 @@ module control_unit(
                 cu_if.matrix_rd = instr[31:28];
                 cu_if.m_reg_write = '1;
                 cu_if.fu_t = FU_M_T;
-                cu_if.i_flag = '1;
+                // cu_if.i_flag = '1;
             end
         ST_M: //st.m
             begin
@@ -193,7 +191,7 @@ module control_unit(
                 cu_if.m_mem_type = M_STORE;
                 cu_if.matrix_rd = instr[31:28];
                 cu_if.fu_t = FU_M_T;
-                cu_if.i_flag = '1;
+                // cu_if.i_flag = '1;
             end
         GEMM: // gemm.m
             begin
