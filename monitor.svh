@@ -1,24 +1,24 @@
 import uvm_pkg::*;
 `include "uvm_macros.svh"
-`include "adder_if.svh"
+`include "systolic_if.svh"
 
 class monitor extends uvm_monitor;
   `uvm_component_utils(monitor)
 
-  virtual adder_if vif;
+  virtual systolic_if vif;
 
-  uvm_analysis_port#(transaction) adder_ap;
+  uvm_analysis_port#(transaction) systolic_ap;
   uvm_analysis_port#(transaction) result_ap;
   transaction prev_tx; // check if new transaction has been sent
 
   function new(string name, uvm_component parent = null);
     super.new(name, parent);
-    adder_ap = new("adder_ap", this);
+    systolic_ap = new("systolic_ap", this);
     result_ap = new("result_ap", this);
   endfunction: new
 
   virtual function void build_phase(uvm_phase phase);
-    if (!uvm_config_db#(virtual adder_if)::get(this, "", "adder_vif", vif)) begin
+    if (!uvm_config_db#(virtual systolic_if)::get(this, "", "systolic_vif", vif)) begin
       `uvm_fatal("Monitor", "No virtual interface specified for this monitor instance")
     end
   endfunction

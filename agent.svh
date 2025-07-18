@@ -1,6 +1,6 @@
 import uvm_pkg::*;
 `include "uvm_macros.svh"
-`include "sequence.svh"
+`include "sequencer.svh"
 `include "driver.svh"
 `include "monitor.svh"
 

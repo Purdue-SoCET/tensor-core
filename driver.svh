@@ -1,11 +1,11 @@
 import uvm_pkg::*;
 `include "uvm_macros.svh"
-`include "sys_if.svh"
+`include "systolic_if.svh"
 
 class driver extends uvm_driver#(transaction);
   `uvm_component_utils(driver)
 
-  virtual sys_if vif;
+  virtual systolic_if vif;
 
   function new(string name, uvm_component parent);
     super.new(name, parent);
@@ -14,7 +14,7 @@ class driver extends uvm_driver#(transaction);
   function void build_phase(uvm_phase phase);
     super.build_phase(phase);
     // get interface
-    if(!uvm_config_db#(virtual sys_if)::get(this, "", "sys_vif", vif)) begin
+    if(!uvm_config_db#(virtual systolic_if)::get(this, "", "systolic_vif", vif)) begin
       `uvm_fatal("Driver", "No virtual interface specified for this test instance");
     end
   endfunction: build_phase

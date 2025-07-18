@@ -1,3 +1,5 @@
+`include "sys_arr_pkg.vh"
+import sys_arr_pkg::*;
 
 class transaction #(parameter NUM_BITS = 4) extends uvm_sequence_item;
   
