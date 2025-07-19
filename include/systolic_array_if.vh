@@ -6,7 +6,7 @@
 import sys_arr_pkg::*;
 /* verilator lint_off IMPORTSTAR */
 
-interface systolic_array_if;
+interface systolic_array_if(input logic clk);
 
   // Signals
   logic weight_en;        // Current input bus is for array weights
@@ -26,7 +26,7 @@ interface systolic_array_if;
   //memory to systolic array
   modport memory_array (  
     input  weight_en, input_en, partial_en, row_in_en, row_ps_en, array_in, array_in_partials,
-    output drained, fifo_has_space, row_out, array_output, out_en
+    output drained, fifo_has_space, row_out, array_output, out_en, clk
   );
   //systolic array to memory
   modport array_memory(   
