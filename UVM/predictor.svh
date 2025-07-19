@@ -21,7 +21,17 @@ class predictor extends uvm_subscriber#(transaction);
     output_tx.copy(t);
 
     // calculate expected sum and expected overflow
-    {output_tx.out_matrix} = (t.input_matrix * t.weight_matrix + t.partial_matrix);
+
+    for(int i =0;i < 4;i++) begin
+      output_tx.out_matrix[i][j] = t.partial_matrix[i][j];
+        for(int j = 0; j < 4; j++) begin
+
+          for(int k = 0; k < 4; k++) begin
+          output_tx.out_matrix[i][((j+1)*16)-1 : j*16] += t.input_matrix[i][j+k] * t.weight_matrix[i+k][((j+1)*16)-1 : j*16];
+          end
+        end
+    end
+    // {output_tx.out_matrix} = (t.input_matrix * t.weight_matrix + t.partial_matrix);
 
     // send expected output to scoreboard
     pred_ap.write(output_tx);

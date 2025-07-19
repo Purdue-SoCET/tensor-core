@@ -48,7 +48,23 @@ class transaction #(parameter NUM_BITS = 4) extends uvm_sequence_item; // NUM_BI
   function new(string name = "transaction");
     super.new(name);
   endfunction: new
-  
+
+   constraint input_matrix_c {
+  foreach (input_matrix[i]) {
+    input_matrix[i] == 64'h0001000100010001;
+  }
+}
+
+   constraint input_matrix_c {
+  foreach (weight_matrix[i]) {
+    weight_matrix[i] == 64'h0001000100010001;
+  }
+}
+     constraint input_matrix_c {
+  foreach (partial_matrix[i]) {
+    partial_matrix[i] == 64'h0001000100010001;
+  }
+}
 
   // if two transactions are the same, return 1
   // function int input_equal(transaction tx);

@@ -10,17 +10,25 @@ class systolic_sequence extends uvm_sequence#(transaction);
   endfunction: new
 
   task body();
+    
     transaction req_item;
     req_item = transaction#(4)::type_id::create("req_item");
-    
+    `uvm_info ("Sequence", $sformatf ("Before Start Item"), UVM_NONE)
     // Pass matrices
     
     repeat(1) begin
+      `uvm_info ("Sequence", $sformatf ("Before Start Item"), UVM_NONE)
       start_item(req_item);
+      `uvm_info ("Sequence", $sformatf ("After Start Item"), UVM_NONE)
       if(!req_item.randomize()) begin
         `uvm_fatal("Sequence", "Not able to randomize")
       end
+      else begin
+        `uvm_info ("Sequence", $sformatf ("Randomise Succesful"), UVM_NONE)
+  
+      end
       finish_item(req_item);
+      `uvm_info ("Sequence", $sformatf ("Randomise Succesful"), UVM_NONE)
     end
 
   

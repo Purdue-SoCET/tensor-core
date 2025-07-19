@@ -1,0 +1,25 @@
+# compile verilog/system verilog design source files
+sv xil_defaultlib  --include "../../../../../../../../../../Xilinx/2025.1/Vivado/data/rsb/busdef" --include "../../../../../" \
+"../../../../../ADD_step1.sv" \
+"../../../../../ADD_step2.sv" \
+"../../../../../ADD_step3.sv" \
+"../../../../../MUL_step1.sv" \
+"../../../../../adder_13b.sv" \
+"../../../../../adder_5b.sv" \
+"../../../../../left_shift.sv" \
+"../../../../../mul_multicycle.sv" \
+"../../../../../s_to_u.sv" \
+"../../../../../sysarr_FIFO.sv" \
+"../../../../../sysarr_MAC.sv" \
+"../../../../../sysarr_OUT_FIFO.sv" \
+"../../../../../sysarr_add.sv" \
+"../../../../../sysarr_control_unit.sv" \
+"../../../../../systolic_array.sv" \
+"../../../../../u_to_s.sv" \
+"../../../../../tb_systolic.sv" \
+
+# compile glbl module
+verilog xil_defaultlib "glbl.v"
+
+# Do not sort compile order
+nosort

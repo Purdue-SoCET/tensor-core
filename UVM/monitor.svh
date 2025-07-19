@@ -50,6 +50,14 @@ class monitor extends uvm_monitor;
       repeat(4)@(posedge vif.clk); // for reset logic
       @(posedge vif.clk);
       tx = transaction#(4)::type_id::create("tx");
+
+            ////weight matrix
+      for(int i = 0;i < 4; i++) begin // does it elaborate all iterations at once?
+      @(posedge vif.clk);
+      tx.weight_matrix[i] = vif.array_in;
+      end
+      @(posedge vif.clk);
+      
   ////input matrix
       for(int i = 0;i < 4; i++) begin
       @(posedge vif.clk);
@@ -59,12 +67,7 @@ class monitor extends uvm_monitor;
       
 
 
-      ////weight matrix
-      for(int i = 0;i < 4; i++) begin // does it elaborate all iterations at once?
-      @(posedge vif.clk);
-      tx.weight_matrix[i] = vif.array_in;
-      end
-      @(posedge vif.clk);
+
 
       ////partial matrix
       for(int i = 0;i < 4; i++) begin

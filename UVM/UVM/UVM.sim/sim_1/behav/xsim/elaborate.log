@@ -1,0 +1,12 @@
+Vivado Simulator v2025.1.0
+Copyright 1986-2022 Xilinx, Inc. All Rights Reserved.
+Copyright 2022-2025 Advanced Micro Devices, Inc. All Rights Reserved.
+Running: C:/Xilinx/2025.1/Vivado/bin/unwrapped/win64.o/xelab.exe --incr --debug typical --relax --mt 2 -L xil_defaultlib -L uvm -L unisims_ver -L unimacro_ver -L secureip --snapshot tb_systolic_behav xil_defaultlib.tb_systolic xil_defaultlib.glbl -log elaborate.log -L uvm 
+Using 2 slave threads.
+WARNING: [XSIM 43-3431] One or more environment variables have been detected which affect the operation of the C compiler. These are typically not set in standard installations and are not tested by AMD, however they may be appropriate for your system, so the flow will attempt to continue.  If errors occur, try running xelab with the "-mt off -v 1" switches to see more information from the C compiler. The following environment variables have been detected:
+Starting static elaboration
+Pass Through NonSizing Optimizer
+WARNING: [VRFC 10-3091] actual bit length 32 differs from formal bit length 1 for port 'ovf_in' [C:/Users/abhil/SOCET_UVM/UVM---Tensor-Core/UVM/sysarr_MAC.sv:308]
+WARNING: [VRFC 10-3091] actual bit length 32 differs from formal bit length 1 for port 'ovf_in' [C:/Users/abhil/SOCET_UVM/UVM---Tensor-Core/UVM/sysarr_add.sv:131]
+Completed static elaboration
+INFO: [XSIM 43-4323] No Change in HDL. Linking previously generated obj files to create kernel
