@@ -47,7 +47,7 @@ class monitor extends uvm_monitor;
 
 
   //     end
-
+      repeat(4)@(posedge vif.clk); // for reset logic
       @(posedge vif.clk);
       tx = transaction#(4)::type_id::create("tx");
   ////input matrix

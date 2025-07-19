@@ -109,7 +109,7 @@ namespace XILINX_DPI {
 		DPIAllocateDPIScopes(1) ;
 		DPISetDPIScopeFunctionName(0, "m__uvm_report_dpi") ;
 		DPISetDPIScopeHierarchy(0, "uvm_pkg") ;
-		DPIRelocateDPIScopeIP(0, (char*)(0x4ac750)) ;
+		DPIRelocateDPIScopeIP(0, (char*)(0x4ac8a0)) ;
 		DPIAddDPIScopeAccessibleFunction(0, 0) ;
 	}
 

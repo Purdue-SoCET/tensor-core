@@ -33,4 +33,8 @@ module tb_systolic();
     run_test("test");
   end
 
+  initial begin
+    reset();
+  end
+
 endmodule

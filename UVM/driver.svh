@@ -33,6 +33,7 @@ class driver extends uvm_driver#(transaction);
       // @(posedge vif.clk);
 
       ////input matrix
+      repeat(4)@(posedge vif.clk); // for reset logic
       for(int i = 0;i < 4; i++) begin
       @(posedge vif.clk);
       vif.input_en <= 1;
