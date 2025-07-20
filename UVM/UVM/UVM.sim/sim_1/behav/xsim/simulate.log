@@ -1,0 +1,65 @@
+Time resolution is 1 ps
+UVM_INFO C:/Xilinx/2025.1/Vivado/data/system_verilog/uvm_1.2/xlnx_uvm_package.sv(18601) @ 0: reporter [UVM/RELNOTES] 
+----------------------------------------------------------------
+UVM-1.2
+(C) 2007-2014 Mentor Graphics Corporation
+(C) 2007-2014 Cadence Design Systems, Inc.
+(C) 2006-2014 Synopsys, Inc.
+(C) 2011-2013 Cypress Semiconductor Corp.
+(C) 2013-2014 NVIDIA Corporation
+----------------------------------------------------------------
+
+  ***********       IMPORTANT RELEASE NOTES         ************
+
+  You are using a version of the UVM library that has been compiled
+  with `UVM_NO_DEPRECATED undefined.
+
+  You are using a version of the UVM library that has been compiled
+  with `UVM_OBJECT_DO_NOT_NEED_CONSTRUCTOR undefined.
+
+      (Specify +UVM_NO_RELNOTES to turn off this notice)
+
+UVM_INFO @ 0: reporter [RNTST] Running test test...
+UVM_INFO C:/Xilinx/2025.1/Vivado/data/system_verilog/uvm_1.2/xlnx_uvm_package.sv(20867) @ 0: reporter [UVM/COMP/NAMECHECK] This implementation of the component name checks requires DPI to be enabled
+                   0 Starting sequence run_phase
+UVM_INFO ../../../../../driver.svh(27) @ 0: uvm_test_top.env.agt.drv [Driver] In Driver
+UVM_INFO ../../../../../sequence.svh(16) @ 0: uvm_test_top.env.agt.sqr@@seq [Sequence] Before Start Item
+UVM_INFO ../../../../../sequence.svh(20) @ 0: uvm_test_top.env.agt.sqr@@seq [Sequence] Before Start Item
+UVM_INFO ../../../../../sequence.svh(22) @ 0: uvm_test_top.env.agt.sqr@@seq [Sequence] After Start Item
+UVM_INFO ../../../../../sequence.svh(27) @ 0: uvm_test_top.env.agt.sqr@@seq [Sequence] Randomise Succesful
+UVM_INFO ../../../../../driver.svh(37) @ 0: uvm_test_top.env.agt.drv [Driver] Got item
+UVM_INFO ../../../../../driver.svh(40) @ 70000: uvm_test_top.env.agt.drv [Driver] Wait for reset over
+UVM_INFO ../../../../../driver.svh(27) @ 4830000: uvm_test_top.env.agt.drv [Driver] In Driver
+UVM_INFO @ 4830000: uvm_test_top.env.comp [Comparator] 
+Expected:
+array_output '{8935414023839611904,0,17787243530152072046,18158771953874304000}
+ ~~~~~~~~~~
+Actual:
+array_output '{18125437535387023702,18279082588248894852,18413243891308099795,17379649861936148861}
+
+UVM_INFO C:/Xilinx/2025.1/Vivado/data/system_verilog/uvm_1.2/xlnx_uvm_package.sv(9338) @ 4830000: reporter [MISCMP] Miscompare for output_tx.out_matrix: lhs = 'h7c00f7b67c00fc000000000000000000f6d8fbbff414536efc00eae1fc00fc00 : rhs = 'hfb8a7d67df467956fdac58c46c9a6d84ff88fbc2f80cf8d3f130eb77d55ef17d
+UVM_INFO C:/Xilinx/2025.1/Vivado/data/system_verilog/uvm_1.2/xlnx_uvm_package.sv(9362) @ 4830000: reporter [MISCMP] 1 Miscompare(s) for object tx@816 vs. output_tx@820
+UVM_INFO @ 4830000: uvm_test_top.env.comp [Comparator] Error: Data mismatch
+UVM_INFO ../../../../../sequence.svh(31) @ 4830000: uvm_test_top.env.agt.sqr@@seq [Sequence] Randomise Succesful
+UVM_INFO ../../../../../sequence.svh(20) @ 4830000: uvm_test_top.env.agt.sqr@@seq [Sequence] Before Start Item
+UVM_INFO ../../../../../sequence.svh(22) @ 4830000: uvm_test_top.env.agt.sqr@@seq [Sequence] After Start Item
+UVM_INFO ../../../../../sequence.svh(27) @ 4830000: uvm_test_top.env.agt.sqr@@seq [Sequence] Randomise Succesful
+UVM_INFO ../../../../../driver.svh(37) @ 4830000: uvm_test_top.env.agt.drv [Driver] Got item
+UVM_INFO ../../../../../driver.svh(40) @ 4910000: uvm_test_top.env.agt.drv [Driver] Wait for reset over
+UVM_INFO ../../../../../driver.svh(27) @ 9450000: uvm_test_top.env.agt.drv [Driver] In Driver
+UVM_INFO @ 9450000: uvm_test_top.env.comp [Comparator] 
+Expected:
+array_output '{12426668837892584689,0,0,3202041987687545856}
+ ~~~~~~~~~~
+Actual:
+array_output '{17807497524330689721,18187747589763825112,18097922937898236438,16569728212931270543}
+
+UVM_INFO C:/Xilinx/2025.1/Vivado/data/system_verilog/uvm_1.2/xlnx_uvm_package.sv(9338) @ 9450000: reporter [MISCMP] Miscompare for output_tx.out_matrix: lhs = 'hac7465780000f4f1000000000000000000000000000000002c6ff03900007c00 : rhs = 'hf720f0a67460f4b9fc67dc11f056fdd8fb28bd066dd17a16e5f38004fc89578f
+UVM_INFO C:/Xilinx/2025.1/Vivado/data/system_verilog/uvm_1.2/xlnx_uvm_package.sv(9362) @ 9450000: reporter [MISCMP] 1 Miscompare(s) for object tx@847 vs. output_tx@851
+UVM_INFO @ 9450000: uvm_test_top.env.comp [Comparator] Error: Data mismatch
+UVM_INFO ../../../../../sequence.svh(31) @ 9450000: uvm_test_top.env.agt.sqr@@seq [Sequence] Randomise Succesful
+UVM_INFO ../../../../../sequence.svh(20) @ 9450000: uvm_test_top.env.agt.sqr@@seq [Sequence] Before Start Item
+UVM_INFO ../../../../../sequence.svh(22) @ 9450000: uvm_test_top.env.agt.sqr@@seq [Sequence] After Start Item
+UVM_INFO ../../../../../sequence.svh(27) @ 9450000: uvm_test_top.env.agt.sqr@@seq [Sequence] Randomise Succesful
+UVM_INFO ../../../../../driver.svh(37) @ 9450000: uvm_test_top.env.agt.drv [Driver] Got item
+UVM_INFO ../../../../../driver.svh(40) @ 9530000: uvm_test_top.env.agt.drv [Driver] Wait for reset over

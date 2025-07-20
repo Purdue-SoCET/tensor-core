@@ -9,4 +9,38 @@ Pass Through NonSizing Optimizer
 WARNING: [VRFC 10-3091] actual bit length 32 differs from formal bit length 1 for port 'ovf_in' [C:/Users/abhil/SOCET_UVM/UVM---Tensor-Core/UVM/sysarr_MAC.sv:308]
 WARNING: [VRFC 10-3091] actual bit length 32 differs from formal bit length 1 for port 'ovf_in' [C:/Users/abhil/SOCET_UVM/UVM---Tensor-Core/UVM/sysarr_add.sv:131]
 Completed static elaboration
-INFO: [XSIM 43-4323] No Change in HDL. Linking previously generated obj files to create kernel
+Starting simulation data flow analysis
+WARNING: [XSIM 43-4099] "/proj/primebuilds/9999.0_PRIME_0428_0031/installs/data/system_verilog/uvm_1.2/xlnx_uvm_package.sv" Line 4356. Module uvm_pkg doesn't have a timescale but at least one module in design has a timescale.
+WARNING: [XSIM 43-4099] "/proj/primebuilds/9999.0_PRIME_0428_0031/installs/data/system_verilog/uvm_1.2/xlnx_uvm_package.sv" Line 4356. Module uvm_pkg doesn't have a timescale but at least one module in design has a timescale.
+WARNING: [XSIM 43-4468] File : /proj/primebuilds/9999.0_PRIME_0428_0031/installs/data/system_verilog/uvm_1.2/xlnx_uvm_package.sv, Line : 25994, RANDC variable size more than 8 bits. This will be treated as a RAND variable instead.
+Completed simulation data flow analysis
+Time Resolution for simulation is 1ps
+Compiling package xil_defaultlib.$unit_ADD_step1_sv_612781523
+Compiling package xil_defaultlib.sys_arr_pkg
+Compiling package uvm.uvm_pkg
+Compiling package std.std
+Compiling module xil_defaultlib.systolic_array_if_default
+Compiling module xil_defaultlib.systolic_array_control_unit_if_d...
+Compiling module xil_defaultlib.systolic_array_MAC_if_default
+Compiling module xil_defaultlib.systolic_array_add_if_default
+Compiling module xil_defaultlib.systolic_array_FIFO_if_default
+Compiling module xil_defaultlib.systolic_array_OUT_FIFO_if_defau...
+Compiling module xil_defaultlib.sysarr_control_unit_default
+Compiling module xil_defaultlib.sysarr_FIFO_default
+Compiling module xil_defaultlib.mul_multicycle
+Compiling module xil_defaultlib.MUL_step1
+Compiling module xil_defaultlib.adder_5b
+Compiling module xil_defaultlib.ADD_step1
+Compiling module xil_defaultlib.u_to_s
+Compiling module xil_defaultlib.adder_13b
+Compiling module xil_defaultlib.s_to_u
+Compiling module xil_defaultlib.ADD_step2
+Compiling module xil_defaultlib.left_shift
+Compiling module xil_defaultlib.ADD_step3
+Compiling module xil_defaultlib.sysarr_MAC_default
+Compiling module xil_defaultlib.sysarr_add_default
+Compiling module xil_defaultlib.sysarr_OUT_FIFO_default
+Compiling module xil_defaultlib.systolic_array_default
+Compiling module xil_defaultlib.tb_systolic
+Compiling module xil_defaultlib.glbl
+Built simulation snapshot tb_systolic_behav

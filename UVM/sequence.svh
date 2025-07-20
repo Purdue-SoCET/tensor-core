@@ -16,7 +16,7 @@ class systolic_sequence extends uvm_sequence#(transaction);
     `uvm_info ("Sequence", $sformatf ("Before Start Item"), UVM_NONE)
     // Pass matrices
     
-    repeat(1) begin
+    repeat(10) begin
       `uvm_info ("Sequence", $sformatf ("Before Start Item"), UVM_NONE)
       start_item(req_item);
       `uvm_info ("Sequence", $sformatf ("After Start Item"), UVM_NONE)

@@ -23,6 +23,7 @@ class transaction #(parameter NUM_BITS = 4) extends uvm_sequence_item; // NUM_BI
   rand bit [N-1:0][DW*N-1:0] input_matrix;  // One NxN matrix for inputs
   rand bit [N-1:0][DW*N-1:0] weight_matrix;
   rand bit [N-1:0][DW*N-1:0] partial_matrix;
+  
   bit [N-1:0][DW*N-1:0] out_matrix;
 
   `uvm_object_utils_begin(transaction)
@@ -50,24 +51,42 @@ class transaction #(parameter NUM_BITS = 4) extends uvm_sequence_item; // NUM_BI
   endfunction: new
 
    constraint input_matrix_c {
-    input_matrix == {16{16'h003c}}; 
-  // foreach (input_matrix[i]) {
-  //   input_matrix[i] == 64'h0001000100010001;
-  // }
+    // input_matrix == {16{16'h3c00}}; 
+  foreach (input_matrix[j]) {
+  input_matrix[0][0*DW +: DW-1] inside {[15'h0000:15'h7BFF]};
+  input_matrix[0][1*DW +: DW-1] inside {[15'h0000:15'h7BFF]};
+  input_matrix[0][2*DW +: DW-1] inside {[15'h0000:15'h7BFF]};
+  input_matrix[0][3*DW +: DW-1] inside {[15'h0000:15'h7BFF]};
     }
 
+  }
+
+
    constraint weight_matrix_c {
-    weight_matrix == {16{16'h003c}}; 
+    // weight_matrix == {16{16'h3c00}}; 
   // foreach (weight_matrix[i]) {
   //   weight_matrix[i] == 64'h0001000100010001;
   // }
+  foreach (weight_matrix[j]) {
+  weight_matrix[0][0*DW +: DW-1] inside {[15'h0000:15'h7BFF]};
+  weight_matrix[0][1*DW +: DW-1] inside {[15'h0000:15'h7BFF]};
+  weight_matrix[0][2*DW +: DW-1] inside {[15'h0000:15'h7BFF]};
+  weight_matrix[0][3*DW +: DW-1] inside {[15'h0000:15'h7BFF]};
+    }
 }
      constraint partial_matrix_c {
-      partial_matrix == {16{16'h003c}}; // Verify endianness
+      // partial_matrix == {16{16'h3c00}}; // Verify endianness
   // foreach (partial_matrix[i]) {
   //   partial_matrix[i] == 64'h0001000100010001;
   // }
+  foreach (partial_matrix[j]) {
+  partial_matrix[0][0*DW +: DW-1] inside {[15'h0000:15'h7BFF]};
+  partial_matrix[0][1*DW +: DW-1] inside {[15'h0000:15'h7BFF]};
+  partial_matrix[0][2*DW +: DW-1] inside {[15'h0000:15'h7BFF]};
+  partial_matrix[0][3*DW +: DW-1] inside {[15'h0000:15'h7BFF]};
+    }
 }
+
 
   // if two transactions are the same, return 1
   // function int input_equal(transaction tx);

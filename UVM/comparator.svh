@@ -36,7 +36,7 @@ class comparator extends uvm_scoreboard;
       expected_fifo.get(expected_tx);
       actual_fifo.get(actual_tx);
       // uvm_report_info("Comparator", $psprintf("\nExpected:\ndrained:%d\n fifo_has_space:%d\n row_out %d\n array_output %d\n out_en\n %d\n~~~~~~~~~~\nActual:\ndrained:%d\n fifo_has_space:%d\n row_out %d\n array_output %d\n out_en\n %d\n", expected_tx.drained, expected_tx.fifo_has_space, expected_tx.row_out, expected_tx.array_output, expected_tx.out_en, actual_tx.drained, actual_tx.fifo_has_space, actual_tx.row_out, actual_tx.array_output, actual_tx.out_en));
-      uvm_report_info("Comparator", $psprintf("\nExpected:\narray_output %d\n ~~~~~~~~~~\nActual:\narray_output %d\n", expected_tx.out_matrix, actual_tx.out_matrix));
+      uvm_report_info("Comparator", $psprintf("\nExpected:\narray_output %0p\n ~~~~~~~~~~\nActual:\narray_output %0p\n", expected_tx.out_matrix, actual_tx.out_matrix));
       // keep count of number of matches and mismatches (actual vs expected)
       if (expected_tx.compare(actual_tx)) begin
         m_matches++;
