@@ -50,20 +50,23 @@ class transaction #(parameter NUM_BITS = 4) extends uvm_sequence_item; // NUM_BI
   endfunction: new
 
    constraint input_matrix_c {
-  foreach (input_matrix[i]) {
-    input_matrix[i] == 64'h0001000100010001;
-  }
-}
+    input_matrix == {16{16'h003c}}; 
+  // foreach (input_matrix[i]) {
+  //   input_matrix[i] == 64'h0001000100010001;
+  // }
+    }
 
-   constraint input_matrix_c {
-  foreach (weight_matrix[i]) {
-    weight_matrix[i] == 64'h0001000100010001;
-  }
+   constraint weight_matrix_c {
+    weight_matrix == {16{16'h003c}}; 
+  // foreach (weight_matrix[i]) {
+  //   weight_matrix[i] == 64'h0001000100010001;
+  // }
 }
-     constraint input_matrix_c {
-  foreach (partial_matrix[i]) {
-    partial_matrix[i] == 64'h0001000100010001;
-  }
+     constraint partial_matrix_c {
+      partial_matrix == {16{16'h003c}}; // Verify endianness
+  // foreach (partial_matrix[i]) {
+  //   partial_matrix[i] == 64'h0001000100010001;
+  // }
 }
 
   // if two transactions are the same, return 1

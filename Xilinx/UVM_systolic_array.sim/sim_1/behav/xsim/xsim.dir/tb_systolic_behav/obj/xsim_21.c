@@ -109,7 +109,7 @@ namespace XILINX_DPI {
 		DPIAllocateDPIScopes(1) ;
 		DPISetDPIScopeFunctionName(0, "m__uvm_report_dpi") ;
 		DPISetDPIScopeHierarchy(0, "uvm_pkg") ;
-		DPIRelocateDPIScopeIP(0, (char*)(0x4ac8a0)) ;
+		DPIRelocateDPIScopeIP(0, (char*)(0x4ad7b0)) ;
 		DPIAddDPIScopeAccessibleFunction(0, 0) ;
 	}
 
@@ -124,7 +124,7 @@ extern "C" {
 
 extern "C" {
 
-	extern void subprog_m_4ff12a0dca8cceb0_556ead11_2271(char*, char*, char*);
+	extern void subprog_m_4ff12a0dca8cceb0_556ead11_2275(char*, char*, char*);
 }
 
 
@@ -196,7 +196,7 @@ extern "C" {
 		}
 		DPIScheduleTransactionBlocking(IP +425696, driver5, (char*)(&copyArg_5_5), 0, 31) ;
 		char* oldSP = *((char**)(IP + callingProcessOffset + 80)) ; 
-		DPIInvokeFunction(IP + callingProcessOffset, SP, (void*)(subprog_m_4ff12a0dca8cceb0_556ead11_2271), IP) ;
+		DPIInvokeFunction(IP + callingProcessOffset, SP, (void*)(subprog_m_4ff12a0dca8cceb0_556ead11_2275), IP) ;
 		DPIDeleteFunctionInvocation(SP) ;
 		*((char**)(IP + callingProcessOffset + 80)) = oldSP ; 
 		DPISetCurrentContext(oldSPcontext);
