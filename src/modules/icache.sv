@@ -53,5 +53,8 @@ module icache (
         end
       end
     end
+    else if (icache_state == miss && !dcif.imemREN) begin
+      nxt_icache_state = idle;
+    end
   end
 endmodule

@@ -19,6 +19,8 @@
 `include "caches_if.vh"
 `include "arbiter_caches_if.vh"
 `include "scratchpad_if.vh"
+`include "main_mem_if.vh"
+
 
 
 // module system (input logic CLK, nrst, system_if.sys syif);
@@ -29,6 +31,7 @@ module system (
   arbiter_caches_if acif,
   scratchpad_if spif,
   systolic_array_if saif,
+  main_mem_if mmif,
   system_if.sys syif
 );
 
@@ -74,7 +77,7 @@ module system (
   // // scheduler core processor
   // scheduler_core                        CPU (CPUCLK, nrst, halt, prif);
   sc_datapath DP (CLK, nrst, dcif);
-  memory_subsystem MS (CLK, nrst, dcif, cif, acif, spif);
+  memory_subsystem MS (CLK, nrst, dcif, cif, acif, spif, mmif, syif);
   systolic_array SYS (CLK, nrst, saif);
 
   always_comb begin

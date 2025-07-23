@@ -66,5 +66,5 @@ module fetch(
 
     assign fif.imemaddr = imemaddr;
     // assign fif.pc = pc_reg;
-    assign fif.imemREN = !fif.freeze;
+    assign fif.imemREN = !fif.freeze && !fif.br_jump;
 endmodule

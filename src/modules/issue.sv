@@ -286,16 +286,16 @@ module issue(
                 if ((isif.fu_ex[0] == 1'b1) && (i == 0)) begin 
                   next_fust_state[i] = incoming_instr[i] ? FUST_WAIT : FUST_EMPTY;
                 end
-                else if ((isif.fu_ex[1] == 1'b1) && (i == 1)) begin
+                if ((isif.fu_ex[1] == 1'b1) && (i == 1)) begin
                   next_fust_state[i] = incoming_instr[i] ? FUST_WAIT : FUST_EMPTY;
                 end
-                else if ((isif.fu_ex[2] == 1'b1) && (i == 2)) begin
+                if ((isif.fu_ex[2] == 1'b1) && (i == 2)) begin
                   next_fust_state[i] = incoming_instr[i] ? FUST_WAIT : FUST_EMPTY;
                 end
-                else if ((isif.fu_ex[3] == 1'b1) && (i == 3)) begin
+                if ((isif.fu_ex[3] == 1'b1) && (i == 3)) begin
                   next_fust_state[i] = incoming_instr[i] ? FUST_WAIT : FUST_EMPTY;
                 end
-                else if ((isif.fu_ex[4] == 1'b1) && (i == 4)) begin
+                if ((isif.fu_ex[4] == 1'b1) && (i == 4)) begin
                   next_fust_state[i] = incoming_instr[i] ? FUST_WAIT : FUST_EMPTY;
                 end  
               end
