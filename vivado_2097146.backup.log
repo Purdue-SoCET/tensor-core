@@ -1,0 +1,468 @@
+#-----------------------------------------------------------
+# Vivado v2023.2 (64-bit)
+# SW Build 4029153 on Fri Oct 13 20:13:54 MDT 2023
+# IP Build 4028589 on Sat Oct 14 00:45:43 MDT 2023
+# SharedData Build 4025554 on Tue Oct 10 17:18:54 MDT 2023
+# Start of session at: Wed Jul 23 12:16:33 2025
+# Process ID: 2097146
+# Current directory: /home/asicfab/a/naray145/UVM---Tensor-Core
+# Command line: vivado
+# Log file: /home/asicfab/a/naray145/UVM---Tensor-Core/vivado.log
+# Journal file: /home/asicfab/a/naray145/UVM---Tensor-Core/vivado.jou
+# Running On: asicfab.ecn.purdue.edu, OS: Linux, CPU Frequency: 2295.737 MHz, CPU Physical cores: 32, Host memory: 269482 MB
+#-----------------------------------------------------------
+start_gui
+WARNING: [Board 49-26] cannot add Board Part xilinx.com:vek280_es:part0:1.0 available at /package/eda/xilinx/Vivado/2023.2/data/xhub/boards/XilinxBoardStore/boards/Xilinx/vek280/es/rev_a/1.0/board.xml as part xcve2802-vsvh1760-2lp-e-s-es1 specified in board_part file is either invalid or not available
+WARNING: [Board 49-26] cannot add Board Part xilinx.com:vek280_es:part0:1.1 available at /package/eda/xilinx/Vivado/2023.2/data/xhub/boards/XilinxBoardStore/boards/Xilinx/vek280/es/rev_a/1.1/board.xml as part xcve2802-vsvh1760-2lp-e-s-es1 specified in board_part file is either invalid or not available
+WARNING: [Board 49-26] cannot add Board Part xilinx.com:vek280_es_revb:part0:1.0 available at /package/eda/xilinx/Vivado/2023.2/data/xhub/boards/XilinxBoardStore/boards/Xilinx/vek280/es/rev_b/1.0/board.xml as part xcve2802-vsvh1760-2mp-e-s-es1 specified in board_part file is either invalid or not available
+WARNING: [Board 49-26] cannot add Board Part xilinx.com:vek280_es_revb:part0:1.1 available at /package/eda/xilinx/Vivado/2023.2/data/xhub/boards/XilinxBoardStore/boards/Xilinx/vek280/es/rev_b/1.1/board.xml as part xcve2802-vsvh1760-2mp-e-s-es1 specified in board_part file is either invalid or not available
+WARNING: [Board 49-26] cannot add Board Part xilinx.com:vhk158_es:part0:1.0 available at /package/eda/xilinx/Vivado/2023.2/data/xhub/boards/XilinxBoardStore/boards/Xilinx/vhk158/es/1.0/board.xml as part xcvh1582-vsva3697-2mp-e-s-es1 specified in board_part file is either invalid or not available
+WARNING: [Board 49-26] cannot add Board Part xilinx.com:vhk158_es:part0:1.1 available at /package/eda/xilinx/Vivado/2023.2/data/xhub/boards/XilinxBoardStore/boards/Xilinx/vhk158/es/1.1/board.xml as part xcvh1582-vsva3697-2mp-e-s-es1 specified in board_part file is either invalid or not available
+WARNING: [Board 49-26] cannot add Board Part xilinx.com:zcu208ld:part0:2.0 available at /package/eda/xilinx/Vivado/2023.2/data/xhub/boards/XilinxBoardStore/boards/Xilinx/zcu208ld/production/2.0/board.xml as part xczu58dr-fsvg1517-2-i specified in board_part file is either invalid or not available
+WARNING: [Board 49-26] cannot add Board Part xilinx.com:zcu216ld:part0:2.0 available at /package/eda/xilinx/Vivado/2023.2/data/xhub/boards/XilinxBoardStore/boards/Xilinx/zcu216ld/production/2.0/board.xml as part xczu59dr-ffvf1760-2-i specified in board_part file is either invalid or not available
+WARNING: [Board 49-26] cannot add Board Part xilinx.com:zcu670:part0:2.0 available at /package/eda/xilinx/Vivado/2023.2/data/xhub/boards/XilinxBoardStore/boards/Xilinx/zcu670/2.0/board.xml as part xczu67dr-fsve1156-2-i specified in board_part file is either invalid or not available
+WARNING: [Board 49-26] cannot add Board Part xilinx.com:zcu670ld:part0:1.0 available at /package/eda/xilinx/Vivado/2023.2/data/xhub/boards/XilinxBoardStore/boards/Xilinx/zcu670ld/1.0/board.xml as part xczu57dr-fsve1156-2-i specified in board_part file is either invalid or not available
+open_project /home/asicfab/a/naray145/UVM---Tensor-Core/Xilinx/UVM_systolic_array.xpr
+INFO: [filemgmt 56-3] Default IP Output Path : Could not find the directory '/home/asicfab/a/naray145/UVM---Tensor-Core/Xilinx/UVM_systolic_array.gen/sources_1'.
+Scanning sources...
+Finished scanning sources
+INFO: [IP_Flow 19-234] Refreshing IP repositories
+INFO: [IP_Flow 19-1704] No user IP repositories specified
+INFO: [IP_Flow 19-2313] Loaded Vivado IP repository '/package/eda/xilinx/Vivado/2023.2/data/ip'.
+launch_simulation
+Command: launch_simulation 
+INFO: [Vivado 12-12493] Simulation top is 'tb_systolic'
+INFO: [Vivado 12-5682] Launching behavioral simulation in '/home/asicfab/a/naray145/UVM---Tensor-Core/Xilinx/UVM_systolic_array.sim/sim_1/behav/xsim'
+INFO: [SIM-utils-51] Simulation object is 'sim_1'
+INFO: [SIM-utils-72] Using boost library from '/package/eda/xilinx/Vivado/2023.2/tps/boost_1_72_0'
+INFO: [SIM-utils-54] Inspecting design source files for 'tb_systolic' in fileset 'sim_1'...
+INFO: [USF-XSim-97] Finding global include files...
+INFO: [USF-XSim-98] Fetching design files from 'sim_1'...
+INFO: [USF-XSim-2] XSim::Compile design
+INFO: [USF-XSim-61] Executing 'COMPILE and ANALYZE' step in '/home/asicfab/a/naray145/UVM---Tensor-Core/Xilinx/UVM_systolic_array.sim/sim_1/behav/xsim'
+xvlog --incr --relax -L uvm -L uvm -prj tb_systolic_vlog.prj
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/home/asicfab/a/naray145/UVM---Tensor-Core/UVM/ADD_step1.sv" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module ADD_step1
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/home/asicfab/a/naray145/UVM---Tensor-Core/UVM/ADD_step2.sv" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module ADD_step2
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/home/asicfab/a/naray145/UVM---Tensor-Core/UVM/ADD_step3.sv" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module ADD_step3
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/home/asicfab/a/naray145/UVM---Tensor-Core/UVM/MUL_step1.sv" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module MUL_step1
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/home/asicfab/a/naray145/UVM---Tensor-Core/UVM/adder_13b.sv" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module adder_13b
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/home/asicfab/a/naray145/UVM---Tensor-Core/UVM/adder_5b.sv" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module adder_5b
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/home/asicfab/a/naray145/UVM---Tensor-Core/UVM/left_shift.sv" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module left_shift
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/home/asicfab/a/naray145/UVM---Tensor-Core/UVM/mul_multicycle.sv" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module mul_multicycle
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/home/asicfab/a/naray145/UVM---Tensor-Core/UVM/s_to_u.sv" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module s_to_u
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/home/asicfab/a/naray145/UVM---Tensor-Core/UVM/sysarr_FIFO.sv" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module sysarr_FIFO
+WARNING: [VRFC 10-8890] default field of an assignment pattern cannot contain another assignment pattern [/home/asicfab/a/naray145/UVM---Tensor-Core/UVM/sysarr_FIFO.sv:26]
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/home/asicfab/a/naray145/UVM---Tensor-Core/UVM/sysarr_MAC.sv" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module sysarr_MAC
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/home/asicfab/a/naray145/UVM---Tensor-Core/UVM/sysarr_OUT_FIFO.sv" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module sysarr_OUT_FIFO
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/home/asicfab/a/naray145/UVM---Tensor-Core/UVM/sysarr_add.sv" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module sysarr_add
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/home/asicfab/a/naray145/UVM---Tensor-Core/UVM/sysarr_control_unit.sv" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module sysarr_control_unit
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/home/asicfab/a/naray145/UVM---Tensor-Core/UVM/systolic_array.sv" into library xil_defaultlib
+WARNING: [VRFC 10-8904] direction for signal 'clk' in modport changed to output because it was specified as input [../../../../../UVM/systolic_array_if.vh:27]
+INFO: [VRFC 10-311] analyzing module systolic_array
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/home/asicfab/a/naray145/UVM---Tensor-Core/UVM/u_to_s.sv" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module u_to_s
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/home/asicfab/a/naray145/UVM---Tensor-Core/UVM/tb_systolic.sv" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module systolic_array
+WARNING: [VRFC 10-3609] overwriting previous definition of module 'systolic_array' [../../../../../UVM/systolic_array.sv:13]
+WARNING: [VRFC 10-5025] system function call '$psprintf' is not IEEE standard [../../../../../UVM/comparator.svh:39]
+INFO: [VRFC 10-311] analyzing module tb_systolic
+Waiting for jobs to finish...
+No pending jobs, compilation finished.
+INFO: [USF-XSim-69] 'compile' step finished in '2' seconds
+INFO: [USF-XSim-3] XSim::Elaborate design
+INFO: [USF-XSim-61] Executing 'ELABORATE' step in '/home/asicfab/a/naray145/UVM---Tensor-Core/Xilinx/UVM_systolic_array.sim/sim_1/behav/xsim'
+xelab --incr --debug typical --relax --mt 8 -L xil_defaultlib -L uvm -L unisims_ver -L unimacro_ver -L secureip --snapshot tb_systolic_behav xil_defaultlib.tb_systolic xil_defaultlib.glbl -log elaborate.log -L uvm
+Vivado Simulator v2023.2
+Copyright 1986-2022 Xilinx, Inc. All Rights Reserved.
+Copyright 2022-2023 Advanced Micro Devices, Inc. All Rights Reserved.
+Running: /package/eda/xilinx/Vivado/2023.2/bin/unwrapped/lnx64.o/xelab --incr --debug typical --relax --mt 8 -L xil_defaultlib -L uvm -L unisims_ver -L unimacro_ver -L secureip --snapshot tb_systolic_behav xil_defaultlib.tb_systolic xil_defaultlib.glbl -log elaborate.log -L uvm 
+Using 8 slave threads.
+Starting static elaboration
+Pass Through NonSizing Optimizer
+WARNING: [VRFC 10-3091] actual bit length 32 differs from formal bit length 1 for port 'ovf_in' [/home/asicfab/a/naray145/UVM---Tensor-Core/UVM/sysarr_MAC.sv:308]
+WARNING: [VRFC 10-3091] actual bit length 32 differs from formal bit length 1 for port 'ovf_in' [/home/asicfab/a/naray145/UVM---Tensor-Core/UVM/sysarr_add.sv:131]
+Completed static elaboration
+Starting simulation data flow analysis
+WARNING: [XSIM 43-4099] "/proj/xbuilds/SWIP/9999.0_0820_0302/installs/lin64/Vivado/2024.1/data/system_verilog/uvm_1.2/xlnx_uvm_package.sv" Line 4356. Module uvm_pkg doesn't have a timescale but at least one module in design has a timescale.
+WARNING: [XSIM 43-4099] "/proj/xbuilds/SWIP/9999.0_0820_0302/installs/lin64/Vivado/2024.1/data/system_verilog/uvm_1.2/xlnx_uvm_package.sv" Line 4356. Module uvm_pkg doesn't have a timescale but at least one module in design has a timescale.
+WARNING: [XSIM 43-4468] File : /proj/xbuilds/SWIP/9999.0_0820_0302/installs/lin64/Vivado/2024.1/data/system_verilog/uvm_1.2/xlnx_uvm_package.sv, Line : 25994, RANDC variable size more than 8 bits. This will be treated as a RAND variable instead.
+Completed simulation data flow analysis
+Time Resolution for simulation is 1ps
+Compiling package xil_defaultlib.$unit_ADD_step1_sv_612781523
+Compiling package xil_defaultlib.sys_arr_pkg
+Compiling package uvm.uvm_pkg
+Compiling package std.std
+Compiling module xil_defaultlib.systolic_array_if
+Compiling module xil_defaultlib.systolic_array_control_unit_if
+Compiling module xil_defaultlib.systolic_array_MAC_if
+Compiling module xil_defaultlib.systolic_array_add_if
+Compiling module xil_defaultlib.systolic_array_FIFO_if
+Compiling module xil_defaultlib.systolic_array_OUT_FIFO_if
+Compiling module xil_defaultlib.sysarr_control_unit
+Compiling module xil_defaultlib.sysarr_FIFO
+Compiling module xil_defaultlib.mul_multicycle
+Compiling module xil_defaultlib.MUL_step1
+Compiling module xil_defaultlib.adder_5b
+Compiling module xil_defaultlib.ADD_step1
+Compiling module xil_defaultlib.u_to_s
+Compiling module xil_defaultlib.adder_13b
+Compiling module xil_defaultlib.s_to_u
+Compiling module xil_defaultlib.ADD_step2
+Compiling module xil_defaultlib.left_shift
+Compiling module xil_defaultlib.ADD_step3
+Compiling module xil_defaultlib.sysarr_MAC
+Compiling module xil_defaultlib.sysarr_add
+Compiling module xil_defaultlib.sysarr_OUT_FIFO
+Compiling module xil_defaultlib.systolic_array_default
+Compiling module xil_defaultlib.tb_systolic
+Compiling module xil_defaultlib.glbl
+Built simulation snapshot tb_systolic_behav
+execute_script: Time (s): cpu = 00:01:30 ; elapsed = 00:00:26 . Memory (MB): peak = 8483.801 ; gain = 0.000 ; free physical = 24688 ; free virtual = 222621
+INFO: [USF-XSim-69] 'elaborate' step finished in '27' seconds
+INFO: [USF-XSim-4] XSim::Simulate design
+INFO: [USF-XSim-61] Executing 'SIMULATE' step in '/home/asicfab/a/naray145/UVM---Tensor-Core/Xilinx/UVM_systolic_array.sim/sim_1/behav/xsim'
+INFO: [USF-XSim-98] *** Running xsim
+   with args "tb_systolic_behav -key {Behavioral:sim_1:Functional:tb_systolic} -tclbatch {tb_systolic.tcl} -log {simulate.log}"
+INFO: [USF-XSim-8] Loading simulator feature
+Time resolution is 1 ps
+source tb_systolic.tcl
+# set curr_wave [current_wave_config]
+# if { [string length $curr_wave] == 0 } {
+#   if { [llength [get_objects]] > 0} {
+#     add_wave /
+#     set_property needs_save false [current_wave_config]
+#   } else {
+#      send_msg_id Add_Wave-1 WARNING "No top level signals found. Simulator will start without a wave window. If you want to open a wave window go to 'File->New Waveform Configuration' or type 'create_wave_config' in the TCL console."
+#   }
+# }
+# run 10000ns
+UVM_INFO /package/eda/xilinx/Vivado/2023.2/data/system_verilog/uvm_1.2/xlnx_uvm_package.sv(18601) @ 0: reporter [UVM/RELNOTES] 
+----------------------------------------------------------------
+UVM-1.2
+(C) 2007-2014 Mentor Graphics Corporation
+(C) 2007-2014 Cadence Design Systems, Inc.
+(C) 2006-2014 Synopsys, Inc.
+(C) 2011-2013 Cypress Semiconductor Corp.
+(C) 2013-2014 NVIDIA Corporation
+----------------------------------------------------------------
+
+  ***********       IMPORTANT RELEASE NOTES         ************
+
+  You are using a version of the UVM library that has been compiled
+  with `UVM_NO_DEPRECATED undefined.
+
+  You are using a version of the UVM library that has been compiled
+  with `UVM_OBJECT_DO_NOT_NEED_CONSTRUCTOR undefined.
+
+      (Specify +UVM_NO_RELNOTES to turn off this notice)
+
+UVM_INFO @ 0: reporter [RNTST] Running test test...
+UVM_INFO /package/eda/xilinx/Vivado/2023.2/data/system_verilog/uvm_1.2/xlnx_uvm_package.sv(20867) @ 0: reporter [UVM/COMP/NAMECHECK] This implementation of the component name checks requires DPI to be enabled
+                   0 Starting sequence run_phase
+UVM_INFO ../../../../../UVM/driver.svh(27) @ 0: uvm_test_top.env.agt.drv [Driver] In Driver
+UVM_INFO ../../../../../UVM/sequence.svh(16) @ 0: uvm_test_top.env.agt.sqr@@seq [Sequence] Before Start Item
+UVM_INFO ../../../../../UVM/sequence.svh(20) @ 0: uvm_test_top.env.agt.sqr@@seq [Sequence] Before Start Item
+UVM_INFO ../../../../../UVM/sequence.svh(22) @ 0: uvm_test_top.env.agt.sqr@@seq [Sequence] After Start Item
+UVM_INFO ../../../../../UVM/sequence.svh(27) @ 0: uvm_test_top.env.agt.sqr@@seq [Sequence] Randomise Succesful
+UVM_INFO ../../../../../UVM/driver.svh(37) @ 0: uvm_test_top.env.agt.drv [Driver] Got item
+UVM_INFO ../../../../../UVM/driver.svh(40) @ 70000: uvm_test_top.env.agt.drv [Driver] Wait for reset over
+UVM_INFO ../../../../../UVM/driver.svh(27) @ 4830000: uvm_test_top.env.agt.drv [Driver] In Driver
+UVM_INFO @ 4830000: uvm_test_top.env.comp [Comparator] 
+Expected:
+array_output '{0,0,0,0}
+ ~~~~~~~~~~
+Actual:
+array_output '{0,0,0,0}
+
+UVM_INFO @ 4830000: uvm_test_top.env.comp [Comparator] Data match
+UVM_INFO ../../../../../UVM/sequence.svh(31) @ 4830000: uvm_test_top.env.agt.sqr@@seq [Sequence] Randomise Succesful
+UVM_INFO ../../../../../UVM/sequence.svh(20) @ 4830000: uvm_test_top.env.agt.sqr@@seq [Sequence] Before Start Item
+UVM_INFO ../../../../../UVM/sequence.svh(22) @ 4830000: uvm_test_top.env.agt.sqr@@seq [Sequence] After Start Item
+UVM_INFO ../../../../../UVM/sequence.svh(27) @ 4830000: uvm_test_top.env.agt.sqr@@seq [Sequence] Randomise Succesful
+UVM_INFO ../../../../../UVM/driver.svh(37) @ 4830000: uvm_test_top.env.agt.drv [Driver] Got item
+UVM_INFO ../../../../../UVM/driver.svh(40) @ 4910000: uvm_test_top.env.agt.drv [Driver] Wait for reset over
+UVM_INFO ../../../../../UVM/driver.svh(27) @ 9450000: uvm_test_top.env.agt.drv [Driver] In Driver
+UVM_INFO @ 9450000: uvm_test_top.env.comp [Comparator] 
+Expected:
+array_output '{0,0,0,0}
+ ~~~~~~~~~~
+Actual:
+array_output '{0,0,0,0}
+
+UVM_INFO @ 9450000: uvm_test_top.env.comp [Comparator] Data match
+UVM_INFO ../../../../../UVM/sequence.svh(31) @ 9450000: uvm_test_top.env.agt.sqr@@seq [Sequence] Randomise Succesful
+UVM_INFO ../../../../../UVM/sequence.svh(20) @ 9450000: uvm_test_top.env.agt.sqr@@seq [Sequence] Before Start Item
+UVM_INFO ../../../../../UVM/sequence.svh(22) @ 9450000: uvm_test_top.env.agt.sqr@@seq [Sequence] After Start Item
+UVM_INFO ../../../../../UVM/sequence.svh(27) @ 9450000: uvm_test_top.env.agt.sqr@@seq [Sequence] Randomise Succesful
+UVM_INFO ../../../../../UVM/driver.svh(37) @ 9450000: uvm_test_top.env.agt.drv [Driver] Got item
+UVM_INFO ../../../../../UVM/driver.svh(40) @ 9530000: uvm_test_top.env.agt.drv [Driver] Wait for reset over
+INFO: [USF-XSim-96] XSim completed. Design snapshot 'tb_systolic_behav' loaded.
+INFO: [USF-XSim-97] XSim simulation ran for 10000ns
+launch_simulation: Time (s): cpu = 00:01:39 ; elapsed = 00:00:32 . Memory (MB): peak = 8513.008 ; gain = 29.207 ; free physical = 24625 ; free virtual = 222563
+close_sim
+INFO: [Simtcl 6-16] Simulation closed
+launch_simulation
+Command: launch_simulation 
+INFO: [Vivado 12-12493] Simulation top is 'tb_systolic'
+INFO: [Vivado 12-5682] Launching behavioral simulation in '/home/asicfab/a/naray145/UVM---Tensor-Core/Xilinx/UVM_systolic_array.sim/sim_1/behav/xsim'
+INFO: [SIM-utils-51] Simulation object is 'sim_1'
+INFO: [SIM-utils-72] Using boost library from '/package/eda/xilinx/Vivado/2023.2/tps/boost_1_72_0'
+INFO: [SIM-utils-54] Inspecting design source files for 'tb_systolic' in fileset 'sim_1'...
+INFO: [USF-XSim-97] Finding global include files...
+INFO: [USF-XSim-98] Fetching design files from 'sim_1'...
+INFO: [USF-XSim-2] XSim::Compile design
+INFO: [USF-XSim-61] Executing 'COMPILE and ANALYZE' step in '/home/asicfab/a/naray145/UVM---Tensor-Core/Xilinx/UVM_systolic_array.sim/sim_1/behav/xsim'
+xvlog --incr --relax -L uvm -L uvm -prj tb_systolic_vlog.prj
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/home/asicfab/a/naray145/UVM---Tensor-Core/UVM/ADD_step1.sv" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module ADD_step1
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/home/asicfab/a/naray145/UVM---Tensor-Core/UVM/ADD_step2.sv" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module ADD_step2
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/home/asicfab/a/naray145/UVM---Tensor-Core/UVM/ADD_step3.sv" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module ADD_step3
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/home/asicfab/a/naray145/UVM---Tensor-Core/UVM/MUL_step1.sv" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module MUL_step1
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/home/asicfab/a/naray145/UVM---Tensor-Core/UVM/adder_13b.sv" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module adder_13b
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/home/asicfab/a/naray145/UVM---Tensor-Core/UVM/adder_5b.sv" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module adder_5b
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/home/asicfab/a/naray145/UVM---Tensor-Core/UVM/left_shift.sv" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module left_shift
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/home/asicfab/a/naray145/UVM---Tensor-Core/UVM/mul_multicycle.sv" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module mul_multicycle
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/home/asicfab/a/naray145/UVM---Tensor-Core/UVM/s_to_u.sv" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module s_to_u
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/home/asicfab/a/naray145/UVM---Tensor-Core/UVM/sysarr_FIFO.sv" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module sysarr_FIFO
+WARNING: [VRFC 10-8890] default field of an assignment pattern cannot contain another assignment pattern [/home/asicfab/a/naray145/UVM---Tensor-Core/UVM/sysarr_FIFO.sv:26]
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/home/asicfab/a/naray145/UVM---Tensor-Core/UVM/sysarr_MAC.sv" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module sysarr_MAC
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/home/asicfab/a/naray145/UVM---Tensor-Core/UVM/sysarr_OUT_FIFO.sv" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module sysarr_OUT_FIFO
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/home/asicfab/a/naray145/UVM---Tensor-Core/UVM/sysarr_add.sv" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module sysarr_add
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/home/asicfab/a/naray145/UVM---Tensor-Core/UVM/sysarr_control_unit.sv" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module sysarr_control_unit
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/home/asicfab/a/naray145/UVM---Tensor-Core/UVM/systolic_array.sv" into library xil_defaultlib
+WARNING: [VRFC 10-8904] direction for signal 'clk' in modport changed to output because it was specified as input [../../../../../UVM/systolic_array_if.vh:27]
+INFO: [VRFC 10-311] analyzing module systolic_array
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/home/asicfab/a/naray145/UVM---Tensor-Core/UVM/u_to_s.sv" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module u_to_s
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/home/asicfab/a/naray145/UVM---Tensor-Core/UVM/tb_systolic.sv" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module systolic_array
+WARNING: [VRFC 10-3609] overwriting previous definition of module 'systolic_array' [../../../../../UVM/systolic_array.sv:13]
+WARNING: [VRFC 10-5025] system function call '$psprintf' is not IEEE standard [../../../../../UVM/comparator.svh:39]
+WARNING: [VRFC 10-5025] system function call '$psprintf' is not IEEE standard [../../../../../UVM/comparator.svh:40]
+WARNING: [VRFC 10-5025] system function call '$psprintf' is not IEEE standard [../../../../../UVM/comparator.svh:41]
+WARNING: [VRFC 10-5025] system function call '$psprintf' is not IEEE standard [../../../../../UVM/comparator.svh:42]
+INFO: [VRFC 10-311] analyzing module tb_systolic
+Waiting for jobs to finish...
+No pending jobs, compilation finished.
+INFO: [USF-XSim-69] 'compile' step finished in '2' seconds
+INFO: [USF-XSim-3] XSim::Elaborate design
+INFO: [USF-XSim-61] Executing 'ELABORATE' step in '/home/asicfab/a/naray145/UVM---Tensor-Core/Xilinx/UVM_systolic_array.sim/sim_1/behav/xsim'
+xelab --incr --debug typical --relax --mt 8 -L xil_defaultlib -L uvm -L unisims_ver -L unimacro_ver -L secureip --snapshot tb_systolic_behav xil_defaultlib.tb_systolic xil_defaultlib.glbl -log elaborate.log -L uvm
+Vivado Simulator v2023.2
+Copyright 1986-2022 Xilinx, Inc. All Rights Reserved.
+Copyright 2022-2023 Advanced Micro Devices, Inc. All Rights Reserved.
+Running: /package/eda/xilinx/Vivado/2023.2/bin/unwrapped/lnx64.o/xelab --incr --debug typical --relax --mt 8 -L xil_defaultlib -L uvm -L unisims_ver -L unimacro_ver -L secureip --snapshot tb_systolic_behav xil_defaultlib.tb_systolic xil_defaultlib.glbl -log elaborate.log -L uvm 
+Using 8 slave threads.
+Starting static elaboration
+Pass Through NonSizing Optimizer
+WARNING: [VRFC 10-3091] actual bit length 32 differs from formal bit length 1 for port 'ovf_in' [/home/asicfab/a/naray145/UVM---Tensor-Core/UVM/sysarr_MAC.sv:308]
+WARNING: [VRFC 10-3091] actual bit length 32 differs from formal bit length 1 for port 'ovf_in' [/home/asicfab/a/naray145/UVM---Tensor-Core/UVM/sysarr_add.sv:131]
+Completed static elaboration
+Starting simulation data flow analysis
+WARNING: [XSIM 43-4099] "/proj/xbuilds/SWIP/9999.0_0820_0302/installs/lin64/Vivado/2024.1/data/system_verilog/uvm_1.2/xlnx_uvm_package.sv" Line 4356. Module uvm_pkg doesn't have a timescale but at least one module in design has a timescale.
+WARNING: [XSIM 43-4099] "/proj/xbuilds/SWIP/9999.0_0820_0302/installs/lin64/Vivado/2024.1/data/system_verilog/uvm_1.2/xlnx_uvm_package.sv" Line 4356. Module uvm_pkg doesn't have a timescale but at least one module in design has a timescale.
+WARNING: [XSIM 43-4468] File : /proj/xbuilds/SWIP/9999.0_0820_0302/installs/lin64/Vivado/2024.1/data/system_verilog/uvm_1.2/xlnx_uvm_package.sv, Line : 25994, RANDC variable size more than 8 bits. This will be treated as a RAND variable instead.
+Completed simulation data flow analysis
+Time Resolution for simulation is 1ps
+Compiling package xil_defaultlib.$unit_ADD_step1_sv_612781523
+Compiling package xil_defaultlib.sys_arr_pkg
+Compiling package uvm.uvm_pkg
+Compiling package std.std
+Compiling module xil_defaultlib.systolic_array_if
+Compiling module xil_defaultlib.systolic_array_control_unit_if
+Compiling module xil_defaultlib.systolic_array_MAC_if
+Compiling module xil_defaultlib.systolic_array_add_if
+Compiling module xil_defaultlib.systolic_array_FIFO_if
+Compiling module xil_defaultlib.systolic_array_OUT_FIFO_if
+Compiling module xil_defaultlib.sysarr_control_unit
+Compiling module xil_defaultlib.sysarr_FIFO
+Compiling module xil_defaultlib.mul_multicycle
+Compiling module xil_defaultlib.MUL_step1
+Compiling module xil_defaultlib.adder_5b
+Compiling module xil_defaultlib.ADD_step1
+Compiling module xil_defaultlib.u_to_s
+Compiling module xil_defaultlib.adder_13b
+Compiling module xil_defaultlib.s_to_u
+Compiling module xil_defaultlib.ADD_step2
+Compiling module xil_defaultlib.left_shift
+Compiling module xil_defaultlib.ADD_step3
+Compiling module xil_defaultlib.sysarr_MAC
+Compiling module xil_defaultlib.sysarr_add
+Compiling module xil_defaultlib.sysarr_OUT_FIFO
+Compiling module xil_defaultlib.systolic_array_default
+Compiling module xil_defaultlib.tb_systolic
+Compiling module xil_defaultlib.glbl
+Built simulation snapshot tb_systolic_behav
+execute_script: Time (s): cpu = 00:01:27 ; elapsed = 00:00:27 . Memory (MB): peak = 8513.008 ; gain = 0.000 ; free physical = 24707 ; free virtual = 222545
+INFO: [USF-XSim-69] 'elaborate' step finished in '26' seconds
+INFO: [USF-XSim-4] XSim::Simulate design
+INFO: [USF-XSim-61] Executing 'SIMULATE' step in '/home/asicfab/a/naray145/UVM---Tensor-Core/Xilinx/UVM_systolic_array.sim/sim_1/behav/xsim'
+INFO: [USF-XSim-98] *** Running xsim
+   with args "tb_systolic_behav -key {Behavioral:sim_1:Functional:tb_systolic} -tclbatch {tb_systolic.tcl} -log {simulate.log}"
+INFO: [USF-XSim-8] Loading simulator feature
+Time resolution is 1 ps
+source tb_systolic.tcl
+# set curr_wave [current_wave_config]
+# if { [string length $curr_wave] == 0 } {
+#   if { [llength [get_objects]] > 0} {
+#     add_wave /
+#     set_property needs_save false [current_wave_config]
+#   } else {
+#      send_msg_id Add_Wave-1 WARNING "No top level signals found. Simulator will start without a wave window. If you want to open a wave window go to 'File->New Waveform Configuration' or type 'create_wave_config' in the TCL console."
+#   }
+# }
+# run 10000ns
+UVM_INFO /package/eda/xilinx/Vivado/2023.2/data/system_verilog/uvm_1.2/xlnx_uvm_package.sv(18601) @ 0: reporter [UVM/RELNOTES] 
+----------------------------------------------------------------
+UVM-1.2
+(C) 2007-2014 Mentor Graphics Corporation
+(C) 2007-2014 Cadence Design Systems, Inc.
+(C) 2006-2014 Synopsys, Inc.
+(C) 2011-2013 Cypress Semiconductor Corp.
+(C) 2013-2014 NVIDIA Corporation
+----------------------------------------------------------------
+
+  ***********       IMPORTANT RELEASE NOTES         ************
+
+  You are using a version of the UVM library that has been compiled
+  with `UVM_NO_DEPRECATED undefined.
+
+  You are using a version of the UVM library that has been compiled
+  with `UVM_OBJECT_DO_NOT_NEED_CONSTRUCTOR undefined.
+
+      (Specify +UVM_NO_RELNOTES to turn off this notice)
+
+UVM_INFO @ 0: reporter [RNTST] Running test test...
+UVM_INFO /package/eda/xilinx/Vivado/2023.2/data/system_verilog/uvm_1.2/xlnx_uvm_package.sv(20867) @ 0: reporter [UVM/COMP/NAMECHECK] This implementation of the component name checks requires DPI to be enabled
+                   0 Starting sequence run_phase
+UVM_INFO ../../../../../UVM/driver.svh(27) @ 0: uvm_test_top.env.agt.drv [Driver] In Driver
+UVM_INFO ../../../../../UVM/sequence.svh(16) @ 0: uvm_test_top.env.agt.sqr@@seq [Sequence] Before Start Item
+UVM_INFO ../../../../../UVM/sequence.svh(20) @ 0: uvm_test_top.env.agt.sqr@@seq [Sequence] Before Start Item
+UVM_INFO ../../../../../UVM/sequence.svh(22) @ 0: uvm_test_top.env.agt.sqr@@seq [Sequence] After Start Item
+UVM_INFO ../../../../../UVM/sequence.svh(27) @ 0: uvm_test_top.env.agt.sqr@@seq [Sequence] Randomise Succesful
+UVM_INFO ../../../../../UVM/driver.svh(37) @ 0: uvm_test_top.env.agt.drv [Driver] Got item
+UVM_INFO ../../../../../UVM/driver.svh(40) @ 70000: uvm_test_top.env.agt.drv [Driver] Wait for reset over
+UVM_INFO ../../../../../UVM/driver.svh(27) @ 4830000: uvm_test_top.env.agt.drv [Driver] In Driver
+UVM_INFO @ 4830000: uvm_test_top.env.comp [Comparator] 
+Expected:
+input_matrix '{281483566841860,1407400653815816,2533317740789772,3659234827763728}
+ ~~~~~~~~~~
+Actual:
+input_matrix '{281483566841860,1407400653815816,2533317740789772,3659234827763728}
+
+UVM_INFO @ 4830000: uvm_test_top.env.comp [Comparator] 
+Expected:
+weight_matrix '{281483566841860,1407400653815816,2533317740789772,3659234827763728}
+ ~~~~~~~~~~
+Actual:
+weight_matrix '{281483566841860,1407400653815816,2533317740789772,3659234827763728}
+
+UVM_INFO @ 4830000: uvm_test_top.env.comp [Comparator] 
+Expected:
+partial_matrix '{0,0,0,0}
+ ~~~~~~~~~~
+Actual:
+partial_matrix '{0,0,0,0}
+
+UVM_INFO @ 4830000: uvm_test_top.env.comp [Comparator] 
+Expected:
+array_output '{0,0,0,0}
+ ~~~~~~~~~~
+Actual:
+array_output '{0,0,0,0}
+
+UVM_INFO @ 4830000: uvm_test_top.env.comp [Comparator] Data match
+UVM_INFO ../../../../../UVM/sequence.svh(31) @ 4830000: uvm_test_top.env.agt.sqr@@seq [Sequence] Randomise Succesful
+UVM_INFO ../../../../../UVM/sequence.svh(20) @ 4830000: uvm_test_top.env.agt.sqr@@seq [Sequence] Before Start Item
+UVM_INFO ../../../../../UVM/sequence.svh(22) @ 4830000: uvm_test_top.env.agt.sqr@@seq [Sequence] After Start Item
+UVM_INFO ../../../../../UVM/sequence.svh(27) @ 4830000: uvm_test_top.env.agt.sqr@@seq [Sequence] Randomise Succesful
+UVM_INFO ../../../../../UVM/driver.svh(37) @ 4830000: uvm_test_top.env.agt.drv [Driver] Got item
+UVM_INFO ../../../../../UVM/driver.svh(40) @ 4910000: uvm_test_top.env.agt.drv [Driver] Wait for reset over
+UVM_INFO ../../../../../UVM/driver.svh(27) @ 9450000: uvm_test_top.env.agt.drv [Driver] In Driver
+UVM_INFO @ 9450000: uvm_test_top.env.comp [Comparator] 
+Expected:
+input_matrix '{281483566841860,1407400653815816,2533317740789772,3659234827763728}
+ ~~~~~~~~~~
+Actual:
+input_matrix '{281483566841860,1407400653815816,2533317740789772,3659234827763728}
+
+UVM_INFO @ 9450000: uvm_test_top.env.comp [Comparator] 
+Expected:
+weight_matrix '{281483566841860,1407400653815816,2533317740789772,3659234827763728}
+ ~~~~~~~~~~
+Actual:
+weight_matrix '{281483566841860,1407400653815816,2533317740789772,3659234827763728}
+
+UVM_INFO @ 9450000: uvm_test_top.env.comp [Comparator] 
+Expected:
+partial_matrix '{0,0,0,0}
+ ~~~~~~~~~~
+Actual:
+partial_matrix '{0,0,0,0}
+
+UVM_INFO @ 9450000: uvm_test_top.env.comp [Comparator] 
+Expected:
+array_output '{0,0,0,0}
+ ~~~~~~~~~~
+Actual:
+array_output '{0,0,0,0}
+
+UVM_INFO @ 9450000: uvm_test_top.env.comp [Comparator] Data match
+UVM_INFO ../../../../../UVM/sequence.svh(31) @ 9450000: uvm_test_top.env.agt.sqr@@seq [Sequence] Randomise Succesful
+UVM_INFO ../../../../../UVM/test.svh(47) @ 9550000: uvm_test_top [test] end run_phase
+UVM_INFO /package/eda/xilinx/Vivado/2023.2/data/system_verilog/uvm_1.2/xlnx_uvm_package.sv(19968) @ 9550000: reporter [TEST_DONE] 'run' phase is ready to proceed to the 'extract' phase
+UVM_INFO @ 9550000: uvm_test_top.env.comp [Comparator] Matches:    2
+UVM_INFO @ 9550000: uvm_test_top.env.comp [Comparator] Mismatches: 0
+UVM_INFO /package/eda/xilinx/Vivado/2023.2/data/system_verilog/uvm_1.2/xlnx_uvm_package.sv(13673) @ 9550000: reporter [UVM/REPORT/SERVER] 
+--- UVM Report Summary ---
+
+** Report counts by severity
+UVM_INFO :   33
+UVM_WARNING :    0
+UVM_ERROR :    0
+UVM_FATAL :    0
+** Report counts by id
+[Comparator]    12
+[Driver]     7
+[RNTST]     1
+[Sequence]     9
+[TEST_DONE]     1
+[UVM/COMP/NAMECHECK]     1
+[UVM/RELNOTES]     1
+[test]     1
+
+$finish called at time : 9550 ns : File "/package/eda/xilinx/Vivado/2023.2/data/system_verilog/uvm_1.2/xlnx_uvm_package.sv" Line 18699
+INFO: [USF-XSim-96] XSim completed. Design snapshot 'tb_systolic_behav' loaded.
+INFO: [USF-XSim-97] XSim simulation ran for 10000ns
+launch_simulation: Time (s): cpu = 00:01:34 ; elapsed = 00:00:32 . Memory (MB): peak = 8589.902 ; gain = 76.895 ; free physical = 24665 ; free virtual = 222508
+close_sim
+INFO: [Simtcl 6-16] Simulation closed
+exit
+INFO: [Common 17-206] Exiting Vivado at Wed Jul 23 12:28:08 2025...

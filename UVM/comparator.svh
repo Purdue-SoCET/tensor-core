@@ -29,6 +29,19 @@ class comparator extends uvm_scoreboard;
     actual_export.connect(actual_fifo.analysis_export);
   endfunction
 
+
+  function void matrix_display(bit[N-1:0][N*DW-1:0] matrix, string name);
+  `uvm_info("COMPARATOR", $sformatf("%s:", name), UVM_MEDIUM)
+    for (int i = 3; i >=0; i--) begin
+      string row = "[ ";
+      for (int j = 3; j >=0; j--) row = {row, $sformatf("%h ", matrix[i][j*DW +: DW])};
+      row = {row, "]"};
+      `uvm_info("COMPARATOR", row, UVM_MEDIUM)
+    // `uvm_info("COMPARATOR", $sformatf("\n\n", name), UVM_MEDIUM)
+    end
+    `uvm_info("COMPARATOR", $sformatf("\n\n"), UVM_MEDIUM)
+  endfunction
+
   task run_phase(uvm_phase phase);
     transaction expected_tx;
     transaction actual_tx;
@@ -36,7 +49,21 @@ class comparator extends uvm_scoreboard;
       expected_fifo.get(expected_tx);
       actual_fifo.get(actual_tx);
       // uvm_report_info("Comparator", $psprintf("\nExpected:\ndrained:%d\n fifo_has_space:%d\n row_out %d\n array_output %d\n out_en\n %d\n~~~~~~~~~~\nActual:\ndrained:%d\n fifo_has_space:%d\n row_out %d\n array_output %d\n out_en\n %d\n", expected_tx.drained, expected_tx.fifo_has_space, expected_tx.row_out, expected_tx.array_output, expected_tx.out_en, actual_tx.drained, actual_tx.fifo_has_space, actual_tx.row_out, actual_tx.array_output, actual_tx.out_en));
-      uvm_report_info("Comparator", $psprintf("\nExpected:\narray_output %0p\n ~~~~~~~~~~\nActual:\narray_output %0p\n", expected_tx.out_matrix, actual_tx.out_matrix));
+      // uvm_report_info("Comparator", $psprintf("\nExpected:\ninput_matrix %0h\n ~~~~~~~~~~\nActual:\ninput_matrix %0h\n", expected_tx.input_matrix, actual_tx.input_matrix));
+      // uvm_report_info("Comparator", $psprintf("\nExpected:\nweight_matrix %0h\n ~~~~~~~~~~\nActual:\nweight_matrix %0h\n", expected_tx.weight_matrix, actual_tx.weight_matrix));
+      // uvm_report_info("Comparator", $psprintf("\nExpected:\npartial_matrix %0h\n ~~~~~~~~~~\nActual:\npartial_matrix %0h\n", expected_tx.partial_matrix, actual_tx.partial_matrix));
+      // uvm_report_info("Comparator", $psprintf("\nExpected:\narray_output %0h\n ~~~~~~~~~~\nActual:\narray_output %0h\n", expected_tx.out_matrix, actual_tx.out_matrix));
+
+
+    matrix_display(actual_tx.input_matrix, "Actual Input");
+    matrix_display(expected_tx.input_matrix, "Expected Input");
+
+    matrix_display(actual_tx.weight_matrix, "Actual Weight");
+    matrix_display(expected_tx.weight_matrix, "Expected Weight");
+
+    matrix_display(actual_tx.out_matrix, "Actual Output");
+    matrix_display(expected_tx.out_matrix, "Expected Output");
+
       // keep count of number of matches and mismatches (actual vs expected)
       if (expected_tx.compare(actual_tx)) begin
         m_matches++;
@@ -53,3 +80,4 @@ class comparator extends uvm_scoreboard;
     uvm_report_info("Comparator", $sformatf("Mismatches: %0d", m_mismatches));
   endfunction
 endclass
+ 

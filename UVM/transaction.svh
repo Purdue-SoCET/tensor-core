@@ -27,22 +27,22 @@ class transaction #(parameter NUM_BITS = 4) extends uvm_sequence_item; // NUM_BI
   bit [N-1:0][DW*N-1:0] out_matrix;
 
   `uvm_object_utils_begin(transaction)
-    `uvm_field_int(weight_en, UVM_NOCOMPARE)
-    `uvm_field_int(input_en, UVM_NOCOMPARE)
-    `uvm_field_int(partial_en, UVM_NOCOMPARE)
-    `uvm_field_int(row_in_en, UVM_NOCOMPARE)
-    `uvm_field_int(row_ps_en, UVM_NOCOMPARE)
-    `uvm_field_int(row_out, UVM_NOCOMPARE)
-    `uvm_field_int(drained, UVM_NOCOMPARE)
-    `uvm_field_int(fifo_has_space, UVM_NOCOMPARE)
-    `uvm_field_int(array_in, UVM_NOCOMPARE)
-    `uvm_field_int(array_in_partials, UVM_NOCOMPARE)
-    `uvm_field_int(out_en, UVM_NOCOMPARE)
-    `uvm_field_int(array_output, UVM_NOCOMPARE)
-    `uvm_field_int(input_matrix, UVM_DEFAULT)
-    `uvm_field_int(weight_matrix, UVM_DEFAULT)
-    `uvm_field_int(partial_matrix, UVM_DEFAULT)
-    `uvm_field_int(out_matrix, UVM_DEFAULT)
+  `uvm_field_int(weight_en, UVM_NOCOMPARE)
+  `uvm_field_int(input_en, UVM_NOCOMPARE)
+  `uvm_field_int(partial_en, UVM_NOCOMPARE)
+  `uvm_field_int(row_in_en, UVM_NOCOMPARE)
+  `uvm_field_int(row_ps_en, UVM_NOCOMPARE)
+  `uvm_field_int(row_out, UVM_NOCOMPARE)
+  `uvm_field_int(drained, UVM_NOCOMPARE)
+  `uvm_field_int(fifo_has_space, UVM_NOCOMPARE)
+  `uvm_field_int(array_in, UVM_NOCOMPARE)
+  `uvm_field_int(array_in_partials, UVM_NOCOMPARE)
+  `uvm_field_int(out_en, UVM_NOCOMPARE)
+  `uvm_field_int(array_output, UVM_NOCOMPARE)
+  `uvm_field_int(input_matrix, UVM_DEFAULT)
+  `uvm_field_int(weight_matrix, UVM_DEFAULT)
+  `uvm_field_int(partial_matrix, UVM_DEFAULT)
+  `uvm_field_int(out_matrix, UVM_DEFAULT)
   `uvm_object_utils_end
   // add constrains for randomization
 
@@ -52,13 +52,18 @@ class transaction #(parameter NUM_BITS = 4) extends uvm_sequence_item; // NUM_BI
 
    constraint input_matrix_c {
     // input_matrix == {16{16'h3c00}}; 
-  foreach (input_matrix[j]) {
-  input_matrix[0][0*DW +: DW-1] inside {[15'h0000:15'h7BFF]};
-  input_matrix[0][1*DW +: DW-1] inside {[15'h0000:15'h7BFF]};
-  input_matrix[0][2*DW +: DW-1] inside {[15'h0000:15'h7BFF]};
-  input_matrix[0][3*DW +: DW-1] inside {[15'h0000:15'h7BFF]};
-    }
-
+    input_matrix == {{16'h3c00, 16'h00, 16'h00, 16'h00},
+                     {16'h3c00, 16'h00, 16'h00, 16'h00},
+                     {16'h3c00, 16'h00, 16'h00, 16'h00},
+                     {16'h3c00, 16'h00, 16'h00, 16'h00}
+                    };
+                 
+  // foreach (input_matrix[j]) {
+  // input_matrix[0][0*DW +: DW-1] inside {[15'h0000:15'h7BFF]};
+  // input_matrix[0][1*DW +: DW-1] inside {[15'h0000:15'h7BFF]};
+  // input_matrix[0][2*DW +: DW-1] inside {[15'h0000:15'h7BFF]};
+  // input_matrix[0][3*DW +: DW-1] inside {[15'h0000:15'h7BFF]};
+  //   }
   }
 
 
@@ -67,24 +72,42 @@ class transaction #(parameter NUM_BITS = 4) extends uvm_sequence_item; // NUM_BI
   // foreach (weight_matrix[i]) {
   //   weight_matrix[i] == 64'h0001000100010001;
   // }
-  foreach (weight_matrix[j]) {
-  weight_matrix[0][0*DW +: DW-1] inside {[15'h0000:15'h7BFF]};
-  weight_matrix[0][1*DW +: DW-1] inside {[15'h0000:15'h7BFF]};
-  weight_matrix[0][2*DW +: DW-1] inside {[15'h0000:15'h7BFF]};
-  weight_matrix[0][3*DW +: DW-1] inside {[15'h0000:15'h7BFF]};
-    }
+  // foreach (weight_matrix[j]) {
+    weight_matrix == 
+                    {{16'h3c00, 16'h3c00, 16'h3c00, 16'h3c00},
+                     {16'h00, 16'h00, 16'h00, 16'h00},
+                     {16'h00, 16'h00, 16'h00, 16'h00},
+                     {16'h00, 16'h00, 16'h00, 16'h00}
+                    };
+  // weight_matrix[0][0*DW +: DW-1] inside {[15'h0000:15'h7BFF]};
+  // weight_matrix[0][1*DW +: DW-1] inside {[15'h0000:15'h7BFF]};
+  // weight_matrix[0][2*DW +: DW-1] inside {[15'h0000:15'h7BFF]};
+  // weight_matrix[0][3*DW +: DW-1] inside {[15'h0000:15'h7BFF]};
+  //   }
 }
+
+// Constraints to try out. 
+  // Also test for Error state - Provide Invalid values and see how DUT reacts
+  // Negative numbers
+  // Max values
+  // Random flags to specify sign
+
+
      constraint partial_matrix_c {
       // partial_matrix == {16{16'h3c00}}; // Verify endianness
   // foreach (partial_matrix[i]) {
   //   partial_matrix[i] == 64'h0001000100010001;
   // }
-  foreach (partial_matrix[j]) {
-  partial_matrix[0][0*DW +: DW-1] inside {[15'h0000:15'h7BFF]};
-  partial_matrix[0][1*DW +: DW-1] inside {[15'h0000:15'h7BFF]};
-  partial_matrix[0][2*DW +: DW-1] inside {[15'h0000:15'h7BFF]};
-  partial_matrix[0][3*DW +: DW-1] inside {[15'h0000:15'h7BFF]};
-    }
+  // foreach (partial_matrix[j]) {
+  // partial_matrix[0][0*DW +: DW-1] inside {[15'h0000:15'h7BFF]};
+  // partial_matrix[0][1*DW +: DW-1] inside {[15'h0000:15'h7BFF]};
+  // partial_matrix[0][2*DW +: DW-1] inside {[15'h0000:15'h7BFF]};
+  // partial_matrix[0][3*DW +: DW-1] inside {[15'h0000:15'h7BFF]};
+  //   }
+  partial_matrix == {{16'h0, 16'h0, 16'h0, 16'h0},
+                     {16'h0, 16'h0, 16'h0, 16'h0},
+                     {16'h0, 16'h0, 16'h0, 16'h0},
+                     {16'h0, 16'h0, 16'h0, 16'h0}}; 
 }
 
 
@@ -101,19 +124,19 @@ class transaction #(parameter NUM_BITS = 4) extends uvm_sequence_item; // NUM_BI
 endclass
 
 
-class seq_it extends transaction;
-  `uvm_object_utils(seq_it)
+// class seq_it extends transaction;
+//   `uvm_object_utils(seq_it)
 
-  function new(string name = "seq_it");
-    super.new(name);
-  endfunction: new
+//   function new(string name = "seq_it");
+//     super.new(name);
+//   endfunction: new
 
- constraint input_matrix_c {
-  foreach (input_matrix[i, j]) {
-    input_matrix[i][j] == i*4 + j + 1;
-  }
-}
+//  constraint input_matrix_c {
+//   foreach (input_matrix[i, j]) {
+//     input_matrix[i][j] == i*4 + j + 1;
+//   }
+// }
 
-endclass: seq_it
+// endclass: seq_it
 
 `endif // TRANSACTION_SVH

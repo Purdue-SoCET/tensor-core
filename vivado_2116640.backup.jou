@@ -1,0 +1,18 @@
+#-----------------------------------------------------------
+# Vivado v2023.2 (64-bit)
+# SW Build 4029153 on Fri Oct 13 20:13:54 MDT 2023
+# IP Build 4028589 on Sat Oct 14 00:45:43 MDT 2023
+# SharedData Build 4025554 on Tue Oct 10 17:18:54 MDT 2023
+# Start of session at: Wed Jul 23 12:41:34 2025
+# Process ID: 2116640
+# Current directory: /home/asicfab/a/naray145/UVM---Tensor-Core
+# Command line: vivado
+# Log file: /home/asicfab/a/naray145/UVM---Tensor-Core/vivado.log
+# Journal file: /home/asicfab/a/naray145/UVM---Tensor-Core/vivado.jou
+# Running On: asicfab.ecn.purdue.edu, OS: Linux, CPU Frequency: 2295.737 MHz, CPU Physical cores: 32, Host memory: 269482 MB
+#-----------------------------------------------------------
+start_gui
+open_project /home/asicfab/a/naray145/UVM---Tensor-Core/Xilinx/UVM_systolic_array.xpr
+launch_simulation
+source tb_systolic.tcl
+close_sim

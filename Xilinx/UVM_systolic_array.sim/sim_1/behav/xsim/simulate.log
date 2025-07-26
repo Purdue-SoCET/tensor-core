@@ -1,0 +1,236 @@
+Time resolution is 1 ps
+UVM_INFO /package/eda/xilinx/Vivado/2023.2/data/system_verilog/uvm_1.2/xlnx_uvm_package.sv(18601) @ 0: reporter [UVM/RELNOTES] 
+----------------------------------------------------------------
+UVM-1.2
+(C) 2007-2014 Mentor Graphics Corporation
+(C) 2007-2014 Cadence Design Systems, Inc.
+(C) 2006-2014 Synopsys, Inc.
+(C) 2011-2013 Cypress Semiconductor Corp.
+(C) 2013-2014 NVIDIA Corporation
+----------------------------------------------------------------
+
+  ***********       IMPORTANT RELEASE NOTES         ************
+
+  You are using a version of the UVM library that has been compiled
+  with `UVM_NO_DEPRECATED undefined.
+
+  You are using a version of the UVM library that has been compiled
+  with `UVM_OBJECT_DO_NOT_NEED_CONSTRUCTOR undefined.
+
+      (Specify +UVM_NO_RELNOTES to turn off this notice)
+
+UVM_INFO @ 0: reporter [RNTST] Running test test...
+UVM_INFO /package/eda/xilinx/Vivado/2023.2/data/system_verilog/uvm_1.2/xlnx_uvm_package.sv(20867) @ 0: reporter [UVM/COMP/NAMECHECK] This implementation of the component name checks requires DPI to be enabled
+                   0 Starting sequence run_phase
+UVM_INFO ../../../../../UVM/driver.svh(27) @ 0: uvm_test_top.env.agt.drv [Driver] In Driver
+UVM_INFO ../../../../../UVM/sequence.svh(16) @ 0: uvm_test_top.env.agt.sqr@@seq [Sequence] Before Start Item
+UVM_INFO ../../../../../UVM/sequence.svh(20) @ 0: uvm_test_top.env.agt.sqr@@seq [Sequence] Before Start Item
+UVM_INFO ../../../../../UVM/sequence.svh(22) @ 0: uvm_test_top.env.agt.sqr@@seq [Sequence] After Start Item
+UVM_INFO ../../../../../UVM/sequence.svh(27) @ 0: uvm_test_top.env.agt.sqr@@seq [Sequence] Randomise Succesful
+UVM_INFO ../../../../../UVM/driver.svh(37) @ 0: uvm_test_top.env.agt.drv [Driver] Got item
+UVM_INFO ../../../../../UVM/driver.svh(40) @ 70000: uvm_test_top.env.agt.drv [Driver] Wait for reset over
+UVM_INFO ../../../../../UVM/predictor.svh(146) @ 390000: uvm_test_top.env.pred [PREDICTOR] Input Matrix (FP16, hex):
+UVM_INFO ../../../../../UVM/predictor.svh(151) @ 390000: uvm_test_top.env.pred [PREDICTOR] [ 3c00 0000 0000 0000 ]
+UVM_INFO ../../../../../UVM/predictor.svh(151) @ 390000: uvm_test_top.env.pred [PREDICTOR] [ 3c00 0000 0000 0000 ]
+UVM_INFO ../../../../../UVM/predictor.svh(151) @ 390000: uvm_test_top.env.pred [PREDICTOR] [ 3c00 0000 0000 0000 ]
+UVM_INFO ../../../../../UVM/predictor.svh(151) @ 390000: uvm_test_top.env.pred [PREDICTOR] [ 3c00 0000 0000 0000 ]
+UVM_INFO ../../../../../UVM/predictor.svh(154) @ 390000: uvm_test_top.env.pred [PREDICTOR] Weight Matrix (FP16, hex):
+UVM_INFO ../../../../../UVM/predictor.svh(159) @ 390000: uvm_test_top.env.pred [PREDICTOR] [ 3c00 3c00 3c00 3c00 ]
+UVM_INFO ../../../../../UVM/predictor.svh(159) @ 390000: uvm_test_top.env.pred [PREDICTOR] [ 0000 0000 0000 0000 ]
+UVM_INFO ../../../../../UVM/predictor.svh(159) @ 390000: uvm_test_top.env.pred [PREDICTOR] [ 0000 0000 0000 0000 ]
+UVM_INFO ../../../../../UVM/predictor.svh(159) @ 390000: uvm_test_top.env.pred [PREDICTOR] [ 0000 0000 0000 0000 ]
+UVM_INFO ../../../../../UVM/predictor.svh(163) @ 390000: uvm_test_top.env.pred [PREDICTOR] Input Matrix (real):
+UVM_INFO ../../../../../UVM/predictor.svh(168) @ 390000: uvm_test_top.env.pred [PREDICTOR] [ 0.00000 0.00000 0.00000 0.00000 ]
+UVM_INFO ../../../../../UVM/predictor.svh(168) @ 390000: uvm_test_top.env.pred [PREDICTOR] [ 0.00000 0.00000 0.00000 0.00000 ]
+UVM_INFO ../../../../../UVM/predictor.svh(168) @ 390000: uvm_test_top.env.pred [PREDICTOR] [ 0.00000 0.00000 0.00000 0.00000 ]
+UVM_INFO ../../../../../UVM/predictor.svh(168) @ 390000: uvm_test_top.env.pred [PREDICTOR] [ 1.00000 1.00000 1.00000 1.00000 ]
+UVM_INFO ../../../../../UVM/predictor.svh(171) @ 390000: uvm_test_top.env.pred [PREDICTOR] Weight Matrix (real):
+UVM_INFO ../../../../../UVM/predictor.svh(176) @ 390000: uvm_test_top.env.pred [PREDICTOR] [ 1.00000 0.00000 0.00000 0.00000 ]
+UVM_INFO ../../../../../UVM/predictor.svh(176) @ 390000: uvm_test_top.env.pred [PREDICTOR] [ 1.00000 0.00000 0.00000 0.00000 ]
+UVM_INFO ../../../../../UVM/predictor.svh(176) @ 390000: uvm_test_top.env.pred [PREDICTOR] [ 1.00000 0.00000 0.00000 0.00000 ]
+UVM_INFO ../../../../../UVM/predictor.svh(176) @ 390000: uvm_test_top.env.pred [PREDICTOR] [ 1.00000 0.00000 0.00000 0.00000 ]
+UVM_INFO ../../../../../UVM/predictor.svh(179) @ 390000: uvm_test_top.env.pred [PREDICTOR] Partial Matrix (real):
+UVM_INFO ../../../../../UVM/predictor.svh(184) @ 390000: uvm_test_top.env.pred [PREDICTOR] [ 0.00000 0.00000 0.00000 0.00000 ]
+UVM_INFO ../../../../../UVM/predictor.svh(184) @ 390000: uvm_test_top.env.pred [PREDICTOR] [ 0.00000 0.00000 0.00000 0.00000 ]
+UVM_INFO ../../../../../UVM/predictor.svh(184) @ 390000: uvm_test_top.env.pred [PREDICTOR] [ 0.00000 0.00000 0.00000 0.00000 ]
+UVM_INFO ../../../../../UVM/predictor.svh(184) @ 390000: uvm_test_top.env.pred [PREDICTOR] [ 0.00000 0.00000 0.00000 0.00000 ]
+UVM_INFO ../../../../../UVM/predictor.svh(187) @ 390000: uvm_test_top.env.pred [PREDICTOR] Output Matrix (real):
+UVM_INFO ../../../../../UVM/predictor.svh(192) @ 390000: uvm_test_top.env.pred [PREDICTOR] [ 0.00000 0.00000 0.00000 0.00000 ]
+UVM_INFO ../../../../../UVM/predictor.svh(192) @ 390000: uvm_test_top.env.pred [PREDICTOR] [ 0.00000 0.00000 0.00000 0.00000 ]
+UVM_INFO ../../../../../UVM/predictor.svh(192) @ 390000: uvm_test_top.env.pred [PREDICTOR] [ 0.00000 0.00000 0.00000 0.00000 ]
+UVM_INFO ../../../../../UVM/predictor.svh(192) @ 390000: uvm_test_top.env.pred [PREDICTOR] [ 4.00000 0.00000 0.00000 0.00000 ]
+UVM_INFO ../../../../../UVM/predictor.svh(195) @ 390000: uvm_test_top.env.pred [PREDICTOR] Output Matrix (FP16, hex):
+UVM_INFO ../../../../../UVM/predictor.svh(200) @ 390000: uvm_test_top.env.pred [PREDICTOR] [ 0000 0000 0000 0000 ]
+UVM_INFO ../../../../../UVM/predictor.svh(200) @ 390000: uvm_test_top.env.pred [PREDICTOR] [ 0000 0000 0000 0000 ]
+UVM_INFO ../../../../../UVM/predictor.svh(200) @ 390000: uvm_test_top.env.pred [PREDICTOR] [ 0000 0000 0000 0000 ]
+UVM_INFO ../../../../../UVM/predictor.svh(200) @ 390000: uvm_test_top.env.pred [PREDICTOR] [ 4400 0000 0000 0000 ]
+UVM_INFO ../../../../../UVM/driver.svh(27) @ 4830000: uvm_test_top.env.agt.drv [Driver] In Driver
+UVM_INFO ../../../../../UVM/comparator.svh(34) @ 4830000: uvm_test_top.env.comp [COMPARATOR] Actual Input:
+UVM_INFO ../../../../../UVM/comparator.svh(39) @ 4830000: uvm_test_top.env.comp [COMPARATOR] [ 3c00 0000 0000 0000 ]
+UVM_INFO ../../../../../UVM/comparator.svh(39) @ 4830000: uvm_test_top.env.comp [COMPARATOR] [ 3c00 0000 0000 0000 ]
+UVM_INFO ../../../../../UVM/comparator.svh(39) @ 4830000: uvm_test_top.env.comp [COMPARATOR] [ 3c00 0000 0000 0000 ]
+UVM_INFO ../../../../../UVM/comparator.svh(39) @ 4830000: uvm_test_top.env.comp [COMPARATOR] [ 3c00 0000 0000 0000 ]
+UVM_INFO ../../../../../UVM/comparator.svh(42) @ 4830000: uvm_test_top.env.comp [COMPARATOR] 
+
+
+UVM_INFO ../../../../../UVM/comparator.svh(34) @ 4830000: uvm_test_top.env.comp [COMPARATOR] Expected Input:
+UVM_INFO ../../../../../UVM/comparator.svh(39) @ 4830000: uvm_test_top.env.comp [COMPARATOR] [ 3c00 0000 0000 0000 ]
+UVM_INFO ../../../../../UVM/comparator.svh(39) @ 4830000: uvm_test_top.env.comp [COMPARATOR] [ 3c00 0000 0000 0000 ]
+UVM_INFO ../../../../../UVM/comparator.svh(39) @ 4830000: uvm_test_top.env.comp [COMPARATOR] [ 3c00 0000 0000 0000 ]
+UVM_INFO ../../../../../UVM/comparator.svh(39) @ 4830000: uvm_test_top.env.comp [COMPARATOR] [ 3c00 0000 0000 0000 ]
+UVM_INFO ../../../../../UVM/comparator.svh(42) @ 4830000: uvm_test_top.env.comp [COMPARATOR] 
+
+
+UVM_INFO ../../../../../UVM/comparator.svh(34) @ 4830000: uvm_test_top.env.comp [COMPARATOR] Actual Weight:
+UVM_INFO ../../../../../UVM/comparator.svh(39) @ 4830000: uvm_test_top.env.comp [COMPARATOR] [ 3c00 3c00 3c00 3c00 ]
+UVM_INFO ../../../../../UVM/comparator.svh(39) @ 4830000: uvm_test_top.env.comp [COMPARATOR] [ 0000 0000 0000 0000 ]
+UVM_INFO ../../../../../UVM/comparator.svh(39) @ 4830000: uvm_test_top.env.comp [COMPARATOR] [ 0000 0000 0000 0000 ]
+UVM_INFO ../../../../../UVM/comparator.svh(39) @ 4830000: uvm_test_top.env.comp [COMPARATOR] [ 0000 0000 0000 0000 ]
+UVM_INFO ../../../../../UVM/comparator.svh(42) @ 4830000: uvm_test_top.env.comp [COMPARATOR] 
+
+
+UVM_INFO ../../../../../UVM/comparator.svh(34) @ 4830000: uvm_test_top.env.comp [COMPARATOR] Expected Weight:
+UVM_INFO ../../../../../UVM/comparator.svh(39) @ 4830000: uvm_test_top.env.comp [COMPARATOR] [ 3c00 3c00 3c00 3c00 ]
+UVM_INFO ../../../../../UVM/comparator.svh(39) @ 4830000: uvm_test_top.env.comp [COMPARATOR] [ 0000 0000 0000 0000 ]
+UVM_INFO ../../../../../UVM/comparator.svh(39) @ 4830000: uvm_test_top.env.comp [COMPARATOR] [ 0000 0000 0000 0000 ]
+UVM_INFO ../../../../../UVM/comparator.svh(39) @ 4830000: uvm_test_top.env.comp [COMPARATOR] [ 0000 0000 0000 0000 ]
+UVM_INFO ../../../../../UVM/comparator.svh(42) @ 4830000: uvm_test_top.env.comp [COMPARATOR] 
+
+
+UVM_INFO ../../../../../UVM/comparator.svh(34) @ 4830000: uvm_test_top.env.comp [COMPARATOR] Actual Output:
+UVM_INFO ../../../../../UVM/comparator.svh(39) @ 4830000: uvm_test_top.env.comp [COMPARATOR] [ 0000 0000 0000 0000 ]
+UVM_INFO ../../../../../UVM/comparator.svh(39) @ 4830000: uvm_test_top.env.comp [COMPARATOR] [ 0000 0000 0000 0000 ]
+UVM_INFO ../../../../../UVM/comparator.svh(39) @ 4830000: uvm_test_top.env.comp [COMPARATOR] [ 0000 0000 0000 0000 ]
+UVM_INFO ../../../../../UVM/comparator.svh(39) @ 4830000: uvm_test_top.env.comp [COMPARATOR] [ 4400 0000 0000 0000 ]
+UVM_INFO ../../../../../UVM/comparator.svh(42) @ 4830000: uvm_test_top.env.comp [COMPARATOR] 
+
+
+UVM_INFO ../../../../../UVM/comparator.svh(34) @ 4830000: uvm_test_top.env.comp [COMPARATOR] Expected Output:
+UVM_INFO ../../../../../UVM/comparator.svh(39) @ 4830000: uvm_test_top.env.comp [COMPARATOR] [ 0000 0000 0000 0000 ]
+UVM_INFO ../../../../../UVM/comparator.svh(39) @ 4830000: uvm_test_top.env.comp [COMPARATOR] [ 0000 0000 0000 0000 ]
+UVM_INFO ../../../../../UVM/comparator.svh(39) @ 4830000: uvm_test_top.env.comp [COMPARATOR] [ 0000 0000 0000 0000 ]
+UVM_INFO ../../../../../UVM/comparator.svh(39) @ 4830000: uvm_test_top.env.comp [COMPARATOR] [ 4400 0000 0000 0000 ]
+UVM_INFO ../../../../../UVM/comparator.svh(42) @ 4830000: uvm_test_top.env.comp [COMPARATOR] 
+
+
+UVM_INFO @ 4830000: uvm_test_top.env.comp [Comparator] Data match
+UVM_INFO ../../../../../UVM/sequence.svh(31) @ 4830000: uvm_test_top.env.agt.sqr@@seq [Sequence] Randomise Succesful
+UVM_INFO ../../../../../UVM/sequence.svh(20) @ 4830000: uvm_test_top.env.agt.sqr@@seq [Sequence] Before Start Item
+UVM_INFO ../../../../../UVM/sequence.svh(22) @ 4830000: uvm_test_top.env.agt.sqr@@seq [Sequence] After Start Item
+UVM_INFO ../../../../../UVM/sequence.svh(27) @ 4830000: uvm_test_top.env.agt.sqr@@seq [Sequence] Randomise Succesful
+UVM_INFO ../../../../../UVM/driver.svh(37) @ 4830000: uvm_test_top.env.agt.drv [Driver] Got item
+UVM_INFO ../../../../../UVM/driver.svh(40) @ 4910000: uvm_test_top.env.agt.drv [Driver] Wait for reset over
+UVM_INFO ../../../../../UVM/predictor.svh(146) @ 5230000: uvm_test_top.env.pred [PREDICTOR] Input Matrix (FP16, hex):
+UVM_INFO ../../../../../UVM/predictor.svh(151) @ 5230000: uvm_test_top.env.pred [PREDICTOR] [ 3c00 0000 0000 0000 ]
+UVM_INFO ../../../../../UVM/predictor.svh(151) @ 5230000: uvm_test_top.env.pred [PREDICTOR] [ 3c00 0000 0000 0000 ]
+UVM_INFO ../../../../../UVM/predictor.svh(151) @ 5230000: uvm_test_top.env.pred [PREDICTOR] [ 3c00 0000 0000 0000 ]
+UVM_INFO ../../../../../UVM/predictor.svh(151) @ 5230000: uvm_test_top.env.pred [PREDICTOR] [ 3c00 0000 0000 0000 ]
+UVM_INFO ../../../../../UVM/predictor.svh(154) @ 5230000: uvm_test_top.env.pred [PREDICTOR] Weight Matrix (FP16, hex):
+UVM_INFO ../../../../../UVM/predictor.svh(159) @ 5230000: uvm_test_top.env.pred [PREDICTOR] [ 3c00 3c00 3c00 3c00 ]
+UVM_INFO ../../../../../UVM/predictor.svh(159) @ 5230000: uvm_test_top.env.pred [PREDICTOR] [ 0000 0000 0000 0000 ]
+UVM_INFO ../../../../../UVM/predictor.svh(159) @ 5230000: uvm_test_top.env.pred [PREDICTOR] [ 0000 0000 0000 0000 ]
+UVM_INFO ../../../../../UVM/predictor.svh(159) @ 5230000: uvm_test_top.env.pred [PREDICTOR] [ 0000 0000 0000 0000 ]
+UVM_INFO ../../../../../UVM/predictor.svh(163) @ 5230000: uvm_test_top.env.pred [PREDICTOR] Input Matrix (real):
+UVM_INFO ../../../../../UVM/predictor.svh(168) @ 5230000: uvm_test_top.env.pred [PREDICTOR] [ 0.00000 0.00000 0.00000 0.00000 ]
+UVM_INFO ../../../../../UVM/predictor.svh(168) @ 5230000: uvm_test_top.env.pred [PREDICTOR] [ 0.00000 0.00000 0.00000 0.00000 ]
+UVM_INFO ../../../../../UVM/predictor.svh(168) @ 5230000: uvm_test_top.env.pred [PREDICTOR] [ 0.00000 0.00000 0.00000 0.00000 ]
+UVM_INFO ../../../../../UVM/predictor.svh(168) @ 5230000: uvm_test_top.env.pred [PREDICTOR] [ 1.00000 1.00000 1.00000 1.00000 ]
+UVM_INFO ../../../../../UVM/predictor.svh(171) @ 5230000: uvm_test_top.env.pred [PREDICTOR] Weight Matrix (real):
+UVM_INFO ../../../../../UVM/predictor.svh(176) @ 5230000: uvm_test_top.env.pred [PREDICTOR] [ 1.00000 0.00000 0.00000 0.00000 ]
+UVM_INFO ../../../../../UVM/predictor.svh(176) @ 5230000: uvm_test_top.env.pred [PREDICTOR] [ 1.00000 0.00000 0.00000 0.00000 ]
+UVM_INFO ../../../../../UVM/predictor.svh(176) @ 5230000: uvm_test_top.env.pred [PREDICTOR] [ 1.00000 0.00000 0.00000 0.00000 ]
+UVM_INFO ../../../../../UVM/predictor.svh(176) @ 5230000: uvm_test_top.env.pred [PREDICTOR] [ 1.00000 0.00000 0.00000 0.00000 ]
+UVM_INFO ../../../../../UVM/predictor.svh(179) @ 5230000: uvm_test_top.env.pred [PREDICTOR] Partial Matrix (real):
+UVM_INFO ../../../../../UVM/predictor.svh(184) @ 5230000: uvm_test_top.env.pred [PREDICTOR] [ 0.00000 0.00000 0.00000 0.00000 ]
+UVM_INFO ../../../../../UVM/predictor.svh(184) @ 5230000: uvm_test_top.env.pred [PREDICTOR] [ 0.00000 0.00000 0.00000 0.00000 ]
+UVM_INFO ../../../../../UVM/predictor.svh(184) @ 5230000: uvm_test_top.env.pred [PREDICTOR] [ 0.00000 0.00000 0.00000 0.00000 ]
+UVM_INFO ../../../../../UVM/predictor.svh(184) @ 5230000: uvm_test_top.env.pred [PREDICTOR] [ 0.00000 0.00000 0.00000 0.00000 ]
+UVM_INFO ../../../../../UVM/predictor.svh(187) @ 5230000: uvm_test_top.env.pred [PREDICTOR] Output Matrix (real):
+UVM_INFO ../../../../../UVM/predictor.svh(192) @ 5230000: uvm_test_top.env.pred [PREDICTOR] [ 0.00000 0.00000 0.00000 0.00000 ]
+UVM_INFO ../../../../../UVM/predictor.svh(192) @ 5230000: uvm_test_top.env.pred [PREDICTOR] [ 0.00000 0.00000 0.00000 0.00000 ]
+UVM_INFO ../../../../../UVM/predictor.svh(192) @ 5230000: uvm_test_top.env.pred [PREDICTOR] [ 0.00000 0.00000 0.00000 0.00000 ]
+UVM_INFO ../../../../../UVM/predictor.svh(192) @ 5230000: uvm_test_top.env.pred [PREDICTOR] [ 4.00000 0.00000 0.00000 0.00000 ]
+UVM_INFO ../../../../../UVM/predictor.svh(195) @ 5230000: uvm_test_top.env.pred [PREDICTOR] Output Matrix (FP16, hex):
+UVM_INFO ../../../../../UVM/predictor.svh(200) @ 5230000: uvm_test_top.env.pred [PREDICTOR] [ 0000 0000 0000 0000 ]
+UVM_INFO ../../../../../UVM/predictor.svh(200) @ 5230000: uvm_test_top.env.pred [PREDICTOR] [ 0000 0000 0000 0000 ]
+UVM_INFO ../../../../../UVM/predictor.svh(200) @ 5230000: uvm_test_top.env.pred [PREDICTOR] [ 0000 0000 0000 0000 ]
+UVM_INFO ../../../../../UVM/predictor.svh(200) @ 5230000: uvm_test_top.env.pred [PREDICTOR] [ 4400 0000 0000 0000 ]
+UVM_INFO ../../../../../UVM/driver.svh(27) @ 9450000: uvm_test_top.env.agt.drv [Driver] In Driver
+UVM_INFO ../../../../../UVM/comparator.svh(34) @ 9450000: uvm_test_top.env.comp [COMPARATOR] Actual Input:
+UVM_INFO ../../../../../UVM/comparator.svh(39) @ 9450000: uvm_test_top.env.comp [COMPARATOR] [ 3c00 0000 0000 0000 ]
+UVM_INFO ../../../../../UVM/comparator.svh(39) @ 9450000: uvm_test_top.env.comp [COMPARATOR] [ 3c00 0000 0000 0000 ]
+UVM_INFO ../../../../../UVM/comparator.svh(39) @ 9450000: uvm_test_top.env.comp [COMPARATOR] [ 3c00 0000 0000 0000 ]
+UVM_INFO ../../../../../UVM/comparator.svh(39) @ 9450000: uvm_test_top.env.comp [COMPARATOR] [ 3c00 0000 0000 0000 ]
+UVM_INFO ../../../../../UVM/comparator.svh(42) @ 9450000: uvm_test_top.env.comp [COMPARATOR] 
+
+
+UVM_INFO ../../../../../UVM/comparator.svh(34) @ 9450000: uvm_test_top.env.comp [COMPARATOR] Expected Input:
+UVM_INFO ../../../../../UVM/comparator.svh(39) @ 9450000: uvm_test_top.env.comp [COMPARATOR] [ 3c00 0000 0000 0000 ]
+UVM_INFO ../../../../../UVM/comparator.svh(39) @ 9450000: uvm_test_top.env.comp [COMPARATOR] [ 3c00 0000 0000 0000 ]
+UVM_INFO ../../../../../UVM/comparator.svh(39) @ 9450000: uvm_test_top.env.comp [COMPARATOR] [ 3c00 0000 0000 0000 ]
+UVM_INFO ../../../../../UVM/comparator.svh(39) @ 9450000: uvm_test_top.env.comp [COMPARATOR] [ 3c00 0000 0000 0000 ]
+UVM_INFO ../../../../../UVM/comparator.svh(42) @ 9450000: uvm_test_top.env.comp [COMPARATOR] 
+
+
+UVM_INFO ../../../../../UVM/comparator.svh(34) @ 9450000: uvm_test_top.env.comp [COMPARATOR] Actual Weight:
+UVM_INFO ../../../../../UVM/comparator.svh(39) @ 9450000: uvm_test_top.env.comp [COMPARATOR] [ 3c00 3c00 3c00 3c00 ]
+UVM_INFO ../../../../../UVM/comparator.svh(39) @ 9450000: uvm_test_top.env.comp [COMPARATOR] [ 0000 0000 0000 0000 ]
+UVM_INFO ../../../../../UVM/comparator.svh(39) @ 9450000: uvm_test_top.env.comp [COMPARATOR] [ 0000 0000 0000 0000 ]
+UVM_INFO ../../../../../UVM/comparator.svh(39) @ 9450000: uvm_test_top.env.comp [COMPARATOR] [ 0000 0000 0000 0000 ]
+UVM_INFO ../../../../../UVM/comparator.svh(42) @ 9450000: uvm_test_top.env.comp [COMPARATOR] 
+
+
+UVM_INFO ../../../../../UVM/comparator.svh(34) @ 9450000: uvm_test_top.env.comp [COMPARATOR] Expected Weight:
+UVM_INFO ../../../../../UVM/comparator.svh(39) @ 9450000: uvm_test_top.env.comp [COMPARATOR] [ 3c00 3c00 3c00 3c00 ]
+UVM_INFO ../../../../../UVM/comparator.svh(39) @ 9450000: uvm_test_top.env.comp [COMPARATOR] [ 0000 0000 0000 0000 ]
+UVM_INFO ../../../../../UVM/comparator.svh(39) @ 9450000: uvm_test_top.env.comp [COMPARATOR] [ 0000 0000 0000 0000 ]
+UVM_INFO ../../../../../UVM/comparator.svh(39) @ 9450000: uvm_test_top.env.comp [COMPARATOR] [ 0000 0000 0000 0000 ]
+UVM_INFO ../../../../../UVM/comparator.svh(42) @ 9450000: uvm_test_top.env.comp [COMPARATOR] 
+
+
+UVM_INFO ../../../../../UVM/comparator.svh(34) @ 9450000: uvm_test_top.env.comp [COMPARATOR] Actual Output:
+UVM_INFO ../../../../../UVM/comparator.svh(39) @ 9450000: uvm_test_top.env.comp [COMPARATOR] [ 0000 0000 0000 0000 ]
+UVM_INFO ../../../../../UVM/comparator.svh(39) @ 9450000: uvm_test_top.env.comp [COMPARATOR] [ 0000 0000 0000 0000 ]
+UVM_INFO ../../../../../UVM/comparator.svh(39) @ 9450000: uvm_test_top.env.comp [COMPARATOR] [ 0000 0000 0000 0000 ]
+UVM_INFO ../../../../../UVM/comparator.svh(39) @ 9450000: uvm_test_top.env.comp [COMPARATOR] [ 4200 0000 0000 0000 ]
+UVM_INFO ../../../../../UVM/comparator.svh(42) @ 9450000: uvm_test_top.env.comp [COMPARATOR] 
+
+
+UVM_INFO ../../../../../UVM/comparator.svh(34) @ 9450000: uvm_test_top.env.comp [COMPARATOR] Expected Output:
+UVM_INFO ../../../../../UVM/comparator.svh(39) @ 9450000: uvm_test_top.env.comp [COMPARATOR] [ 0000 0000 0000 0000 ]
+UVM_INFO ../../../../../UVM/comparator.svh(39) @ 9450000: uvm_test_top.env.comp [COMPARATOR] [ 0000 0000 0000 0000 ]
+UVM_INFO ../../../../../UVM/comparator.svh(39) @ 9450000: uvm_test_top.env.comp [COMPARATOR] [ 0000 0000 0000 0000 ]
+UVM_INFO ../../../../../UVM/comparator.svh(39) @ 9450000: uvm_test_top.env.comp [COMPARATOR] [ 4400 0000 0000 0000 ]
+UVM_INFO ../../../../../UVM/comparator.svh(42) @ 9450000: uvm_test_top.env.comp [COMPARATOR] 
+
+
+UVM_INFO /package/eda/xilinx/Vivado/2023.2/data/system_verilog/uvm_1.2/xlnx_uvm_package.sv(9338) @ 9450000: reporter [MISCMP] Miscompare for output_tx.out_matrix: lhs = 'h4400000000000000 : rhs = 'h4200000000000000
+UVM_INFO /package/eda/xilinx/Vivado/2023.2/data/system_verilog/uvm_1.2/xlnx_uvm_package.sv(9362) @ 9450000: reporter [MISCMP] 1 Miscompare(s) for object tx@983 vs. output_tx@987
+UVM_INFO @ 9450000: uvm_test_top.env.comp [Comparator] Error: Data mismatch
+UVM_INFO ../../../../../UVM/sequence.svh(31) @ 9450000: uvm_test_top.env.agt.sqr@@seq [Sequence] Randomise Succesful
+UVM_INFO ../../../../../UVM/test.svh(47) @ 9550000: uvm_test_top [test] end run_phase
+UVM_INFO /package/eda/xilinx/Vivado/2023.2/data/system_verilog/uvm_1.2/xlnx_uvm_package.sv(19968) @ 9550000: reporter [TEST_DONE] 'run' phase is ready to proceed to the 'extract' phase
+UVM_INFO @ 9550000: uvm_test_top.env.comp [Comparator] Matches:    1
+UVM_INFO @ 9550000: uvm_test_top.env.comp [Comparator] Mismatches: 1
+UVM_INFO /package/eda/xilinx/Vivado/2023.2/data/system_verilog/uvm_1.2/xlnx_uvm_package.sv(13673) @ 9550000: reporter [UVM/REPORT/SERVER] 
+--- UVM Report Summary ---
+
+** Report counts by severity
+UVM_INFO :  169
+UVM_WARNING :    0
+UVM_ERROR :    0
+UVM_FATAL :    0
+** Report counts by id
+[COMPARATOR]    72
+[Comparator]     4
+[Driver]     7
+[MISCMP]     2
+[PREDICTOR]    70
+[RNTST]     1
+[Sequence]     9
+[TEST_DONE]     1
+[UVM/COMP/NAMECHECK]     1
+[UVM/RELNOTES]     1
+[test]     1
+
+$finish called at time : 9550 ns : File "/package/eda/xilinx/Vivado/2023.2/data/system_verilog/uvm_1.2/xlnx_uvm_package.sv" Line 18699
