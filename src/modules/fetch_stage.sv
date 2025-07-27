@@ -15,7 +15,7 @@ module fetch_stage(
   word_t save_pc, pc_change;
   logic miss_pred, missed;
 
-  // Instantiation interfaces
+  //Instantiation interfaces   
   fetch_if fif();
   fu_branch_predictor_if btbif();
 
