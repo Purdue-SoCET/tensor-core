@@ -20,7 +20,7 @@ module fetch_stage(
   fu_branch_predictor_if btbif();
 
   //-------------------------------------------
-  // Fetch unit connections
+  // Fetch unit connections 
   assign fif.imemload      = fsif.imemload;           // Input from memory
   assign fif.freeze        = fsif.freeze || fsif.jump;  // Input from scoreboard
   assign fif.jump          = fsif.jump;
@@ -133,5 +133,4 @@ module fetch_stage(
   );
 
   assign fif.pc_prediction = btbif.predicted_target;
-
 endmodule
