@@ -21,11 +21,11 @@ module fu_branch_predictor(
   word_t btb_target;
 
   // Extract indices from pc and update_pc (lower 2 bits are ignored due to word alignment)
-  assign pc_idx = fubpif.pc[IDX_SIZE+1:2];
+  assign pc_idx        = fubpif.pc[IDX_SIZE+1:2];
   assign update_pc_idx = fubpif.update_pc[IDX_SIZE+1:2];
 
   // Extract tag from pc and update_pc
-  assign pc_tag = fubpif.pc[WORD_W-1:IDX_SIZE+2];
+  assign pc_tag        = fubpif.pc[WORD_W-1:IDX_SIZE+2];
   assign update_pc_tag = fubpif.update_pc[WORD_W-1:IDX_SIZE+2];
 
   // Buffer Type
@@ -61,7 +61,7 @@ module fu_branch_predictor(
 
   always_comb begin : OUTPUT_LOGIC
     fubpif.predicted_outcome = 1'b0;
-    fubpif.predicted_target = fubpif.imemaddr + 32'd4;
+    fubpif.predicted_target  = fubpif.imemaddr + 32'd4;
 
     if (btb_hit) begin
       fubpif.predicted_outcome = (btb_target < fubpif.pc);
