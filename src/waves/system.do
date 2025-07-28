@@ -47,6 +47,10 @@ add wave -noupdate -expand -group {fetch if} -expand -group fetch -radix unsigne
 add wave -noupdate -expand -group {fetch if} -radix unsigned /system_tb/DUT/DP/fif/update_pc
 add wave -noupdate -expand -group {fetch if} /system_tb/DUT/DP/fif/branch_target
 add wave -noupdate -expand -group {fetch if} /system_tb/DUT/DP/FETCH/missed
+add wave -noupdate -expand -group {fetch if} /system_tb/DUT/DP/FETCH/pc_change
+add wave -noupdate -expand -group {fetch if} /system_tb/DUT/DP/FETCH/prev_instr
+add wave -noupdate -expand -group {fetch if} /system_tb/DUT/DP/FETCH/prev_pc
+add wave -noupdate -expand -group {fetch if} /system_tb/DUT/DP/FETCH/prev_pred
 add wave -noupdate -expand -group {fetch if} -radix unsigned /system_tb/DUT/DP/FETCH/save_pc
 add wave -noupdate -expand -group {fetch if} /system_tb/DUT/DP/fif/freeze
 add wave -noupdate -expand -group {fetch if} /system_tb/DUT/DP/fif/jump
@@ -78,7 +82,7 @@ add wave -noupdate -expand -group dispatch -childformat {{/system_tb/DUT/DP/SCOR
 add wave -noupdate -expand -group dispatch /system_tb/DUT/DP/SCOREBOARD/DI/RSTS/status
 add wave -noupdate -expand -group dispatch /system_tb/DUT/DP/SCOREBOARD/diif/branch_resolved
 add wave -noupdate -expand -group dispatch /system_tb/DUT/DP/SCOREBOARD/diif/branch_miss
-add wave -noupdate -expand -group dispatch -expand -subitemconfig {/system_tb/DUT/DP/SCOREBOARD/diif/fust_s.op -expand {/system_tb/DUT/DP/SCOREBOARD/diif/fust_s.op[0]} -expand} /system_tb/DUT/DP/SCOREBOARD/diif/fust_s
+add wave -noupdate -expand -group dispatch -expand -subitemconfig {/system_tb/DUT/DP/SCOREBOARD/diif/fust_s.op -expand} /system_tb/DUT/DP/SCOREBOARD/diif/fust_s
 add wave -noupdate -expand -group dispatch /system_tb/DUT/DP/SCOREBOARD/DI/jump
 add wave -noupdate -expand -group dispatch /system_tb/DUT/DP/SCOREBOARD/DI/n_jump
 add wave -noupdate -expand -group dispatch -expand -subitemconfig {/system_tb/DUT/DP/SCOREBOARD/diif/fust_m.op -expand} /system_tb/DUT/DP/SCOREBOARD/diif/fust_m
@@ -90,7 +94,6 @@ add wave -noupdate -expand -group dispatch -radix unsigned /system_tb/DUT/DP/SCO
 add wave -noupdate -expand -group dispatch -childformat {{/system_tb/DUT/DP/SCOREBOARD/diif/wb.s_rw -radix unsigned} {/system_tb/DUT/DP/SCOREBOARD/diif/wb.load_done -radix unsigned}} -expand -subitemconfig {/system_tb/DUT/DP/SCOREBOARD/diif/wb.s_rw {-height 16 -radix unsigned} /system_tb/DUT/DP/SCOREBOARD/diif/wb.load_done {-height 16 -radix unsigned}} /system_tb/DUT/DP/SCOREBOARD/diif/wb
 add wave -noupdate -expand -group dispatch /system_tb/DUT/DP/SCOREBOARD/diif/fu_ex
 add wave -noupdate -expand -group dispatch -radix unsigned /system_tb/DUT/DP/SCOREBOARD/DI/m_rd
-add wave -noupdate -expand -group dispatch /system_tb/DUT/DP/SCOREBOARD/DI/tag_val
 add wave -noupdate -expand -group dispatch /system_tb/DUT/DP/SCOREBOARD/DI/dispatch.fust_m.op.md
 add wave -noupdate -expand -group dispatch -group rstmif /system_tb/DUT/DP/SCOREBOARD/DI/rstmif/di_sel
 add wave -noupdate -expand -group dispatch -group rstmif /system_tb/DUT/DP/SCOREBOARD/DI/rstmif/di_write
@@ -110,12 +113,8 @@ add wave -noupdate -expand -group dispatch /system_tb/DUT/DP/SCOREBOARD/diif/n_f
 add wave -noupdate -expand -group dispatch /system_tb/DUT/DP/SCOREBOARD/diif/n_fust_s_en
 add wave -noupdate -expand -group dispatch /system_tb/DUT/DP/SCOREBOARD/diif/n_fust_m_en
 add wave -noupdate -expand -group dispatch /system_tb/DUT/DP/SCOREBOARD/diif/n_fust_g_en
-add wave -noupdate -expand -group dispatch -radix unsigned /system_tb/DUT/DP/SCOREBOARD/DI/temp
-add wave -noupdate -expand -group dispatch /system_tb/DUT/DP/SCOREBOARD/DI/temp1
 add wave -noupdate -expand -group dispatch -radix unsigned /system_tb/DUT/DP/SCOREBOARD/DI/s_rs1
 add wave -noupdate -expand -group dispatch -radix unsigned /system_tb/DUT/DP/SCOREBOARD/DI/s_rs2
-add wave -noupdate -expand -group dispatch /system_tb/DUT/DP/SCOREBOARD/diif/n_mm
-add wave -noupdate -expand -group dispatch /system_tb/DUT/DP/SCOREBOARD/diif/n_rm
 add wave -noupdate -expand -group dispatch /system_tb/DUT/DP/SCOREBOARD/diif/n_t1
 add wave -noupdate -expand -group dispatch /system_tb/DUT/DP/SCOREBOARD/diif/n_t2
 add wave -noupdate -expand -group dispatch /system_tb/DUT/DP/SCOREBOARD/diif/n_gt1
@@ -170,14 +169,13 @@ add wave -noupdate -expand -group issue /system_tb/DUT/DP/SCOREBOARD/IS/age
 add wave -noupdate -expand -group issue /system_tb/DUT/DP/SCOREBOARD/IS/incoming_instr
 add wave -noupdate -expand -group issue /system_tb/DUT/DP/SCOREBOARD/IS/rdy
 add wave -noupdate -expand -group issue /system_tb/DUT/DP/SCOREBOARD/IS/next_oldest_rdy
-add wave -noupdate -expand -group issue /system_tb/DUT/DP/SCOREBOARD/IS/test
 add wave -noupdate -expand -group issue /system_tb/DUT/DP/SCOREBOARD/IS/n_age
 add wave -noupdate -expand -group issue /system_tb/DUT/DP/SCOREBOARD/IS/next_ready
 add wave -noupdate -expand -group issue /system_tb/DUT/DP/SCOREBOARD/IS/fu_ready
 add wave -noupdate -expand -group issue /system_tb/DUT/DP/SCOREBOARD/IS/next_single_ready
 add wave -noupdate -expand -group issue /system_tb/DUT/DP/SCOREBOARD/IS/single_ready
 add wave -noupdate -expand -group issue /system_tb/DUT/DP/SCOREBOARD/IS/n_rdy
-add wave -noupdate -expand -group issue -childformat {{/system_tb/DUT/DP/SCOREBOARD/isif/out.rd -radix unsigned} {/system_tb/DUT/DP/SCOREBOARD/isif/out.rdat1 -radix decimal} {/system_tb/DUT/DP/SCOREBOARD/isif/out.rdat2 -radix hexadecimal} {/system_tb/DUT/DP/SCOREBOARD/isif/out.imm -radix hexadecimal} {/system_tb/DUT/DP/SCOREBOARD/isif/out.branch_pc -radix unsigned} {/system_tb/DUT/DP/SCOREBOARD/isif/out.md -radix unsigned}} -expand -subitemconfig {/system_tb/DUT/DP/SCOREBOARD/isif/out.fu_en -expand /system_tb/DUT/DP/SCOREBOARD/isif/out.rd {-height 16 -radix unsigned} /system_tb/DUT/DP/SCOREBOARD/isif/out.rdat1 {-height 16 -radix decimal} /system_tb/DUT/DP/SCOREBOARD/isif/out.rdat2 {-height 16 -radix hexadecimal} /system_tb/DUT/DP/SCOREBOARD/isif/out.imm {-height 16 -radix hexadecimal} /system_tb/DUT/DP/SCOREBOARD/isif/out.branch_pc {-height 16 -radix unsigned} /system_tb/DUT/DP/SCOREBOARD/isif/out.md {-radix unsigned}} /system_tb/DUT/DP/SCOREBOARD/isif/out
+add wave -noupdate -expand -group issue -childformat {{/system_tb/DUT/DP/SCOREBOARD/isif/out.rd -radix unsigned} {/system_tb/DUT/DP/SCOREBOARD/isif/out.rdat1 -radix decimal} {/system_tb/DUT/DP/SCOREBOARD/isif/out.rdat2 -radix hexadecimal} {/system_tb/DUT/DP/SCOREBOARD/isif/out.imm -radix hexadecimal} {/system_tb/DUT/DP/SCOREBOARD/isif/out.branch_pc -radix unsigned} {/system_tb/DUT/DP/SCOREBOARD/isif/out.md -radix unsigned}} -expand -subitemconfig {/system_tb/DUT/DP/SCOREBOARD/isif/out.fu_en -expand /system_tb/DUT/DP/SCOREBOARD/isif/out.rd {-height 16 -radix unsigned} /system_tb/DUT/DP/SCOREBOARD/isif/out.rdat1 {-height 16 -radix decimal} /system_tb/DUT/DP/SCOREBOARD/isif/out.rdat2 {-height 16 -radix hexadecimal} /system_tb/DUT/DP/SCOREBOARD/isif/out.imm {-height 16 -radix hexadecimal} /system_tb/DUT/DP/SCOREBOARD/isif/out.branch_pc {-height 16 -radix unsigned} /system_tb/DUT/DP/SCOREBOARD/isif/out.md {-height 16 -radix unsigned}} /system_tb/DUT/DP/SCOREBOARD/isif/out
 add wave -noupdate -expand -group issue /system_tb/DUT/DP/SCOREBOARD/isif/fust_s
 add wave -noupdate -expand -group issue /system_tb/DUT/DP/SCOREBOARD/isif/fust_m
 add wave -noupdate -expand -group issue /system_tb/DUT/DP/SCOREBOARD/isif/fust_g
@@ -438,7 +436,7 @@ add wave -noupdate -expand -group {sys array if} -radix decimal /system_tb/DUT/s
 add wave -noupdate -expand -group {sys array if} /system_tb/DUT/saif/array_in_partials
 add wave -noupdate -expand -group {sys array if} /system_tb/DUT/saif/array_output
 TreeUpdate [SetDefaultTree]
-WaveRestoreCursors {{Cursor 7} {6764095 ps} 1} {{Cursor 2} {104053 ps} 1} {{Cursor 3} {6801228 ps} 0}
+WaveRestoreCursors {{Cursor 7} {6764095 ps} 1} {{Cursor 2} {104053 ps} 1} {{Cursor 3} {449518343 ps} 0}
 quietly wave cursor active 3
 configure wave -namecolwidth 394
 configure wave -valuecolwidth 143
@@ -454,4 +452,4 @@ configure wave -griddelta 40
 configure wave -timeline 0
 configure wave -timelineunits ns
 update
-WaveRestoreZoom {6723728 ps} {6856608 ps}
+WaveRestoreZoom {449460886 ps} {449593766 ps}

@@ -25,6 +25,9 @@ module fetch(
             imemaddr  <= '0;
             fif.instr <= '0;
             fif.pc    <= '0;
+        end else if (fsif.freeze) begin
+            pc_reg  <= pc_reg;
+            fif.pc  <= fif.pc;
         end else if (fif.br_jump) begin
             pc_reg    <= next_pc;
             fif.pc    <= next_pc;
