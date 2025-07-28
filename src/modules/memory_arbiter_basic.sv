@@ -13,7 +13,6 @@ module memory_arbiter_basic(
 
   logic [31:0] dcache_load, icache_load;
   
-  
   //scratchpad stuff
   logic [31:0] local_addr_inc1 = 32'd8;
   logic [31:0] local_addr_inc2 = 32'd4;
@@ -146,10 +145,11 @@ module memory_arbiter_basic(
   assign spif.load_data = load_data_reg;
   assign spif.sLoad_row = sLoad_row_reg;
 
-//  always_comb begin
-//    if (((arbiter_state == SP_LOAD1) || (arbiter_state == SP_LOAD2)))
-//      // mem_read(sp_load_addr, sp_load_data);
-//  end
+  // TODO
+  // always_comb begin
+  //   if (((arbiter_state == SP_LOAD1) || (arbiter_state == SP_LOAD2)))
+  //     // mem_read(sp_load_addr, sp_load_data);
+  // end
 
   always_comb begin
     acif.ramstore = '0;
