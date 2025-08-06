@@ -18,7 +18,7 @@ module main_mem(
 //      .rsta_busy(mmif.busy)  // output wire rsta_busy
 //    );
 
-    logic [31:0] addr;
+    logic [31:0] addr, data_in, data_out;
 
     assign mmif.busy = '0;
     // assign mmif.data_out = '1;
@@ -35,10 +35,12 @@ module main_mem(
 
     always_ff @(posedge clk) begin
         if (mmif.write_en == '1) begin
-            instr[addr] <= mmif.data_in;
+            instr[addr] <= data_in;
+            data_in <= mmif.data_in;
         end
         else begin
-            mmif.data_out <= instr[addr];
+            mmif.data_out <= data_out;
+            data_out <= instr[addr];
         end
     end
     

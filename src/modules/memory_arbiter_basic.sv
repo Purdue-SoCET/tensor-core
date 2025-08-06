@@ -38,13 +38,13 @@ module memory_arbiter_basic(
       arbiter_state <= IDLE;
       load_count <= '0;
       sLoad_row_reg <= 3'd0;
-      // bram_wait_reg <= '0;
+      bram_wait_reg <= '0;
     end
     else begin
       arbiter_state <= next_arbiter_state;
       load_count <= next_load_count;
       sLoad_row_reg <= next_sLoad_row_reg;
-      // bram_wait_reg <= bram_wait;
+      bram_wait_reg <= bram_wait;
     end
   end
 
@@ -62,7 +62,7 @@ module memory_arbiter_basic(
         else if (spif.sStore) begin
           next_arbiter_state = SP_STORE1;
         end
-        else if (bram_wait) begin
+        else if (bram_wait_reg) begin
           next_arbiter_state = IDLE2;
         end
       end
