@@ -30,17 +30,15 @@ module main_mem(
     assign addr = (mmif.addr >> 2);
 
     initial begin
-        $readmemh("/home/asicfab/a/rrbathin/socet/amp/tensor-core/src/meminit.mem", instr); 
+        $readmemh("/home/asicfab/a/rrbathin/socet/amp/tensor-core/meminit.hex", instr); 
     end
 
     always_ff @(posedge clk) begin
         if (mmif.write_en == '1) begin
-            instr[addr] <= data_in;
-            data_in <= mmif.data_in;
+            instr[addr] <= mmif.data_in;
         end
         else begin
-            mmif.data_out <= data_out;
-            data_out <= instr[addr];
+            mmif.data_out <= instr[addr];
         end
     end
     

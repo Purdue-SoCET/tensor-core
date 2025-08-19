@@ -270,7 +270,7 @@ module issue(
                     next_fust_state[i] = FUST_RDY;
                   end 
                   else begin
-                    next_fust_state[i] = (((n_rdy[i] == next_oldest_rdy[i]) || (next_single_ready && next_ready[i]))) ? FUST_EX : FUST_RDY;
+                    next_fust_state[i] = (((next_single_ready && next_ready[i]))) ? FUST_EX : FUST_RDY;
                   end
                 end
               end
@@ -279,7 +279,7 @@ module issue(
                     next_fust_state[i] = FUST_RDY;
                 end 
                 else begin 
-                  next_fust_state[i] = (((next_oldest_rdy[i]) || (single_ready && fu_ready[i]))) ? FUST_EX : FUST_RDY;
+                  next_fust_state[i] = (((oldest_rdy[i]) || (single_ready && fu_ready[i]))) ? FUST_EX : FUST_RDY;
                 end
               end
               FUST_EX: begin

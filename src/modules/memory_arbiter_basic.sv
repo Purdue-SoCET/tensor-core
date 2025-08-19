@@ -62,7 +62,7 @@ module memory_arbiter_basic(
         else if (spif.sStore) begin
           next_arbiter_state = SP_STORE1;
         end
-        else if (bram_wait_reg) begin
+        else if (bram_wait) begin
           next_arbiter_state = IDLE2;
         end
       end

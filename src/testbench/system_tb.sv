@@ -27,7 +27,7 @@
 
 module system_tb;
   // clock period
-  parameter PERIOD = 10;
+  parameter PERIOD = 20;
 
   // signals
   logic CLK = 1, nRST;
@@ -37,15 +37,16 @@ module system_tb;
 
   // interface
   system_if                           syif();
-  datapath_cache_if                   dcif();
-  caches_if                           cif();
-  arbiter_caches_if                   acif(cif);
-  scratchpad_if                       spif();
-  systolic_array_if saif();
-  main_mem_if mmif();
+//  datapath_cache_if                   dcif();
+  logic flushed;
+//  caches_if                           cif();
+//  arbiter_caches_if                   acif(cif);
+//  scratchpad_if                       spif();
+//  systolic_array_if saif();
+//  main_mem_if mmif();
 
   // dut
-  system                              DUT (CLK,nRST,dcif,cif,acif,spif,saif,mmif,syif);
+  system                              DUT (CLK,nRST,flushed,syif);
   // import word type
   import isa_pkg::word_t;
 //  import "DPI-C" function void mem_init();
@@ -61,12 +62,12 @@ module system_tb;
      syif.addr = 0;
      syif.store = 0;
      syif.WEN = 0;
-    // syif.REN = 0;
+     syif.REN = 0;
     @(posedge CLK);
     $display("Starting Scheduler Core:");
     nRST = 1;
     // wait for halt
-    while (!dcif.flushed)
+    while (!flushed)
     begin
       // acif.ramaddr = '1;
       @(posedge CLK);
@@ -75,10 +76,44 @@ module system_tb;
     // repeat (100) @(posedge CLK);
     $display("Halted at time = %g and ran for %d cycles.",$time, cycles);
     nRST = 0;
-//     dump_memory();
+     dump_memory();
     $stop;
   end
   
+  task automatic dump_memory();
+    string filename;
+    int memfd;
+
+    syif.tbCTRL = 1;
+    syif.addr = 0;
+    syif.store = 0;
+    syif.WEN = 0;
+    syif.REN = 0;
+    
+    filename = "/home/asicfab/a/rrbathin/socet/amp/tensor-core/memdump.txt";
+    
+    memfd = $fopen(filename, "w");
+    if (!memfd) begin
+        $display("Failed to open %s.", filename);
+        $finish;
+    end
+    $display("Starting memory dump for Scheduler Core.");
+    
+    for (int unsigned i = 0; i < 1500; i++) begin
+        syif.addr = i << 2;
+        syif.REN = 1;
+        repeat (3) @(posedge CLK);
+        $fdisplay(memfd, "%08h", syif.load);
+        @(posedge CLK);
+    end
+    
+    syif.tbCTRL = 0;
+    syif.REN = 0;
+    $fclose(memfd);
+    
+    $display("Finished memory dump for Scheduler Core.");
+  endtask
+
 //      task automatic dump_memory();
 //       string filename = "memdump.txt";   // name as you like
 //       int memfd;
