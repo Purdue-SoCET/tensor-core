@@ -243,7 +243,7 @@ module fu_branch(
     temp_br_jump = '0;
     // delay = 1'b0;
 
-    if (fubif.enable) begin
+    if (fubif.enable && !(fubif.miss || fubif.resolved || fubif.br_jump)) begin
       if (fubif.j_type != 2'd0) begin
         actual_outcome = 1'b1;
         temp_br_jump = 1'b1;
@@ -302,7 +302,7 @@ module fu_branch(
 always_ff @(posedge CLK, negedge nRST) begin : BRANCH_LOGIC_clocked
     // updated_pc is corrected PC after branch resolution (ignore during correct prediction)
     // update_pc is original PC of branch instr being resolved (used to update the BTB)
-    if (!nRST || fubif.miss || fubif.resolved) begin
+    if (!nRST) begin
     fubif.branch_outcome <= 1'b0;
     fubif.miss <= 1'b0;
 
@@ -334,4 +334,16 @@ always_ff @(posedge CLK, negedge nRST) begin : BRANCH_LOGIC_clocked
       
     end 
   end
+
+  // assign fubif.branch_outcome = temp_branch_outcome;
+  // assign fubif.miss = temp_miss;
+  // assign fubif.correct_pc = temp_correct_pc;
+  // assign fubif.branch_target = temp_branch_target;
+  // assign fubif.update_btb = temp_update_btb;
+  // assign fubif.update_pc = temp_update_pc;
+  // assign fubif.resolved = temp_resolved;
+  // assign fubif.jump_dest = temp_jump_dest;
+  // assign fubif.jump_wdat = temp_jump_wdat;
+  // assign fubif.br_jump = temp_br_jump;
+
 endmodule
