@@ -322,12 +322,12 @@ add wave -noupdate -group {syst array} /system_tb/DUT/SYS/y
 add wave -noupdate -group {syst array} /system_tb/DUT/SYS/row_out
 add wave -noupdate -group {syst array} /system_tb/DUT/SYS/current_out
 add wave -noupdate -group {syst array} /system_tb/DUT/SYS/q
-add wave -noupdate -group dmem /system_tb/DUT/dcif/dhit
-add wave -noupdate -group dmem /system_tb/DUT/dcif/dmemREN
-add wave -noupdate -group dmem /system_tb/DUT/dcif/dmemWEN
-add wave -noupdate -group dmem -radix hexadecimal /system_tb/DUT/dcif/dmemload
-add wave -noupdate -group dmem -radix hexadecimal /system_tb/DUT/dcif/dmemstore
-add wave -noupdate -group dmem -radix unsigned /system_tb/DUT/dcif/dmemaddr
+add wave -noupdate -expand -group dmem /system_tb/DUT/dcif/dhit
+add wave -noupdate -expand -group dmem /system_tb/DUT/dcif/dmemREN
+add wave -noupdate -expand -group dmem /system_tb/DUT/dcif/dmemWEN
+add wave -noupdate -expand -group dmem -radix unsigned /system_tb/DUT/dcif/dmemload
+add wave -noupdate -expand -group dmem -radix unsigned /system_tb/DUT/dcif/dmemstore
+add wave -noupdate -expand -group dmem -radix unsigned /system_tb/DUT/dcif/dmemaddr
 add wave -noupdate -group dcache /system_tb/DUT/acif/dREN
 add wave -noupdate -group dcache /system_tb/DUT/acif/dWEN
 add wave -noupdate -group dcache /system_tb/DUT/acif/load_done
@@ -460,8 +460,8 @@ add wave -noupdate -group {sys array if} /system_tb/DUT/saif/array_in_partials
 add wave -noupdate -group {sys array if} /system_tb/DUT/saif/array_output
 add wave -noupdate -expand -group mem /system_tb/DUT/MS/MM/instr
 TreeUpdate [SetDefaultTree]
-WaveRestoreCursors {{Cursor 7} {6764095 ps} 1} {{Cursor 2} {104053 ps} 1} {{Cursor 3} {5775426 ps} 1} {{Cursor 4} {1892105 ps} 0}
-quietly wave cursor active 4
+WaveRestoreCursors {{Cursor 7} {6764095 ps} 1} {{Cursor 2} {104053 ps} 1} {{Cursor 3} {5775426 ps} 1} {{Cursor 4} {4010635 ps} 1} {{Cursor 5} {4086383 ps} 0}
+quietly wave cursor active 5
 configure wave -namecolwidth 394
 configure wave -valuecolwidth 143
 configure wave -justifyvalue left
@@ -476,4 +476,4 @@ configure wave -griddelta 40
 configure wave -timeline 0
 configure wave -timelineunits ns
 update
-WaveRestoreZoom {1704413 ps} {2096237 ps}
+WaveRestoreZoom {3801688 ps} {4358312 ps}
