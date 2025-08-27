@@ -99,7 +99,7 @@ add wave -noupdate -expand -group dispatch -childformat {{/system_tb/DUT/DP/SCOR
 add wave -noupdate -expand -group dispatch /system_tb/DUT/DP/SCOREBOARD/DI/RSTS/status
 add wave -noupdate -expand -group dispatch /system_tb/DUT/DP/SCOREBOARD/diif/branch_resolved
 add wave -noupdate -expand -group dispatch /system_tb/DUT/DP/SCOREBOARD/diif/branch_miss
-add wave -noupdate -expand -group dispatch -expand -subitemconfig {/system_tb/DUT/DP/SCOREBOARD/diif/fust_s.busy -expand /system_tb/DUT/DP/SCOREBOARD/diif/fust_s.t1 -expand /system_tb/DUT/DP/SCOREBOARD/diif/fust_s.t2 -expand /system_tb/DUT/DP/SCOREBOARD/diif/fust_s.op -expand {/system_tb/DUT/DP/SCOREBOARD/diif/fust_s.op[2]} -expand {/system_tb/DUT/DP/SCOREBOARD/diif/fust_s.op[1]} -expand {/system_tb/DUT/DP/SCOREBOARD/diif/fust_s.op[0]} -expand} /system_tb/DUT/DP/SCOREBOARD/diif/fust_s
+add wave -noupdate -expand -group dispatch -expand -subitemconfig {/system_tb/DUT/DP/SCOREBOARD/diif/fust_s.busy -expand /system_tb/DUT/DP/SCOREBOARD/diif/fust_s.op -expand {/system_tb/DUT/DP/SCOREBOARD/diif/fust_s.op[2]} -expand {/system_tb/DUT/DP/SCOREBOARD/diif/fust_s.op[1]} -expand {/system_tb/DUT/DP/SCOREBOARD/diif/fust_s.op[0]} -expand} /system_tb/DUT/DP/SCOREBOARD/diif/fust_s
 add wave -noupdate -expand -group dispatch /system_tb/DUT/DP/SCOREBOARD/DI/jump
 add wave -noupdate -expand -group dispatch /system_tb/DUT/DP/SCOREBOARD/DI/n_jump
 add wave -noupdate -expand -group dispatch -subitemconfig {/system_tb/DUT/DP/SCOREBOARD/diif/fust_m.op -expand} /system_tb/DUT/DP/SCOREBOARD/diif/fust_m
@@ -307,21 +307,21 @@ add wave -noupdate -expand -group spif /system_tb/DUT/spif/weight_input_row_sel
 add wave -noupdate -expand -group spif /system_tb/DUT/spif/partial_sum_row_sel
 add wave -noupdate -expand -group spif -radix unsigned /system_tb/DUT/spif/load_addr
 add wave -noupdate -expand -group spif /system_tb/DUT/spif/store_addr
-add wave -noupdate -expand -group {syst array} /system_tb/DUT/SYS/clk
-add wave -noupdate -expand -group {syst array} /system_tb/DUT/SYS/nRST
-add wave -noupdate -expand -group {syst array} /system_tb/DUT/SYS/MAC_inputs
-add wave -noupdate -expand -group {syst array} /system_tb/DUT/SYS/MAC_outputs
-add wave -noupdate -expand -group {syst array} -radix unsigned /system_tb/DUT/SYS/top_input
-add wave -noupdate -expand -group {syst array} -radix unsigned /system_tb/DUT/SYS/loadi
-add wave -noupdate -expand -group {syst array} -radix unsigned /system_tb/DUT/SYS/loadps
-add wave -noupdate -expand -group {syst array} /system_tb/DUT/SYS/start
-add wave -noupdate -expand -group {syst array} /system_tb/DUT/SYS/nxt_start
-add wave -noupdate -expand -group {syst array} /system_tb/DUT/SYS/nxt_drained
-add wave -noupdate -expand -group {syst array} /system_tb/DUT/SYS/z
-add wave -noupdate -expand -group {syst array} /system_tb/DUT/SYS/y
-add wave -noupdate -expand -group {syst array} /system_tb/DUT/SYS/row_out
-add wave -noupdate -expand -group {syst array} /system_tb/DUT/SYS/current_out
-add wave -noupdate -expand -group {syst array} /system_tb/DUT/SYS/q
+add wave -noupdate -group {syst array} /system_tb/DUT/SYS/clk
+add wave -noupdate -group {syst array} /system_tb/DUT/SYS/nRST
+add wave -noupdate -group {syst array} /system_tb/DUT/SYS/MAC_inputs
+add wave -noupdate -group {syst array} /system_tb/DUT/SYS/MAC_outputs
+add wave -noupdate -group {syst array} -radix unsigned /system_tb/DUT/SYS/top_input
+add wave -noupdate -group {syst array} -radix unsigned /system_tb/DUT/SYS/loadi
+add wave -noupdate -group {syst array} -radix unsigned /system_tb/DUT/SYS/loadps
+add wave -noupdate -group {syst array} /system_tb/DUT/SYS/start
+add wave -noupdate -group {syst array} /system_tb/DUT/SYS/nxt_start
+add wave -noupdate -group {syst array} /system_tb/DUT/SYS/nxt_drained
+add wave -noupdate -group {syst array} /system_tb/DUT/SYS/z
+add wave -noupdate -group {syst array} /system_tb/DUT/SYS/y
+add wave -noupdate -group {syst array} /system_tb/DUT/SYS/row_out
+add wave -noupdate -group {syst array} /system_tb/DUT/SYS/current_out
+add wave -noupdate -group {syst array} /system_tb/DUT/SYS/q
 add wave -noupdate -expand -group dmem /system_tb/DUT/dcif/dhit
 add wave -noupdate -expand -group dmem /system_tb/DUT/dcif/dmemREN
 add wave -noupdate -expand -group dmem /system_tb/DUT/dcif/dmemWEN
@@ -467,9 +467,9 @@ add wave -noupdate -radix unsigned /system_tb/syif/addr
 add wave -noupdate /system_tb/syif/store
 add wave -noupdate /system_tb/syif/load
 TreeUpdate [SetDefaultTree]
-WaveRestoreCursors {{Cursor 7} {6764095 ps} 1} {{Cursor 2} {104053 ps} 1} {{Cursor 3} {5775426 ps} 1} {{Cursor 4} {8094454 ps} 1} {{Cursor 5} {8199633 ps} 0}
+WaveRestoreCursors {{Cursor 7} {6764095 ps} 1} {{Cursor 2} {104053 ps} 1} {{Cursor 3} {5775426 ps} 1} {{Cursor 4} {4010635 ps} 1} {{Cursor 5} {4086383 ps} 0}
 quietly wave cursor active 5
-configure wave -namecolwidth 179
+configure wave -namecolwidth 394
 configure wave -valuecolwidth 143
 configure wave -justifyvalue left
 configure wave -signalnamewidth 0
@@ -483,4 +483,4 @@ configure wave -griddelta 40
 configure wave -timeline 0
 configure wave -timelineunits ns
 update
-WaveRestoreZoom {7975899 ps} {8326092 ps}
+WaveRestoreZoom {3801688 ps} {4358312 ps}
