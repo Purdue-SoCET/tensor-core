@@ -1,9 +1,9 @@
 # UVM---Tensor-Core
 
 ## Current Status
-✅ Systolic Array functionality verified.
-✅ Tests can be driven constraint random and directed.
-✅ Tests were performed on Vivado, should work with QuestaSim as well. 
+✅ Systolic Array functionality verified. <br>
+✅ Tests can be driven constraint random and directed. <br>
+✅ Tests were performed on Vivado, should work with QuestaSim as well. <br>
 - Contains necessary DUT, include and test files in the UVM folder
 <br><br>
 ## To-do
