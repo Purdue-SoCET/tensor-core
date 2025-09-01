@@ -1,12 +1,13 @@
 # UVM---Tensor-Core
 
 ## Current Status
-🟡Not yet ready to run
-- Contains necessary DUT, include and UB|VM files
+✅ Systolic Array functionality verified.
+✅ Tests can be driven constraint random and directed.
+✅ Tests were performed on Vivado, should work with QuestaSim as well. 
+- Contains necessary DUT, include and test files in the UVM folder
 <br><br>
 ## To-do
 
-- Modify necessary files to drive interface signals
-- Check randomization, number of runs, logic for expected outcome
-- Get it setup on Vivado/Questa
-- (Keep Adding to the list)
+- Check overflows, underflows, max-min range, weird inputs. 
+- Feed undeterministic delays in inputs to observe behavior. 
+- (Keep Adding to the list) - Use a test plan!
