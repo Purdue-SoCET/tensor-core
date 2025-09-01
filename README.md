@@ -4,7 +4,7 @@
 ✅ Systolic Array functionality verified. <br>
 ✅ Tests can be driven constraint random and directed. <br>
 ✅ Tests were performed on Vivado, should work with QuestaSim as well. <br>
-- Contains necessary DUT, include and test files in the UVM folder
+- Contains necessary DUT, include and test files in the [UVM](UVM/) folder
 <br><br>
 ## To-do
 
