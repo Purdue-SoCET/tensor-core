@@ -155,3 +155,36 @@
 --------------------------------
 = 32 bits total
 ```
+
+---
+
+## Example 
+```
+# load the packed stuff into a register through imm, then put it into the descp unit
+
+# Load a 32-bit scpad.tdesc record into SPAD descriptor table entry tdesc_id=3
+scpad.tdesc.cfg   tdesc_id=3, rP=r8
+# Load a 32-bit systolic.cdesc record into SA descriptor table entry cdesc_id=5
+systolic.cdesc.cfg cdesc_id=5, rP=r9
+
+# Load matrix A tile from DRAM into SPAD0 (with ingest swizzle)
+scpad.load  spad=0, swz=1, tdesc_id=3, qid=1, num_elems=A_ELEMS, rDRAM=r5, rSPAD=r2
+
+# Load matrix B tile from DRAM into SPAD0 (with ingest swizzle)
+scpad.load  spad=0, swz=1, tdesc_id=3, qid=2, num_elems=B_ELEMS, rDRAM=r6, rSPAD=r3
+
+# Run systolic array GEMM: A×B -> C, outputs written into SPAD1
+sysarray.GEMM spA=0, spB=0, spC=1, swzA=0, swzB=1, M=M_T, N=N_T, K=K_T, rA_spad_base=r2, rB_spad_base=r3, rC_spad_base=r4, acc_en=0
+
+# Load C partial tile from SPAD1 into vector register v0
+vreg.load spad=1, swz=0, vdst=v0, num_elems=C_ELEMS, rSPAD=r4, spad_off=0
+
+# Perform vector operation: v0 = v0 + α (FP16 add with immediate scalar α)
+vreg.op is_imm=1, vdst=v0, vsrc1=v0, imm=ALPHA_15b, vop=ADD, reduce=None, sat=0, fp16=1, len_elems=C_ELEMS
+
+# Store processed C tile back into SPAD1 at the second subtile (offset = C_BYTES)
+vreg.store spad=1, swz=0, vsrc=v0, num_elems=C_ELEMS, rSPAD=r4, spad_off=C_BYTES
+
+# Write the final processed C tile from SPAD1 back into DRAM (row-major order)
+scpad.store spad=1, swz=1, tdesc_id=3, qid=4, num_elems=C_ELEMS, rDRAM=r7, rSPAD=r4, spad_off=C_BYTES
+```
