@@ -16,7 +16,7 @@
          per 2KB page                                        (12)
 [26:21]  GPR with dram base                                  (6)
 [20:14]  GPR with scpad base                                 (7)
-[13:0]   EMPTY                                               (14)
+[13:0]   offset                                             (14)
                                                      ----
                                                      = 64 bits
 ```
