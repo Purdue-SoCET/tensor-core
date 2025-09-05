@@ -3,6 +3,7 @@
 
 package vector_pkg;
 
+    // Vector ISA ----------------------------------------------------------------------
     parameter OPCODE_W = 7;
     parameter VIDX_W = 8;
     parameter RIDX_W = 8;
@@ -43,6 +44,18 @@ package vector_pkg;
         imm_t imm; 
         opcode_t opcode;
     } rv_itype_t;
+    // --------------------------------------------------------------------------------
+
+    typedef struct packed {
+        logic sign;
+        logic [4:0] exp;
+        logic [9:0] frac;
+    } fp16_t; 
+
+    typedef enum logic [5:0] {
+        VALU_ADD       = 6'h00,
+        VALU_SUB       = 6'h01,
+    } valu_op_t;
 
 
 endpackage
