@@ -181,8 +181,23 @@ module addr_mapper_tb ();
         #(tb_CLK * 3);
 
         //*****************************************************************************
-        // 
+        // 0xFFFFFFFF, x4
         //*****************************************************************************
-        
+        tb_test_case     = "Config = x4, Address = 0xFFFFFFFF";
+        tb_test_case_num = tb_test_case_num + 1;
+
+        @(negedge tb_CLK)
+        tb_amif.address = 32'hFFFFFFFF;
+        tb_amif.configs = x4;
+
+        tb_expected_amif = 32'hFFFFFFFF;
+
+        @(posedge tb_CLK)
+        check_output();
+
+        #(tb_CLK * 3);
+
+
+
     end
 endmodule
