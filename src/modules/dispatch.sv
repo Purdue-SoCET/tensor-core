@@ -144,9 +144,9 @@ module dispatch(
     // if there is a branch, instructions following are in "speculation state"
     always_comb begin : Speculation_State
       n_spec = spec;
-      if (diif.branch_resolved || diif.branch_miss)
+      if ((diif.branch_resolved || diif.branch_miss))
         n_spec = 1'b0;
-      else if (cuif.fu_s == FU_S_BRANCH && !(cuif.jal || cuif.jalr))
+      else if ((cuif.fu_s == FU_S_BRANCH && !(cuif.jal || cuif.jalr)) || diif.fust_s.busy[FU_S_BRANCH])
         n_spec = 1'b1;
     end
 
@@ -165,7 +165,7 @@ module dispatch(
       n_jump = jump;
       if ((diif.branch_resolved && !(cuif.jal || cuif.jalr)) || diif.branch_miss)
         n_jump = 1'b0;
-      else if (cuif.jal || cuif.jalr)
+      else if ((cuif.jal || cuif.jalr))
         n_jump = 1'b1;
     end
 
