@@ -76,8 +76,6 @@ package vector_pkg;
         logic spwrite;
         logic spread;
     } control_t;
-    // --------------------------------------------------------------------------------
-
 
 endpackage
 `endif
