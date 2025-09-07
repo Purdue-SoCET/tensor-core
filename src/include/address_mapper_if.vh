@@ -3,7 +3,7 @@
 
 `include "dram_pkg.vh"
 
-interface address_mapper_if
+interface address_mapper_if;
     
     // import address related parameters
     import dram_pkg::*;
@@ -19,7 +19,7 @@ interface address_mapper_if
     logic [IGNORE_BITS - 1:0] ignore;
 
     modport addr_mapper (
-        input  address, configs
+        input  address, configs,
         output rank, BG, bank, row, col, offset, ignore
     );
 
