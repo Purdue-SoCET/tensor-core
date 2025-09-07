@@ -6,9 +6,11 @@ import numpy as np
 from matplotlib.colors import ListedColormap
 from matplotlib.patches import Patch
 
+NUM_BANKS = 4
+
 class SwitchingNetwork:
     @staticmethod
-    def route(shift_mask, input_vals, num_banks=32):
+    def route(shift_mask, input_vals, num_banks=NUM_BANKS):
         assert len(shift_mask) == num_banks
         assert len(input_vals) == num_banks
 
@@ -18,13 +20,13 @@ class SwitchingNetwork:
                 out[b] = input_vals[i]
         return out
 
-class AddressBlock32:
+class AddressBlockNUM_BANKS:
     @staticmethod
     def _row_lane(abs_row: int, cols: int):
-        low5 = abs_row & 31
-        banks = [(lane ^ low5) & 31 for lane in range(32)]
-        slots = [abs_row] * 32
-        valid = [(lane < cols) for lane in range(32)]
+        low5 = abs_row & (NUM_BANKS - 1)
+        banks = [(lane ^ low5) & (NUM_BANKS - 1) for lane in range(NUM_BANKS)]
+        slots = [abs_row] * NUM_BANKS
+        valid = [(lane < cols) for lane in range(NUM_BANKS)]
         return banks, slots, valid
 
     @staticmethod
@@ -32,9 +34,9 @@ class AddressBlock32:
         banks = []
         slots = []
         valid = []
-        for lane in range(32):
+        for lane in range(NUM_BANKS):
             abs_row = base_row + lane
-            bank = (col_id ^ (abs_row & 31)) & 31
+            bank = (col_id ^ (abs_row & (NUM_BANKS - 1))) & (NUM_BANKS - 1)
             banks.append(bank)
             slots.append(abs_row)
             valid.append(lane < rows)
@@ -43,11 +45,11 @@ class AddressBlock32:
     @staticmethod
     def gen_masks_row(base_row: int, row_id: int, cols: int):
         abs_row = base_row + row_id
-        lane_bank, lane_slot, lane_valid = AddressBlock32._row_lane(abs_row, cols)
+        lane_bank, lane_slot, lane_valid = AddressBlockNUM_BANKS._row_lane(abs_row, cols)
 
-        shift_mask_lane2bank = [(lane_bank[i] if lane_valid[i] else None) for i in range(32)]
-        slot_mask = [None] * 32
-        for i in range(32):
+        shift_mask_lane2bank = [(lane_bank[i] if lane_valid[i] else None) for i in range(NUM_BANKS)]
+        slot_mask = [None] * NUM_BANKS
+        for i in range(NUM_BANKS):
             if lane_valid[i]:
                 b = lane_bank[i]
                 slot_mask[b] = lane_slot[i] 
@@ -56,11 +58,11 @@ class AddressBlock32:
 
     @staticmethod
     def gen_masks_col(base_row: int, col_id: int, rows: int):
-        lane_bank, lane_slot, lane_valid = AddressBlock32._col_lane(base_row, col_id, rows)
+        lane_bank, lane_slot, lane_valid = AddressBlockNUM_BANKS._col_lane(base_row, col_id, rows)
 
-        shift_mask_lane2bank = [(lane_bank[i] if lane_valid[i] else None) for i in range(32)]
-        slot_mask = [None] * 32
-        for i in range(32):
+        shift_mask_lane2bank = [(lane_bank[i] if lane_valid[i] else None) for i in range(NUM_BANKS)]
+        slot_mask = [None] * NUM_BANKS
+        for i in range(NUM_BANKS):
             if lane_valid[i]:
                 b = lane_bank[i]
                 slot_mask[b] = lane_slot[i]  
@@ -68,9 +70,9 @@ class AddressBlock32:
         return shift_mask_lane2bank, slot_mask, lane_bank, lane_slot, lane_valid
 
 
-class Scratchpad32:
+class Scratchpad:
     def __init__(self, slots_per_bank: int):
-        self.B = 32
+        self.B = NUM_BANKS
         self.S = slots_per_bank
 
         self.banks = [["" for _ in range(self.S)] for _ in range(self.B)]
@@ -82,7 +84,7 @@ class Scratchpad32:
                 self.banks[b][s] = ""
 
     def write_tile(self, tile_id: str, rows: int, cols: int, base_row: int, strict: bool = True):
-        assert 0 <= cols <= 32, "Tile width must be <= 32 (tile externally if wider)."
+        assert 0 <= cols <= NUM_BANKS, "Tile width must be <= NUM_BANKS (tile externally if wider)."
 
         stored = 0
         dropped = 0
@@ -102,7 +104,7 @@ class Scratchpad32:
                 if rr < rows and cc < cols:
                     dram_vec[i] = f"{tile_id}_{rr}_{cc}"
 
-            shift_mask, slot_mask, _, _, _ = AddressBlock32.gen_masks_row(base_row=base_row, row_id=r, cols=cols)
+            shift_mask, slot_mask, _, _, _ = AddressBlockNUM_BANKS.gen_masks_row(base_row=base_row, row_id=r, cols=cols)
 
             switch_out = SwitchingNetwork.route(shift_mask, dram_vec)
 
@@ -139,7 +141,7 @@ class Scratchpad32:
         if row_based:
             assert 0 <= row_id < rows
 
-            shift_lane2bank, slot_mask, _, _, _ = AddressBlock32.gen_masks_row(base_row, row_id, cols)
+            shift_lane2bank, slot_mask, _, _, _ = AddressBlockNUM_BANKS.gen_masks_row(base_row, row_id, cols)
             bank_inputs = _read(slot_mask)
 
             # In hardware, we can just do bank_inputs[shift_lane2bank[i]]
@@ -149,13 +151,13 @@ class Scratchpad32:
                     bank_to_lane[bank] = lane
             lane_out = SwitchingNetwork.route(bank_to_lane, bank_inputs)
 
-            golden = [(f"{tile_id}_{row_id}_{c}" if c < cols else 0) for c in range(32)]
+            golden = [(f"{tile_id}_{row_id}_{c}" if c < cols else 0) for c in range(NUM_BANKS)]
             mode = "row"
 
         else:
             assert 0 <= col_id < cols
 
-            shift_lane2bank, slot_mask, _, _, _ = AddressBlock32.gen_masks_col(base_row, col_id, rows)
+            shift_lane2bank, slot_mask, _, _, _ = AddressBlockNUM_BANKS.gen_masks_col(base_row, col_id, rows)
             bank_inputs = _read(slot_mask)
 
             # In hardware, we can just do bank_inputs[shift_lane2bank[i]]
@@ -165,7 +167,7 @@ class Scratchpad32:
                     bank_to_lane[bank] = lane
             lane_out = SwitchingNetwork.route(bank_to_lane, bank_inputs)
 
-            golden = [ (f"{tile_id}_{r}_{col_id}" if r < rows else 0) for r in range(32) ]
+            golden = [ (f"{tile_id}_{r}_{col_id}" if r < rows else 0) for r in range(NUM_BANKS) ]
             mode = "col"
 
         mismatches = [(i, lane_out[i], golden[i]) for i in range(B) if lane_out[i] != golden[i]]
@@ -268,36 +270,36 @@ def save_png(sc0, path: str, annotate: bool=True, grid: bool=True):
 
 
 
-sc0 = Scratch032(slots_per_bank=128)
-stats = sc0.write_tile(tile_id="A", rows=16, cols=20, base_row=0)
+sc0 = Scratchpad(slots_per_bank=128)
+stats = sc0.write_tile(tile_id="A", rows=3, cols=4, base_row=0)
 print(stats)
-stats = sc0.write_tile(tile_id="B", rows=32, cols=32, base_row=17)
+stats = sc0.write_tile(tile_id="B", rows=4, cols=4, base_row=17)
 print(stats)
-stats = sc0.write_tile(tile_id="C", rows=21, cols=15, base_row=50)
+stats = sc0.write_tile(tile_id="C", rows=2, cols=3, base_row=50)
 print(stats)
-stats = sc0.write_tile(tile_id="D", rows=32, cols=2, base_row=72)
+stats = sc0.write_tile(tile_id="D", rows=4, cols=2, base_row=72)
 print(stats)
 
 
-stats = sc0.read_tile(tile_id="A", base_row=0, row_id=0)
-print(f"Slot Mask: {stats['slot_mask']}")
-print(f"Shift Mask: {stats['shift_mask']}")
-print(f"Mismatches: {stats['mismatches']} | Pass: {stats['pass']}")
+# stats = sc0.read_tile(tile_id="A", base_row=0, row_id=0)
+# print(f"Slot Mask: {stats['slot_mask']}")
+# print(f"Shift Mask: {stats['shift_mask']}")
+# print(f"Mismatches: {stats['mismatches']} | Pass: {stats['pass']}")
 
-stats = sc0.read_tile(tile_id="B", base_row=17, row_id=4)
-print(f"Slot Mask: {stats['slot_mask']}")
-print(f"Shift Mask: {stats['shift_mask']}")
-print(f"Mismatches: {stats['mismatches']} | Pass: {stats['pass']}")
+# stats = sc0.read_tile(tile_id="B", base_row=17, row_id=4)
+# print(f"Slot Mask: {stats['slot_mask']}")
+# print(f"Shift Mask: {stats['shift_mask']}")
+# print(f"Mismatches: {stats['mismatches']} | Pass: {stats['pass']}")
 
-stats = sc0.read_tile(tile_id="B", base_row=17, col_id=4, row_based=False)
-print(f"Slot Mask: {stats['slot_mask']}")
-print(f"Shift Mask: {stats['shift_mask']}")
-print(f"Mismatches: {stats['mismatches']} | Pass: {stats['pass']}")
+# stats = sc0.read_tile(tile_id="B", base_row=17, col_id=4, row_based=False)
+# print(f"Slot Mask: {stats['slot_mask']}")
+# print(f"Shift Mask: {stats['shift_mask']}")
+# print(f"Mismatches: {stats['mismatches']} | Pass: {stats['pass']}")
 
-stats = sc0.read_tile(tile_id="D", base_row=72, col_id=1, row_based=False)
-print(f"Slot Mask: {stats['slot_mask']}")
-print(f"Shift Mask: {stats['shift_mask']}")
-print(f"Mismatches: {stats['mismatches']} | Pass: {stats['pass']}")
+# stats = sc0.read_tile(tile_id="D", base_row=72, col_id=1, row_based=False)
+# print(f"Slot Mask: {stats['slot_mask']}")
+# print(f"Shift Mask: {stats['shift_mask']}")
+# print(f"Mismatches: {stats['mismatches']} | Pass: {stats['pass']}")
 
 overview_path = "./scpad_overview.png"
 save_png(sc0, overview_path, annotate=True, grid=True)
