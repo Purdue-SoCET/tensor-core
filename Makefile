@@ -1,5 +1,5 @@
 # SCRDIR = /home/asicfab/a/saha56/tensor-core/src/waves
-SCRDIR = /home/asicfab/a/vvaidya/seniordesign/tensor-core/src/scripts
+SCRDIR = /home/asicfab/a/mill3131/tensor-core/src/scripts
 # SCRDIR = /home/asicfab/a/wong371/william_pr/tensor-core/src/scripts
 
 SOURCE_FILES = \
