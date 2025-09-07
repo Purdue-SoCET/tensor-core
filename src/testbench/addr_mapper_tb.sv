@@ -133,13 +133,13 @@ module addr_mapper_tb ();
                 $display("Incorrect 'offset' output during %s test case", tb_test_case);
             end
 
-            if (tb_expected_amif.ignore == tb_amif.ignore) begin
-                $display("Correct 'ignore' output during %s test case", tb_test_case);
-            end
-            else begin
-                tb_mismatch = 1'b1;
-                $display("Incorrect 'ignore' output during %s test case", tb_test_case);
-            end
+            // if (tb_expected_amif.ignore == tb_amif.ignore) begin
+            //     $display("Correct 'ignore' output during %s test case", tb_test_case);
+            // end
+            // else begin
+            //     tb_mismatch = 1'b1;
+            //     $display("Incorrect 'ignore' output during %s test case", tb_test_case);
+            // end
 
             // Wait some small amount of time so check pulse timing is visible on waves
             #(0.1);
@@ -163,7 +163,7 @@ module addr_mapper_tb ();
 
         // Initialize DUT signals
         tb_amif.address = '0;
-        tb_amif.configs = '0;
+        tb_amif.configs = x4;
     
         //*****************************************************************************
         // Power-on-Reset Test Case (Not needed because combinational. USING AS A RESET)
@@ -187,17 +187,67 @@ module addr_mapper_tb ();
         tb_test_case_num = tb_test_case_num + 1;
 
         @(negedge tb_CLK)
-        tb_amif.address = 32'hFFFFFFFF;
+        tb_amif.address = 32'hFFFF_FFFF;
         tb_amif.configs = x4;
 
-        tb_expected_amif = 32'hFFFFFFFF;
+        tb_expected_amif.rank = '1;
+        tb_expected_amif.BG = '1;
+        tb_expected_amif.bank = '1;
+        tb_expected_amif.row = '1;
+        tb_expected_amif.col = '1;
+        tb_expected_amif.offset = '1;
+        //tb_expected_amif.ignore = '1;
 
         @(posedge tb_CLK)
         check_output();
 
         #(tb_CLK * 3);
 
+        //*****************************************************************************
+        // 0xDEADBEEF, x8
+        //*****************************************************************************
+        tb_test_case     = "Config = x8, Address = 0xDEADBEEF";
+        tb_test_case_num = tb_test_case_num + 1;
 
+        @(negedge tb_CLK)
+        tb_amif.address = 32'hDEAD_BEEF;
+        tb_amif.configs = x8;
+
+        tb_expected_amif.rank = '1;
+        tb_expected_amif.BG = '1;
+        tb_expected_amif.bank = 2'b10;
+        tb_expected_amif.row = 15'h5EAD;
+        tb_expected_amif.col = 10'h3DB;
+        tb_expected_amif.offset = '1;
+        //tb_expected_amif.ignore = '1;
+
+        @(posedge tb_CLK)
+        check_output();
+
+        #(tb_CLK * 3);
+
+        //*****************************************************************************
+        // 0xDEADBEEF, x16
+        //*****************************************************************************
+        tb_test_case     = "Config = x16, Address = 0xDEADBEEF";
+        tb_test_case_num = tb_test_case_num + 1;
+
+        @(negedge tb_CLK)
+        tb_amif.address = 32'hDEAD_BEEF;
+        tb_amif.configs = x16;
+
+        tb_expected_amif.rank = '1;
+        tb_expected_amif.BG = '1;
+        tb_expected_amif.bank = 2'b10;
+        tb_expected_amif.row = 15'h5EAD;
+        tb_expected_amif.col = 10'h3DB;
+        tb_expected_amif.offset = '1;
+        //tb_expected_amif.ignore = '1;
+
+        @(posedge tb_CLK)
+        check_output();
+
+        #(tb_CLK * 3);
 
     end
 endmodule

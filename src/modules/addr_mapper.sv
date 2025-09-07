@@ -21,19 +21,19 @@ module addr_mapper #(
 
     address_mapper_if.addr_mapper amif
 );
-
+    import dram_pkg::*;
     // ignore bits for discarding extra address bits after rank bits and before row bits
     // logic [IGNORE_BITS - 1:0] ignore;
 
 
     always_comb begin
-        if (amif.configss == x4 || amif.configs == x8) begin
-            {amif.rank, amif.ignore, amif.row, amif.bank, amif.BG[1], amif.col[9:3], amif.BG[0], amif.col[2:0], amif.offset} = amif.address;
+        if (amif.configs == x4 || amif.configs == x8) begin
+            {amif.rank, amif.row, amif.bank, amif.BG[1], amif.col[9:3], amif.BG[0], amif.col[2:0], amif.offset} = amif.address;
         end
 
         // x16 has only 1 BG bit (2 BGs) 
         else if (amif.configs == x16) begin
-            {amif.rank, amif.ignore, amif.row, amif.bank, amif.BG, amif.col, amif.offset} = amif.address;
+            {amif.rank, amif.row, amif.bank, amif.BG, amif.col, amif.offset} = amif.address;
         end
     end
     
