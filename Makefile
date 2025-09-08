@@ -47,8 +47,8 @@ help:
 
 # Generic make targets
 %:
-	$(VLOG) $(VLOG_FLAGS) ./src/testbench/$*_tb.sv ./src/modules/*.sv
-	$(VSIM) $(VSIM_FLAGS) -c work.$*_tb -do "run -all;"  -onfinish stop 
+	$(VLOG) $(VLOG_FLAGS) $(TB_DIR)/$*_tb.sv $(MODULE_DIR)/*.sv
+	$(VSIM) $(VSIM_FLAGS) -c work.$*_tb -do "run -all;"
 
 %.wav:
 	$(VLOG) $(VLOG_FLAGS) $(TB_DIR)/$*_tb.sv $(MODULE_DIR)/$*.sv
