@@ -92,18 +92,3 @@ wb:
 	ls ./src/waves/
 	$(VLOG) $(VLOG_FLAGS) ./src/testbench/writeback_tb.sv ./src/modules/writeback.sv
 	$(VSIM) $(VSIM_FLAGS) work.writeback_tb -do "do $(abspath ./src/waves/writeback.do); run -all"
-
-# These three rules are bricked after porting to this new makefile	
-# memory_arbiter_basic:
-# 	$(VLOG) $(VLOG_FLAGS) ./src/include/caches_pkg.vh ./src/include/types_pkg.vh \
-# 	./src/testbench/memory_arbiter_basic_tb.sv ./src/modules/memory_arbiter_basic.sv
-# 	$(VSIM) $(SIMTERM) $(VSIM_FLAGS) work.memory_arbiter_basic_tb -do $(SIMDO)
-
-# memory_subsystem:
-# 	$(VLOG) $(VLOG_FLAGS) ./src/include/*.vh \
-# 	./src/testbench/memory_subsystem_tb.sv ./src/modules/*.sv
-# 	$(VSIM) -c $(VSIM_FLAGS) work.memory_subsystem_tb -sv_lib memory -do $(SIMDO)
-
-# memory_subsystem.wav:
-# 	$(VLOG) $(VLOG_FLAGS) ./src/include/*.vh ./src/testbench/memory_subsystem_tb.sv ./src/modules/*.sv
-# 	$(VSIM) $(VSIM_FLAGS) work.memory_subsystem_tb -sv_lib memory -do "do $(WAVES_DIR)/memory_subsystem.do; run $(SIMTIME);" -suppress 2275
