@@ -30,7 +30,12 @@ module main_mem(
     assign addr = (mmif.addr >> 2);
 
     initial begin
-        $readmemh("/home/asicfab/a/rrbathin/socet/amp/tensor-core/meminit.hex", instr); 
+        string meminit;
+        if (!$value$plusargs("meminit=%s", meminit)) begin
+            $fatal(1, "No +memfile argument provided! Edit makefile");
+        end
+        $display("Loading memory from: %s", meminit);
+        $readmemh(meminit, instr);
     end
 
     always_ff @(posedge clk) begin
