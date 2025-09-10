@@ -83,6 +83,7 @@ module system_tb;
   task automatic dump_memory();
     string filename;
     int memfd;
+    string memdump;
 
     syif.tbCTRL = 1;
     syif.addr = 0;
@@ -90,7 +91,11 @@ module system_tb;
     syif.WEN = 0;
     syif.REN = 0;
     
-    filename = "/home/asicfab/a/rrbathin/socet/amp/tensor-core/memdump.txt";
+    if (!$value$plusargs("memdump=%s", memdump)) begin //passed in from makefile
+      $display("No memdump file specified! Add one in makefile");
+      memdump = "memdump.txt";
+    end
+    filename = memdump;
     
     memfd = $fopen(filename, "w");
     if (!memfd) begin
@@ -113,40 +118,5 @@ module system_tb;
     
     $display("Finished memory dump for Scheduler Core.");
   endtask
-
-//      task automatic dump_memory();
-//       string filename = "memdump.txt";   // name as you like
-//       int memfd;
-    
-//       syif.tbCTRL = 1;
-//       syif.addr = 0;
-//       syif.WEN = 0;
-    
-//       memfd = $fopen(filename, "w");
-//       if (!memfd) begin
-//         $display("Failed to open %s.", filename);
-//         $finish;
-//       end
-//       $display("Starting memory dump for Scheduler Core.");
-    
-//       for (int unsigned i = 0; i < 106384; i++) begin
-//         syif.addr = i << 2;
-//         syif.REN = 1;
-//         repeat (3) @(posedge CLK);
-    
-// //        if (syif.load === 0)
-// //          continue;  // skip if load is zero, or remove this if you want to dump zeros too
-    
-//         $fdisplay(memfd, "%08h", syif.load);  // output as 8-character hex, one per line
-//         @(posedge CLK);
-//       end
-    
-//       syif.tbCTRL = 0;
-//       syif.REN = 0;
-//       $fclose(memfd);
-    
-//       $display("Finished memory dump for Scheduler Core.");
-//     endtask
-
    
 endmodule

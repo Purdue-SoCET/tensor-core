@@ -1,8 +1,0 @@
-- Write data to wFIFO
-    - ensure that gemm_complete and load_complete signals go high
-    - ensure that correct data is stored in registers
-- Write 4 types of data to rFIFO
-    - ensure correct data is read
-    - ensure that stores go to dramFIFO
-    - ensure all other mats go to gemmFIFO
-    - FIFO encodings are accurate for gemmFIFO and loadFIFO
