@@ -1,10 +1,10 @@
 `ifndef COMMAND_FSM_IF_VH
 `define COMMAND_FSM_IF_VH
 
-include "command_fsm_if.vh"
-include "dram_command_if.vh"
+`include "dram_pkg.vh"
 
-interface command_FSM_if ();
+interface command_fsm_if ();
+    
     import dram_pkg::*;
     logic dREN, dWEN;
     logic init_done, init_req;
@@ -26,5 +26,6 @@ interface command_FSM_if ();
         output cmd_state
     );
 
-
 endinterface
+
+`endif //COMMAND_FSM_IF_VH
