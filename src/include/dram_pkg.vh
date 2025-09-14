@@ -4,7 +4,7 @@
 package dram_pkg;
 
     //Hoho
-    
+
     // WORD SIZE
     parameter WORD_W            = 32;
 
@@ -44,9 +44,20 @@ package dram_pkg;
         x16 = 2'b10
     } configs_t;
 
-    // command FSM states
     typedef enum logic [4:0] {
         POWER_UP,
+        PRE_RESET,
+        RESET,
+        NOP,
+        LOAD_MODE_DLL,
+        LOAD_BG0_REG3,
+        LOAD_BG1_REG6,
+        LOAD_BG1_REG5,
+        LOAD_BG1_REG4,
+        LOAD_BG0_REG2,
+        LOAD_BG0_REG1,
+        LOAD_BG0_REG0,
+        ZQ_CL,
         IDLE,
         ACTIVATE,
         ACTIVATING,
@@ -56,7 +67,7 @@ package dram_pkg;
         READ,
         READING,
         REFRESH
-    } cmd_fsm_t; 
+    } dram_state_t; 
 
 endpackage
 

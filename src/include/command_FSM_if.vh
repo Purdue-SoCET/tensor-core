@@ -1,10 +1,8 @@
 `ifndef COMMAND_FSM_IF_VH
 `define COMMAND_FSM_IF_VH
-
+`include "command_FSM_if.vh"
 `include "dram_pkg.vh"
-
-interface command_fsm_if ();
-    
+interface command_FSM_if ();
     import dram_pkg::*;
     logic dREN, dWEN;
     logic init_done, init_req;
@@ -12,6 +10,7 @@ interface command_fsm_if ();
     logic tPRE_done, tREF_done, rf_req;
 
     logic [1:0] row_stat;
+    logic row_resolve;
     cmd_fsm_t cmd_state, ncmd_state;
 
     modport dut (
@@ -19,13 +18,10 @@ interface command_fsm_if ();
         input tACT_done, tWR_done, tRD_done,
         input tPRE_done, tREF_done, rf_req,
         input row_stat,
-        output cmd_state, ncmd_state, init_req
-    );
-
-    modport timing_ctrl (
-        output cmd_state
+        output cmd_state, ncmd_state, init_req, row_resolve
     );
 
 endinterface
 
-`endif //COMMAND_FSM_IF_VH
+
+`endif
