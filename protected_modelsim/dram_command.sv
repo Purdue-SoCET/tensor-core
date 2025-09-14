@@ -828,10 +828,13 @@ module dram_command (
                     dr_ram.ADDR = {1'b0, 1'b1, 1'b0, 1'b0, dr_sche.COL0};
                 end
                 // dr_sche.wr_en = 1'b1;
+
+                //Communication between dram command and data_transfer
+                //curr: follow the timing constraint
                 if (timing_count > 16) begin
                     dr_sche.wr_en = 1'b0;
                 end
-                else if (timing_count > 10) begin
+                else if (timing_count > 9) begin
                     time_bug = 1'b1;
                     dr_sche.wr_en = 1'b1;
                 end
@@ -918,11 +921,13 @@ module dram_command (
                     if (dr_sche.ramREN_curr || dr_sche.ramWEN_curr) begin
                         rollover_value = tRCD;
                     end 
+                    //non-blocking timing
                     else if (dr_sche.BG0 != dr_sche.BG1) begin
                         rollover_value = tRRD_S;
                     end else begin
                         rollover_value = tRRD_L;    
                     end
+                    //non-blocking timing
                 end else begin
                         rollover_value = tFAW; //This is meant act is 5
                 end

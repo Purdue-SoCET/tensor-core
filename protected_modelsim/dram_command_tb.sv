@@ -10,7 +10,7 @@ module dram_command_tb;
     parameter tCK = 1.25;
     import dram_pack::*;
     // signals
-    logic CLK = 1, nRST;
+    logic CLK, CLKx2;
     reg model_enable_val;
     string task_name;
 
@@ -23,7 +23,19 @@ module dram_command_tb;
     reg[MAX_DQS_BITS-1:0] dqs_out;
     reg[MAX_DM_BITS-1:0] dm_out;
 
-    always #(PERIOD/2) CLK++;
+    always begin
+        CLK = 1'b0;
+        #(CLK_PERIOD / 2.0);
+        CLK = 1'b1;
+        #(CLK_PERIOD / 2.0);
+    end
+
+    always begin
+        CLKx2 = 1'b1;
+        #(CLK_PERIOD / 4.0);
+        CLKx2 = 1'b0;
+        #(CLK_PERIOD / 4.0);
+    end
 
     dram_command_if dc_if();
     scheduler_buffer_if sch_if();
@@ -54,7 +66,6 @@ module dram_command_tb;
       //Interface of schduler buffer
       ramaddr_phy = addr_x4_t'(sch_if.ramaddr_rq);
       ramaddr_phy_ft = addr_x4_t'(sch_if.ramaddr_rq_ft);
-      
       dc_if.Ra0 = {'0, ramaddr_phy.rank};
       dc_if.Ra1 = {'0, ramaddr_phy_ft.rank};
       dc_if.BA0 = {'0, ramaddr_phy.bank};
@@ -80,16 +91,14 @@ module dram_command_tb;
       dt_if.rd_en = dc_if.rd_en;
       
 
-
-      dt_if.memstore = sch_if.ramstore_rq;
+      // scheduler buffer -> Data_transfer
+      //dt_if.memstore = sch_if.ramstore_rq;
       
 
 
     end
 
     //Interface between dram command and ddr4
-
-    
     // assign iDDR4.DM_n = dq_en ? dm_out : {MAX_DM_BITS{1'bz}};
     // assign iDDR4.DQ = dq_en ? dq_out : {MAX_DQ_BITS{1'bz}};
     // assign iDDR4.DQS_t = dqs_en ? dqs_out : {MAX_DQS_BITS{1'bz}};
@@ -121,7 +130,7 @@ module dram_command_tb;
       repeat (200) @(posedge CLK);
 
       task_name = "Add Read";
-      add_request(.addr({'0, 3'd1,2'b00}), .write(1'b0), .data(32'hDDCC_BBAA));
+      add_request(.addr({'0, 3'd2,2'b00}), .write(1'b0), .data(32'hDDCC_BBAA));
       dq_en = 1'b0;
       task_name = "Done add Read";
       repeat (200) @(posedge CLK);

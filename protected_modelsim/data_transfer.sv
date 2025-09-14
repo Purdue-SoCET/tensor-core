@@ -29,7 +29,8 @@ module data_transfer (
     assign mydata.DQ = (mydata.wr_en) ?    DQ_up : 'z;
     assign mydata.DQS_t = (mydata.wr_en) ? DQS_t_2 : 'z;
     assign mydata.DQS_c = (mydata.wr_en) ? ~DQS_t_2 : 'z;
-    assign mydata.DM_n = (mydata.wr_en) ? !(count_burst == COL_choice_tr) : 1'bz;
+    //assign mydata.DM_n = (mydata.wr_en) ? ~(count_burst == COL_choice_tr) : 1'bz;
+    assign mydata.DM_n = 1'b1;
     assign mydata.memload = (count_burst == (BURST + 4'd2)) ? word_register[mydata.COL_choice] : '0;
     assign COL_choice_tr = mydata.COL_choice + 4'd3; 
 
@@ -51,8 +52,7 @@ module data_transfer (
                 cnt1 <= count_burst;
             end else if (mydata.rd_en) begin
                 count_burst <= ncount_burst;
-            end
-            if (mydata.clear) begin
+            end else begin
                 count_burst <= '0;
             end
             DQS_t_2 = nDQS_t;

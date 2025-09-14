@@ -27,7 +27,6 @@ typedef enum logic [4:0] {
     //Format for addressing mapping testing
     typedef struct packed {
         logic rank;
-        logic blank;
         logic [14:0] row;
         logic [1:0] bank;
         logic bg1;

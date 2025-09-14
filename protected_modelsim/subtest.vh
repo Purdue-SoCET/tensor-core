@@ -229,149 +229,149 @@
         timing_trk.timing_name = "Reading";
         deselect(_dut_mode_config.AL + timing.tRTP/timing.tCK + timing.tRP/timing.tCK);
 
-//         for (UTYPE_TS ts = min_ts.first(); ts < min_ts.last(); ts = ts.next()) begin
-//             if (1 == tt_timesets[ts][TS_LOADED]) begin
-//                 sr_change_period(ts);
-//             end
-//         end
+        for (UTYPE_TS ts = min_ts.first(); ts < min_ts.last(); ts = ts.next()) begin
+            if (1 == tt_timesets[ts][TS_LOADED]) begin
+                sr_change_period(ts);
+            end
+        end
 
-//         sr_change_period(nominal_ts);
-//         deselect(10);
-//         // POWER DOWN SECTION
-//         odt_out <= 1'b0;
-//         odt_out <= #(50*timing.tCK) 1'b1;
-//         odt_out <= #((50 + MAX_BL)*timing.tCK) 1'b0;
-//         refresh();
-//         deselect(timing.tREFPDENc);
-//         precharge_power_down(timing.tRFC/timing.tCK);
-//         deselect(timing.tXSDLLc);
-//         self_refresh(timing.tRFC/timing.tCK);
-//         deselect(timing.tDLLKc);
+        sr_change_period(nominal_ts);
+        deselect(10);
+        // POWER DOWN SECTION
+        odt_out <= 1'b0;
+        odt_out <= #(50*timing.tCK) 1'b1;
+        odt_out <= #((50 + MAX_BL)*timing.tCK) 1'b0;
+        refresh();
+        deselect(timing.tREFPDENc);
+        precharge_power_down(timing.tRFC/timing.tCK);
+        deselect(timing.tXSDLLc);
+        self_refresh(timing.tRFC/timing.tCK);
+        deselect(timing.tDLLKc);
 
-//         $display("Power-Down Entry after WRITE w/ AP (WRA)");
-//         dut_mode_config.BL_reg = rBL4;
-//         _state.ModeToAddrDecode(dut_mode_config, mode_regs);
-//         load_mode(.bg(0), .ba(0), .addr(mode_regs[0])); // Mode Register with Burst Chop
+        $display("Power-Down Entry after WRITE w/ AP (WRA)");
+        dut_mode_config.BL_reg = rBL4;
+        _state.ModeToAddrDecode(dut_mode_config, mode_regs);
+        load_mode(.bg(0), .ba(0), .addr(mode_regs[0])); // Mode Register with Burst Chop
 
-//         deselect(timing.tMOD/timing.tCK);
-//         activate(.bg(0), .ba(0), .row(0)); // Activate Bank 0, Row 0
-//         deselect(timing.tRCD/timing.tCK);
-//         write(.bg(0), .ba(0), .col(0), .ap(1), .bc(0), .dm('1), .dq('0 | {MAX_DQ_BITS{1'b1}}));
-//         deselect(_dut_mode_config.WL_calculated + 5 + _dut_mode_config.write_recovery);
-//         active_power_down(timing.tPDc);
-//         deselect(timing.tXSc);
+        deselect(timing.tMOD/timing.tCK);
+        activate(.bg(0), .ba(0), .row(0)); // Activate Bank 0, Row 0
+        deselect(timing.tRCD/timing.tCK);
+        write(.bg(0), .ba(0), .col(0), .ap(1), .bc(0), .dm('1), .dq('0 | {MAX_DQ_BITS{1'b1}}));
+        deselect(_dut_mode_config.WL_calculated + 5 + _dut_mode_config.write_recovery);
+        active_power_down(timing.tPDc);
+        deselect(timing.tXSc);
 
-//         $display("refresh to power down re-entry");
-//         refresh();
-//         deselect(timing.tREFPDENc);
-//         precharge_power_down(timing.tPDc);
-//         deselect(timing.tXSDLLc);
-//         precharge_power_down(timing.tPDc);
-//         deselect(timing.tXSDLLc);
+        $display("refresh to power down re-entry");
+        refresh();
+        deselect(timing.tREFPDENc);
+        precharge_power_down(timing.tPDc);
+        deselect(timing.tXSDLLc);
+        precharge_power_down(timing.tPDc);
+        deselect(timing.tXSDLLc);
 
-//         $display("Power-Down Exit to Refresh to Power-Down Entry");
-//         refresh();
-//         deselect(timing.tREFPDENc);
-//         precharge_power_down(timing.tPDc);
-//         deselect(timing.tXSDLLc);
+        $display("Power-Down Exit to Refresh to Power-Down Entry");
+        refresh();
+        deselect(timing.tREFPDENc);
+        precharge_power_down(timing.tPDc);
+        deselect(timing.tXSDLLc);
 
-//         $display("Change Frequency to %s during Self Refresh", max_ts.name());
-//         sr_change_period(max_ts);
-//         deselect(timing.tXSDLLc);
+        $display("Change Frequency to %s during Self Refresh", max_ts.name());
+        sr_change_period(max_ts);
+        deselect(timing.tXSDLLc);
 
-//         $display("Change Frequency to %s during Self Refresh", min_ts.name());
-//         sr_change_period(min_ts);
-//         deselect(timing.tXSDLLc);
+        $display("Change Frequency to %s during Self Refresh", min_ts.name());
+        sr_change_period(min_ts);
+        deselect(timing.tXSDLLc);
 
-//         $display("Change Frequency to %s during Self Refresh", min_ts.name());
-//         sr_change_period(nominal_ts);
-//         deselect(timing.tXSDLLc);
+        $display("Change Frequency to %s during Self Refresh", min_ts.name());
+        sr_change_period(nominal_ts);
+        deselect(timing.tXSDLLc);
 
-//         // TODO: multipurpose register section
+        // TODO: multipurpose register section
 
-//         // self refresh with ck off
-//         deselect(timing.tMOD/timing.tCK);
-//         self_refresh(timing.tCKSREc);
-//         clk_enb = 0;
-//         #(timing.tRFC);
-//         clk_enb <= 1'b1;
-//         #(timing.tCKSRX);
-//         deselect(timing.tXSDLLc + 1);
+        // self refresh with ck off
+        deselect(timing.tMOD/timing.tCK);
+        self_refresh(timing.tCKSREc);
+        clk_enb = 0;
+        #(timing.tRFC);
+        clk_enb <= 1'b1;
+        #(timing.tCKSRX);
+        deselect(timing.tXSDLLc + 1);
 
-//         // Gear down
-//         _state.ModeToAddrDecode(dut_mode_config, mode_regs);
-//         load_mode(.bg(0), .ba(0), .addr((mode_regs[0] & ~'he00) | 'h600));
-//         deselect(timing.tMOD/timing.tCK);
-//         load_mode(.bg(0), .ba(3), .addr(mode_regs[3] | 'h8 | 'h4));
-//         deselect(timing.tSYNC_GEARc);
-//         nop(1);
-//         deselect(timing.tCMD_GEARc + 1);
-//         activate(.bg('b1), .ba('b11), .row('b1010));
-//         deselect(timing.tSYNC_GEARc);
+        // Gear down
+        _state.ModeToAddrDecode(dut_mode_config, mode_regs);
+        load_mode(.bg(0), .ba(0), .addr((mode_regs[0] & ~'he00) | 'h600));
+        deselect(timing.tMOD/timing.tCK);
+        load_mode(.bg(0), .ba(3), .addr(mode_regs[3] | 'h8 | 'h4));
+        deselect(timing.tSYNC_GEARc);
+        nop(1);
+        deselect(timing.tCMD_GEARc + 1);
+        activate(.bg('b1), .ba('b11), .row('b1010));
+        deselect(timing.tSYNC_GEARc);
 
-//         // TODO: write levelization section
+        // TODO: write levelization section
 
-//         // TODO: zq_calibration
+        // TODO: zq_calibration
 
-//         // Setting a fixed timeset can also be accomplished using +define+FIXED_2400 (for example) see readme.txt for all options.
-//         $display("Forcing model configuration");
-//         // Setting the correct timeset.
-//         sr_change_period(TS_833);
-//         SetTimingStruct(TS_833);
-//         timing.tCK = tCK;
-//         _state.UpdateTiming(timing);
-//         deselect(timing.tXSDLLc);
-//         golden_model.set_timing_parameter_lock(.locked(1), .recalculate_params(1), .non_spec_tck(833)); // Prevent tCK changes from changing the loaded timeset.
-//         // Forcing dut mode config parameters without loadmodes.
-//         // Please see arch_package.sv::UTYPE_DutModeConfig for settings.
-//         // Be careful since there are many illegal configurations.
-//         // Many parameters are enumerated values, please see arch_package.sv::UTYPE_DutModeConfig.
-//         dut_mode_config.CL = 18;
-//         dut_mode_config.CWL = 14;
-//         dut_mode_config.BL_reg = rBL8;
-//         dut_mode_config.write_recovery = 20;
-//         dut_mode_config.rd_preamble_clocks = 2;
-//         // Forcing the model.
-//         golden_model.SetDutModeConfig(dut_mode_config);
+        // Setting a fixed timeset can also be accomplished using +define+FIXED_2400 (for example) see readme.txt for all options.
+        $display("Forcing model configuration");
+        // Setting the correct timeset.
+        sr_change_period(TS_833);
+        SetTimingStruct(TS_833);
+        timing.tCK = tCK;
+        _state.UpdateTiming(timing);
+        deselect(timing.tXSDLLc);
+        golden_model.set_timing_parameter_lock(.locked(1), .recalculate_params(1), .non_spec_tck(833)); // Prevent tCK changes from changing the loaded timeset.
+        // Forcing dut mode config parameters without loadmodes.
+        // Please see arch_package.sv::UTYPE_DutModeConfig for settings.
+        // Be careful since there are many illegal configurations.
+        // Many parameters are enumerated values, please see arch_package.sv::UTYPE_DutModeConfig.
+        dut_mode_config.CL = 18;
+        dut_mode_config.CWL = 14;
+        dut_mode_config.BL_reg = rBL8;
+        dut_mode_config.write_recovery = 20;
+        dut_mode_config.rd_preamble_clocks = 2;
+        // Forcing the model.
+        golden_model.SetDutModeConfig(dut_mode_config);
 
-//         // Initializing memory with a file.
-//         $display("Reading memory initialized with a file");
-//         failure = golden_model.initialize_memory_with_file("memory_file.txt");
-//         activate(.bg(0), .ba(0), .row(0));
-//         deselect(timing.tRCD/timing.tCK);
-//         activate(.bg(1), .ba(1), .row(0));
-//         deselect(timing.tRCD/timing.tCK);
-//         activate(.bg(0), .ba(1), .row(0));
-//         deselect(timing.tRCD/timing.tCK);
-//         read(.bg(0), .ba(0), .col(0), .ap(1));
-//         deselect(_dut_mode_config.RL + timing.tCCD_L/timing.tCK + _dut_mode_config.BL/2 + _dut_mode_config.wr_preamble_clocks - _dut_mode_config.WL_calculated);
-// //         read(.bg(1), .ba(1), .col(0), .ap(1));
-//         deselect(_dut_mode_config.RL + timing.tCCD_L/timing.tCK + _dut_mode_config.BL/2 + _dut_mode_config.wr_preamble_clocks - _dut_mode_config.WL_calculated);
-//         read(.bg(0), .ba(1), .col(0), .ap(1));
-//         deselect(_dut_mode_config.RL + _dut_mode_config.BL/2 + timing.tRAS/timing.tCK);
+        // Initializing memory with a file.
+        $display("Reading memory initialized with a file");
+        failure = golden_model.initialize_memory_with_file("memory_file.txt");
+        activate(.bg(0), .ba(0), .row(0));
+        deselect(timing.tRCD/timing.tCK);
+        activate(.bg(1), .ba(1), .row(0));
+        deselect(timing.tRCD/timing.tCK);
+        activate(.bg(0), .ba(1), .row(0));
+        deselect(timing.tRCD/timing.tCK);
+        read(.bg(0), .ba(0), .col(0), .ap(1));
+        deselect(_dut_mode_config.RL + timing.tCCD_L/timing.tCK + _dut_mode_config.BL/2 + _dut_mode_config.wr_preamble_clocks - _dut_mode_config.WL_calculated);
+//         read(.bg(1), .ba(1), .col(0), .ap(1));
+        deselect(_dut_mode_config.RL + timing.tCCD_L/timing.tCK + _dut_mode_config.BL/2 + _dut_mode_config.wr_preamble_clocks - _dut_mode_config.WL_calculated);
+        read(.bg(0), .ba(1), .col(0), .ap(1));
+        deselect(_dut_mode_config.RL + _dut_mode_config.BL/2 + timing.tRAS/timing.tCK);
 
-//         // Accessing memory with a function.
-//         // bg/ba/row/col are not limited by the current configuration. Please make sure they are correct.
-//         for (int i=0;i<64;i++) begin
-//             logic[MAX_DQ_BITS*MAX_BURST_LEN-1:0] data;
+        // Accessing memory with a function.
+        // bg/ba/row/col are not limited by the current configuration. Please make sure they are correct.
+        for (int i=0;i<64;i++) begin
+            logic[MAX_DQ_BITS*MAX_BURST_LEN-1:0] data;
 
-//             data = {$urandom, $urandom, $urandom, $urandom};
-//             failure = golden_model.memory_write(.bg(i[3:2]), .ba(i[1:0]), .row(i+2*i), .col(i+i), .data(data));
-//             // for 3DS
-//             // failure = golden_model.memory_write_with_rank(.rank(0), .bg(i[3:2]), .ba(i[1:0]), .row(i+2*i), .col(i+i), .data(data));
-//             $display("Writing [%0d][%0d][%0h][%0h] %0h", i[3:2], i[1:0], i+2*i, i+i, data);
-//             data = '1;
-//             failure = golden_model.memory_read(.bg(i[3:2]), .ba(i[1:0]), .row(i+2*i), .col((i+i) & ~'h3), .data(data));
-//             // for 3DS
-//             // failure = golden_model.memory_read_with_rank(.rank(0), .bg(i[3:2]), .ba(i[1:0]), .row(i+2*i), .col((i+i) & ~'h3), .data(data));
-//             $display("Reading [%0d][%0d][%0h][%0h] %0h", i[3:2], i[1:0], i+2*i, i+i, data);
-//             activate(.bg(i[3:2]), .ba(i[1:0]), .row(i+2*i));
-//             deselect(timing.tRCD/timing.tCK);
-//             read(.bg(i[3:2]), .ba(i[1:0]), .col((i+i) & ~'h3), .ap(1));
-//             deselect(_dut_mode_config.RL + _dut_mode_config.BL + timing.tRAS/timing.tCK);
-//             precharge(.ap(1));
-//             deselect(timing.tRAS/timing.tCK);
-//         end
+            data = {$urandom, $urandom, $urandom, $urandom};
+            failure = golden_model.memory_write(.bg(i[3:2]), .ba(i[1:0]), .row(i+2*i), .col(i+i), .data(data));
+            // for 3DS
+            // failure = golden_model.memory_write_with_rank(.rank(0), .bg(i[3:2]), .ba(i[1:0]), .row(i+2*i), .col(i+i), .data(data));
+            $display("Writing [%0d][%0d][%0h][%0h] %0h", i[3:2], i[1:0], i+2*i, i+i, data);
+            data = '1;
+            failure = golden_model.memory_read(.bg(i[3:2]), .ba(i[1:0]), .row(i+2*i), .col((i+i) & ~'h3), .data(data));
+            // for 3DS
+            // failure = golden_model.memory_read_with_rank(.rank(0), .bg(i[3:2]), .ba(i[1:0]), .row(i+2*i), .col((i+i) & ~'h3), .data(data));
+            $display("Reading [%0d][%0d][%0h][%0h] %0h", i[3:2], i[1:0], i+2*i, i+i, data);
+            activate(.bg(i[3:2]), .ba(i[1:0]), .row(i+2*i));
+            deselect(timing.tRCD/timing.tCK);
+            read(.bg(i[3:2]), .ba(i[1:0]), .col((i+i) & ~'h3), .ap(1));
+            deselect(_dut_mode_config.RL + _dut_mode_config.BL + timing.tRAS/timing.tCK);
+            precharge(.ap(1));
+            deselect(timing.tRAS/timing.tCK);
+        end
 
         test_done;
     end
