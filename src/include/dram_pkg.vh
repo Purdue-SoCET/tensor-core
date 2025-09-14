@@ -19,15 +19,19 @@ package dram_pkg;
     parameter IGNORE_BITS       = 1;
 
     // TIMING PARAMETERS
-    // parameter tRCD = ;
-    // parameter tAL = ;
-    // parameter tCL = ;
-    // parameter tBURST = ;
-    // parameter tRCD = ;
-    // parameter tCWL = ;
-    // parameter tREFI = ;
-    // parameter tRP = ;
-    // parameter tRFC = ;
+    parameter tRCD = 10;
+    parameter tAL = 10;
+    parameter tCL = 10;
+    parameter tBURST = 10;
+    parameter tRCD = 10;
+    parameter tCWL = 10;
+    parameter tREFI = 10;
+    parameter tRP = 10;
+    parameter tRFC = 10;
+    parameter tRAS = 10;
+    parameter tRC = tRAS + tRP;
+    parameter tRL = tAL + tCL;        // Read Latency
+    parameter tWL = tAL + tCWL;       // Write Latency
 
     // word_t
     typedef logic [WORD_W-1:0] word_t;
@@ -37,7 +41,21 @@ package dram_pkg;
         x4  = 2'b00,
         x8  = 2'b01,
         x16 = 2'b10
-    } configs_t; 
+    } configs_t;
+
+    // command FSM states
+    typedef enum logic [4:0] {
+        POWER_UP,
+        IDLE,
+        ACTIVATE,
+        ACTIVATING,
+        WRITE,
+        WRITING,
+        PRECHARGE,
+        READ,
+        READING,
+        REFRESH
+    } cmd_fsm_t; 
 
 endpackage
 
