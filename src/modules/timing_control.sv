@@ -4,13 +4,17 @@
 
 module timing_control (
     input logic clk, nRST,
-    timing_signals_if.timing_ctrl timif
-    command_fsm_if.timing_control cfsmif
+    timing_signals_if.timing_ctrl timif,
+    command_fsm_if.timing_ctrl cfsmif
 );
+    import dram_pkg::*;
+    
+    logic wr_en;
+    
     // time counter signals
     parameter N = 5;
     logic [N-1:0] time_load, time_count;
-    logic time_count_done;
+    logic time_counter_en, time_count_done;
 
     always_comb begin
         timif.tACT_done = 1'b0;
@@ -21,7 +25,7 @@ module timing_control (
         timif.rf_req = 1'b0;
         
         time_counter_en = 1'b0;
-        time_LOAD = '0;
+        time_load = '0;
         wr_en = 1'b0;
 
         case (cfsmif.cmd_state)
@@ -46,7 +50,6 @@ module timing_control (
             ACTIVATING : begin
                 if (time_count_done == 1'b1) begin
                     timif.tACT_done = 1'b1;
-                    time_counter_en = 1'b0;
                 end
             end
 
@@ -62,7 +65,6 @@ module timing_control (
             READING : begin
                 if (time_count_done == 1'b1) begin
                     timif.tRD_done = 1'b1;
-                    time_counter_en = 1'b0;
                 end
             end
 
@@ -76,30 +78,28 @@ module timing_control (
             end
 
             WRITING : begin
-                if (time_count == tWL) begin
+                if (time_count == tBURST) begin
                     wr_en = 1'b1;
                 end
 	                
                 if (time_count_done == 1'b1) begin
 	                timif.tWR_done = 1'b1;
-                    time_counter_en = 1'b0; 
                 end
             end
 
-            PRE : begin
+            PRECHARGE : begin
                 time_counter_en = 1'b1;
-                time_load = tRP;
+                time_load = tRP - 1;
 
                 if (time_count_done == 1'b1) begin
                     timif.tPRE_done = 1'b1;
-                    time_counter_en = 1'b0;
                 end
             end
 
         endcase
     end
 
-    flex_counter #(.N(N)) time_counter (.clk(clk), .nRST(nRST), .enable(yime_counter_en),
+    flex_counter #(.N(N)) time_counter (.clk(clk), .nRST(nRST), .enable(time_counter_en),
                                         .count_load(time_load), .count(time_count), 
                                         .count_done(time_count_done));
 endmodule

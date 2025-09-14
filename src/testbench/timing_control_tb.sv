@@ -116,7 +116,7 @@ module timing_control_tb ();
             end
             else begin
                 tb_mismatch = 1'b1;
-                $display("Incorrect '' output during %s test case", tb_test_case);
+                $display("Incorrect 'tPRE_done' output during %s test case", tb_test_case);
             end
 
             if (tb_expected_timif.tREF_done == tb_timif.tREF_done) begin
@@ -159,7 +159,7 @@ module timing_control_tb ();
         tb_cfsmif.cmd_state = IDLE;
     
         //*****************************************************************************
-        // Power-on-Reset Test Case (Not needed because combinational. USING AS A RESET)
+        // Power-on-Reset Test Case
         //*****************************************************************************
         tb_test_case     = "Power-on-Reset";
         tb_test_case_num = tb_test_case_num + 1;
@@ -179,8 +179,91 @@ module timing_control_tb ();
         #(tb_CLK * 3);
 
         //*****************************************************************************
-        // Add more test cases
+        // ACT -> RD/WRITE
         //*****************************************************************************
+        tb_test_case     = "ACT -> RD/WRITE";
+        tb_test_case_num = tb_test_case_num + 1;
+
+        @(posedge tb_CLK)
+        tb_cfsmif.cmd_state = ACTIVATE;     // time loaded, counter enabled   
+
+        @(posedge tb_CLK)
+        tb_cfsmif.cmd_state = ACTIVATING;                // state changed after pos edge
+        repeat (tRCD - tAL) @(posedge tb_CLK);           // waiting for timer to finish counting
+
+        @(negedge tb_CLK)
+        tb_expected_timif.tACT_done = 1'b1; // timer should finish counting
+        check_output();
+
+        @(posedge tb_CLK)
+        tb_expected_timif.tACT_done = 1'b0; // clearing expected value signal
+
+        #(tb_CLK * 3);
+
+        //*****************************************************************************
+        // READ
+        //*****************************************************************************
+        tb_test_case     = "READ";
+        tb_test_case_num = tb_test_case_num + 1;
+
+        @(posedge tb_CLK)
+        tb_cfsmif.cmd_state = READ;     // time loaded, counter enabled   
+
+        @(posedge tb_CLK)
+        tb_cfsmif.cmd_state = READING;                   // state changed after pos edge
+        repeat (tRL + tBURST) @(posedge tb_CLK);           // waiting for timer to finish counting
+
+        @(negedge tb_CLK)
+        tb_expected_timif.tRD_done = 1'b1; // timer should finish counting
+        check_output();
+
+        @(posedge tb_CLK)
+        tb_expected_timif.tRD_done = 1'b0; // clearing expected value signal
+
+        #(tb_CLK * 3);
+
+        //*****************************************************************************
+        // Write
+        //*****************************************************************************
+        tb_test_case     = "WRITE";
+        tb_test_case_num = tb_test_case_num + 1;
+
+        @(posedge tb_CLK)
+        tb_cfsmif.cmd_state = WRITE;     // time loaded, counter enabled   
+
+        @(posedge tb_CLK)
+        tb_cfsmif.cmd_state = WRITING;            // state changed after pos edge
+        repeat (tWL) @(posedge tb_CLK);           // wr_en should go high
+        repeat (tBURST) @(posedge tb_CLK);        // waiting for timer to finish counting
+
+        @(negedge tb_CLK)
+        tb_expected_timif.tWR_done = 1'b1; // timer should finish counting
+        check_output();
+
+        @(posedge tb_CLK)
+        tb_expected_timif.tWR_done = 1'b0; // clearing expected value signal
+
+        #(tb_CLK * 3);
+
+        //*****************************************************************************
+        // PRECHARGE
+        //*****************************************************************************
+        tb_test_case     = "PRECHARGE";
+        tb_test_case_num = tb_test_case_num + 1;
+
+        @(posedge tb_CLK)
+        tb_cfsmif.cmd_state = PRECHARGE;        // time loaded, counter enabled   
+
+        repeat (tRP) @(posedge tb_CLK);         // waiting for timer to finish counting
+
+        @(negedge tb_CLK)
+        tb_expected_timif.tPRE_done = 1'b1;      // timer should finish counting
+        check_output();
+
+        @(posedge tb_CLK)
+        tb_expected_timif.tPRE_done = 1'b0;      // clearing expected value signal
+
+        #(tb_CLK * 3);
 
         $finish;
 
