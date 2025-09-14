@@ -2,7 +2,9 @@
 `define TIMING_SIGNALS_IF_VH
 
 
-interface timing_signals_if
+interface timing_signals_if;
+    import dram_pkg::*;
+
     logic tACT_done;
     logic tWR_done;
     logic tRD_done;
