@@ -1,4 +1,4 @@
-SCRDIR = /home/asicfab/a/than0/tensor-core/src/scripts
+SCRDIR = /home/asicfab/a/khatri12/tensor-core/src/scripts
 SIMTIME = 100us             # Default simulation run time
 
 # modelsim viewing options
@@ -27,11 +27,11 @@ icache:
 	vsim $(SIMTERM) -voptargs="+acc" work.icache_tb -do $(SIMDO)
 
 %:
-	vlog -sv +incdir+./src/include ./src/testbench/$*_tb.sv ./src/modules/$*.sv
+	vlog -sv +incdir+./src/include +incdir+./src/modules ./src/testbench/$*_tb.sv ./src/modules/$*.sv ./src/modules/flex_counter.sv
 	vsim $(SIMTERM) -voptargs="+acc" work.$*_tb -do $(SIMDO)
 
 %.wav:
-	vlog -sv +incdir+./src/include ./src/testbench/$*_tb.sv ./src/modules/$*.sv
+	vlog -sv +incdir+./src/include ./src/testbench/$*_tb.sv ./src/modules/$*.sv ./src/modules/flex_counter.sv
 	vsim -voptargs="+acc" work.$*_tb -do "do $(SCRDIR)/$*.do; run $(SIMTIME);" -suppress 2275
 
 
