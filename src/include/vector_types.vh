@@ -49,7 +49,7 @@ package vector_pkg;
     // Data Structures ----------------------------------------------------------------
     parameter NUM_ELEMENTS = 32;
 
-    typdef fp16_t [NUM_ELEMENTS-1:0] vreg_t;
+    typedef fp16_t [NUM_ELEMENTS-1:0] vreg_t;
 
     typedef struct packed {
         logic sign;
@@ -62,6 +62,7 @@ package vector_pkg;
         VALU_SUB       = 6'h01,
     } valu_op_t;
 
+    // TOP LEVEL CONTROL SIGNALS
     typedef struct packed {
         logic wen; // write en
         vsel_t vwsel; // vector write select 
@@ -76,6 +77,50 @@ package vector_pkg;
         logic spwrite;
         logic spread;
     } control_t;
+
+    // Veggie Input Signals
+    typedef struct packed {
+        logic WEN;
+        vsel_t vd;
+        vsel_t vs1;
+        vsel_t vs2;
+        logic vm;
+        logic WEN;
+    } veggie_in_t;
+
+    typedef struct packed {
+        vreg_t v1;
+        vreg_t v2;
+        vreg_t vmask;
+        logic ready; // to SB
+    } veggie_out_t;
+
+    typedef struct packed {
+        logic REN;
+        logic WEN;
+        logic tag;
+        logic WEN;
+        vsel_t vs;
+        vsel_t vd;
+        vreg_t vdata;
+    } bank_in_t;
+
+    typedef struct packed {
+        logic vm;
+        logic WEN;
+        vsel_t vd;
+        vreg_t vdata;
+    } cntrl_bank_in_t;
+
+    typedef enum logic [1:0] {
+        IDLE,
+        READ
+    } conflict_state_t;
+
+    typedef enum logic [1:0] {
+        RW_CONFLICT = 2'b1x,
+        RR_CONFLICT = 2'b01
+    } conflict_type_t;
     // --------------------------------------------------------------------------------
 
 

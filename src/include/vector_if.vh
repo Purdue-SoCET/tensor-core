@@ -27,6 +27,10 @@ interface vector_if;
 
   // VALU Signals
   vreg_t vdat1, vdat2, result;
+
+  // VEGGIE SIGNALS
+  veggie_in_t veggie_in; 
+  veggie_out_t veggie_out;
   
   modport vector (
     input control, r1, imm, vd, v1, v2, vmask, col, row, row_id,
@@ -37,7 +41,11 @@ interface vector_if;
     input vdat1, vdat2, vop, vmask,
     output result
   );
-
+  // Veggie
+  modport veggie (
+    input logic CLK, nRST, veggie_in,
+    output veggie_out
+  );
 endinterface
 
 `endif
