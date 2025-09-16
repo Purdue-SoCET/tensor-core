@@ -49,17 +49,17 @@ package vector_pkg;
     // Data Structures ----------------------------------------------------------------
     parameter NUM_ELEMENTS = 32;
 
-    typdef fp16_t [NUM_ELEMENTS-1:0] vreg_t;
-
     typedef struct packed {
         logic sign;
         logic [4:0] exp;
         logic [9:0] frac;
     } fp16_t; 
+    
+    typedef fp16_t [NUM_ELEMENTS-1:0] vreg_t;
 
     typedef enum logic [5:0] {
         VALU_ADD       = 6'h00,
-        VALU_SUB       = 6'h01,
+        VALU_SUB       = 6'h01
     } valu_op_t;
 
     typedef struct packed {

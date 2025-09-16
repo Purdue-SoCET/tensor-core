@@ -21,6 +21,11 @@ interface vaddsub_if;
         output out, overflow
     );
 
+    modport tb (
+        input out, overflow,
+        output port_a, port_b, sub, enable
+    );
+
 endinterface
 `endif
 
