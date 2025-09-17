@@ -1,47 +1,129 @@
-`ifndef  SCRATCHPAD_IF_VH
-`define SCRATCHPAD_IF_VH
-// `include "types_pkg.vh"
+`ifndef SCPAD_IF_VH
+`define SCPAD_IF_VH
 
-interface scratchpad_if;
-    // import types_pkg::*;
+interface spad_if;
+    import spad_types_pkg::*;
 
-    // COPIED FROM TYPES PACKAGE
-    parameter WORD_W = 32;
-    parameter REG_W  = 5;
-    parameter MATRIX_W = 4;
-    parameter VALUE_BITS = 16;
-    parameter BITS_PER_ROW = MATRIX_W * VALUE_BITS;
+    // Refer to `scpad_types_pkg.vh` for the definition of scpad. 
 
-    parameter FU_S_W = 2;
-    parameter FU_M_W = 1;
-    parameter MAT_S_W = 2;
-    parameter ROW_S_W = 2;
+    // Typical Control Flow within Scratchpad. 
+    //      Ingress 
+    //          Functional_Unit.SCPAD will pass DRAM Base Address to start loading from, num_rows and num_cols of the matrix (max bitwidth of both ports is 5)
+    //          This information goes to Backend Prefetcher. 
+    //              Backend Prefetcher has a FIFO containing {slot_mask, shift_mask, valid_mask}.
+    //              It starts talking to the DRAM Controller by sending how many bytes to load (max 32, so bitwidth = 5). DRAM Controller signals when it's ready with the data. 
+    //              When this signal goes high, Backend Prefetched will set crossbar reservation bit high. Only proceeds when the confirmation bit gets set high too. 
+    //              Data is passed into through a `scpad_data wdata` field, and is routed into the crossbar along with the shift_mask and valid_mask. 
+    //              Output from the crossbar is latched and held until SRAM is free. Remember, SRAM Control unit always loves Backend communication, unless it's already serving another request. 
+    //              Here, the slot_mask is sent in, after which the final data is written into the banks. 
+    //      Egress 
+    //          From Scpad -> VReg           
+    //              VReg Cntrl. is a part of Vector Core (VC). It will send in a request packet. Frontend Arbiter prioritizes the VC requests based on the valid bits of SA and VC request vectors. 
+    //              It will send in an addr, valid, write (0/1). The Frontend VC will make a {slot_mask, shift_mask, valid_mask} pair, and set crossbar reservation bit high. It will only proceed if the
+    //               confimation bit gets set high too
+    //              slot_mask and a read signal gets sent into SRAM Cntrl, and then `scpad_data rdata` is read out. 
+    //              This gets routed into the crossbar, along with the shift_mask and valid_mask. 
+    //              Output of crossbar gets set into the rdata going out through the response packet in the common bus shared by VC and SA, only that valid bits differ. 
+    //          From Scpad -> SA 
+    //              TCA handles this communication in the same way the VReg. Cntrl. is expected to. 
 
-    
-    logic instrFIFO_WEN, psumout_en, drained, fifo_has_space, sLoad_hit, sStore_hit;
-    logic [2+MAT_S_W+ROW_S_W+WORD_W-1:0] instrFIFO_wdata;
-    logic [ROW_S_W-1:0] psumout_row_sel_in, sLoad_row;
-    logic [BITS_PER_ROW-2:0] psumout_data, load_data;
+    // Arbitration Logic for the SRAM Control itself. 
+    //      Always prioritize Backend, then Frontend VC, then Frontend SA
 
-    logic instrFIFO_full, partial_enable, weight_enable, input_enable, sLoad, sStore, gemm_complete;
-    logic [BITS_PER_ROW-1:0] weight_input_data, partial_sum_data, store_data;
-    logic [ROW_S_W-1:0] weight_input_row_sel, partial_sum_row_sel;
-    logic [WORD_W-1:0] load_addr, store_addr;
+    // Crossbar Signals
+    typedef struct packed {
+        slot_mask  slot;
+        shift_mask  shift;
+        valid_mask  valid;
+    } xbar_desc_t;
+    xbar_desc_t vc_xbar_desc, sa_xbar_desc, be_xbar_desc; 
+    logic crossbar_req_vc, crossbar_req_sa, crossbar_req_be; // request into the crossbar arb. logic
+    logic crossbar_reserved_vc, crossbar_reserved_sa, crossbar_reserved_be; // confirms if it's reserved or not for either BE, FE VC, FE SA
+    scpad_data xbar_in_vc, xbar_in_sa, xbar_in_be;
+    scpad_data xbar_out;
 
-    modport sp (
-        input instrFIFO_WEN, psumout_en, drained, fifo_has_space, sLoad_hit, sStore_hit, 
-        instrFIFO_wdata, psumout_row_sel_in, sLoad_row, psumout_data, load_data,
-        output instrFIFO_full, partial_enable, weight_enable, input_enable, sLoad, sStore,
-        weight_input_data, partial_sum_data, store_data, weight_input_row_sel, partial_sum_row_sel,
-        load_addr, store_addr, gemm_complete
+    // SRAM Control -> Goes to TCA and VReg Ctrl.
+    typedef struct packed {
+        logic [1:0]  valid; // [1]=VC, [0]=SA
+        logic  ready;
+        scpad_data rdata; 
+    } resp_t;
+
+    logic sram_req_be, sram_req_sa, sram_req_vc; 
+    logic sram_reserved_be, sram_reserved_vc, sram_reserved_sa; 
+    resp_t resp;
+
+    // Frontend Arbitration logic will use req_sa_t.valid vs req_vc_t.valid to decide which gets served first. 
+    // Systolic Array Request -> Comes from the TCA
+    // Vector Core Request -> Comes from the VReg Ctrl.
+    typedef struct packed { 
+        logic valid; 
+        logic write; // if valid and !write -> then its a read
+        logic [SCPAD_ADDR_WIDTH-1:0] addr; 
+        scpad_data wdata; 
+        logic [NUM_COLS-1:0] wmask; 
+    } req_sa_t, req_vc_t; 
+
+    req_sa_t sa_req;
+    req_vc_t vc_req;
+
+    // Scratchpad will talk to DRAM Controller, Vector Core, Systolic Array and Functional_Unit_SCPAD. 
+    modport external (
+        output sa_req, vc_req,  
+        input  resp  
     );
 
-    modport arbiter (
-        input store_data, load_addr, store_addr, sLoad, sStore,
-        output load_data, sLoad_hit, sStore_hit, sLoad_row
+    // Backend Prefetcher will talk to the SRAM Control, Crossbar, DRAM Controller, Vector Core and Systolic Array
+    // Responsible for all ingress
+    modport backend (
+        output be_xbar_desc, crossbar_req_be,
+        output xbar_in_be,
+        output sram_req_be,
+        input  resp  
     );
-    
+
+
+    // Frontend VC will talk to the SRAM Control and Crossbar and have output ports into Vector Core
+    // Responsible for purely VC Egress
+    modport frontend_vc (
+        input  vc_req, crossbar_reserved_vc,               
+        output vc_xbar_desc, crossbar_req_vc,
+        output sram_req_vc,
+        input  resp  
+    );
+
+
+    // Frontend SA will talk to the SRAM Control and Crossbar and have output ports into Systolic Array
+    // Responsible for purely SA Egress
+    modport frontend_sa (
+        input  sa_req, crossbar_reserved_sa,    
+        output sa_xbar_desc, crossbar_req_sa,
+        output sram_req_sa,
+        input  resp
+    );
+
+    modport crossbar (
+        input  crossbar_req_vc, vc_xbar_desc, xbar_in_vc,
+            crossbar_req_sa, sa_xbar_desc, xbar_in_sa,
+            crossbar_req_be, be_xbar_desc,  xbar_in_be,
+        output crossbar_reserved_vc, crossbar_reserved_sa, crossbar_reserved_be, 
+        output xbar_out
+    );
+
+    modport sram_ctrl (
+        input  sram_req_be, sram_req_vc, sram_req_sa,  // highlights the intent of each unit
+        output sram_reserved_be, sram_reserved_vc, sram_reserved_sa, // confirms that it's ready 
+
+        input be_xbar_desc, sa_xbar_desc, vc_xbar_desc, 
+
+        input  xbar_out,    
+        output xbar_in_vc,     
+        output xbar_in_sa,  
+
+        output resp // drives respective .valid bit         
+    );
+
 
 endinterface
 
-`endif 
+`endif
