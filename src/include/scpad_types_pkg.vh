@@ -17,7 +17,7 @@ package spad_types_pkg;
     parameter int ELEM_BITS = 16;  // fp16 
 
     parameter int MAX_TILE_SIZE = 32; // M x M 
-    parameter int MAX_DIM_WIDTH  = 5; // bit length
+    localparam int MAX_DIM_WIDTH  = $clog2(MAX_TILE_SIZE); // bit length
 
     localparam int ELEM_BYTES  = ELEM_BITS/8; // always a multiple of 8        
     localparam int ROW_BYTES = (NUM_COLS * ELEM_BITS)/8;   

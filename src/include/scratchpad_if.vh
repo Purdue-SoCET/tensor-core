@@ -53,21 +53,36 @@ interface spad_if;
     logic sram_reserved_be, sram_reserved_vc, sram_reserved_sa; 
     resp_t resp;
 
-    // Frontend Arbitration logic will use req_sa_t.valid vs req_vc_t.valid to decide which gets served first. 
     // Systolic Array Request -> Comes from the TCA
     // Vector Core Request -> Comes from the VReg Ctrl.
+    //      Frontend Arbitration logic will use req_sa_t.valid vs req_vc_t.valid to decide which gets served first. 
     typedef struct packed { 
         logic valid; 
         logic write; // if valid and !write -> then its a read
-        logic [SCPAD_ADDR_WIDTH-1:0] addr; 
+        logic [SCPAD_ADDR_WIDTH-1:0] addr; // always the BASE row, basically an identifier
+        logic [MAX_DIM_WIDTH-1:0] num_rows, num_cols; // purely for sysarray.ld -> loading an entire tile/kernel into the SA
+        logic [MAX_DIM_WIDTH-1:0] row_id, col_id; // used by VC and SA -> tells us which row or which tile
+        logic row_or_col; // 0 to load a row, 1 to load a col | set by VC or SA
+        logic [SCPAD_ID_WIDTH-1:0] scpad_id; // which scpad to load from
         scpad_data wdata; 
-        logic [NUM_COLS-1:0] wmask; 
     } req_sa_t, req_vc_t; 
+
+    // Scheduler Request -> Functional_Unit.SCPAD
+    typedef struct packed { 
+        logic valid; 
+        logic write; 
+        logic [SCPAD_ADDR_WIDTH-1:0] addr; // always the BASE row, basically an identifier
+        logic [MAX_DIM_WIDTH-1:0] num_rows, num_cols; // purely for sysarray.ld -> loading an entire tile/kernel into the SA
+        logic [MAX_DIM_WIDTH-1:0] row_id, col_id; // used by VC and SA -> tells us which row or which tile
+        logic row_or_col; // 0 to load a row, 1 to load a col | set by VC or SA
+        logic [SCPAD_ID_WIDTH-1:0] scpad_id; // which scpad to load from
+    } req_be_t; 
 
     req_sa_t sa_req;
     req_vc_t vc_req;
+    req_be_t be_req; 
 
-    // Scratchpad will talk to DRAM Controller, Vector Core, Systolic Array and Functional_Unit_SCPAD. 
+    // Scratchpad will talk to DRAM Controller, Vector Core, Systolic Array and Functional_Unit.SCPAD. 
     modport external (
         output sa_req, vc_req,  
         input  resp  
@@ -76,30 +91,31 @@ interface spad_if;
     // Backend Prefetcher will talk to the SRAM Control, Crossbar, DRAM Controller, Vector Core and Systolic Array
     // Responsible for all ingress
     modport backend (
-        output be_xbar_desc, crossbar_req_be,
+        input  be_req, 
+        input  resp, 
+        output be_xbar_desc, crossbar_req_be, 
         output xbar_in_be,
-        output sram_req_be,
-        input  resp  
+        output sram_req_be
     );
 
 
     // Frontend VC will talk to the SRAM Control and Crossbar and have output ports into Vector Core
     // Responsible for purely VC Egress
     modport frontend_vc (
-        input  vc_req, crossbar_reserved_vc,               
-        output vc_xbar_desc, crossbar_req_vc,
-        output sram_req_vc,
-        input  resp  
+        input  vc_req,
+        input  resp,   
+        output vc_xbar_desc, crossbar_req_vc, crossbar_reserved_vc, 
+        output sram_req_vc
     );
 
 
     // Frontend SA will talk to the SRAM Control and Crossbar and have output ports into Systolic Array
     // Responsible for purely SA Egress
     modport frontend_sa (
-        input  sa_req, crossbar_reserved_sa,    
-        output sa_xbar_desc, crossbar_req_sa,
-        output sram_req_sa,
-        input  resp
+        input  sa_req, 
+        input  resp,  
+        output sa_xbar_desc, crossbar_req_sa, crossbar_reserved_sa, 
+        output sram_req_sa
     );
 
     modport crossbar (
