@@ -84,7 +84,7 @@ interface spad_if;
 
     // Scratchpad will talk to DRAM Controller, Vector Core, Systolic Array and Functional_Unit.SCPAD. 
     modport external (
-        output sa_req, vc_req,  
+        output sa_req, vc_req, be_req, 
         input  resp  
     );
 
