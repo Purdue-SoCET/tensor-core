@@ -31,7 +31,7 @@ package dram_pkg;
     parameter tRC = tRAS + tRP;
     parameter tRL = tAL + tCL;        // Read Latency
     parameter tWL = tAL + tCWL;       // Write Latency
-    parameter tREFRESH_LIMIT = 9 * tREFI;
+    parameter MAX_tREFRESH_LIMIT = 9 * tREFI;
 
     // word_t
     typedef logic [WORD_W-1:0] word_t;
