@@ -22,7 +22,6 @@ module timing_control (
         timif.tRD_done = 1'b0;
         timif.tPRE_done = 1'b0;
         timif.tREF_done = 1'b0;
-        timif.rf_req = 1'b0;
         
         time_counter_en = 1'b0;
         time_load = '0;
@@ -96,10 +95,71 @@ module timing_control (
                 end
             end
 
+            REFRESH : begin
+                time_counter_en = 1'b1;
+                time_load = tRFC - 1;
+
+                if (time_count_done == 1'b1) begin
+                    timif.tREF_done = 1'b1;
+                end
+            end
+
         endcase
     end
+
+    //////////// REFRESH ////////////
+    logic [N-1:0] refresh_limit, next_refresh_limit;
+    logic [N-1:0] refresh_count, next_refresh_count;
+
+    always_ff @(posedge clk, negedge nRST) begin : REFRESH_REG_LOGIC
+        if (~nRST) begin
+            refresh_count <= '0;
+            refresh_limit <= tREFI;
+        end
+
+        else begin
+            refresh_count <= next_refresh_count;
+            refresh_limit <= next_refresh_limit;
+        end
+    end
+
+    always_comb begin : REFRESH_COMB_LOGIC
+        timif.rf_req = 1'b0;
+
+        // REFRESH command is required every tREFI on average.
+        // Default refresh limit is tREFI.
+        // If refresh counter is over the tREFI limit, subtract the
+        // additional time from tREFI for next refresh limit.
+        
+        next_refresh_limit = tREFI;
+        if (refresh_count > tREFI) begin
+            next_refresh_limit = tREFI - (refresh_count - tREFI);
+        end
+
+        
+        // Set the refresh counter to 0 in the REFRESH state.
+        // Otherwise, the refresh counter is always incrementing.
+
+        next_refresh_count = refresh_count + 1;
+        if (cfsmif.cmd_state == REFRESH) begin
+            next_refresh_count = '0;
+        end
+
+        // Maximum time between refreshes is 9 * tREFI.
+        // if (refresh_count == MAX_tREFRESH_LIMIT - (tWL + tRP) || refresh_count == tREFRESH_LIMIT - (tRL + tRP)) begin
+        //     timif.rf_req = 1'b1;
+        // end
+        // Set the refresh request high when refresh count over or equal the refresh limit.
+        if (refresh_count >= refresh_limit) begin
+            timif.rf_req = 1'b1;
+        end
+    end 
 
     flex_counter #(.N(N)) time_counter (.clk(clk), .nRST(nRST), .enable(time_counter_en),
                                         .count_load(time_load), .count(time_count), 
                                         .count_done(time_count_done));
+
+    
+
+
 endmodule
