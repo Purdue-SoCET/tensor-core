@@ -13,6 +13,7 @@ add wave -noupdate -expand -group {Time Signals} /timing_control_tb/tb_timif/tWR
 add wave -noupdate -expand -group {Time Signals} /timing_control_tb/tb_timif/tRD_done
 add wave -noupdate -expand -group {Time Signals} /timing_control_tb/tb_timif/tPRE_done
 add wave -noupdate -expand -group {Time Signals} /timing_control_tb/tb_timif/tREF_done
+add wave -noupdate -expand -group {Time Signals} /timing_control_tb/DUT/wr_en
 add wave -noupdate -expand -group {Time Signals} /timing_control_tb/tb_timif/rf_req
 add wave -noupdate -expand -group {Expected Time Signals} /timing_control_tb/tb_expected_timif/tACT_done
 add wave -noupdate -expand -group {Expected Time Signals} /timing_control_tb/tb_expected_timif/tWR_done
@@ -26,12 +27,12 @@ add wave -noupdate -expand -group {Counter Signals} /timing_control_tb/DUT/time_
 add wave -noupdate -expand -group {Counter Signals} /timing_control_tb/DUT/time_counter/count_done
 add wave -noupdate -expand -group {Counter Signals} /timing_control_tb/DUT/time_counter/next_count
 TreeUpdate [SetDefaultTree]
-WaveRestoreCursors {{Cursor 1} {65 ns} 0}
+WaveRestoreCursors {{Cursor 1} {629 ns} 0}
 quietly wave cursor active 1
 configure wave -namecolwidth 325
 configure wave -valuecolwidth 100
 configure wave -justifyvalue left
-configure wave -signalnamewidth 0
+configure wave -signalnamewidth 1
 configure wave -snapdistance 10
 configure wave -datasetprefix 0
 configure wave -rowmargin 4
@@ -42,4 +43,4 @@ configure wave -griddelta 40
 configure wave -timeline 0
 configure wave -timelineunits ns
 update
-WaveRestoreZoom {0 ns} {112 ns}
+WaveRestoreZoom {0 ns} {751 ns}
