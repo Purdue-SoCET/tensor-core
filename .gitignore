@@ -2,3 +2,4 @@ transcript
 work/
 .venv
 vsim.*
+*.txt

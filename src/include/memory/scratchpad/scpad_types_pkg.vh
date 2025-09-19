@@ -53,7 +53,7 @@ package spad_types_pkg;
     localparam int SCPAD_ID_WIDTH = (NUM_SCPADS > 1) ? $clog2(NUM_SCPADS) : 1;
 
     typedef logic [NUM_COLS-1:0][ELEM_BITS-1:0] scpad_data;      
-    typedef logic [NUM_COLS-1:0] valid_mask;    
+    typedef logic [NUM_COLS-1:0] enable_mask;    
     typedef logic [NUM_COLS-1:0][COL_IDX_WIDTH-1:0] shift_mask; 
     typedef logic [NUM_COLS-1:0][ROW_IDX_WIDTH-1:0] slot_mask; 
 
