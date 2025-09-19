@@ -23,12 +23,12 @@ module scratchpad (
         for (gi = 0; gi < NUM_COLS; gi++) begin
         sram_bank u_bank_gi #(.READ_LATENCY(2), .WRITE_LATENCY(4)) (
             .clk (clk),
-            .ren (ren_b[gi]),
-            .raddr (raddr_b),
+            .ren (ren[gi]),
+            .raddr (raddr),
             .rdata (sram_banks_read_vector[gi]),
             .rdone (rdone[gi]), 
-            .wen  (wen_b[gi]),
-            .waddr (waddr_b),
+            .wen  (wen[gi]),
+            .waddr (waddr),
             .wdata (sram_banks_write_vector[gi])
             .wdone (wdone[gi])
         );
