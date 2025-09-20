@@ -24,7 +24,7 @@ package dram_pkg;
     parameter tCL = 10;
     parameter tBURST = 10;
     parameter tCWL = 10;
-    parameter tREFI = 10;
+    parameter tREFI = 100;
     parameter tRP = 10;
     parameter tRFC = 10;
     parameter tRAS = 10;
@@ -52,9 +52,11 @@ package dram_pkg;
         WRITE,
         WRITING,
         PRECHARGE,
+        PRECHARGING,
         READ,
         READING,
-        REFRESH
+        REFRESH,
+        REFRESHING
     } cmd_fsm_t; 
 
 endpackage

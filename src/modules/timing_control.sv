@@ -12,7 +12,7 @@ module timing_control (
     logic wr_en;
     
     // time counter signals
-    parameter N = 5;
+    parameter N = 10;
     logic [N-1:0] time_load, time_count;
     logic time_counter_en, time_count_done;
 
@@ -88,8 +88,10 @@ module timing_control (
 
             PRECHARGE : begin
                 time_counter_en = 1'b1;
-                time_load = tRP - 1;
+                time_load = tRP;
+            end
 
+            PRECHARGING : begin
                 if (time_count_done == 1'b1) begin
                     timif.tPRE_done = 1'b1;
                 end
@@ -97,8 +99,10 @@ module timing_control (
 
             REFRESH : begin
                 time_counter_en = 1'b1;
-                time_load = tRFC - 1;
+                time_load = tRFC;
+            end
 
+            REFRESHING : begin
                 if (time_count_done == 1'b1) begin
                     timif.tREF_done = 1'b1;
                 end
@@ -133,7 +137,9 @@ module timing_control (
         
         next_refresh_limit = tREFI;
         if (refresh_count > tREFI) begin
-            next_refresh_limit = tREFI - (refresh_count - tREFI);
+            if (cfsmif.cmd_state != REFRESH && cfsmif.cmd_state != REFRESHING) begin
+                next_refresh_limit = tREFI - (refresh_count - tREFI);
+            end
         end
 
         
@@ -141,7 +147,7 @@ module timing_control (
         // Otherwise, the refresh counter is always incrementing.
 
         next_refresh_count = refresh_count + 1;
-        if (cfsmif.cmd_state == REFRESH) begin
+        if (cfsmif.cmd_state == REFRESH || cfsmif.cmd_state == REFRESHING) begin
             next_refresh_count = '0;
         end
 
@@ -150,7 +156,7 @@ module timing_control (
         //     timif.rf_req = 1'b1;
         // end
         // Set the refresh request high when refresh count over or equal the refresh limit.
-        if (refresh_count >= refresh_limit) begin
+        if ((refresh_count >= refresh_limit) && (cfsmif.cmd_state != REFRESH)) begin
             timif.rf_req = 1'b1;
         end
     end 

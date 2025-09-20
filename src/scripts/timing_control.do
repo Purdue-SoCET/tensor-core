@@ -26,8 +26,13 @@ add wave -noupdate -expand -group {Counter Signals} /timing_control_tb/DUT/time_
 add wave -noupdate -expand -group {Counter Signals} /timing_control_tb/DUT/time_counter/count
 add wave -noupdate -expand -group {Counter Signals} /timing_control_tb/DUT/time_counter/count_done
 add wave -noupdate -expand -group {Counter Signals} /timing_control_tb/DUT/time_counter/next_count
+add wave -noupdate -expand -group {Refresh Counter Signals} -radix unsigned /timing_control_tb/DUT/refresh_limit
+add wave -noupdate -expand -group {Refresh Counter Signals} -radix unsigned /timing_control_tb/DUT/next_refresh_limit
+add wave -noupdate -expand -group {Refresh Counter Signals} -radix unsigned /timing_control_tb/DUT/refresh_count
+add wave -noupdate -expand -group {Refresh Counter Signals} -radix unsigned /timing_control_tb/DUT/next_refresh_count
+add wave -noupdate /dram_pkg::tREFI
 TreeUpdate [SetDefaultTree]
-WaveRestoreCursors {{Cursor 1} {629 ns} 0}
+WaveRestoreCursors {{Cursor 1} {15 ns} 0}
 quietly wave cursor active 1
 configure wave -namecolwidth 325
 configure wave -valuecolwidth 100

@@ -127,6 +127,25 @@ module timing_control_tb ();
                 $display("Incorrect 'tREF_done' output during %s test case", tb_test_case);
             end
 
+            // if (tb_expected_timif.rf_req == tb_timif. rf_req) begin
+            //     $display("Correct 'rf_req' output during %s test case", tb_test_case);
+            // end
+            // else begin
+            //     tb_mismatch = 1'b1;
+            //     $display("Incorrect 'rf_req' output during %s test case", tb_test_case);
+            // end
+
+            // Wait some small amount of time so check pulse timing is visible on waves
+            #(0.1);
+            tb_check = 1'b0;
+        end
+    endtask
+
+    task check_refresh;
+        begin
+            tb_mismatch = 1'b0;
+            tb_check    = 1'b1;
+        
             if (tb_expected_timif.rf_req == tb_timif. rf_req) begin
                 $display("Correct 'rf_req' output during %s test case", tb_test_case);
             end
@@ -188,8 +207,8 @@ module timing_control_tb ();
         tb_cfsmif.cmd_state = ACTIVATE;     // time loaded, counter enabled   
 
         @(posedge tb_CLK)
-        tb_cfsmif.cmd_state = ACTIVATING;                // state changed after pos edge
-        repeat (tRCD - tAL) @(posedge tb_CLK);           // waiting for timer to finish counting
+        tb_cfsmif.cmd_state = ACTIVATING;                    // state changed after pos edge
+        repeat (tRCD - tAL - 1) @(posedge tb_CLK);           // waiting for timer to finish counting
 
         @(negedge tb_CLK)
         tb_expected_timif.tACT_done = 1'b1; // timer should finish counting
@@ -211,7 +230,7 @@ module timing_control_tb ();
 
         @(posedge tb_CLK)
         tb_cfsmif.cmd_state = READING;                   // state changed after pos edge
-        repeat (tRL + tBURST) @(posedge tb_CLK);           // waiting for timer to finish counting
+        repeat (tRL + tBURST - 1) @(posedge tb_CLK);           // waiting for timer to finish counting
 
         @(negedge tb_CLK)
         tb_expected_timif.tRD_done = 1'b1; // timer should finish counting
@@ -233,7 +252,7 @@ module timing_control_tb ();
 
         @(posedge tb_CLK)
         tb_cfsmif.cmd_state = WRITING;            // state changed after pos edge
-        repeat (tWL) @(posedge tb_CLK);           // wr_en should go high
+        repeat (tWL - 1) @(posedge tb_CLK);           // wr_en should go high
         repeat (tBURST) @(posedge tb_CLK);        // waiting for timer to finish counting
 
         @(negedge tb_CLK)
@@ -252,16 +271,72 @@ module timing_control_tb ();
         tb_test_case_num = tb_test_case_num + 1;
 
         @(posedge tb_CLK)
-        tb_cfsmif.cmd_state = PRECHARGE;        // time loaded, counter enabled   
+        tb_cfsmif.cmd_state = PRECHARGE;        // time loaded, counter enabled
 
-        repeat (tRP) @(posedge tb_CLK);         // waiting for timer to finish counting
+        @(posedge tb_CLK)
+        tb_cfsmif.cmd_state = PRECHARGING;      // state changed after pos edge   
+
+        repeat (tRP - 1) @(posedge tb_CLK);     // waiting for timer to finish counting
 
         @(negedge tb_CLK)
-        tb_expected_timif.tPRE_done = 1'b1;      // timer should finish counting
+        tb_expected_timif.tPRE_done = 1'b1;     // timer should finish counting
         check_output();
 
         @(posedge tb_CLK)
         tb_expected_timif.tPRE_done = 1'b0;      // clearing expected value signal
+
+        #(tb_CLK * 3);
+
+        //*****************************************************************************
+        // REFRESH
+        //*****************************************************************************
+        tb_test_case     = "REFRESH";
+        tb_test_case_num = tb_test_case_num + 1;
+
+        @(posedge tb_CLK)
+        tb_cfsmif.cmd_state = REFRESH;           // time loaded, counter enabled
+
+        @(posedge tb_CLK)
+        tb_cfsmif.cmd_state = REFRESHING;                   // state changed after pos edge
+
+        repeat (tRFC - 1) @(posedge tb_CLK);         // waiting for timer to finish counting
+
+        @(negedge tb_CLK)
+        tb_expected_timif.tREF_done = 1'b1;      // timer should finish counting
+        check_output();
+
+        @(posedge tb_CLK)
+        tb_expected_timif.tREF_done = 1'b0;      // clearing expected value signal
+
+        #(tb_CLK * 3);
+
+        //*****************************************************************************
+        // REFRESH Request
+        //*****************************************************************************
+        tb_test_case     = "Refresh request";
+        tb_test_case_num = tb_test_case_num + 1;
+
+        @(posedge tb_CLK)                       
+        tb_cfsmif.cmd_state = IDLE;
+
+        reset_dut();                            // to reset refresh counter
+        
+        repeat (tREFI - 2) @(posedge tb_CLK);    // waiting for refresh counter to reach tREFI
+
+        @(negedge tb_CLK)
+        tb_expected_timif.rf_req = 1'b1;      // refresh timer should finish counting
+        check_refresh();
+
+        // At this point, refresh request is not serviced.
+        // Refresh counter should keep increasing
+        repeat (20) @(posedge tb_CLK);        // refresh_count = tREFI + 20
+
+        @(posedge tb_CLK)
+        tb_cfsmif.cmd_state = REFRESH;
+        
+        @(negedge tb_CLK)                       
+        tb_expected_timif.rf_req= 1'b0;      // Refresh request is now satisfied. clearing expected value signal
+        check_refresh();
 
         #(tb_CLK * 3);
 
