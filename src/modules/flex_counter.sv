@@ -37,7 +37,7 @@ end
 
 always_comb begin
     if (en_rising_edge == 1'b1) begin
-        next_count = count_load;
+        next_count = count_load - 1;        // -1 because 1 cycle taken to load the value
     end
 
     else begin
