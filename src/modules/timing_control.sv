@@ -131,13 +131,18 @@ module timing_control (
         timif.rf_req = 1'b0;
 
         // REFRESH command is required every tREFI on average.
-        // Default refresh limit is tREFI.
         // If refresh counter is over the tREFI limit, subtract the
         // additional time from tREFI for next refresh limit.
         
-        next_refresh_limit = tREFI;
-        if (refresh_count > tREFI) begin
-            if (cfsmif.cmd_state != REFRESH && cfsmif.cmd_state != REFRESHING) begin
+        next_refresh_limit = refresh_limit;
+
+        if (cfsmif.cmd_state == REFRESH || cfsmif.cmd_state == REFRESHING) begin
+            if (refresh_count < tREFI) begin
+                next_refresh_limit = tREFI;
+            end
+        end
+        else begin
+            if (refresh_count > tREFI) begin
                 next_refresh_limit = tREFI - (refresh_count - tREFI);
             end
         end

@@ -340,6 +340,30 @@ module timing_control_tb ();
 
         #(tb_CLK * 3);
 
+        //*****************************************************************************
+        // REFRESH Request with refresh_limit < tREFI
+        //*****************************************************************************
+        tb_test_case     = "Refresh request with refresh_limit < tREFI";
+        tb_test_case_num = tb_test_case_num + 1;
+
+        @(posedge tb_CLK)                       
+        tb_cfsmif.cmd_state = IDLE;
+        
+        repeat (80) @(posedge tb_CLK);    // refresh limit is now 80
+
+        @(negedge tb_CLK)
+        tb_expected_timif.rf_req = 1'b1;      // refresh timer should finish counting
+        check_refresh();
+
+        @(posedge tb_CLK)
+        tb_cfsmif.cmd_state = REFRESH;
+        
+        @(negedge tb_CLK)                       
+        tb_expected_timif.rf_req= 1'b0;      // refresh request is now satisfied. clearing expected value signal
+        check_refresh();
+
+        #(tb_CLK * 3);
+
         $finish;
 
     end
