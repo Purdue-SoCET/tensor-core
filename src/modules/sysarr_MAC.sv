@@ -38,8 +38,10 @@ module sysarr_MAC(input logic clk, input logic nRST, systolic_array_MAC_if.MAC m
     logic [DW-1:0] input_x;
     logic [DW-1:0] nxt_input_x;
 
-    logic [DW-1:0] weight, nxt_weight;
-    assign mac_if.in_pass = mac_if.weight_en ? weight : input_x;
+    logic [DW-1:0] weight, nxt_weight, latched_weight_passon, nxt_latched_weight_passon;
+    logic next_weight_next_en;
+    assign mac_if.in_pass = mac_if.weight_next_en ? latched_weight_passon : input_x;
+    // assign mac_if.weight_next_en = mac_if.weight_en;                    // not able to get this to work latched
 
 
     // Latching MAC unit input value, to pass it on to the next 
@@ -47,19 +49,28 @@ module sysarr_MAC(input logic clk, input logic nRST, systolic_array_MAC_if.MAC m
         if(nRST == 1'b0)begin
             input_x <= '0;
             weight <= '0;
+            mac_if.weight_next_en <= 0;
+            latched_weight_passon <= 0;
         end else begin
             input_x <= nxt_input_x;
             weight <= nxt_weight;
+            mac_if.weight_next_en <= next_weight_next_en;
+            latched_weight_passon <= nxt_latched_weight_passon;
         end 
     end
     always_comb begin
         nxt_input_x = input_x;
         nxt_weight = weight;
+        nxt_latched_weight_passon = latched_weight_passon;
+        next_weight_next_en = mac_if.weight_next_en;
         if(mac_if.weight_en) begin
             nxt_weight = mac_if.in_value;
+            next_weight_next_en = 1;
+            nxt_latched_weight_passon = weight;
         end
         if (mac_if.MAC_shift)begin
             nxt_input_x = mac_if.in_value;
+            next_weight_next_en = 0;
         end
     end
 

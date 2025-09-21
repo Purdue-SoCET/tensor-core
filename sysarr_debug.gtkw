@@ -1,17 +1,23 @@
 [*]
-[*] GTKWave Analyzer v3.3.120 (w)1999-2024 BSI
-[*] Tue Apr 15 16:48:06 2025
+[*] GTKWave Analyzer v3.3.121 (w)1999-2024 BSI
+[*] Wed Apr 30 18:23:02 2025
 [*]
 [dumpfile] "/home/vinay/tensorcore/tensor-core/dump.vcd"
-[dumpfile_mtime] "Tue Apr 15 16:22:34 2025"
-[dumpfile_size] 181066
+[dumpfile_mtime] "Wed Apr 30 17:53:23 2025"
+[dumpfile_size] 110786
 [savefile] "/home/vinay/tensorcore/tensor-core/sysarr_debug.gtkw"
 [timestart] 0
 [size] 2560 1458
-[pos] 207 1263
-*-17.037176 314900 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[pos] 233 1286
+*-17.037176 75000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] systolic_array_tb.
 [treeopen] systolic_array_tb.DUT.
+[treeopen] systolic_array_tb.DUT.genblk3[2].
+[treeopen] systolic_array_tb.DUT.genblk3[2].genblk1[0].mac_inst.
+[treeopen] systolic_array_tb.DUT.genblk3[2].genblk1[1].
+[treeopen] systolic_array_tb.DUT.genblk3[2].genblk1[2].
+[treeopen] systolic_array_tb.DUT.genblk3[2].genblk1[3].
+[treeopen] systolic_array_tb.DUT.genblk3[2].genblk1[3].mac_inst.
 [treeopen] systolic_array_tb.DUT.genblk4[0].
 [treeopen] systolic_array_tb.DUT.genblk4[1].
 [treeopen] systolic_array_tb.DUT.genblk4[2].
@@ -23,7 +29,7 @@
 [sst_width] 358
 [signals_width] 396
 [sst_expanded] 1
-[sst_vpaned_height] 557
+[sst_vpaned_height] 536
 @22
 systolic_array_tb.memory_if.array_in[63:0]
 systolic_array_tb.memory_if.array_in_partials[63:0]
@@ -69,31 +75,52 @@ systolic_array_tb.DUT.mac_ifs[1].MAC_shift
 systolic_array_tb.DUT.mac_ifs[1].weight_en
 @200
 -macs[0:3]
-@22
-systolic_array_tb.DUT.mac_ifs[0].weight_read[15:0]
-systolic_array_tb.DUT.mac_ifs[1].weight_read[15:0]
-systolic_array_tb.DUT.mac_ifs[2].weight_read[15:0]
-systolic_array_tb.DUT.mac_ifs[3].weight_read[15:0]
-@200
 -macs[4:7]
-@22
-systolic_array_tb.DUT.mac_ifs[4].weight_read[15:0]
-systolic_array_tb.DUT.mac_ifs[5].weight_read[15:0]
-systolic_array_tb.DUT.mac_ifs[6].weight_read[15:0]
-systolic_array_tb.DUT.mac_ifs[7].weight_read[15:0]
-@200
 -macs[8:11]
-@22
-systolic_array_tb.DUT.mac_ifs[8].weight_read[15:0]
-systolic_array_tb.DUT.mac_ifs[9].weight_read[15:0]
-systolic_array_tb.DUT.mac_ifs[10].weight_read[15:0]
-systolic_array_tb.DUT.mac_ifs[11].weight_read[15:0]
-@200
 -macs[12:15]
+@28
+systolic_array_tb.DUT.mac_ifs[0].weight_en
+systolic_array_tb.DUT.mac_ifs[0].weight_next_en
+systolic_array_tb.DUT.mac_ifs[1].weight_en
+systolic_array_tb.DUT.mac_ifs[1].weight_next_en
+systolic_array_tb.DUT.mac_ifs[2].weight_en
+systolic_array_tb.DUT.mac_ifs[2].weight_next_en
+systolic_array_tb.DUT.mac_ifs[3].weight_en
 @22
-systolic_array_tb.DUT.mac_ifs[12].weight_read[15:0]
-systolic_array_tb.DUT.mac_ifs[13].weight_read[15:0]
-systolic_array_tb.DUT.mac_ifs[14].weight_read[15:0]
-systolic_array_tb.DUT.mac_ifs[15].weight_read[15:0]
+systolic_array_tb.DUT.genblk3[2].genblk1[0].mac_inst.weight[15:0]
+systolic_array_tb.DUT.genblk3[2].genblk1[1].mac_inst.weight[15:0]
+systolic_array_tb.DUT.genblk3[2].genblk1[2].mac_inst.weight[15:0]
+systolic_array_tb.DUT.genblk3[2].genblk1[3].mac_inst.weight[15:0]
+@23
+systolic_array_tb.DUT.MAC_inputs[0][0][15:0]
+@22
+systolic_array_tb.DUT.MAC_inputs[0][1][15:0]
+systolic_array_tb.DUT.MAC_inputs[0][2][15:0]
+systolic_array_tb.DUT.MAC_inputs[0][3][15:0]
+@28
+systolic_array_tb.DUT.mac_ifs[4].weight_en
+systolic_array_tb.DUT.mac_ifs[4].weight_next_en
+systolic_array_tb.DUT.mac_ifs[5].weight_en
+systolic_array_tb.DUT.mac_ifs[5].weight_next_en
+systolic_array_tb.DUT.mac_ifs[6].weight_en
+systolic_array_tb.DUT.mac_ifs[6].weight_next_en
+systolic_array_tb.DUT.mac_ifs[7].weight_en
+systolic_array_tb.DUT.mac_ifs[7].weight_next_en
+systolic_array_tb.DUT.mac_ifs[8].weight_en
+systolic_array_tb.DUT.mac_ifs[8].weight_next_en
+systolic_array_tb.DUT.mac_ifs[9].weight_en
+systolic_array_tb.DUT.mac_ifs[9].weight_next_en
+systolic_array_tb.DUT.mac_ifs[10].weight_en
+systolic_array_tb.DUT.mac_ifs[10].weight_next_en
+systolic_array_tb.DUT.mac_ifs[11].weight_en
+systolic_array_tb.DUT.mac_ifs[11].weight_next_en
+systolic_array_tb.DUT.mac_ifs[12].weight_en
+systolic_array_tb.DUT.mac_ifs[12].weight_next_en
+systolic_array_tb.DUT.mac_ifs[13].weight_en
+systolic_array_tb.DUT.mac_ifs[13].weight_next_en
+systolic_array_tb.DUT.mac_ifs[14].weight_en
+systolic_array_tb.DUT.mac_ifs[14].weight_next_en
+systolic_array_tb.DUT.mac_ifs[15].weight_en
+systolic_array_tb.DUT.mac_ifs[15].weight_next_en
 [pattern_trace] 1
 [pattern_trace] 0

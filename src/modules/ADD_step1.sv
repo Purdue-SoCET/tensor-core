@@ -1,5 +1,5 @@
 //By            : Joe Nasti
-//Last updated  : 11/17/2024 - reduced to 16 bit FP values for systolic array
+//Last updated  : April 2025 - reduced to 16 bit FP values for systolic array
 
 `timescale 1ns/1ps
 
