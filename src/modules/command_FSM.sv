@@ -69,10 +69,11 @@ module command_FSM (
                         if (mycmd.row_stat == HIT) mycmd.ncmd_state = mycmd.dWEN ? WRITE : READ;
                         else if(mycmd.row_stat == CONFLICT) mycmd.ncmd_state = PRECHARGE;
                         else if (mycmd.row_stat == MISS) mycmd.ncmd_state = ACTIVATE;
-                    end
-                end else begin
-                    mycmd.ncmd_state = IDLE;
-                end 
+                    end 
+                    else begin
+                        mycmd.ncmd_state = IDLE;
+                    end 
+                end
             end
 
             READING: begin
