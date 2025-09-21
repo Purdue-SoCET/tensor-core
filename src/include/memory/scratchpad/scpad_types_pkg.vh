@@ -23,7 +23,7 @@ package spad_types_pkg;
     localparam int ROW_BYTES = (NUM_COLS * ELEM_BITS)/8;   
     localparam int NUM_ROWS = SCPAD_SIZE_BYTES / ROW_BYTES;  // num slots in each bank 
 
-    localparam int SCPAD_ADDR_WIDTH = SCPAD_SIZE_BYTES /  ROW_BYTES; // 14 bits
+    localparam int SCPAD_ADDR_WIDTH = $clog2(SCPAD_SIZE_BYTES /  ROW_BYTES); // 14 bits
     parameter int DRAM_ADDR_WIDTH  = 32; 
 
     localparam int ROW_IDX_WIDTH  = $clog2(NUM_ROWS);
@@ -48,14 +48,14 @@ package spad_types_pkg;
         return (row_idx << ROW_SHIFT) | (col_idx << ELEM_SHIFT);
     endfunction
 
+    // Not editable. Keep at 2. Hardcoded Logic. 
+    localparam NUM_SCPADS = 2; 
+    localparam int SCPAD_ID_WIDTH = $clog2(NUM_SCPADS);
 
-    localparam NUM_SCPADS = 1; 
-    localparam int SCPAD_ID_WIDTH = (NUM_SCPADS > 1) ? $clog2(NUM_SCPADS) : 1;
-
-    typedef logic [NUM_COLS-1:0][ELEM_BITS-1:0] scpad_data;      
-    typedef logic [NUM_COLS-1:0] enable_mask;    
-    typedef logic [NUM_COLS-1:0][COL_IDX_WIDTH-1:0] shift_mask; 
-    typedef logic [NUM_COLS-1:0][ROW_IDX_WIDTH-1:0] slot_mask; 
+    typedef logic [NUM_COLS-1:0][ELEM_BITS-1:0] scpad_data_t;      
+    typedef logic [NUM_COLS-1:0] enable_mask_t;    
+    typedef logic [NUM_COLS-1:0][COL_IDX_WIDTH-1:0] shift_mask_t; 
+    typedef logic [NUM_COLS-1:0][ROW_IDX_WIDTH-1:0] slot_mask_t; 
 
 
 endpackage
