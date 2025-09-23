@@ -31,7 +31,7 @@ interface tca_if;
     logic row_major;                            // 0 = col streaming, 1 = row streaming
     logic [SCPAD_ID_WIDTH-1:0] ifmap_id;        // scratchpad bank holding input activations
     logic [SCPAD_ID_WIDTH-1:0] psum_id;         // scratchpad bank for partial sums/output
-} tca_req_t;
+    } tca_req_t;
 
   typedef struct packed {
       logic valid;      // response is valid this cycle
@@ -81,20 +81,25 @@ interface tca_if;
     // Scratchpad: @Akshath
     // Systolic: @Vinay, @Meixuan
 
-  modport top ( //@JayShah
-      input  scheduler_tca_req,
-      output tca_scheduler_res
-  );
+    modport top ( 
+        input  tca_scheduler_res, tca_frontend_req, sa_req,
+        output scheduler_tca_req,  frontend_tca_res,  sa_res
+    );
 
-  modport scpad ( //@Akshath
-      output tca_frontend_req,
-      input  frontend_tca_res
-  );
+    modport scheduler_fu ( //@JayShah
+        input  scheduler_tca_req,
+        output tca_scheduler_res
+    );
 
-  modport systolic ( //@Vinay, @Meixuan
-      output sa_req,
-      input  sa_res
-  );
+    modport scpad ( //@Akshath
+        output tca_frontend_req,
+        input  frontend_tca_res
+    );
+
+    modport systolic ( //@Vinay, @Meixuan
+        output sa_req,
+        input  sa_res
+    );
 
 endinterface
 `endif
