@@ -45,7 +45,7 @@ interface tca_if;
       logic load_ifmap;     // load input feature map (rows typically)
     //TODO: do we need this
       logic load_psum;      // load partial sums (if continuing accumulation)
-      logic start;          // once all data is loaded, signal SA to start compute
+      logic start;          // once data had start to load, signal SA to start compute
       systolic_data din;    // actual data word being streamed into the SA
   } tca_sa_req_t;
 
@@ -79,7 +79,7 @@ interface tca_if;
 
     // Scheduler: @JayShah
     // Scratchpad: @Akshath
-    // Systolic: @Vinay, @Meixuan
+    // Systolic: @Vinay, @Mixuan
 
     modport top ( 
         input  tca_scheduler_res, tca_frontend_req, sa_req,
@@ -96,7 +96,7 @@ interface tca_if;
         input  frontend_tca_res
     );
 
-    modport systolic ( //@Vinay, @Meixuan
+    modport systolic ( //@Vinay, @Mixuan
         output sa_req,
         input  sa_res
     );
