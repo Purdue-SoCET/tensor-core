@@ -101,7 +101,7 @@ interface scpad_if;
     typedef struct packed { 
         logic valid; 
         logic write; // if valid and !write -> then its a read
-        logic [SCPAD_ADDR_WIDTH-1:0] addr; // always the BASE row, basically an identifier
+        logic [SCPAD_ADDR_WIDTH-1:0] addr; // starting address of the tile
         logic [MAX_DIM_WIDTH-1:0] num_rows, num_cols; // purely for sysarray.ld -> loading an entire tile/kernel into the SA
         logic [MAX_DIM_WIDTH-1:0] row_id, col_id; // used by VC and SA -> tells us which row or which tile
         logic row_or_col; // 0 to load a row, 1 to load a col | set by VC or SA
@@ -118,6 +118,10 @@ interface scpad_if;
     frontend_req_t tca_frontend_req, vc_frontend_req;
     frontend_res_t frontend_tca_res, frontend_vc_res;
     scpad_data_t frontend_xbar_data, xbar_frontend_data; // post-MUX
+
+    ////////////////////////////////////////////////////////////////////////////
+    /////////////////////// Backend Internal + External //////////////////////
+    ///////////////////////////////////////////////////////////////////////////
 
     typedef struct packed { 
         logic valid; 
@@ -147,7 +151,7 @@ interface scpad_if;
         logic valid; 
         logic complete; 
         scpad_data rdata; 
-    } dram_w_res_t;
+    } dram_res_t;
 
     dram_req_t backend_dram_req;
     dram_res_t dram_backend_res;

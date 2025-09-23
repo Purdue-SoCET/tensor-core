@@ -23,7 +23,7 @@ package spad_types_pkg;
     localparam int ROW_BYTES = (NUM_COLS * ELEM_BITS)/8;   
     localparam int NUM_ROWS = SCPAD_SIZE_BYTES / ROW_BYTES;  // num slots in each bank 
 
-    localparam int SCPAD_ADDR_WIDTH = $clog2(SCPAD_SIZE_BYTES /  ROW_BYTES); // 14 bits
+    localparam int SCPAD_ADDR_WIDTH = $clog2(SCPAD_SIZE_BYTES); // imagine scpad is flattened, and then addressable. 
     parameter int DRAM_ADDR_WIDTH  = 32; 
 
     localparam int ROW_IDX_WIDTH  = $clog2(NUM_ROWS);
