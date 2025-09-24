@@ -6,7 +6,7 @@ package dram_pkg;
     //Hoho
 
     // WORD SIZE
-    parameter WORD_W            = 32;
+    parameter WORD_W            = 64;
 
     // CONFIGS
     parameter CONFIG_BITS = 2;
@@ -34,6 +34,16 @@ package dram_pkg;
     parameter tRC = tRAS + tRP;
     parameter tRL = tAL + tCL;        // Read Latency
     parameter tWL = tAL + tCWL;       // Write Latency
+
+    //INITIALIZE TIME
+    parameter tRESET        = 80;
+    parameter tPWUP         = 80;
+    parameter tRESETCKE     = 80;
+    parameter tPDc          = 3;
+    parameter tXPR          = 217;
+    parameter tDLLKc        = 597;
+    parameter tZQinitc      = 1024;
+    parameter tMOD          = 25;
 
     // word_t
     typedef logic [WORD_W-1:0] word_t;

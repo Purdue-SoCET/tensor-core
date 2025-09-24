@@ -33,6 +33,7 @@ module dram_cmd_dimm_tb;
     logic [31:0] data_store2;
     logic [31:0] data_store3;
     logic [31:0] data_store4;
+    logic DM_debug;
     assign model_enable = model_enable_val;
     // always #(PERIOD/2) CLK++;
     // always #(PERIOD/4) CLKx2++;
@@ -257,16 +258,28 @@ module dram_cmd_dimm_tb;
         dt_if.DQS_c
         } : 4'bzz;
 
+    // assign {
+    //     iDDR4_1.DM_n,
+    //     iDDR4_2.DM_n,
+    //     iDDR4_3.DM_n,
+    //     iDDR4_4.DM_n
+    // } = dq_en ? {
+    //     dt_if.DM_n,
+    //     dt_if.DM_n,
+    //     dt_if.DM_n,
+    //     dt_if.DM_n
+    // } : 4'bzz;
+
     assign {
         iDDR4_1.DM_n,
         iDDR4_2.DM_n,
         iDDR4_3.DM_n,
         iDDR4_4.DM_n
     } = dq_en ? {
-        dt_if.DM_n,
-        dt_if.DM_n,
-        dt_if.DM_n,
-        dt_if.DM_n
+        DM_debug,
+        DM_debug,
+        DM_debug,
+        DM_debug
     } : 4'bzz;
 
 
@@ -283,6 +296,95 @@ module dram_cmd_dimm_tb;
     assign dt_if.DQS_c = ~dq_en ? iDDR4_1.DQS_c: 1'bz;
     assign dt_if.DM_n = ~dq_en ? iDDR4_1.DM_n: 1'bz;
     assign dt_if.COL_choice = ramaddr_phy.col_0;
+
+
+    task writing_1();
+        task_name = "Write 1";
+        DM_debug = 1'b1;
+        add_request(.addr({16'hAAAA, 8'hAA, 8'b000_000_00}), .write(1'b1), .data(32'hAAAA_AAAA));
+        data_store1 = 32'h1111_1111;
+        data_store2 = 32'h2222_2222;
+        data_store3 = 32'h3333_3333;
+        data_store4 = 32'h4444_4444;
+        
+        while (!dt_if.wr_en) begin
+            @(posedge CLK);
+        end
+        dt_if.memstore = data_store1;
+        @(posedge CLKx2);
+        dt_if.memstore = data_store1;
+        @(posedge CLKx2);
+        dt_if.memstore = data_store2;
+        @(posedge CLKx2);
+        dt_if.memstore = data_store3;
+        @(posedge CLKx2);
+        dt_if.memstore = data_store4;
+        @(posedge CLKx2);
+        dt_if.memstore = 32'h5555_5555;
+        @(posedge CLKx2);
+        dt_if.memstore = 32'h6666_6666;
+        @(posedge CLKx2);
+        dt_if.memstore = 32'h7777_7777;
+        @(posedge CLKx2);
+        dt_if.memstore = 32'h8888_8888;
+        @(posedge CLK);
+        
+        dt_if.clear = 1'b1;
+        
+        @(posedge CLK);
+        dt_if.clear = 1'b0;
+
+    endtask
+
+    task writing_2();
+        
+        task_name = "Write 2";
+        DM_debug = 1'b0;
+        add_request(.addr({16'hAAAA, 8'hAA, 8'b000_000_00}), .write(1'b1), .data(32'hAAAA_AAAA));
+        data_store1 = 32'hAAAA_AAAA;
+        data_store2 = 32'hBBBB_BBBB;
+        data_store3 = 32'hCCCC_CCCC;
+        data_store4 = 32'hDDDD_DDDD;
+        
+        while (!dt_if.wr_en) begin
+            @(posedge CLK);
+        end
+        dt_if.memstore = data_store1;
+        @(posedge CLKx2);
+        dt_if.memstore = data_store1;
+        @(posedge CLKx2);
+        dt_if.memstore = data_store2;
+        @(posedge CLKx2);
+        dt_if.memstore = data_store3;
+        @(posedge CLKx2);
+        dt_if.memstore = data_store4;
+        @(posedge CLKx2);
+        dt_if.memstore = 32'hAABB_5555;
+        @(posedge CLKx2);
+        dt_if.memstore = 32'hAABB_6666;
+        @(posedge CLKx2);
+        dt_if.memstore = 32'hAABB_7777;
+        @(posedge CLKx2);
+        dt_if.memstore = 32'hAABB_8888;
+        @(posedge CLK);
+        
+        dt_if.clear = 1'b1;
+        
+        @(posedge CLK);
+        dt_if.clear = 1'b0;
+    endtask
+
+    task read_chk();
+        DM_debug = 1'bzz;
+        task_name = "Add Read";
+        add_request(.addr({16'hAAAA, 8'hAA, 8'b000_000_00}), .write(1'b0), .data(32'hDDCC_BBAA));
+        //   add_request(.addr({'0, 3'd1,2'b00}), .write(1'b0), .data(32'hDDCC_BBAA));
+        dq_en = 1'b0;
+        //   task_name = "Done add Read";
+        //   repeat (200) @(posedge CLK);
+        //   task_name = "After 400 cycle Read";
+        repeat (100) @(posedge CLK);
+    endtask
 
     initial begin
       iDDR4_1.CK <= 2'b01;
@@ -301,41 +403,14 @@ module dram_cmd_dimm_tb;
       // repeat (2254) @(posedge CLK);
       #((tRESET + tPWUP + tRESETCKE + tPDc + tXPR + tDLLKc + tMOD * 7 + tZQinitc) * PERIOD);
 
-
+      writing_1();
+      read_chk();
+      dq_en = 1'b1;
+      writing_2();
+      read_chk();
       //Add request
       //Ignore the writing data
-      add_request(.addr({16'hAAAA, 8'hAA, 8'b000_000_00}), .write(1'b1), .data(32'hAAAA_AAAA));
-      data_store1 = 32'h1111_1111;
-      data_store2 = 32'h2222_2222;
-      data_store3 = 32'h3333_3333;
-      data_store4 = 32'h4444_4444;
       
-      while (!dt_if.wr_en) begin
-        @(posedge CLK);
-      end
-    dt_if.memstore = data_store1;
-    @(posedge CLKx2);
-    dt_if.memstore = data_store1;
-    @(posedge CLKx2);
-    dt_if.memstore = data_store2;
-    @(posedge CLKx2);
-    dt_if.memstore = data_store3;
-    @(posedge CLKx2);
-    dt_if.memstore = data_store4;
-    @(posedge CLKx2);
-    dt_if.memstore = 32'h5555_5555;
-    @(posedge CLKx2);
-    dt_if.memstore = 32'h6666_6666;
-    @(posedge CLKx2);
-    dt_if.memstore = 32'h7777_7777;
-    @(posedge CLKx2);
-    dt_if.memstore = 32'h8888_8888;
-    @(posedge CLK);
-    
-    dt_if.clear = 1'b1;
-    
-    @(posedge CLK);
-    dt_if.clear = 1'b0;
     //   add_request(.addr({16'hAAAA, 8'hAA, 8'b000_001_00}), .write(1'b1), .data(32'hBBBB_BBBB));
     //   repeat (100) @(posedge CLK);
     //   add_request(.addr({16'hAAAA, 8'hAA, 8'b000_010_00}), .write(1'b1), .data(32'hCCCC_CCCC));
@@ -352,14 +427,7 @@ module dram_cmd_dimm_tb;
     //   add_request(.addr({'0, 3'd2,2'b00}), .write(1'b1), .data(32'hDDCC_BBAA));
       //repeat (100) @(posedge CLK);
 
-      task_name = "Add Read";
-      add_request(.addr({16'hAAAA, 8'hAA, 8'b000_000_00}), .write(1'b0), .data(32'hDDCC_BBAA));
-    //   add_request(.addr({'0, 3'd1,2'b00}), .write(1'b0), .data(32'hDDCC_BBAA));
-    dq_en = 1'b0;
-    //   task_name = "Done add Read";
-    //   repeat (200) @(posedge CLK);
-    //   task_name = "After 400 cycle Read";
-      repeat (200) @(posedge CLK);;
+      
       $finish;
 
     end

@@ -112,7 +112,7 @@ module signal_gen #(
         nWE_n_A14  = WE_n_A14;
         nCS_n      = CS_n;
 
-    case (state)
+    case (nstate)
         POWER_UP: begin
             cmd_addr = POWER_UP_PRG;
             nCKE     = 1'b0;
@@ -258,12 +258,17 @@ module signal_gen #(
                 cmd_addr    = PRECHARGE_CMD;
                 nBG         = mysig.BG0;
                 nBA         = mysig.BA0;
-                nADDR[10]   = 1'b0;
+                nADDR[10]   = mysig.ref_re ? 1'b1 : 1'b0;
             end
         end
 
-
-        //REFRESH
+        REFRESH: begin
+            if (issue) begin
+                cmd_addr = REFRESH_CMD;
+                nBG =0;
+                nBA = 0;
+            end
+        end
 
         default: begin
             cmd_addr = DESEL_CMD;

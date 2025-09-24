@@ -740,7 +740,7 @@ module dram_command (
                     cmd_addr = LOAD_MODE_CMD;
                     dr_ram.BG       = 2'h1;
                     dr_ram.BA       = 2'h1;
-                    dr_ram.ADDR     = 14'h0;
+                    dr_ram.ADDR     = 14'b0001000_0000000;
                 end else begin
                     cmd_addr = DESEL_CMD;
                 end
@@ -770,7 +770,9 @@ module dram_command (
                     cmd_addr = LOAD_MODE_CMD;
                     dr_ram.BG       = 2'h0;
                     dr_ram.BA       = 2'h1;
-                    dr_ram.ADDR     = 14'h0001;
+                    dr_ram.ADDR     = 14'h0000;
+                    //A[0] for DLL disable
+                    // dr_ram.ADDR     = 14'h0001;
                 end else begin
                     cmd_addr = DESEL_CMD;
                 end

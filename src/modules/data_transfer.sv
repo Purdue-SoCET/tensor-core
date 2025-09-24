@@ -80,7 +80,6 @@ module data_transfer (
         end else begin 
             //This is something we need to change
             if (mydata.rd_en && edge_flag) begin
-                
                 word_register[count_burst - 4'd2] <= mydata.DQ;
                 // if (count_burst > 4'd1) begin
                 //     word_register[count_burst - 4'd2] <= mydata.DQ;

@@ -1,5 +1,5 @@
 QuestaSim-64 vlog 2021.4 Compiler 2021.10 Oct 13 2021
-Start time: 14:59:04 on Sep 14,2025
+Start time: 20:27:17 on Sep 21,2025
 vlog -reportprogress 300 -work work "+acc" -l vcs.log -sv "+define+DDR4_4G_X8" arch_defines.v dimm.vh dram_command.sv arch_package.sv proj_package.sv interface.sv ddr4_model.svp dram_cmd_dimm_tb.sv scheduler_buffer.sv data_transfer.sv socetlib_counter.sv edge_det.sv edge_det_if.vh 
 -- Compiling package dimm_vh_unit
 -- Compiling package dram_pack
@@ -19,8 +19,10 @@ vlog -reportprogress 300 -work work "+acc" -l vcs.log -sv "+define+DDR4_4G_X8" a
 ** at dram_command_if.vh(158): (vlog-2275) Existing interface 'dram_command_if' at line 158 will be overwritten.
 -- Compiling interface scheduler_buffer_if
 -- Compiling interface data_transfer_if
+** Warning: dram_cmd_dimm_tb.sv(378): (vlog-2600) [RDGN] - Redundant digits in numeric literal.
 -- Compiling package dram_cmd_dimm_tb_sv_unit
 -- Compiling module dram_cmd_dimm_tb
+** Warning: dram_cmd_dimm_tb.sv(378): (vlog-2600) [RDGN] - Redundant digits in numeric literal.
 -- Compiling package dram_pack
 ** Warning: ** while parsing file included at scheduler_buffer.sv(1)
 ** while parsing file included at scheduler_buffer_if.vh(3)
@@ -70,5 +72,5 @@ vlog -reportprogress 300 -work work "+acc" -l vcs.log -sv "+define+DDR4_4G_X8" a
 
 Top level modules:
 	dram_cmd_dimm_tb
-End time: 14:59:04 on Sep 14,2025, Elapsed time: 0:00:00
-Errors: 0, Warnings: 14
+End time: 20:27:18 on Sep 21,2025, Elapsed time: 0:00:01
+Errors: 0, Warnings: 16

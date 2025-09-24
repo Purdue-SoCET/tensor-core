@@ -6,8 +6,11 @@
 interface signal_gen_if ();
     import dram_pkg::*;
 
+    //REFRESH request
+    logic ref_re;
+
     //Signals interface between control unit and signal generator
-    dram_state_t state, nstate; //Don't need nstate???
+    dram_state_t state, nstate; 
     logic [RANK_BITS-1:0] RA;
     logic [BANK_GROUP_BITS-1:0] BG;
     logic [BANK_BITS-1:0] B;
@@ -39,6 +42,7 @@ interface signal_gen_if ();
 
     
     modport dut (
+        input ref_re,
         input state, nstate, RA, BG, B, R, C,
         output ACT_n, RAS_n_A16, CAS_n_A15, WE_n_A14, ALERT_n, PARITY, RESET_n, TEN, CS_n, CKE, ODT, C, BG, BA, ADDR, ADDR_17, PWR, VREF_CA, VREF_DQ, ZQ,
         output C, BG, BA

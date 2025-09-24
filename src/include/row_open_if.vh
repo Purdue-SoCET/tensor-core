@@ -1,0 +1,28 @@
+`ifndef ROW_OPEN_IF
+`define ROW_OPEN_IF
+`include "dram_pkg.vh"
+
+interface row_open_if();
+    import dram_pack::*;
+    //We are following 512 x 8 addressing map
+    logic [15:0] row;
+    logic [1:0] bank, bank_group;
+
+    //Conflicted row
+    logic [15:0] row_conflict;
+
+    //Memory request
+    logic req_en, refresh, row_resolve;
+    logic [1:0] row_stat; //00 IDLE, 01 HIT, 10 MISS, 11 CONFLICT
+
+    modport dut (
+        input bank_group, bank, row, req_en, refresh, row_resolve,
+        output row_stat, row_conflict
+    );
+
+    modport tb  (
+        input  row_stat, row_conflict,
+        output req_en, refresh, bank_group, bank, row
+    );
+endinterface
+`endif
