@@ -50,8 +50,9 @@ add wave -noupdate -expand -group row_open_if /dram_top_tb/DUT/myrow/req_en
 add wave -noupdate -expand -group row_open_if /dram_top_tb/DUT/myrow/refresh
 add wave -noupdate -expand -group row_open_if /dram_top_tb/DUT/myrow/row_resolve
 add wave -noupdate -expand -group row_open_if /dram_top_tb/DUT/myrow/row_stat
+add wave -noupdate -expand -group row_open_if -expand /dram_top_tb/DUT/u1/reg_f
 TreeUpdate [SetDefaultTree]
-WaveRestoreCursors {{Cursor 1} {165 ps} 0}
+WaveRestoreCursors {{Cursor 1} {2854656 ps} 0}
 quietly wave cursor active 1
 configure wave -namecolwidth 150
 configure wave -valuecolwidth 142
@@ -67,4 +68,4 @@ configure wave -griddelta 40
 configure wave -timeline 0
 configure wave -timelineunits ps
 update
-WaveRestoreZoom {0 ps} {3281 ps}
+WaveRestoreZoom {2836410 ps} {2871110 ps}

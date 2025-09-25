@@ -1,4 +1,4 @@
-`timescale 1ns/1ps
+`timescale 1ps/1ps
 
 `include "init_state_if.vh"
 `include "socetlib_counter_if.vh"

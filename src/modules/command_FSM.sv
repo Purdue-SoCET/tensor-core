@@ -1,4 +1,4 @@
-`timescale 1ns/1ps
+`timescale 1ps/1ps
 `include "command_FSM_if.vh"
 
 module command_FSM (
@@ -6,7 +6,7 @@ module command_FSM (
     input logic nRST,
     command_FSM_if.dut mycmd
 );
-    import dram_pack::*;
+    import dram_pkg::*;
     localparam logic [1:0] IDLE_R = 2'b00;
     localparam logic [1:0] HIT = 2'b01;
     localparam logic [1:0] MISS = 2'b10;
@@ -42,7 +42,11 @@ module command_FSM (
             end
 
             REFRESH: begin
-                //todo after tREF done should it go back to original state or IDLE
+                mycmd.ncmd_state = REFRESHING;
+                
+            end
+
+            REFRESHING: begin
                 if (mycmd.tREF_done) begin
                     mycmd.ncmd_state = IDLE;     
                 end
@@ -95,16 +99,22 @@ module command_FSM (
                         else if(mycmd.row_stat == CONFLICT) mycmd.ncmd_state = PRECHARGE;
                         else if (mycmd.row_stat == MISS) mycmd.ncmd_state = ACTIVATE;
                     end
-                end else begin
-                    mycmd.ncmd_state = IDLE;
+                    else begin
+                        mycmd.ncmd_state = IDLE;
+                    end 
                 end 
             end
 
             PRECHARGE: begin
-                mycmd.row_resolve = 1'b1;
+                mycmd.ncmd_state = PRECHARGING;
+            end
+
+            PRECHARGING: begin
                 if (mycmd.tPRE_done) begin
+                    mycmd.row_resolve = 1'b1;
                     mycmd.ncmd_state = mycmd.rf_req ? REFRESH : IDLE;
                 end
+
             end
         endcase
     end

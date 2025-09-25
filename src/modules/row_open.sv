@@ -1,5 +1,5 @@
 //Implementing the open-row policy
-`timescale  10ns/1ps
+`timescale 1ps/1ps
 `include "row_open_if.vh"
 
 module row_open (
@@ -40,7 +40,7 @@ module row_open (
     always_comb begin
         nreg_f = reg_f;
         nrow_stat = 0;
-        nrow_conflict = 0;
+        nrow_conflict = pol_if.row_conflict;
 
         if (pol_if.refresh) begin
             nreg_f = 0;
@@ -54,7 +54,11 @@ module row_open (
                 end else if (reg_f[ptr].valid) begin
                     nrow_stat = 2'b11; //CONFLICT
                     nrow_conflict = reg_f[ptr].row;
-                    nreg_f[ptr].valid = 1'b0;
+                    if (pol_if.row_resolve) begin
+                        nreg_f[ptr].valid = 0;
+                        nrow_stat = 2'b0; //IDLE
+                    end
+                    
                 end
                 else begin
                     nreg_f[ptr].valid = 1'b1;

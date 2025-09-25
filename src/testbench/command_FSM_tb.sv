@@ -101,6 +101,7 @@ module command_FSM_tb ();
         drive_req(0, 2'b10); // is_write=0, stat=MISS
 
         @(posedge CLK);
+        @(posedge CLK);
 
         
         mycmd.tACT_done = 1;
@@ -108,10 +109,6 @@ module command_FSM_tb ();
         mycmd.tACT_done = 0;
 
         @(posedge CLK);
-        // NOTE: There is a bug in your RTL. In READING, an else without a condition
-        // drives the state to IDLE immediately. This test assumes that is fixed.
-        // If not fixed, the state will go to READING for 0 cycles.
-        // if (mycmd.cmd_state != READING) $error("READ -> READING failed");
         
         mycmd.tRD_done = 1;
         mycmd.dWEN = 0;
