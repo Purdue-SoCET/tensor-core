@@ -37,6 +37,8 @@ module dram_top_tb ();
         mycmd.tPRE_done = 0;
         mycmd.tREF_done = 0;
         mycmd.rf_req    = 0;
+        mycmd.ram_addr = 0;
+        mycmd.ramstore = 0;
 
         repeat(2) @(posedge CLK);
         nRST = 1'b1;

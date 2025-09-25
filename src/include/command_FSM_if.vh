@@ -10,6 +10,7 @@ interface command_FSM_if ();
     logic tPRE_done, tREF_done, rf_req;
 
     logic [1:0] row_stat;
+    logic ram_wait;
     logic row_resolve;
     cmd_fsm_t cmd_state, ncmd_state;
 
@@ -18,7 +19,7 @@ interface command_FSM_if ();
         input tACT_done, tWR_done, tRD_done,
         input tPRE_done, tREF_done, rf_req,
         input row_stat,
-        output cmd_state, ncmd_state, init_req, row_resolve
+        output cmd_state, ncmd_state, init_req, row_resolve, ram_wait
     );
 
     

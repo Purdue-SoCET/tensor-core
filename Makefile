@@ -3,7 +3,7 @@ SIMTIME = 100us             # Default simulation run time
 
 SCRDIR = ./src/modules
 
-EXTRA_dram_top = $(SCRDIR)/row_open.sv $(SCRDIR)/init_state.sv $(SCRDIR)/address_mapper.sv $(SCRDIR)/socetlib_counter.sv
+EXTRA_dram_top = $(SCRDIR)/row_open.sv $(SCRDIR)/init_state.sv $(SCRDIR)/address_mapper.sv $(SCRDIR)/socetlib_counter.sv $(SCRDIR)/command_FSM.sv
 
 # modelsim viewing options
 ifneq (0,$(words $(filter %.wav,$(MAKECMDGOALS))))
