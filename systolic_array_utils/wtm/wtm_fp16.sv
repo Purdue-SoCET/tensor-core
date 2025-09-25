@@ -9,18 +9,24 @@ module wtm_fp16 (
     // sign bit 0 -> +, 1 -> - 
     assign S[15] = A[15] ^ B[15]; 
 
+    // exponent summation 
+    assign S[14:10] = A[14:10] + B[14:10]; 
+
     // error message 
-    assign E = A[14:0] == 0 || B[14:0] == 0 ? 0 : 
-      {1'b0, A[14:0]} == 16'h7f80 || {1'b0, B[14:0]} == 16'h7f80 ? 1 : 
-      (A[14:7] == '1 && A[6:0] != 0) || (B[14:7] == '1 && B[6:0] != 0) ? 'd2 : 'd3; 
-    
-  logic [85:0] s; 
-  logic [103:0] c; 
+    assign E = (A[14:0] == 15'h0000 || B[14:0] == 15'h0000) ? 2'd0 :      // zero
+           ((A[14:10] == 5'b11111 && A[9:0] == 10'd0) || 
+            (B[14:10] == 5'b11111 && B[9:0] == 10'd0)) ? 2'd1 :       // infinity
+           ((A[14:10] == 5'b11111 && A[9:0] != 10'd0) || 
+            (B[14:10] == 5'b11111 && B[9:0] != 10'd0)) ? 2'd2 :       // NaN
+           2'd3;  // valid 
+
+  logic [86:0] s; 
+  logic [104:0] c; 
   
 // decimal wallace tree multiplication 
 
   // First Stage 
-  ha ha010 (.a(A[0] && B[1]), .b(A[1] && B[0]), .s(), .c(c[0]));
+  ha ha01 (.a(A[0] && B[1]), .b(A[1] && B[0]), .s(), .cout(c[0]));
   fa fa02 (.a(A[0] && B[2]), .b(A[1] && B[1]), .cin(A[2] && B[0]), .s(s[0]), .cout(c[1]));
   fa fa03 (.a(A[0] && B[3]), .b(A[1] && B[2]), .cin(A[2] && B[1]), .s(s[1]), .cout(c[2]));
   fa fa04 (.a(A[0] && B[4]), .b(A[1] && B[3]), .cin(A[2] && B[2]), .s(s[2]), .cout(c[3]));
@@ -39,7 +45,7 @@ module wtm_fp16 (
   fa fa017 (.a(A[3] && B[7]), .b(A[4] && B[6]), .cin(A[5] && B[5]), .s(s[15]), .cout(c[16]));
   fa fa018 (.a(A[3] && B[8]), .b(A[4] && B[7]), .cin(A[5] && B[6]), .s(s[16]), .cout(c[17]));
   fa fa019 (.a(A[3] && B[9]), .b(A[4] && B[8]), .cin(A[5] && B[7]), .s(s[17]), .cout(c[18]));
-  fa fa020 (.a(A[4] && B[9]), .b(A[5] && B[8]), .s(s[18]), .cout(c[19]));
+  ha fa020 (.a(A[4] && B[9]), .b(A[5] && B[8]), .s(s[18]), .cout(c[19]));
   ha ha021 (.a(A[6] && B[1]), .b(A[7] && B[0]), .s(s[19]), .cout(c[20]));
   fa fa022 (.a(A[6] && B[2]), .b(A[7] && B[1]), .cin(A[8] && B[0]), .s(s[20]), .cout(c[21]));
   fa fa023 (.a(A[6] && B[3]), .b(A[7] && B[2]), .cin(A[8] && B[1]), .s(s[21]), .cout(c[22]));
@@ -62,8 +68,8 @@ module wtm_fp16 (
   fa fa18 (.a(c[7]), .b(s[7]), .cin(c[14]), .s(s[35]), .cout(c[37]));
   fa fa19 (.a(c[8]), .b(s[8]), .cin(c[15]), .s(s[36]), .cout(c[38]));
   fa fa110 (.a(c[9]), .b(A[2] && B[9]), .cin(c[16]), .s(s[37]), .cout(c[39]));
-  ha ha111 (.a(A[6] && B[0]), .b(s[11]), .s(s[38]), .c(c[40])); 
-  ha ha112 (.a(s[19]), .b(s[12]), .s(s[39]), .c(c[41])); 
+  ha ha111 (.a(A[6] && B[0]), .b(s[11]), .s(s[38]), .cout(c[40])); 
+  ha ha112 (.a(s[19]), .b(s[12]), .s(s[39]), .cout(c[41])); 
   fa fa113 (.a(s[13]), .b(c[20]), .cin(s[20]), .s(s[40]), .cout(c[42]));
   fa fa114 (.a(s[14]), .b(c[21]), .cin(s[21]), .s(s[41]), .cout(c[43]));
   fa fa115 (.a(s[15]), .b(c[22]), .cin(s[22]), .s(s[42]), .cout(c[44]));
@@ -122,8 +128,8 @@ module wtm_fp16 (
   fa fa414 (.a(c[77]), .b(c[51]), .cin(A[9] && B[9]), .s(s[86]), .cout(c[91]));
 
   // Sixth Stage (Vector Merge)
-  ha ha51 (.a(c[78]), .b(s[74]), .s(), .cout(c[92]));
-  fa fa52 (.a(c[79]), .b(s[75]), .cin(c[92]), .s(), .cout(c[93]));
+  ha ha51 (.a(c[78]), .b(s[74]), .s(), .cout(c[92])); 
+  fa fa52 (.a(c[79]), .b(s[75]), .cin(c[92]), .s(), .cout(c[93])); 
   fa fa53 (.a(c[80]), .b(s[76]), .cin(c[93]), .s(), .cout(c[94]));
   fa fa54 (.a(c[81]), .b(s[77]), .cin(c[94]), .s(), .cout(c[95]));
   fa fa55 (.a(c[82]), .b(s[78]), .cin(c[95]), .s(), .cout(c[96]));
@@ -135,6 +141,6 @@ module wtm_fp16 (
   fa fa511 (.a(c[88]), .b(s[84]), .cin(c[101]), .s(S[5]), .cout(c[102]));
   fa fa512 (.a(c[89]), .b(s[85]), .cin(c[102]), .s(S[6]), .cout(c[103]));
   fa fa513 (.a(c[90]), .b(s[86]), .cin(c[103]), .s(S[7]), .cout(c[104]));
-  fa fa514 (.a(c[91]), .b(c[104]), .s(S[8]), .cout(S[9]));
+  ha fa514 (.a(c[91]), .b(c[104]), .s(S[8]), .cout(S[9]));
   
 endmodule
