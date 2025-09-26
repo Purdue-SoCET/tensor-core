@@ -12,13 +12,13 @@
 
 `timescale 1ns/1ps
 
-module mul_multicycle #(parameter num_bits = 13) (input logic clk, nRST, start, stop, input logic [num_bits-1:0] op1, op2, output logic [num_bits-1:0] result, output logic overflow, round_loss);
+module mul_multicycle #(parameter num_bits = 11) (input logic clk, nRST, start, stop, input logic [num_bits-1:0] op1, op2, output logic [num_bits-1+2:0] result, output logic overflow, round_loss);
 
 logic [num_bits-1:0] multiplicand, next_multiplicand;
 logic [(num_bits*2)-1:0] product, next_product;
 
 assign overflow = product[(num_bits*2)-1];
-assign result = product[(num_bits*2-2):num_bits-1];
+assign result = product[(num_bits*2-2):num_bits-1 -2];      // Multiply result is the num_bits output bits plus two more: the R and S bits for rounding.
 assign round_loss = |product[num_bits-2:0];
 
 // op2 is the "multiplier", op1 is the "multiplicand"

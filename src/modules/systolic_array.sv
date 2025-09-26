@@ -177,7 +177,7 @@ module systolic_array(
             sysarr_add add_inst (
                 .clk(clk),
                 .nRST(nRST),
-                .adder(add_ifs[o].add)weights
+                .adder(add_ifs[o].add)//weights
             );
             if (o == 0) begin : add_ready
                 assign control_unit_if.add_value_ready = add_ifs[o].value_ready;

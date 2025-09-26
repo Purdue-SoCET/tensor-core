@@ -1,13 +1,11 @@
-// 11 bit wallace tree multiplier.
-// tell me to parameterize this, and i will throw a snowball at you.
-// use for FP16 multiplication.
+// 11 bit wallace tree multiplier. Single cycle edition, no pipelining.
+
 // by: Mixuan Pan and Vinay Pundith, September 2025
 
 `timescale 1ns/1ps
 
-/* verilator lint_off UNUSEDSIGNAL */
-
-module mul_wallacetree (input logic clk, nRST, [10:0] a, b, input logic active, output logic [12:0] result, output logic overflow, round_loss, value_ready);
+// module mul_wallacetree #(parameter num_bits = 11) (input logic clk, nRST, start, stop, input logic [num_bits-1:0] op1, op2, output logic [num_bits-1:0] result, output logic overflow, round_loss);
+module mul_wallacetree_singlecycle (input logic [10:0] a, b, output logic [22:0] result);
 logic [2:0][12:0] stage1_sums;
 logic [2:0][10:0] stage1_carries;
 
@@ -176,39 +174,6 @@ endgenerate
 // bit 20
 ha ha_s5_b20 (.a(stage4_level1_sums[20]), .b(stage3_carries[1][10]), .s(stage5_sums[20]), .cout(stage5_carries[15]));
 
-
-// add pipeline register here
-logic [20:0] stage5_sums_lat;
-logic [15:0] stage5_carries_lat;
-logic [22:0] product;
-
-always_ff @(posedge clk, negedge nRST)
-begin
-    if(nRST == 1'b0)
-    begin
-        stage5_sums_lat <= 0;
-        stage5_carries_lat <= 0;
-        value_ready <= 0;
-    end
-    else begin
-        value_ready <= active;
-        if(active)
-        begin
-            stage5_sums_lat <= stage5_sums;
-            stage5_carries_lat <= stage5_carries;
-        end
-        else begin
-            stage5_sums_lat <= stage5_sums_lat;
-            stage5_carries_lat <= stage5_carries_lat;
-        end
-        
-    end
-end
-
-assign product = ({1'b0, stage5_sums_lat} + {stage5_carries_lat, 6'b0});
-
-assign overflow = product[21];
-assign result = product[20:8];      // Multiply result is the num_bits output bits plus two more: the R and S bits for rounding.
-assign round_loss = |product[7:0];
+assign result = {1'b0, stage5_sums} + {stage5_carries, 6'b0};
 
 endmodule

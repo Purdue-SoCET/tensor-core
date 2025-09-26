@@ -2,11 +2,13 @@
 // Used in wallace tree multiplier
 // By: Mixuan Pan, Sep 2025
 
+`timescale 1ns/1ps
+
 `default_nettype none
 module fa (
   input logic a, b, cin,
-  output logic S, cout
+  output logic s, cout
 );
-  assign S = a ^ b ^ cin;
+  assign s = a ^ b ^ cin;
   assign cout = (a & b) | (cin & (a ^ b));
 endmodule

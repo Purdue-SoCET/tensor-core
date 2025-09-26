@@ -2,6 +2,7 @@
 // used in wallace tree multiplier
 // by Mixuan Pan, Sept 2025
 
+`timescale 1ns/1ps
 
 `default_nettype none
 module ha (

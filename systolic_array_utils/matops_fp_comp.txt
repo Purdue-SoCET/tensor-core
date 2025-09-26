@@ -1,0 +1,4 @@
+matrix 0 row 0 col 0: sysarr output 0000 (0.0), python output 4f5f (29.484375). error: 100.0%
+matrix 0 row 0 col 1: sysarr output 5248 (50.25), python output 4ffe (31.96875). error: 57.1875%
+matrix 0 row 1 col 0: sysarr output 4cce (19.21875), python output 5264 (51.125). error: 62.40625%
+matrix 0 row 1 col 1: sysarr output 5544 (84.25), python output 52eb (55.34375). error: 52.25%

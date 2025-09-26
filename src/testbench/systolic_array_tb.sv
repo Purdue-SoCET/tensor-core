@@ -15,16 +15,13 @@ module systolic_array_tb();
   // clk/reset
   logic tb_nRST;
 
-  string testcase = "fp4";
+  string testcase = "fp";
   string path_to_files = "/home/vinay/tensorcore/tensor-core/";
   string input_filename = {"systolic_array_utils/matops_", testcase, "_encoded.txt"};
   string output_filename = {"systolic_array_utils/matops_", testcase, "_encoded_result.txt"};
   string python_output_filename = {"systolic_array_utils/matops_", testcase, "_encoded_output.txt"};
   string python_command = {"/bin/python3 ", path_to_files, "systolic_array_utils/matrix_mul_fp.py systolic_array_utils/matops_", testcase, "_encoded"};
   string comparison_command = {"/bin/python3 ", path_to_files, "systolic_array_utils/compare_sysarr_output.py systolic_array_utils/matops_", testcase, "_encoded_result.txt systolic_array_utils/matops_", testcase, "_encoded_output.txt systolic_array_utils/matops_", testcase, "_comp.txt"};
-
-
-
 
   // Memory interface instance
   systolic_array_if memory_if();
