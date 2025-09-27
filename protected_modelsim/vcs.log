@@ -1,76 +1,139 @@
 QuestaSim-64 vlog 2021.4 Compiler 2021.10 Oct 13 2021
-Start time: 20:27:17 on Sep 21,2025
-vlog -reportprogress 300 -work work "+acc" -l vcs.log -sv "+define+DDR4_4G_X8" arch_defines.v dimm.vh dram_command.sv arch_package.sv proj_package.sv interface.sv ddr4_model.svp dram_cmd_dimm_tb.sv scheduler_buffer.sv data_transfer.sv socetlib_counter.sv edge_det.sv edge_det_if.vh 
+Start time: 14:53:07 on Sep 27,2025
+vlog -work work "+acc" -l vcs.log -sv "+incdir+./include" "+define+DDR4_4G_X8" ./arch_defines.v ./dimm.vh ./arch_package.sv ./proj_package.sv ./interface.sv ./ddr4_model.svp ./src/timing_signal.sv ./src/dram_top.sv ./src/flex_counter.sv ./src/signal_gen.sv ./src/init_state.sv ./src/command_FSM.sv ./src/control_unit.sv ./src/address_mapper.sv ./src/socetlib_counter.sv ./src/scheduler_buffer.sv ./src/edge_det.sv ./src/row_open.sv ./src/data_transfer.sv ./tb/dram_top_tb.sv 
 -- Compiling package dimm_vh_unit
--- Compiling package dram_pack
--- Compiling interface dram_command_if
--- Importing package dram_pack
--- Compiling module dram_command
 -- Compiling package arch_package
 -- Compiling package proj_package
 -- Importing package arch_package
 -- Compiling interface DDR4_if
 -- Importing package proj_package
--- Compiling package dram_pack
-** Warning: ** while parsing file included at dram_cmd_dimm_tb.sv(1)
-** at dram_command_if.vh(4): (vlog-2275) Existing package 'dram_pack' at line 4 will be overwritten.
--- Compiling interface dram_command_if
-** Warning: ** while parsing file included at dram_cmd_dimm_tb.sv(1)
-** at dram_command_if.vh(158): (vlog-2275) Existing interface 'dram_command_if' at line 158 will be overwritten.
--- Compiling interface scheduler_buffer_if
--- Compiling interface data_transfer_if
-** Warning: dram_cmd_dimm_tb.sv(378): (vlog-2600) [RDGN] - Redundant digits in numeric literal.
--- Compiling package dram_cmd_dimm_tb_sv_unit
--- Compiling module dram_cmd_dimm_tb
-** Warning: dram_cmd_dimm_tb.sv(378): (vlog-2600) [RDGN] - Redundant digits in numeric literal.
--- Compiling package dram_pack
-** Warning: ** while parsing file included at scheduler_buffer.sv(1)
-** while parsing file included at scheduler_buffer_if.vh(3)
-** at dram_command_if.vh(4): (vlog-2275) Existing package 'dram_pack' at line 4 will be overwritten.
--- Compiling interface dram_command_if
-** Warning: ** while parsing file included at scheduler_buffer.sv(1)
-** while parsing file included at scheduler_buffer_if.vh(3)
-** at dram_command_if.vh(158): (vlog-2275) Existing interface 'dram_command_if' at line 158 will be overwritten.
--- Compiling interface scheduler_buffer_if
-** Warning: ** while parsing file included at scheduler_buffer.sv(1)
-** at scheduler_buffer_if.vh(6): (vlog-2275) Existing interface 'scheduler_buffer_if' at line 6 will be overwritten.
--- Compiling module scheduler_buffer
--- Compiling package dram_pack
-** Warning: ** while parsing file included at data_transfer.sv(1)
-** while parsing file included at data_transfer_if.vh(4)
-** at dram_command_if.vh(4): (vlog-2275) Existing package 'dram_pack' at line 4 will be overwritten.
--- Compiling interface dram_command_if
-** Warning: ** while parsing file included at data_transfer.sv(1)
-** while parsing file included at data_transfer_if.vh(4)
-** at dram_command_if.vh(158): (vlog-2275) Existing interface 'dram_command_if' at line 158 will be overwritten.
--- Compiling interface data_transfer_if
-** Warning: ** while parsing file included at data_transfer.sv(1)
-** at data_transfer_if.vh(6): (vlog-2275) Existing interface 'data_transfer_if' at line 6 will be overwritten.
--- Compiling interface edge_det_if
--- Compiling module data_transfer
+-- Compiling package dram_pkg
+-- Compiling interface timing_signal_if
+-- Importing package dram_pkg
+-- Compiling interface command_FSM_if
+-- Compiling module timing_signal
+-- Compiling package dram_pkg
+** Warning: ** while parsing file included at ./src/dram_top.sv(2)
+** while parsing file included at ./include/dram_top_if.vh(3)
+** at ./include/dram_pkg.vh(4): (vlog-2275) Existing package 'dram_pkg' at line 4 will be overwritten.
+-- Compiling interface dram_top_if
+-- Compiling interface control_unit_if
+-- Compiling interface signal_gen_if
+-- Compiling module dram_top
+-- Compiling module flex_counter
+-- Compiling package dram_pkg
+** Warning: ** while parsing file included at ./src/signal_gen.sv(2)
+** while parsing file included at ./include/signal_gen_if.vh(3)
+** at ./include/dram_pkg.vh(4): (vlog-2275) Existing package 'dram_pkg' at line 4 will be overwritten.
+-- Compiling interface signal_gen_if
+** Warning: ** while parsing file included at ./src/signal_gen.sv(2)
+** at ./include/signal_gen_if.vh(6): (vlog-2275) Existing interface 'signal_gen_if' at line 6 will be overwritten.
+-- Compiling module signal_gen
+-- Compiling package dram_pkg
+** Warning: ** while parsing file included at ./src/init_state.sv(3)
+** while parsing file included at ./include/init_state_if.vh(4)
+** at ./include/dram_pkg.vh(4): (vlog-2275) Existing package 'dram_pkg' at line 4 will be overwritten.
+-- Compiling interface init_state_if
+-- Compiling module init_state
+-- Compiling package dram_pkg
+** Warning: ** while parsing file included at ./src/command_FSM.sv(2)
+** while parsing file included at ./include/command_FSM_if.vh(4)
+** at ./include/dram_pkg.vh(4): (vlog-2275) Existing package 'dram_pkg' at line 4 will be overwritten.
+-- Compiling interface command_FSM_if
+** Warning: ** while parsing file included at ./src/command_FSM.sv(2)
+** at ./include/command_FSM_if.vh(5): (vlog-2275) Existing interface 'command_FSM_if' at line 5 will be overwritten.
+-- Compiling module command_FSM
+-- Compiling package dram_pkg
+** Warning: ** while parsing file included at ./src/control_unit.sv(4)
+** while parsing file included at ./include/control_unit_if.vh(3)
+** at ./include/dram_pkg.vh(4): (vlog-2275) Existing package 'dram_pkg' at line 4 will be overwritten.
+-- Compiling interface control_unit_if
+** Warning: ** while parsing file included at ./src/control_unit.sv(4)
+** at ./include/control_unit_if.vh(6): (vlog-2275) Existing interface 'control_unit_if' at line 6 will be overwritten.
+-- Compiling interface command_FSM_if
+** Warning: ** while parsing file included at ./src/control_unit.sv(5)
+** at ./include/command_FSM_if.vh(5): (vlog-2275) Existing interface 'command_FSM_if' at line 5 will be overwritten.
+-- Compiling interface init_state_if
+** Warning: ** while parsing file included at ./src/control_unit.sv(6)
+** at ./include/init_state_if.vh(6): (vlog-2275) Existing interface 'init_state_if' at line 6 will be overwritten.
+-- Compiling interface address_mapper_if
+-- Compiling interface row_open_if
+-- Compiling interface timing_signal_if
+** Warning: ** while parsing file included at ./src/control_unit.sv(9)
+** at ./include/timing_signal_if.vh(6): (vlog-2275) Existing interface 'timing_signal_if' at line 6 will be overwritten.
+-- Compiling module control_unit
+-- Compiling package dram_pkg
+** Warning: ** while parsing file included at ./src/address_mapper.sv(1)
+** at ./include/dram_pkg.vh(4): (vlog-2275) Existing package 'dram_pkg' at line 4 will be overwritten.
+-- Compiling interface address_mapper_if
+** Warning: ** while parsing file included at ./src/address_mapper.sv(2)
+** at ./include/address_mapper_if.vh(6): (vlog-2275) Existing interface 'address_mapper_if' at line 6 will be overwritten.
+-- Compiling module addr_mapper
 -- Compiling module socetlib_counter
 -- Compiling package dram_pack
-** Warning: ** while parsing file included at edge_det.sv(1)
-** while parsing file included at edge_det_if.vh(3)
-** at dram_command_if.vh(4): (vlog-2275) Existing package 'dram_pack' at line 4 will be overwritten.
 -- Compiling interface dram_command_if
-** Warning: ** while parsing file included at edge_det.sv(1)
-** while parsing file included at edge_det_if.vh(3)
-** at dram_command_if.vh(158): (vlog-2275) Existing interface 'dram_command_if' at line 158 will be overwritten.
--- Compiling interface edge_det_if
-** Warning: ** while parsing file included at edge_det.sv(1)
-** at edge_det_if.vh(4): (vlog-2275) Existing interface 'edge_det_if' at line 4 will be overwritten.
--- Compiling module edge_det
+-- Importing package dram_pack
+-- Compiling interface scheduler_buffer_if
+-- Compiling module scheduler_buffer
 -- Compiling package dram_pack
-** Warning: ** while parsing file included at edge_det_if.vh(3)
+** Warning: ** while parsing file included at ./src/edge_det.sv(1)
+** while parsing file included at edge_det_if.vh(3)
 ** at dram_command_if.vh(4): (vlog-2275) Existing package 'dram_pack' at line 4 will be overwritten.
 -- Compiling interface dram_command_if
-** Warning: ** while parsing file included at edge_det_if.vh(3)
+** Warning: ** while parsing file included at ./src/edge_det.sv(1)
+** while parsing file included at edge_det_if.vh(3)
 ** at dram_command_if.vh(158): (vlog-2275) Existing interface 'dram_command_if' at line 158 will be overwritten.
 -- Compiling interface edge_det_if
-** Warning: edge_det_if.vh(4): (vlog-2275) Existing interface 'edge_det_if' at line 4 will be overwritten.
+-- Compiling module edge_det
+-- Compiling package dram_pkg
+** Warning: ** while parsing file included at ./src/row_open.sv(3)
+** while parsing file included at ./include/row_open_if.vh(3)
+** at ./include/dram_pkg.vh(4): (vlog-2275) Existing package 'dram_pkg' at line 4 will be overwritten.
+-- Compiling interface row_open_if
+** Warning: ** while parsing file included at ./src/row_open.sv(3)
+** at ./include/row_open_if.vh(5): (vlog-2275) Existing interface 'row_open_if' at line 5 will be overwritten.
+-- Compiling module row_open
+-- Compiling package dram_pack
+** Warning: ** while parsing file included at ./src/data_transfer.sv(1)
+** while parsing file included at data_transfer_if.vh(4)
+** at dram_command_if.vh(4): (vlog-2275) Existing package 'dram_pack' at line 4 will be overwritten.
+-- Compiling interface dram_command_if
+** Warning: ** while parsing file included at ./src/data_transfer.sv(1)
+** while parsing file included at data_transfer_if.vh(4)
+** at dram_command_if.vh(158): (vlog-2275) Existing interface 'dram_command_if' at line 158 will be overwritten.
+-- Compiling interface data_transfer_if
+-- Compiling interface edge_det_if
+** Warning: ** while parsing file included at ./src/data_transfer.sv(2)
+** at edge_det_if.vh(4): (vlog-2275) Existing interface 'edge_det_if' at line 4 will be overwritten.
+-- Compiling module data_transfer
+-- Compiling package dram_pkg
+** Warning: ** while parsing file included at ./tb/dram_top_tb.sv(1)
+** at ./include/dram_pkg.vh(4): (vlog-2275) Existing package 'dram_pkg' at line 4 will be overwritten.
+-- Compiling package dram_pack
+** Warning: ** while parsing file included at ./tb/dram_top_tb.sv(2)
+** while parsing file included at scheduler_buffer_if.vh(3)
+** at dram_command_if.vh(4): (vlog-2275) Existing package 'dram_pack' at line 4 will be overwritten.
+-- Compiling interface dram_command_if
+** Warning: ** while parsing file included at ./tb/dram_top_tb.sv(2)
+** while parsing file included at scheduler_buffer_if.vh(3)
+** at dram_command_if.vh(158): (vlog-2275) Existing interface 'dram_command_if' at line 158 will be overwritten.
+-- Compiling interface scheduler_buffer_if
+** Warning: ** while parsing file included at ./tb/dram_top_tb.sv(2)
+** at scheduler_buffer_if.vh(6): (vlog-2275) Existing interface 'scheduler_buffer_if' at line 6 will be overwritten.
+-- Compiling interface data_transfer_if
+** Warning: ** while parsing file included at ./tb/dram_top_tb.sv(3)
+** at data_transfer_if.vh(6): (vlog-2275) Existing interface 'data_transfer_if' at line 6 will be overwritten.
+-- Compiling interface control_unit_if
+** Warning: ** while parsing file included at ./tb/dram_top_tb.sv(4)
+** at ./include/control_unit_if.vh(6): (vlog-2275) Existing interface 'control_unit_if' at line 6 will be overwritten.
+-- Compiling interface signal_gen_if
+** Warning: ** while parsing file included at ./tb/dram_top_tb.sv(5)
+** at ./include/signal_gen_if.vh(6): (vlog-2275) Existing interface 'signal_gen_if' at line 6 will be overwritten.
+-- Compiling package dram_top_tb_sv_unit
+-- Compiling module dram_top_tb
 
 Top level modules:
-	dram_cmd_dimm_tb
-End time: 20:27:18 on Sep 21,2025, Elapsed time: 0:00:01
-Errors: 0, Warnings: 16
+	scheduler_buffer
+	dram_top_tb
+End time: 14:53:07 on Sep 27,2025, Elapsed time: 0:00:00
+Errors: 0, Warnings: 27

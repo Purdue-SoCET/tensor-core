@@ -2,6 +2,7 @@
 
 `include "dram_top_if.vh"
 
+
 module dram_top_tb ();
     import dram_pkg::*;
     logic CLK, nRST;

@@ -5,11 +5,11 @@
 interface row_open_if();
     import dram_pkg::*;
     //We are following 512 x 8 addressing map
-    logic [15:0] row;
+    logic [ROW_BITS-1:0] row;
     logic [1:0] bank, bank_group;
 
     //Conflicted row
-    logic [15:0] row_conflict;
+    logic [ROW_BITS-1:0] row_conflict;
 
     //Memory request
     logic req_en, refresh, row_resolve;
