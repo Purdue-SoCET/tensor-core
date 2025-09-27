@@ -164,7 +164,7 @@ module timing_signal (
         // Set the refresh counter to 0 in the REFRESH state.
         // Otherwise, the refresh counter is always incrementing.
 
-        next_refresh_count = refresh_count + 1;
+        next_refresh_count = (!timif.init_done) ? refresh_count : refresh_count + 1;
         if (cfsmif.cmd_state == REFRESH || cfsmif.cmd_state == REFRESHING) begin
             next_refresh_count = '0;
         end

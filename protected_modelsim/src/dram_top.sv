@@ -13,7 +13,7 @@ module dram_top (
 
     assign mysig.ref_re = myctrl_sig.rf_req;
     assign mysig.state =  myctrl_sig.state;
-    assign mysig.nstate = myctrl_sig.state;
+    assign mysig.nstate = myctrl_sig.nstate;
     assign mysig.RA0 =     myctrl_sig.rank;
     assign mysig.BG0 =     myctrl_sig.BG;
     assign mysig.BA0=      myctrl_sig.bank;

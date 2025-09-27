@@ -26,11 +26,11 @@ module addr_mapper #(
     // logic [IGNORE_BITS - 1:0] ignore;
 
 
-    always_comb begin
+    always_comb begin 
+        {amif.rank, amif.row, amif.bank, amif.BG[1], amif.col[9:3], amif.BG[0], amif.col[2:0], amif.offset} = 0;
         if (amif.configs == x4 || amif.configs == x8) begin
             {amif.rank, amif.row, amif.bank, amif.BG[1], amif.col[9:3], amif.BG[0], amif.col[2:0], amif.offset} = amif.address;
         end
-
         // x16 has only 1 BG bit (2 BGs) 
         else if (amif.configs == x16) begin
             {amif.rank, amif.row, amif.bank, amif.BG, amif.col, amif.offset} = amif.address;

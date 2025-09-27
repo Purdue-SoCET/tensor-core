@@ -367,11 +367,15 @@ module dram_top_tb;
       nRST = 1'b0;
       @(posedge CLK);
       @(posedge CLK);
-      repeat (20) @(posedge CLK);
       nRST = 1'b1;
-    //   task_name = "Power_up";
-      // repeat (2254) @(posedge CLK);
-    //   #((tRESET + tPWUP + tRESETCKE + tPDc + tXPR + tDLLKc + tMOD * 7 + tZQinitc) * PERIOD);
+
+      task_name = "Power_up";
+      #((tRESET + tPWUP + tRESETCKE + tPDc + tXPR + tDLLKc + tMOD * 7 + tZQinitc) * PERIOD);
+      repeat (25) @(posedge CLK);
+
+      //Case 1 check the refresh case no interrept
+      task_name = "Refresh";
+      repeat (100) @(posedge CLK);
 
     //   writing_1();
     //   read_chk();

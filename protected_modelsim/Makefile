@@ -38,9 +38,9 @@ dram_top:
 	vsim -do ./scripts/dram_top_tb.do dram_top_tb
 	run -all
 
-# %:
-# 	vlog -sv +incdir+./src/include ./src/testbench/$*_tb.sv  ./src/modules/$*.sv $(EXTRA_dram_top)
-# 	vsim $(SIMTERM) -voptargs="+acc" work.$*_tb -do $(SIMDO)
+%:
+	vlog -sv +incdir+./src/include ./src/testbench/$*_tb.sv  ./src/modules/$*.sv $(EXTRA_dram_top)
+	vsim $(SIMTERM) -voptargs="+acc" work.$*_tb -do $(SIMDO)
 
 %.wav:
 	vlog -sv +incdir+./src/include ./src/testbench/$*_tb.sv  ./src/modules/edge_det.sv ./src/modules/$*.sv $(EXTRA_dram_top)

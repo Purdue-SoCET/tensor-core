@@ -112,7 +112,7 @@ module signal_gen #(
         // mysig.WE_n_A14  = mysig.WE_n_A14;
         // mysig.CS_n      = mysig.CS_n;
 
-    case (mysig.nstate)
+    case (mysig.state)
         POWER_UP: begin
             cmd_addr = POWER_UP_PRG;
             mysig.CKE     = 1'b0;
@@ -176,7 +176,7 @@ module signal_gen #(
                 cmd_addr = LOAD_MODE_CMD;
                 mysig.BG      = 2'h1;
                 mysig.BA      = 2'h1;
-                mysig.ADDR    = 14'h0;
+                mysig.ADDR     = 14'h1000;
             end
         end
 
@@ -203,7 +203,9 @@ module signal_gen #(
                 cmd_addr = LOAD_MODE_CMD;
                 mysig.BG      = 2'h0;
                 mysig.BA      = 2'h1;
-                mysig.ADDR    = 14'h0001;
+                mysig.ADDR    = 14'h0000;
+                //A[0] for DLL disable
+                // dr_ram.ADDR     = 14'h0001;
             end
         end
 

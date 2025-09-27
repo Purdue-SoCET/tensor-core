@@ -18,6 +18,18 @@ module control_unit(
 );
     import dram_pkg::*;
 
+    logic init_done_l;
+
+
+    always_ff @(posedge CLK, negedge nRST) begin
+        if(!nRST) begin
+            init_done_l <= 0;
+        end else begin
+            init_done_l <= myinit.init_done;
+
+        end
+    end
+
     command_FSM_if mycmd();
     init_state_if myinit();
     address_mapper_if myaddr();
@@ -47,7 +59,7 @@ module control_unit(
     //Interface between init and command FSM
     assign myinit.init = mycmd.init_req;
     assign mycmd.init_done = myinit.init_done;
-
+    assign mytime.init_done =  myinit.init_done;
 
     //Address mapper
     assign myaddr.address = mytop.ram_addr;
@@ -71,7 +83,7 @@ module control_unit(
     
     //Logic for state, nstate with mux
     always_comb begin
-        if (!myinit.init_done) begin
+        if (!init_done_l) begin
             mysig.state = myinit.init_state;
             mysig.nstate = myinit.ninit_state;
         end else begin

@@ -11,7 +11,8 @@ interface data_transfer_if ();
     logic wr_en, rd_en, clear;
     logic [WORD_W - 1: 0] memstore, memload;
     logic [2:0] COL_choice;
-    wire [WORD_W - 1 : 0] DQ;
+    wire [WORD_W - 1cd ..
+     : 0] DQ;
     wire DQS_t, DQS_c, DM_n;
 
     modport data_trans (

@@ -21,13 +21,13 @@ package dram_pkg;
     parameter IGNORE_BITS       = 1;
     parameter ADDR_BITS    = 14; //TODO: Need to take a look for ROW/COL/ADDR interface
 
-    // TIMING PARAMETERS
+    // TIMING PARAMETERS for x8
     parameter tRCD = 10;
     parameter tAL = 1;
     parameter tCL = 10;
     parameter tBURST = 10;
     parameter tCWL = 10;
-    parameter tREFI = 10;
+    parameter tREFI = 50; //The actual value is 260, but we put 50 for observing
     parameter tRP = 10;
     parameter tRFC = 10;
     parameter tRAS = 10;

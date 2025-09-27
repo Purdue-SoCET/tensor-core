@@ -14,12 +14,14 @@ interface timing_signal_if;
     logic rf_req;
 
     logic wr_en, rd_en, clear;
+    logic init_done;
 
     modport cmd_fsm (
         input tACT_done, tWR_done, tRD_done, tPRE_done, tREF_done, rf_req
     );
 
     modport timing_ctrl (
+        input init_done,
         output wr_en, rd_en, clear,
         output tACT_done, tWR_done, tRD_done, tPRE_done, tREF_done, rf_req
     );
