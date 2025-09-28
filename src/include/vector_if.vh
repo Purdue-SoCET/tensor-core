@@ -25,12 +25,16 @@ interface vector_if;
 
   // Scratchpad Interface Signals
 
-  // VALU Signals
+  // VALU Signals GOING TO DELETE
   vreg_t vdat1, vdat2, result;
 
   // VEGGIE SIGNALS
   veggie_in_t veggie_in; 
   veggie_out_t veggie_out;
+
+  // Lane Signals 
+  lane_in_t lane_in;
+  lane_out_t lane_out;
   
   modport vector (
     input control, r1, imm, vd, v1, v2, vmask, col, row, row_id,
@@ -43,9 +47,26 @@ interface vector_if;
   );
   // Veggie
   modport veggie (
-    input logic CLK, nRST, veggie_in,
+    input logic CLK, nRST, 
+    input veggie_in,
     output veggie_out
   );
+  // Lane
+  modport lane (
+    input logic CLK, nRST,
+    input lane_in,
+    output lane_out
+  );  
+
+  modport seq_alu (
+    input alut_in,
+    output alut_out
+  );
+  modport alu_wb (
+    input aluwb_in,
+    output aluwb_out
+  );
+
 endinterface
 
 `endif

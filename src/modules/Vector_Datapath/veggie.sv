@@ -17,6 +17,7 @@
     bank.vd     = (vs == 0) ? vif.vd : '0; \
     bank.vdata  = (vs == 0) ? vif.vdata : '0;
 
+// NOTE: Test Read OR write with 4 banks and compare it to read AND write with 2 banks
 module veggie #(
     parameter BANK_COUNT=4, //Num banks not including control bank
     parameter VREG_COUNT=256 
