@@ -6,9 +6,21 @@ import numpy as np
 from matplotlib.colors import ListedColormap
 from matplotlib.patches import Patch
 
-NUM_BANKS = 32
+NUM_BANKS = 4
 
-class AddressBlock:
+class SwitchingNetwork:
+    @staticmethod
+    def route(shift_mask, input_vals, num_banks=NUM_BANKS):
+        assert len(shift_mask) == num_banks
+        assert len(input_vals) == num_banks
+
+        out = [0] * num_banks
+        for i, b in enumerate(shift_mask):
+            if b is not None and 0 <= b < num_banks:
+                out[b] = input_vals[i]
+        return out
+
+class AddressBlockNUM_BANKS:
     @staticmethod
     def _row_lane(abs_row: int, cols: int):
         low5 = abs_row & (NUM_BANKS - 1)
@@ -33,7 +45,7 @@ class AddressBlock:
     @staticmethod
     def gen_masks_row(base_row: int, row_id: int, cols: int):
         abs_row = base_row + row_id
-        lane_bank, lane_slot, lane_valid = AddressBlock._row_lane(abs_row, cols)
+        lane_bank, lane_slot, lane_valid = AddressBlockNUM_BANKS._row_lane(abs_row, cols)
 
         shift_mask_lane2bank = [(lane_bank[i] if lane_valid[i] else None) for i in range(NUM_BANKS)]
         slot_mask = [None] * NUM_BANKS
@@ -46,7 +58,7 @@ class AddressBlock:
 
     @staticmethod
     def gen_masks_col(base_row: int, col_id: int, rows: int):
-        lane_bank, lane_slot, lane_valid = AddressBlock._col_lane(base_row, col_id, rows)
+        lane_bank, lane_slot, lane_valid = AddressBlockNUM_BANKS._col_lane(base_row, col_id, rows)
 
         shift_mask_lane2bank = [(lane_bank[i] if lane_valid[i] else None) for i in range(NUM_BANKS)]
         slot_mask = [None] * NUM_BANKS
@@ -57,6 +69,120 @@ class AddressBlock:
 
         return shift_mask_lane2bank, slot_mask, lane_bank, lane_slot, lane_valid
 
+
+class Scratchpad:
+    def __init__(self, slots_per_bank: int):
+        self.B = NUM_BANKS
+        self.S = slots_per_bank
+
+        self.banks = [["" for _ in range(self.S)] for _ in range(self.B)]
+        self.tiles = {} 
+
+    def clear(self):
+        for b in range(self.B):
+            for s in range(self.S):
+                self.banks[b][s] = ""
+
+    def write_tile(self, tile_id: str, rows: int, cols: int, base_row: int, strict: bool = True):
+        assert 0 <= cols <= NUM_BANKS, "Tile width must be <= NUM_BANKS (tile externally if wider)."
+
+        stored = 0
+        dropped = 0
+        trace: List[Dict[str, Any]] = []
+
+        for r in range(rows):
+            print('----')
+            abs_row = base_row + r
+
+            dram_vec: List[Optional[str]] = [None] * self.B
+
+            # simulate DRAM read out 
+            for i in range(self.B):
+                flat = r * cols + i
+                rr = flat // cols if cols > 0 else 0
+                cc = flat %  cols if cols > 0 else 0
+                if rr < rows and cc < cols:
+                    dram_vec[i] = f"{tile_id}_{rr}_{cc}"
+
+            shift_mask, slot_mask, _, _, _ = AddressBlockNUM_BANKS.gen_masks_row(base_row=base_row, row_id=r, cols=cols)
+
+            switch_out = SwitchingNetwork.route(shift_mask, dram_vec)
+
+            for bank, val in enumerate(switch_out):
+                s = slot_mask[bank]
+                if s is None: continue 
+
+                if not (0 <= s < self.S):
+                    raise ValueError(f"Out-of-range write: bank={bank}, slot={s}")
+                    dropped += 1
+                    continue
+
+                self.banks[bank][s] = val
+                stored += 1
+
+        self.tiles[tile_id] = {"rows": rows, "cols": cols, "base_row": base_row}
+        return {"stored": stored, "dropped": dropped}
+
+    def read_tile(self, tile_id: str, base_row: int, row_id: int = 0, col_id: int = 0, row_based: bool = True):
+
+        def _read(slot_mask): 
+            bank_inputs = [0] * B
+            for b in range(B):
+                s = slot_mask[b]
+                if s is not None:
+                    bank_inputs[b] = self.banks[b][s]
+            return bank_inputs
+
+        assert tile_id in self.tiles
+        rows = self.tiles[tile_id]["rows"]
+        cols = self.tiles[tile_id]["cols"]
+        B = self.B
+
+        if row_based:
+            assert 0 <= row_id < rows
+
+            shift_lane2bank, slot_mask, _, _, _ = AddressBlockNUM_BANKS.gen_masks_row(base_row, row_id, cols)
+            bank_inputs = _read(slot_mask)
+
+            # In hardware, we can just do bank_inputs[shift_lane2bank[i]]
+            bank_to_lane = [None] * B
+            for lane, bank in enumerate(shift_lane2bank):
+                if bank is not None:
+                    bank_to_lane[bank] = lane
+            lane_out = SwitchingNetwork.route(bank_to_lane, bank_inputs)
+
+            golden = [(f"{tile_id}_{row_id}_{c}" if c < cols else 0) for c in range(NUM_BANKS)]
+            mode = "row"
+
+        else:
+            assert 0 <= col_id < cols
+
+            shift_lane2bank, slot_mask, _, _, _ = AddressBlockNUM_BANKS.gen_masks_col(base_row, col_id, rows)
+            bank_inputs = _read(slot_mask)
+
+            # In hardware, we can just do bank_inputs[shift_lane2bank[i]]
+            bank_to_lane = [None] * B
+            for lane, bank in enumerate(shift_lane2bank):
+                if bank is not None:
+                    bank_to_lane[bank] = lane
+            lane_out = SwitchingNetwork.route(bank_to_lane, bank_inputs)
+
+            golden = [ (f"{tile_id}_{r}_{col_id}" if r < rows else 0) for r in range(NUM_BANKS) ]
+            mode = "col"
+
+        mismatches = [(i, lane_out[i], golden[i]) for i in range(B) if lane_out[i] != golden[i]]
+
+        return {
+            "mode": mode,
+            "slot_mask": slot_mask,
+            "shift_mask_inv": shift_lane2bank,
+            "bank_inputs": bank_inputs,
+            "shift_mask": bank_to_lane,
+            "lane_out": lane_out,
+            "golden": golden,
+            "pass": len(mismatches) == 0,
+            "mismatches": mismatches
+        }
 
 def _parse_cell_triplet(cell: str):
     if not cell:
@@ -104,8 +230,8 @@ def save_png(sc0, path: str, annotate: bool=True, grid: bool=True):
     colors = ["white"] + base_colors[:len(tile_ids)]
     cmap = ListedColormap(colors)
 
-    fig_w = max(20, B * 0.55) # 32 = B  -> banks
-    fig_h = max(14, S * 0.35)  # 64 = S -> slots 
+    fig_w = max(20, B * 0.55) 
+    fig_h = max(14, S * 0.35)   
     fig, ax = plt.subplots(figsize=(fig_w, fig_h), dpi=350)
     im = ax.imshow(idx_grid, cmap=cmap, aspect="auto", interpolation="nearest", origin="upper")
 
@@ -142,116 +268,38 @@ def save_png(sc0, path: str, annotate: bool=True, grid: bool=True):
     plt.close(fig)
     return path
 
-class Scratchpad:
-    def __init__(self, slots_per_bank: int):
-        self.B = NUM_BANKS
-        self.S = slots_per_bank
 
-        self.banks = [["" for _ in range(self.S)] for _ in range(self.B)]
-        self.tiles = {} 
 
-    def clear(self):
-        for b in range(self.B):
-            for s in range(self.S):
-                self.banks[b][s] = ""
+sc0 = Scratchpad(slots_per_bank=128)
+stats = sc0.write_tile(tile_id="A", rows=3, cols=4, base_row=0)
+print(stats)
+stats = sc0.write_tile(tile_id="B", rows=4, cols=4, base_row=17)
+print(stats)
+stats = sc0.write_tile(tile_id="C", rows=2, cols=3, base_row=50)
+print(stats)
+stats = sc0.write_tile(tile_id="D", rows=4, cols=2, base_row=72)
+print(stats)
 
-    def write_tile(self, tile_id: str, rows: int, cols: int, base_row: int, strict: bool = True):
-        assert 0 <= cols <= NUM_BANKS, "Tile width must be <= NUM_BANKS (tile externally if wider)."
 
-        stored = 0
-        dropped = 0
-        trace: List[Dict[str, Any]] = []
+# stats = sc0.read_tile(tile_id="A", base_row=0, row_id=0)
+# print(f"Slot Mask: {stats['slot_mask']}")
+# print(f"Shift Mask: {stats['shift_mask']}")
+# print(f"Mismatches: {stats['mismatches']} | Pass: {stats['pass']}")
 
-        for r in range(rows):
-            print('----')
-            abs_row = base_row + r
+# stats = sc0.read_tile(tile_id="B", base_row=17, row_id=4)
+# print(f"Slot Mask: {stats['slot_mask']}")
+# print(f"Shift Mask: {stats['shift_mask']}")
+# print(f"Mismatches: {stats['mismatches']} | Pass: {stats['pass']}")
 
-            dram_vec: List[Optional[str]] = [None] * self.B
+# stats = sc0.read_tile(tile_id="B", base_row=17, col_id=4, row_based=False)
+# print(f"Slot Mask: {stats['slot_mask']}")
+# print(f"Shift Mask: {stats['shift_mask']}")
+# print(f"Mismatches: {stats['mismatches']} | Pass: {stats['pass']}")
 
-            # simulate DRAM read out 
-            for i in range(self.B):
-                flat = r * cols + i
-                rr = flat // cols if cols > 0 else 0
-                cc = flat %  cols if cols > 0 else 0
-                if rr < rows and cc < cols:
-                    dram_vec[i] = f"{tile_id}_{rr}_{cc}"
+# stats = sc0.read_tile(tile_id="D", base_row=72, col_id=1, row_based=False)
+# print(f"Slot Mask: {stats['slot_mask']}")
+# print(f"Shift Mask: {stats['shift_mask']}")
+# print(f"Mismatches: {stats['mismatches']} | Pass: {stats['pass']}")
 
-            shift_mask, slot_mask, _, _, _ = AddressBlock.gen_masks_row(base_row=base_row, row_id=r, cols=cols)
-
-            switch_out = SwitchingNetwork.route(shift_mask, dram_vec)
-
-            for bank, val in enumerate(switch_out):
-                s = slot_mask[bank]
-                if s is None: continue 
-
-                if not (0 <= s < self.S):
-                    raise ValueError(f"Out-of-range write: bank={bank}, slot={s}")
-                    dropped += 1
-                    continue
-
-                self.banks[bank][s] = val
-                stored += 1
-
-        self.tiles[tile_id] = {"rows": rows, "cols": cols, "base_row": base_row}
-        return {"stored": stored, "dropped": dropped}
-
-    def read_tile(self, tile_id: str, base_row: int, row_id: int = 0, col_id: int = 0, row_based: bool = True):
-
-        def _read(slot_mask): 
-            bank_inputs = [0] * B
-            for b in range(B):
-                s = slot_mask[b]
-                if s is not None:
-                    bank_inputs[b] = self.banks[b][s]
-            return bank_inputs
-
-        assert tile_id in self.tiles
-        rows = self.tiles[tile_id]["rows"]
-        cols = self.tiles[tile_id]["cols"]
-        B = self.B
-
-        if row_based:
-            assert 0 <= row_id < rows
-
-            shift_lane2bank, slot_mask, _, _, _ = AddressBlock.gen_masks_row(base_row, row_id, cols)
-            bank_inputs = _read(slot_mask)
-
-            # In hardware, we can just do bank_inputs[shift_lane2bank[i]]
-            bank_to_lane = [None] * B
-            for lane, bank in enumerate(shift_lane2bank):
-                if bank is not None:
-                    bank_to_lane[bank] = lane
-            lane_out = SwitchingNetwork.route(bank_to_lane, bank_inputs)
-
-            golden = [(f"{tile_id}_{row_id}_{c}" if c < cols else 0) for c in range(NUM_BANKS)]
-            mode = "row"
-
-        else:
-            assert 0 <= col_id < cols
-
-            shift_lane2bank, slot_mask, _, _, _ = AddressBlock.gen_masks_col(base_row, col_id, rows)
-            bank_inputs = _read(slot_mask)
-
-            # In hardware, we can just do bank_inputs[shift_lane2bank[i]]
-            bank_to_lane = [None] * B
-            for lane, bank in enumerate(shift_lane2bank):
-                if bank is not None:
-                    bank_to_lane[bank] = lane
-            lane_out = SwitchingNetwork.route(bank_to_lane, bank_inputs)
-
-            golden = [ (f"{tile_id}_{r}_{col_id}" if r < rows else 0) for r in range(NUM_BANKS) ]
-            mode = "col"
-
-        mismatches = [(i, lane_out[i], golden[i]) for i in range(B) if lane_out[i] != golden[i]]
-
-        return {
-            "mode": mode,
-            "slot_mask": slot_mask,
-            "shift_mask_inv": shift_lane2bank,
-            "bank_inputs": bank_inputs,
-            "shift_mask": bank_to_lane,
-            "lane_out": lane_out,
-            "golden": golden,
-            "pass": len(mismatches) == 0,
-            "mismatches": mismatches
-        }
+overview_path = "./scpad_overview.png"
+save_png(sc0, overview_path, annotate=True, grid=True)
