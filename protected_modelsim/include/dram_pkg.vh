@@ -25,14 +25,17 @@ package dram_pkg;
     parameter tRCD = 10;
     parameter tAL = 1;
     parameter tCL = 10;
-    parameter tBURST = 10;
+    parameter tBURST = 4;
     parameter tCWL = 10;
-    parameter tREFI = 50; //The actual value is 260, but we put 50 for observing
+    parameter tREFI = 260; //The actual value is ___, but we put 50 for observing
     parameter tRP = 10;
     parameter tRFC = 10;
     parameter tRAS = 10;
     parameter tRC = tRAS + tRP;
     parameter tRL = tAL + tCL;        // Read Latency
+
+    //Tri debug
+    parameter tWR = 12;
     parameter tWL = tAL + tCWL;       // Write Latency
 
     //INITIALIZE TIME

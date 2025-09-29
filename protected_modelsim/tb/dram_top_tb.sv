@@ -33,8 +33,6 @@ module dram_top_tb;
     // addr_x4_t ramaddr_phy, ramaddr_phy_ft, ramstore_phy, ramstore_phy_ft;
     reg clk_val, clk_enb;
     // DQ transmit
-    reg dq_en;
-    reg dqs_en;
     reg[MAX_DQ_BITS-1:0] dq_out;
     reg[MAX_DQS_BITS-1:0] dqs_out;
     reg[MAX_DM_BITS-1:0] dm_out;
@@ -44,6 +42,10 @@ module dram_top_tb;
     logic [31:0] data_store4;
     logic DM_debug;
     assign model_enable = model_enable_val;
+
+    //Signal flag to choose write or read
+    reg dq_en;
+    reg dqs_en;
     
 
     always begin
@@ -63,7 +65,7 @@ module dram_top_tb;
     // ddr4_module_if iDDR4_1();
     control_unit_if dc_if();
     signal_gen_if sig_if();
-    // scheduler_buffer_if sch_if();
+    scheduler_buffer_if sch_if();
     data_transfer_if dt_if();
     
     DDR4_if #(.CONFIGURED_DQ_BITS(CONFIGURED_DQ_BITS)) iDDR4_1();
@@ -73,22 +75,24 @@ module dram_top_tb;
 
 
     dram_top DUT (.CLK(CLK), .nRST(nRST), .myctrl(dc_if), .myctrl_sig(dc_if), .mysig(sig_if));
-    // scheduler_buffer SCH_BUFF (.CLK(CLK), .nRST(nRST), .mysche(sch_if));
+    scheduler_buffer SCH_BUFF (.CLK(CLK), .nRST(nRST), .mysche(sch_if));
     data_transfer DT (.CLK(CLK), .CLKx2(CLKx2),.nRST(nRST), .mydata(dt_if));
 
-    // always_comb begin
-    //   dc_if.ramREN_curr = sch_if.ramREN_curr;
-    //   dc_if.ramREN_ftrt = sch_if.ramREN_ftrt;
-    //   dc_if.ramWEN_curr = sch_if.ramWEN_curr;
+    //Scheduler interface with the 
+    always_comb begin
+      dc_if.dREN = (!dc_if.ram_wait) ? 0 : sch_if.ramREN_curr;
+      dc_if.dWEN = (!dc_if.ram_wait) ? 0 : sch_if.ramWEN_curr;
+      dc_if.ram_addr = sch_if.ramaddr_rq;
+      
     //   dc_if.ramWEN_ftrt = sch_if.ramWEN_ftrt;
-    //   sch_if.request_done = dc_if.request_done;
+      sch_if.request_done = !dc_if.ram_wait;
     
 
-    //   //Interface between dram command and the data_transfer
-    //   dt_if.wr_en = dc_if.wr_en;
-    //   dt_if.rd_en = dc_if.rd_en;
-    //   //dt_if.memstore = sch_if.ramstore_rq;
-    // end
+      //Interface between dram command and the data_transfer
+      dt_if.wr_en = dc_if.wr_en;
+      dt_if.rd_en = dc_if.rd_en;
+      dt_if.memstore = sch_if.ramstore_rq;
+    end
 
     always @(posedge clk_val && clk_enb) begin
         clk_val <= #(tCK/2) 1'b0;
@@ -373,9 +377,23 @@ module dram_top_tb;
       #((tRESET + tPWUP + tRESETCKE + tPDc + tXPR + tDLLKc + tMOD * 7 + tZQinitc) * PERIOD);
       repeat (25) @(posedge CLK);
 
-      //Case 1 check the refresh case no interrept
-      task_name = "Refresh";
-      repeat (100) @(posedge CLK);
+    //   //Case 1 check the refresh case no interrept
+    //   task_name = "Refresh";
+    //   repeat (100) @(posedge CLK);
+    
+    task_name = "Writing_Cycle";
+    //Case 2 check the writing cycle
+    add_request(.addr({16'hAAAA, 8'hAA, 8'b000_000_00}), .write(1'b1), .data(32'hAAAA_AAAA));
+    repeat (50) @(posedge CLK);
+
+    
+    task_name = "Reading_Cycle";
+    dq_en = 1'b0;
+    //Case 3 check the reading cycle
+    add_request(.addr({16'hAAAA, 8'hAA, 8'b000_000_00}), .write(1'b0), .data(32'hAAAA_AAAA));
+    repeat (50) @(posedge CLK);
+    
+
 
     //   writing_1();
     //   read_chk();
@@ -386,22 +404,22 @@ module dram_top_tb;
 
     end
 
-    // task add_request(input logic [31:0] addr, input logic write, input logic [31:0] data);
-    //   if (write) begin
-    //       sch_if.dWEN = 1'b1;
-    //       sch_if.dREN = 1'b0;
-    //       sch_if.ramaddr = addr;
-    //       sch_if.memstore = data;
-    //   end else begin
-    //       sch_if.dWEN = 1'b0;
-    //       sch_if.dREN = 1'b1;
-    //       sch_if.ramaddr = addr;
-    //   end
-    //   #(PERIOD);
-    //   // @(posedge CLK);
-    //   sch_if.dWEN = 1'b0;
-    //   sch_if.dREN = 1'b0;
-    // endtask
+    task add_request(input logic [31:0] addr, input logic write, input logic [31:0] data);
+      if (write) begin
+          sch_if.dWEN = 1'b1;
+          sch_if.dREN = 1'b0;
+          sch_if.ramaddr = addr;
+          sch_if.memstore = data;
+      end else begin
+          sch_if.dWEN = 1'b0;
+          sch_if.dREN = 1'b1;
+          sch_if.ramaddr = addr;
+      end
+      #(PERIOD);
+      // @(posedge CLK);
+      sch_if.dWEN = 1'b0;
+      sch_if.dREN = 1'b0;
+    endtask
 
 
 

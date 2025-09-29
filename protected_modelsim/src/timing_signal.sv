@@ -80,6 +80,7 @@ module timing_signal (
 
             WRITE : begin
                 time_counter_en = 1'b1;
+                // time_load = tWL + tBURST;
                 time_load = tWL + tBURST;
 
                 // TODO for consecutive writes
@@ -88,7 +89,7 @@ module timing_signal (
             end
 
             WRITING : begin
-                if (time_count <= tBURST) begin
+                if (time_count <= tBURST + 2) begin
                     timif.wr_en = 1'b1;
                 end
 	                

@@ -1,5 +1,5 @@
 QuestaSim-64 vlog 2021.4 Compiler 2021.10 Oct 13 2021
-Start time: 18:48:56 on Sep 27,2025
+Start time: 22:12:39 on Sep 28,2025
 vlog -work work "+acc" -l vcs.log -sv "+incdir+./include" "+define+DDR4_4G_X8" ./arch_defines.v ./dimm.vh ./arch_package.sv ./proj_package.sv ./interface.sv ./ddr4_model.svp ./src/timing_signal.sv ./src/dram_top.sv ./src/flex_counter.sv ./src/signal_gen.sv ./src/init_state.sv ./src/command_FSM.sv ./src/control_unit.sv ./src/address_mapper.sv ./src/socetlib_counter.sv ./src/scheduler_buffer.sv ./src/edge_det.sv ./src/row_open.sv ./src/data_transfer.sv ./tb/dram_top_tb.sv 
 -- Compiling package dimm_vh_unit
 -- Compiling package arch_package
@@ -133,7 +133,6 @@ vlog -work work "+acc" -l vcs.log -sv "+incdir+./include" "+define+DDR4_4G_X8" .
 -- Compiling module dram_top_tb
 
 Top level modules:
-	scheduler_buffer
 	dram_top_tb
-End time: 18:48:57 on Sep 27,2025, Elapsed time: 0:00:01
+End time: 22:12:40 on Sep 28,2025, Elapsed time: 0:00:01
 Errors: 0, Warnings: 27

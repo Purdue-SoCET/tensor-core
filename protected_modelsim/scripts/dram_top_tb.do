@@ -3,6 +3,7 @@ quietly WaveActivateNextPane {} 0
 add wave -noupdate /dram_top_tb/CLK
 add wave -noupdate /dram_top_tb/nRST
 add wave -noupdate /dram_top_tb/CLKx2
+add wave -noupdate /dram_top_tb/task_name
 add wave -noupdate -expand -group DRAM_1 /dram_top_tb/iDDR4_1/CONFIGURED_DQ_BITS
 add wave -noupdate -expand -group DRAM_1 /dram_top_tb/iDDR4_1/CONFIGURED_DQS_BITS
 add wave -noupdate -expand -group DRAM_1 /dram_top_tb/iDDR4_1/CONFIGURED_DM_BITS
@@ -35,8 +36,6 @@ add wave -noupdate -expand -group control_arb /dram_top_tb/DUT/myctrl/dWEN
 add wave -noupdate -expand -group control_arb /dram_top_tb/DUT/myctrl/dREN
 add wave -noupdate -expand -group control_arb /dram_top_tb/DUT/myctrl/ram_wait
 add wave -noupdate -expand -group control_arb /dram_top_tb/DUT/myctrl/ram_addr
-add wave -noupdate -expand -group control_arb /dram_top_tb/DUT/myctrl/ramload
-add wave -noupdate -expand -group control_arb /dram_top_tb/DUT/myctrl/ramstore
 add wave -noupdate -expand -group addr_map /dram_top_tb/DUT/ctrl/myaddr/address
 add wave -noupdate -expand -group addr_map /dram_top_tb/DUT/ctrl/myaddr/configs
 add wave -noupdate -expand -group addr_map /dram_top_tb/DUT/ctrl/myaddr/rank
@@ -105,11 +104,27 @@ add wave -noupdate -expand -group time_signal -radix unsigned /dram_top_tb/DUT/c
 add wave -noupdate -expand -group time_signal -radix decimal /dram_top_tb/DUT/ctrl/u4/refresh_count
 add wave -noupdate -expand -group time_signal -divider timing_trk
 add wave -noupdate -expand -group time_signal /dram_top_tb/DUT/ctrl/u4/time_load
-add wave -noupdate -expand -group time_signal /dram_top_tb/DUT/ctrl/u4/time_count
+add wave -noupdate -expand -group time_signal -radix decimal /dram_top_tb/DUT/ctrl/u4/time_count
 add wave -noupdate -expand -group time_signal /dram_top_tb/DUT/ctrl/u4/time_counter_en
 add wave -noupdate -expand -group time_signal /dram_top_tb/DUT/ctrl/u4/time_count_done
+add wave -noupdate -group Scheduler_buff /dram_top_tb/sch_if/dREN
+add wave -noupdate -group Scheduler_buff /dram_top_tb/sch_if/dWEN
+add wave -noupdate -group Scheduler_buff /dram_top_tb/sch_if/ramaddr
+add wave -noupdate -group Scheduler_buff /dram_top_tb/sch_if/ramaddr_rq
+add wave -noupdate -group Scheduler_buff /dram_top_tb/sch_if/ramREN_curr
+add wave -noupdate -group Scheduler_buff /dram_top_tb/sch_if/ramWEN_curr
+add wave -noupdate -group Scheduler_buff /dram_top_tb/SCH_BUFF/fifo
+add wave -noupdate -group Scheduler_buff /dram_top_tb/SCH_BUFF/wptr
+add wave -noupdate -group Scheduler_buff /dram_top_tb/SCH_BUFF/rptr
+add wave -noupdate -expand -group data_transfer /dram_top_tb/dt_if/wr_en
+add wave -noupdate -expand -group data_transfer /dram_top_tb/dt_if/rd_en
+add wave -noupdate -expand -group data_transfer /dram_top_tb/dt_if/COL_choice
+add wave -noupdate -expand -group data_transfer /dram_top_tb/dt_if/DQ
+add wave -noupdate -expand -group data_transfer /dram_top_tb/dt_if/DQS_t
+add wave -noupdate -expand -group data_transfer /dram_top_tb/dt_if/DQS_c
+add wave -noupdate -expand -group data_transfer /dram_top_tb/dt_if/DM_n
 TreeUpdate [SetDefaultTree]
-WaveRestoreCursors {{Cursor 1} {3483693 ps} 0}
+WaveRestoreCursors {{Cursor 1} {3524618 ps} 0}
 quietly wave cursor active 1
 configure wave -namecolwidth 150
 configure wave -valuecolwidth 255
@@ -125,4 +140,4 @@ configure wave -griddelta 40
 configure wave -timeline 0
 configure wave -timelineunits ps
 update
-WaveRestoreZoom {3485209 ps} {3492535 ps}
+WaveRestoreZoom {0 ps} {3750863 ps}

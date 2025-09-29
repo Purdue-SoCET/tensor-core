@@ -227,7 +227,8 @@ module signal_gen #(
 
         ACTIVATE: begin
             if (issue) begin
-                cmd_addr = cmd_t'({2'b0, mysig.R0[16], mysig.R0[15], mysig.R0[14]});
+                // cmd_addr = cmd_t'({2'b0, mysig.R0[16], mysig.R0[15], mysig.R0[14]});
+                cmd_addr = cmd_t'({2'b0, 1'b0, 1'b0, mysig.R0[14]});
                 mysig.BG      = mysig.BG0;
                 mysig.BA      = mysig.BA0;
                 mysig.ADDR    = mysig.R0[13:0];

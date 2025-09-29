@@ -17,12 +17,20 @@ module scheduler_buffer #(
     // logic [1:0][WORD_W : 0] [64:0]fifo;
     // logic [1:0][WORD_W : 0] [64:0]n_fifo;
 
-    logic [64:0][1:0][WORD_W:0] fifo, n_fifo;
+    logic [64:0][1:0][WORD_W + 1:0] fifo, n_fifo;
 
     assign mysche.ramaddr_rq = fifo[rptr][0][31:0];
     assign mysche.ramaddr_rq_ft = fifo[rptr - 1][0][31:0];
     assign mysche.ramstore_rq = fifo[rptr][1][31:0];
     assign mysche.ramstore_rq_ft = fifo[rptr - 1][1][31:0];
+    
+    assign mysche.ramREN_curr = fifo[rptr][0][33:32] == 2'b01 ? 1'b1 : 1'b0;
+    assign mysche.ramREN_ftrt = fifo[rptr - 1][0][32] == 2'b01 ? 1'b1 : 1'b0;
+
+    assign mysche.ramWEN_curr = fifo[rptr][0][33:32] == 2'b10 ? 1'b1 : 1'b0;
+    assign mysche.ramWEN_ftrt = fifo[rptr - 1][0][32] == 2'b10 ? 1'b1 : 1'b0;
+
+
     assign full = (wptr == 7'd64) ? 1'b1: 1'b0;
     
 
@@ -51,9 +59,9 @@ module scheduler_buffer #(
         end
 
         if (mysche.dREN) begin
-            n_fifo[wptr][0] = {1'b1, mysche.ramaddr};
+            n_fifo[wptr][0] = {2'b01, mysche.ramaddr};
         end else if (mysche.dWEN) begin
-            n_fifo[wptr][0] = {1'b0,mysche.ramaddr};
+            n_fifo[wptr][0] = {2'b10,mysche.ramaddr};
             n_fifo[wptr][1] = mysche.memstore;
         end
 
