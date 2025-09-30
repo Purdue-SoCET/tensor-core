@@ -1,30 +1,17 @@
 onerror {resume}
 quietly WaveActivateNextPane {} 0
-add wave -noupdate -radix binary /vaddsub_tb/DUT/CLK
-add wave -noupdate -radix binary /vaddsub_tb/DUT/nRST
-add wave -noupdate -radix binary /vaddsub_tb/DUT/fp1
-add wave -noupdate -radix binary /vaddsub_tb/DUT/fp2
-add wave -noupdate -radix binary /vaddsub_tb/DUT/sign_a
-add wave -noupdate -radix binary /vaddsub_tb/DUT/sign_b
-add wave -noupdate -radix binary /vaddsub_tb/DUT/sign_r
-add wave -noupdate -radix binary /vaddsub_tb/DUT/overflow
-add wave -noupdate -radix binary /vaddsub_tb/DUT/exp_a
-add wave -noupdate -radix binary /vaddsub_tb/DUT/exp_b
-add wave -noupdate -radix binary /vaddsub_tb/DUT/exp_r
-add wave -noupdate -radix binary /vaddsub_tb/DUT/frac_a
-add wave -noupdate -radix binary /vaddsub_tb/DUT/frac_b
-add wave -noupdate -radix binary /vaddsub_tb/DUT/frac_r
-add wave -noupdate -radix binary /vaddsub_tb/DUT/exp_diff
-add wave -noupdate -radix binary /vaddsub_tb/DUT/frac_a_alligned
-add wave -noupdate -radix binary /vaddsub_tb/DUT/frac_b_alligned
-add wave -noupdate -radix binary /vaddsub_tb/DUT/out
+add wave -noupdate /vreduction_alu_tb/casename
+add wave -noupdate /vreduction_alu_tb/alu_if/value_a
+add wave -noupdate /vreduction_alu_tb/alu_if/value_b
+add wave -noupdate /vreduction_alu_tb/alu_if/value_out
+add wave -noupdate /vreduction_alu_tb/alu_if/alu_op
 TreeUpdate [SetDefaultTree]
-WaveRestoreCursors {{Cursor 1} {0 ns} 0}
-quietly wave cursor active 0
+WaveRestoreCursors {{Cursor 1} {568 ns} 0}
+quietly wave cursor active 1
 configure wave -namecolwidth 150
 configure wave -valuecolwidth 100
 configure wave -justifyvalue left
-configure wave -signalnamewidth 1
+configure wave -signalnamewidth 0
 configure wave -snapdistance 10
 configure wave -datasetprefix 0
 configure wave -rowmargin 4
