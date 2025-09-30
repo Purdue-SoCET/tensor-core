@@ -1,10 +1,10 @@
 `include "vector_types.vh"
 `include "vaddsub_if.vh"
 module sqrt (
-    input logic CLK, nRST,
+    input logic CLK, nRST, valid_data_in,
     input logic [15:0] input_val,
     output logic [15:0] output_val,
-    output logic valid_data
+    output logic valid_data_out
 );
     
     localparam logic [15:0][15:0] normal_slopes = '{
@@ -32,6 +32,8 @@ module sqrt (
         16'h35D3, 16'h3628, 16'h367A, 16'h36C7,
         16'h3711, 16'h3758, 16'h379D, 16'h37DF
     };
+
+    localparam MULT_LATENCY = 3;
 
     //STAGE 1: Pre multiplication setup
     logic sign, sign_n;
@@ -111,14 +113,22 @@ module sqrt (
         endcase
     end
 
-    
+    logic [15:0] mult1_product, mult2_product;
     //mult 1: slope * mantissa_norm
+    sqrt_dmult1 #(
+        .LATENCY(MULT_LATENCY),
+        .PRECOMPUTED_RESULT(16'h3C00)
+    ) dummmy1 (
+        .CLK(CLK),
+        .nRST(nRST),
+        .port_a(input_slope),
+        .port_b(normalized_mantissa),
+        .product(mult1_product)
+    );
 
     //Stage 2/3: post mult 1
-    localparam MULT_LATENCY = 3;
     logic [15:0] intercept_pipe [0:MULT_LATENCY-1];
     logic odd_exp_pipe [0:MULT_LATENCY-1];
-    logic [15:0] mult1_product, mult2_product;
     always_ff @( posedge CLK, negedge nRST) begin
         if (!nRST) begin
             intercept_pipe <= '{default:'0};
@@ -156,7 +166,11 @@ module sqrt (
 
     end
     //mult2: odd exponent adjustment. sqrt_sum * odd_exp_adj
-    
+    sqrt_dmult1 #(
+        .LATENCY(MULT_LATENCY), .PRECOMPUTED_RESULT(16'h3C00)
+    ) dmult2 (
+        .CLK(CLK), .nRST(nRST), .port_a(sqrt_sum), .port_b(odd_exp_adj), .product(mult2_product)
+    );
     //exponent pipe
     logic [4:0] exponent_pipe [0:(2*MULT_LATENCY)-1];
     logic [4:0] final_exp;
@@ -201,4 +215,18 @@ module sqrt (
         end
     end
 
+    //valid signals
+    logic valid_pipe [0:(2*MULT_LATENCY)];
+    always_ff @(posedge CLK, negedge nRST) begin
+        if (!nRST) begin
+            valid_pipe <= '{default:'0};
+        end
+        else begin
+            valid_pipe[0] <= valid_data_in;
+            for (int i = 1; i <= 2*MULT_LATENCY; i++) begin
+                valid_pipe[i] <= valid_pipe[i-1];
+            end
+        end
+    end
+    assign valid_data = valid_pipe[2 * MULT_LATENCY];
 endmodule
