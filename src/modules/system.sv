@@ -19,39 +19,62 @@
 `include "caches_if.vh"
 `include "arbiter_caches_if.vh"
 `include "scratchpad_if.vh"
-`include "main_mem_if.vh"
 
 
-
-// module system (input logic CLK, nrst, system_if.sys syif);
 // module system (input logic CLK, nrst, system_if.sys syif);
 module system (
   input logic CLK, nrst,
-  output logic flushed,
+  datapath_cache_if dcif,
+  caches_if cif,
+  arbiter_caches_if acif,
+  scratchpad_if spif,
+  systolic_array_if saif,
   system_if.sys syif
 );
 
-  datapath_cache_if dcif();
-  caches_if cif();
-  arbiter_caches_if acif(cif);
-  scratchpad_if spif();
-  systolic_array_if saif();
-  main_mem_if mmif();
 
   import ram_pkg::*;
   import isa_pkg::*;
+  // import types_pkg::*;
   import datapath_pkg::*;
   import sp_types_pkg::*;
 
   // stopped running
   logic halt;
 
+  // clock division
+  // parameter CLKDIV = 2;
+  // logic CPUCLK;
   logic [3:0] count;
-  
-  assign flushed = dcif.flushed;
+  // logic CPUnrst;
 
+  // always_ff @(posedge CLK, negedge nrst)
+  // begin
+  //   if (!nrst)
+  //   begin
+  //     count <= 0;
+  //     CPUCLK <= 0;
+  //   end
+  //   else if (count == CLKDIV-2)
+  //   begin
+  //     count <= 0;
+  //     CPUCLK <= ~CPUCLK;
+  //   end
+  //   else
+  //   begin
+  //     count <= count + 1;
+  //   end
+  // end
+
+
+
+  // // interfaces
+  // cpu_ram_if                            prif ();
+
+  // // scheduler core processor
+  // scheduler_core                        CPU (CPUCLK, nrst, halt, prif);
   sc_datapath DP (CLK, nrst, dcif);
-  memory_subsystem MS (CLK, nrst, dcif, cif, acif, spif, mmif, syif);
+  memory_subsystem MS (CLK, nrst, dcif, cif, acif, spif);
   systolic_array SYS (CLK, nrst, saif);
 
   always_comb begin
@@ -73,19 +96,19 @@ module system (
     dcif.gemm_complete = spif.gemm_complete;
     dcif.store_complete = spif.store_complete;
   end
+  // // memory
+  // ram                                   RAM (CLK, nrst, prif);
 
+  // // interface connections
   assign syif.halt = dcif.halt;
+  // assign syif.load = prif.ramload;
 
-  // initial 
-	// begin: IICE_UC_1
-  //   $dumpvars(1, system.CLK);
-  //   $dumpvars(1, system.nrst);
-  //   $dumpvars(1, system.flushed);
-  //   $dumpvars(1, system.MS.acif.ramload);
-  //   $dumpvars(1, system.MS.mmif.addr);
-  //   $dumpvars(1, system.MS.mmif.data_in);
-  //   $dumpvars(1, system.MS.mmif.write_en);
-  // end
+  // // who has ram control
+  // assign prif.ramWEN = (syif.tbCTRL) ? syif.WEN : prif.memWEN;
+  // assign prif.ramREN = (syif.tbCTRL) ? syif.REN : prif.memREN;
+  // assign prif.ramaddr = (syif.tbCTRL) ? syif.addr : prif.memaddr;
+  // assign prif.ramstore = (syif.tbCTRL) ? syif.store : prif.memstore;
+
 
 
 endmodule

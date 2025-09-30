@@ -270,7 +270,7 @@ module issue(
                     next_fust_state[i] = FUST_RDY;
                   end 
                   else begin
-                    next_fust_state[i] = (((next_single_ready && next_ready[i]))) ? FUST_EX : FUST_RDY;
+                    next_fust_state[i] = (((n_rdy[i] == next_oldest_rdy[i]) || (next_single_ready && next_ready[i]))) ? FUST_EX : FUST_RDY;
                   end
                 end
               end
@@ -279,23 +279,23 @@ module issue(
                     next_fust_state[i] = FUST_RDY;
                 end 
                 else begin 
-                  next_fust_state[i] = (((oldest_rdy[i]) || (single_ready && fu_ready[i]))) ? FUST_EX : FUST_RDY;
+                  next_fust_state[i] = (((next_oldest_rdy[i]) || (single_ready && fu_ready[i]))) ? FUST_EX : FUST_RDY;
                 end
               end
               FUST_EX: begin
                 if ((isif.fu_ex[0] == 1'b1) && (i == 0)) begin 
                   next_fust_state[i] = incoming_instr[i] ? FUST_WAIT : FUST_EMPTY;
                 end
-                if ((isif.fu_ex[1] == 1'b1) && (i == 1)) begin
+                else if ((isif.fu_ex[1] == 1'b1) && (i == 1)) begin
                   next_fust_state[i] = incoming_instr[i] ? FUST_WAIT : FUST_EMPTY;
                 end
-                if ((isif.fu_ex[2] == 1'b1) && (i == 2)) begin
+                else if ((isif.fu_ex[2] == 1'b1) && (i == 2)) begin
                   next_fust_state[i] = incoming_instr[i] ? FUST_WAIT : FUST_EMPTY;
                 end
-                if ((isif.fu_ex[3] == 1'b1) && (i == 3)) begin
+                else if ((isif.fu_ex[3] == 1'b1) && (i == 3)) begin
                   next_fust_state[i] = incoming_instr[i] ? FUST_WAIT : FUST_EMPTY;
                 end
-                if ((isif.fu_ex[4] == 1'b1) && (i == 4)) begin
+                else if ((isif.fu_ex[4] == 1'b1) && (i == 4)) begin
                   next_fust_state[i] = incoming_instr[i] ? FUST_WAIT : FUST_EMPTY;
                 end  
               end

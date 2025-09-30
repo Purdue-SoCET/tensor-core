@@ -36,8 +36,8 @@ typedef struct packed {
 } dcachef_t;
 
 // Internal signals
-word_t hit_count, next_hit_count, latched_dmemaddr, next_dmemload;
-logic miss, finish_flush, next_dhit;
+word_t hit_count, next_hit_count, latched_dmemaddr;
+logic miss, finish_flush;
 logic [NUM_SETS-1:0] lru, next_lru;
 logic [INDEX_BITS-1:0] flush_idx, next_flush_idx;
 logic [4:0] flush_counter, next_flush_counter;
@@ -58,16 +58,12 @@ always_ff @(posedge CLK, negedge nRST) begin
     lru <= '0;
     flush_counter <= 0;
     latched_dmemaddr <= '0;
-    dcif.dhit <= '0;
-    dcif.dmemload <= '0;
   end else begin
     dcache <= next_dcache;
     flush_idx <= next_flush_idx;
     lru <= next_lru;
     flush_counter <= next_flush_counter;
     latched_dmemaddr <= dcif.dmemaddr;
-    dcif.dhit <= next_dhit;
-    dcif.dmemload <= next_dmemload;
   end
 end
 
@@ -124,8 +120,8 @@ end
 
 // Cache controller logic
 always_comb begin
-  next_dhit = '0;
-  next_dmemload = '0;
+  dcif.dhit = '0;
+  dcif.dmemload = '0;
   cif.dREN = '0;
   cif.dWEN = '0;
   cif.daddr = '0;
@@ -145,27 +141,27 @@ always_comb begin
         // Way 0 check
         if (dcache[dcache_format.idx][0].valid && 
             (dcache_format.tag == dcache[dcache_format.idx][0].tag)) begin
-          next_dhit = 1'b1;
+          dcif.dhit = 1'b1;
           next_hit_count = hit_count + 1;
           next_lru[dcache_format.idx] = 1'b1;
           if (dcif.dmemWEN) begin
             next_dcache[dcache_format.idx][0].data[dcache_format.blkoff] = dcif.dmemstore;
             next_dcache[dcache_format.idx][0].dirty = 1'b1;
           end else begin
-            next_dmemload = dcache[dcache_format.idx][0].data[dcache_format.blkoff];
+            dcif.dmemload = dcache[dcache_format.idx][0].data[dcache_format.blkoff];
           end
         end
         // Way 1 check
         else if (dcache[dcache_format.idx][1].valid && 
                  (dcache_format.tag == dcache[dcache_format.idx][1].tag)) begin
-          next_dhit = 1'b1;
+          dcif.dhit = 1'b1;
           next_hit_count = hit_count + 1;
           next_lru[dcache_format.idx] = 1'b0;
           if (dcif.dmemWEN) begin
             next_dcache[dcache_format.idx][1].data[dcache_format.blkoff] = dcif.dmemstore;
             next_dcache[dcache_format.idx][1].dirty = 1'b1;
           end else begin
-            next_dmemload = dcache[dcache_format.idx][1].data[dcache_format.blkoff];
+            dcif.dmemload = dcache[dcache_format.idx][1].data[dcache_format.blkoff];
           end
         end
         else begin

@@ -17,7 +17,7 @@ interface arbiter_caches_if(
   word_t  iaddr, daddr;
  
   // ram
-  logic                   ramWEN, ramREN, ramBUSY;
+  logic                   ramWEN, ramREN;
   ramstate_t              ramstate;
   word_t                  ramaddr, ramstore, ramload;
 
@@ -40,7 +40,7 @@ interface arbiter_caches_if(
       // cache inputs
       input   iREN, dREN, dWEN, dstore, iaddr, daddr,
       // ram inputs
-      input   ramload, ramstate, ramBUSY,
+      input   ramload, ramstate,
       // cache outputs
       output  iwait, dwait, iload, dload,
       // ram outputs
