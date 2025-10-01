@@ -35,6 +35,10 @@ interface vector_if;
   // Lane Signals 
   lane_in_t lane_in;
   lane_out_t lane_out;
+
+  // Mask Unit Signals
+  masku_in_t masku_in;
+  masku_out_t masku_out;
   
   modport vector (
     input control, r1, imm, vd, v1, v2, vmask, col, row, row_id,
@@ -65,6 +69,11 @@ interface vector_if;
   modport alu_wb (
     input aluwb_in,
     output aluwb_out
+  );
+
+  modport masku (
+    input masku_in,
+    output masku_out
   );
 
 endinterface

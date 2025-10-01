@@ -13,6 +13,10 @@ package vector_pkg;
     parameter SLICE_ID_W = $clog2(SLICE_W);
     parameter VL_W = $clog2(VLMAX);
 
+    // Other Parameters
+    parameter ESZ = 16; // Element Size
+    parameter ESZ_W = $clog2(ESZ);
+
     // Instruction Fields
     parameter OPCODE_W = 7;
     parameter VIDX_W = 8;
@@ -81,25 +85,27 @@ package vector_pkg;
     typedef struct packed {
         logic wen; // write en
         vsel_t vwsel; // vector write select 
-        logic [1:0] valid; // valid FU
-        logic [4:0] vop; // Vector op
-        logic [1:0] valu_src; // VV, VS, VI
+        logic [2:0] valid; // valid FU
+        logic [4:0] vop; // Vector op for ALU
         dtype_t datatype; // FP16, INT32, ETC
         logic vm; 
-        logic sp;
+        logic rm;
+        logic[1:0] sp;
         logic swizzle;
         logic memtovreg;
-        logic spwrite;
-        logic spread;
+        logic sp_write;
+        logic sp_read;
+        vl_t vl;
+        logic[4:0] shift; // TBD
     } control_t;
 
     // Veggie Input Signals
     typedef struct packed {
-        logic WEN;
         vsel_t vd;
         vsel_t vs1;
         vsel_t vs2;
-        logic vm;
+        logic vs2_REN;
+        logic[4:0] vm; // LSB is enable, rest are offset
         logic WEN;
     } veggie_in_t;
 
@@ -137,6 +143,20 @@ package vector_pkg;
         RR_CONFLICT = 2'b01
     } conflict_type_t;
     // --------------------------------------------------------------------------------
+
+
+    // MaskU Structs -------------------------------------------------------------------
+    typedef struct packed {
+        logic vm;
+        logic[ESZ_W-1:0] imm; 
+        vreg_t vmask;
+        vl_t vl;
+    } mask_in_t;
+
+    // Output to 16 lanes
+    typedef struct packed {
+        logic[NUM_ELEMENTS-1:0] mask; // 2 bits per lane to be hard wired
+    } mask_out_t;
 
     // Lane Structs --------------------------------------------------------------------
     typedef enum logic [2:0] {
