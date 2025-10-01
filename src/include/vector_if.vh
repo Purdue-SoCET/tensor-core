@@ -8,6 +8,7 @@ interface vector_if;
   import vector_pkg::*;
 
   // Top level signals
+  /*
   logic CLK, nRST;
   control_t control;
   vreg_t v1, v2, vdata; // FP16 Vector Data
@@ -20,7 +21,7 @@ interface vector_if;
   dtype_t datatype;
   logic [4:0] error;
   logic [IMM_W-1:0] imm;
-
+  
   // Scheduler Core Interface Signals
 
   // Scratchpad Interface Signals
@@ -35,11 +36,11 @@ interface vector_if;
   // Lane Signals 
   lane_in_t lane_in;
   lane_out_t lane_out;
-
+  */
   // Mask Unit Signals
   masku_in_t masku_in;
   masku_out_t masku_out;
-  
+/* 
   modport vector (
     input control, r1, imm, vd, v1, v2, vmask, col, row, row_id,
     output wen, vd, vdata, swizzle, col, row, datatype, row_id, error
@@ -70,7 +71,7 @@ interface vector_if;
     input aluwb_in,
     output aluwb_out
   );
-
+*/
   modport masku (
     input masku_in,
     output masku_out

@@ -14,6 +14,7 @@ package vector_pkg;
     parameter VL_W = $clog2(VLMAX);
 
     // Other Parameters
+    parameter NUM_ELEMENTS = 32;
     parameter ESZ = 16; // Element Size
     parameter ESZ_W = $clog2(ESZ);
 
@@ -31,7 +32,7 @@ package vector_pkg;
     typedef logic [IMM_W-1:0] imm_t;
     typedef logic [DTYPE_W-1:0] dtype_t;
 
-    typedef logic [SLICE_ID_W-1:0] slice_t;
+    typedef logic [SLICE_ID_W-1:0] slice_idx_t;
     typedef logic [LANE_ID_W-1:0] lane_id_t;
     typedef logic [VL_W-1:0] vl_t;
 
@@ -78,7 +79,7 @@ package vector_pkg;
 
     typedef enum logic [5:0] {
         VALU_ADD       = 6'h00,
-        VALU_SUB       = 6'h01,
+        VALU_SUB       = 6'h01
     } valu_op_t;
 
     // TOP LEVEL CONTROL SIGNALS
@@ -120,7 +121,6 @@ package vector_pkg;
         logic REN;
         logic WEN;
         logic tag;
-        logic WEN;
         vsel_t vs;
         vsel_t vd;
         vreg_t vdata;
@@ -151,19 +151,20 @@ package vector_pkg;
         logic[ESZ_W-1:0] imm; 
         vreg_t vmask;
         vl_t vl;
-    } mask_in_t;
+    } masku_in_t;
 
     // Output to 16 lanes
     typedef struct packed {
         logic[NUM_ELEMENTS-1:0] mask; // 2 bits per lane to be hard wired
-    } mask_out_t;
+    } masku_out_t;
 
     // Lane Structs --------------------------------------------------------------------
+    /*
     typedef enum logic [2:0] {
         ALLU = 3'b000,
         EXP  = 3'b001,
         SQRT = 3'b010,
-        MUL  = 3'b011
+        MUL  = 3'b011,
         DIV  = 3'b100
     } ready_t;
 
@@ -188,6 +189,6 @@ package vector_pkg;
         lane_id_t lane_id;
         vsel_t vd;
     } lane_out_t;
-
+    */
 endpackage
 `endif

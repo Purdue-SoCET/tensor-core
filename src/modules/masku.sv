@@ -16,15 +16,16 @@ module masku (
     always_comb begin : Extract_Mask
         vmask = '0;
         if (vif.masku_in.vm == 1'b0) begin
-            vmask = `1; 
+            vmask = '1; 
         end else begin
             for (int i = 0; i < NUM_ELEMENTS; i++) begin
-                if (vif.masku_in.vl =< i) begin
+                /*if (vif.masku_in.vl <= i) begin
                     vmask[i] = 1'b0; 
                 end 
                 else begin
-                    vmask[i] = vif.masku_in.vmask[(i*ESZ) + vif.masku_in.imm];
-                end
+                */
+                vmask[i] = logic'(vif.masku_in.vmask[i][vif.masku_in.imm]);
+                //end
             end
         end
     end
