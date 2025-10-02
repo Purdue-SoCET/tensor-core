@@ -9,7 +9,7 @@ module timing_control (
 );
     import dram_pkg::*;
     
-    logic wr_en;
+    //logic timif.wr_en;
     
     // time counter signals
     parameter N = 10;
@@ -25,7 +25,7 @@ module timing_control (
         
         time_counter_en = 1'b0;
         time_load = '0;
-        wr_en = 1'b0;
+        timif.wr_en = 1'b0;
 
         case (cfsmif.cmd_state)
             ACTIVATE : begin
@@ -78,7 +78,7 @@ module timing_control (
 
             WRITING : begin
                 if (time_count == tBURST) begin
-                    wr_en = 1'b1;
+                    timif.wr_en = 1'b1;
                 end
 	                
                 if (time_count_done == 1'b1) begin
