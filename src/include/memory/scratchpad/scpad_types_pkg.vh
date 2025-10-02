@@ -11,7 +11,7 @@
 //      5. SRAM Controller 
 //      6. Frontend Arb. 
 
-package spad_types_pkg;
+package scpad_types_pkg;
     parameter int SCPAD_SIZE_BYTES = 1024*1024;  // total scratchpad size 
     parameter int NUM_COLS = 32;  // always a power of 2 
     parameter int ELEM_BITS = 16;  // fp16 
