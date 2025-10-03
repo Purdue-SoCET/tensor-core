@@ -8,9 +8,7 @@ module timing_control (
     command_fsm_if.timing_ctrl cfsmif
 );
     import dram_pkg::*;
-    
-    //logic timif.wr_en;
-    
+      
     // time counter signals
     parameter N = 10;
     logic [N-1:0] time_load, time_count;
@@ -26,6 +24,7 @@ module timing_control (
         time_counter_en = 1'b0;
         time_load = '0;
         timif.wr_en = 1'b0;
+        timif.rd_en = 1'b0;
 
         case (cfsmif.cmd_state)
             ACTIVATE : begin
@@ -62,6 +61,10 @@ module timing_control (
             end
 
             READING : begin
+                if (time_count == tBURST) begin
+                    timif.rd_en = 1'b1;
+                end
+
                 if (time_count_done == 1'b1) begin
                     timif.tRD_done = 1'b1;
                 end
@@ -110,6 +113,8 @@ module timing_control (
 
         endcase
     end
+
+    assign timif.clear = timif.tRD_done || timif.tWR_done;
 
     //////////// REFRESH ////////////
     logic [N-1:0] refresh_limit, next_refresh_limit;
