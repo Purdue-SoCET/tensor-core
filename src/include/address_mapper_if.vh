@@ -27,6 +27,10 @@ interface address_mapper_if;
         input rank, BG, bank, row, col, offset, ignore
     );
 
+    modport row_open (
+        input row, bank, BG
+    );
+
 endinterface
 
 `endif // ADDRESS_MAPPER_IF_VH

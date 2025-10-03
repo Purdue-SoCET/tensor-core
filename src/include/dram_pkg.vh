@@ -33,6 +33,16 @@ package dram_pkg;
     parameter tWL = tAL + tCWL;       // Write Latency
     parameter MAX_tREFRESH_LIMIT = 9 * tREFI;
 
+    //INITIALIZE TIMING PARAMETERS
+    parameter tRESET        = 80;
+    parameter tPWUP         = 80;
+    parameter tRESETCKE     = 80;
+    parameter tPDc          = 3;
+    parameter tXPR          = 217;
+    parameter tDLLKc        = 597;
+    parameter tZQinitc      = 1024;
+    parameter tMOD          = 25;
+
     // word_t
     typedef logic [WORD_W-1:0] word_t;
 
@@ -43,9 +53,21 @@ package dram_pkg;
         x16 = 2'b10
     } configs_t;
 
-    // command FSM states
+    // DRAM init/command states
     typedef enum logic [4:0] {
         POWER_UP,
+        PRE_RESET,
+        RESET,
+        NOP,
+        LOAD_MODE_DLL,
+        LOAD_BG0_REG3,
+        LOAD_BG1_REG6,
+        LOAD_BG1_REG5,
+        LOAD_BG1_REG4,
+        LOAD_BG0_REG2,
+        LOAD_BG0_REG1,
+        LOAD_BG0_REG0,
+        ZQ_CL,
         IDLE,
         ACTIVATE,
         ACTIVATING,
@@ -57,7 +79,20 @@ package dram_pkg;
         READING,
         REFRESH,
         REFRESHING
-    } cmd_fsm_t; 
+    } dram_state_t; 
+
+    // {cs, act, ras, cas, we}
+    typedef enum logic [4:0] {
+        POWER_UP_PRG  = 5'b01111,
+        LOAD_MODE_CMD = 5'b01000,
+        REFRESH_CMD   = 5'b01001,
+        PRECHARGE_CMD = 5'b01010,
+        ACTIVATE_CMD  = 5'b00xxx,
+        WRITE_CMD     = 5'b01100,
+        READ_CMD      = 5'b01101,
+        ZQ_CMD        = 5'b01110,
+        DESEL_CMD     = 5'b11000
+    } cmd_t;
 
 endpackage
 

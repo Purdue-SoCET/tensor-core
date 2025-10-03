@@ -10,16 +10,17 @@ interface command_fsm_if ();
     logic init_done, init_req;
     logic tACT_done, tWR_done, tRD_done;
     logic tPRE_done, tREF_done, rf_req;
+    logic row_resolve, ram_wait;
+    //logic [1:0] row_stat;
 
-    logic [1:0] row_stat;
-    cmd_fsm_t cmd_state, ncmd_state;
+    dram_state_t cmd_state, ncmd_state;
 
-    modport dut (
+    modport cmd_fsm (
         input dREN, dWEN, init_done,
         input tACT_done, tWR_done, tRD_done,
         input tPRE_done, tREF_done, rf_req,
-        input row_stat,
-        output cmd_state, ncmd_state, init_req
+        //input row_stat,
+        output cmd_state, ncmd_state, init_req, row_resolve, ram_wait
     );
 
     modport timing_ctrl (
