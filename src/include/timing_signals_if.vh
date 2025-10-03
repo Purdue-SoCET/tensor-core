@@ -13,7 +13,7 @@ interface timing_signals_if;
     logic tREF_done;
     logic rf_req;
     logic wr_en;
-    lofic rd_en;
+    logic rd_en;
     logic clear;   // everytime done
 
     modport cmd_fsm (
@@ -21,11 +21,11 @@ interface timing_signals_if;
     );
 
     modport timing_ctrl (
-        output tACT_done, tWR_done, tRD_done, tPRE_done, tREF_done, rf_req, wr_en, rd_en, clear;
+        output tACT_done, tWR_done, tRD_done, tPRE_done, tREF_done, rf_req, wr_en, rd_en, clear
     );
 
     modport data_transfer (
-        input wr_en, rd_en, clear;
+        input wr_en, rd_en, clear
     );
 
 endinterface
