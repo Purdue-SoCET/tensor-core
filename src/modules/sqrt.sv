@@ -67,13 +67,13 @@ module sqrt (
         index = mantissa[9:6];
         if (is_subnormal) begin
             normalized_mantissa = {1'b0, 5'd0, mantissa};
-            input_slope = subnormal_slopes[index];
-            input_intercept = subnormal_intercepts[index];
+            input_slope = subnormal_slopes[15 - index];
+            input_intercept = subnormal_intercepts[15 - index];
         end
         else begin
             normalized_mantissa = {1'b0, 5'd15, mantissa};
-            input_slope = normal_slopes[index];
-            input_intercept = normal_intercepts[index];
+            input_slope = normal_slopes[15 - index];
+            input_intercept = normal_intercepts[15 - index];
         end
     end
 
@@ -117,7 +117,7 @@ module sqrt (
     //mult 1: slope * mantissa_norm
     sqrt_dmult1 #(
         .LATENCY(MULT_LATENCY),
-        .PRECOMPUTED_RESULT(16'h3C00)
+        .PRECOMPUTED_RESULT(16'h37FE)
     ) dummmy1 (
         .CLK(CLK),
         .nRST(nRST),
@@ -145,12 +145,12 @@ module sqrt (
     end
 
     vaddsub_if add1_if ();
-    vaddsub add1 (CLK, nRST, add1_if.vaddsub);
+    vaddsub add1 (CLK, nRST, add1_if);
     logic [15:0] sqrt_sum;
     always_comb begin
         add1_if.port_a = mult1_product;
         add1_if.port_b = intercept_pipe[MULT_LATENCY-1];
-        add1_if.out = sqrt_sum;
+        sqrt_sum = add1_if.out;
         add1_if.sub = 'b0;
         add1_if.enable = 'b1;
     end
@@ -228,5 +228,5 @@ module sqrt (
             end
         end
     end
-    assign valid_data = valid_pipe[2 * MULT_LATENCY];
+    assign valid_data_out = valid_pipe[2 * MULT_LATENCY];
 endmodule
