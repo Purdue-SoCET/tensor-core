@@ -27,12 +27,12 @@ module addr_map (
         always_comb begin
             if (rol_or_col) begin // row-major read
                 slot_mask[bank_id] = base_row + row_id;
-                shift_mask[bank_id]  = (bank_id < cols);
-                bank_mask[bank_id]  = COL_IDX_WIDTH'((bank_id ^ (abs_row & (NUM_COLS-1))) & (NUM_COLS-1));
+                valid_mask[bank_id]  = (bank_id < cols);
+                shift_mask[bank_id]  = COL_IDX_WIDTH'((bank_id ^ (abs_row & (NUM_COLS-1))) & (NUM_COLS-1));
             end else begin
                 slot_mask[bank_id] = base_row + ROW_IDX_WIDTH'(bank_id);
-                shift_mask[bank_id] = (bank_id < rows);
-                bank_mask[bank_id]  = COL_IDX_WIDTH'((col_id ^ (abs_row & (NUM_COLS-1))) & (NUM_COLS-1));
+                valid_mask[bank_id] = (bank_id < rows);
+                shift_mask[bank_id]  = COL_IDX_WIDTH'((col_id ^ (abs_row & (NUM_COLS-1))) & (NUM_COLS-1));
             end
         end
     end
