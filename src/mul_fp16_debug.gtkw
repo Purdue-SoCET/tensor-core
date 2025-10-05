@@ -1,0 +1,29 @@
+[*]
+[*] GTKWave Analyzer v3.3.121 (w)1999-2024 BSI
+[*] Sun Oct  5 08:57:32 2025
+[*]
+[dumpfile] "/home/vinay/tensorcore/tensor-core/src/mul_fp16_waves.vcd"
+[dumpfile_mtime] "Sun Oct  5 08:56:30 2025"
+[dumpfile_size] 47718
+[savefile] "/home/vinay/tensorcore/tensor-core/src/mul_fp16_debug.gtkw"
+[timestart] 0
+[size] 2560 1458
+[pos] -781 -430
+*-10.800000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] mul_fp16_tb.
+[treeopen] mul_fp16_tb.melvin.
+[sst_width] 278
+[signals_width] 150
+[sst_expanded] 1
+[sst_vpaned_height] 456
+@22
+mul_fp16_tb.tb_a[15:0]
+mul_fp16_tb.tb_b[15:0]
+@28
+mul_fp16_tb.tb_clk
+mul_fp16_tb.tb_start
+mul_fp16_tb.tb_done
+@23
+mul_fp16_tb.tb_result[15:0]
+[pattern_trace] 1
+[pattern_trace] 0
