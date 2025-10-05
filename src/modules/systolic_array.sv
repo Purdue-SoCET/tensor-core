@@ -24,6 +24,7 @@ module systolic_array(
     logic [N-1:0] loadps;
     // MAC Unit inputs/outputs latched within systolic array
     logic [DW-1:0] MAC_inputs [N-1:0][N-1:0];
+    logic weight_enables [N-1:0] [N-1:0];
     logic [DW-1:0] MAC_outputs [N-1:0][N-1:0];
     logic [DW-1:0] nxt_MAC_outputs [N-1:0][N-1:0];
     // Partial Sum adder inputs
@@ -112,6 +113,7 @@ module systolic_array(
             assign input_fifos_ifs[j].shift = control_unit_if.in_fifo_shift[j];
             assign input_fifos_ifs[j].load_values = top_input;
             assign MAC_inputs[j][0] = memory.weight_en ? memory.array_in[((N-j)*DW)-1 : ((N-j-1)*DW)] : input_fifos_ifs[j].out;
+            assign weight_enables[j][0] = memory.weight_en;
         end
     endgenerate
     // Partial Sum Generation
@@ -153,8 +155,9 @@ module systolic_array(
                 end
                 assign mac_ifs[m*N + n].start = control_unit_if.MAC_start;
                 // assign mac_ifs[m*N + n].weight = weights[n][(N - m) * DW - 1 -: DW];
-                assign mac_ifs[m*N + n].weight_en = memory.weight_en;
+                // assign mac_ifs[m*N + n].weight_en = memory.weight_en;
                 assign mac_ifs[m*N + n].in_value = MAC_inputs[m][n];
+                assign mac_ifs[m*N + n].weight_en = weight_enables[m][n];
                 assign mac_ifs[m*N + n].MAC_shift = control_unit_if.MAC_shift;
                 if (m == 0) begin : no_accumulate
                     assign mac_ifs[m*N + n].in_accumulate = '0;
@@ -163,6 +166,7 @@ module systolic_array(
                 end
                 if (n != 0)begin : macInputForwarding
                     assign MAC_inputs[m][n] = mac_ifs[m*N + (n-1)].in_pass;
+                    assign weight_enables[m][n] = mac_ifs[m*N + (n-1)].weight_next_en;
                 end
                 assign nxt_MAC_outputs[m][n] = mac_ifs[m*N + n].out_accumulate;
             end
@@ -174,7 +178,7 @@ module systolic_array(
             sysarr_add add_inst (
                 .clk(clk),
                 .nRST(nRST),
-                .adder(add_ifs[o].add)
+                .adder(add_ifs[o].add)//weights
             );
             if (o == 0) begin : add_ready
                 assign control_unit_if.add_value_ready = add_ifs[o].value_ready;

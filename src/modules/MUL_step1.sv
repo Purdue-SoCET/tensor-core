@@ -48,50 +48,63 @@ module MUL_step1 (
         end
     end
     
-    // Counter to drive multicycle multiplier
-    logic [3:0] count;
-    logic mul_start;
-    logic mul_stop;
-    always_ff @(posedge clk, negedge nRST) begin
-        if(nRST == 1'b0) begin
-            count <= 0;
-            mul_start <= 0;
-        end
-        else begin
-            mul_start <= 0;
-            if(count == 14) begin      
-                count <= 0;
-            end
-            else if(count == 0) begin
-                if(active == 1'b1) begin
-                    count <= count + 1;
-                    mul_start <= 1;
-                end
-            end
-            else begin
-                count <= count + 1;
-                // mul_start <= 0;
-            end
-        end
-    end
+    // // Counter to drive multicycle multiplier
+    // logic [3:0] count;
+    // logic mul_start;
+    // logic mul_stop;
+    // always_ff @(posedge clk, negedge nRST) begin
+    //     if(nRST == 1'b0) begin
+    //         count <= 0;
+    //         mul_start <= 0;
+    //     end
+    //     else begin
+    //         mul_start <= 0;
+    //         if(count == 12) begin      
+    //             count <= 0;
+    //         end
+    //         else if(count == 0) begin
+    //             if(active == 1'b1) begin
+    //                 count <= count + 1;
+    //                 mul_start <= 1;
+    //             end
+    //         end
+    //         else begin
+    //             count <= count + 1;
+    //             // mul_start <= 0;
+    //         end
+    //     end
+    // end
 
     // assign mul_start = active & (count == 1);
     assign mul_stop = (count == 0); 
     assign mul_stall = |count;
-    logic [12:0] op1;
-    logic [12:0] op2;
-    assign op1 = {frac_leading_bit_fp1, fp1_in[9:0], 2'b00};
-    assign op2 = {frac_leading_bit_fp2, fp2_in[9:0], 2'b00};
-    mul_multicycle MUL(
+
+    logic [10:0] op1;
+    logic [10:0] op2;
+    assign op1 = {frac_leading_bit_fp1, fp1_in[9:0]};
+    assign op2 = {frac_leading_bit_fp2, fp2_in[9:0]};
+
+    mul_wallacetree wallaca (
         .clk(clk),
         .nRST(nRST),
-        .start(mul_start),
-        .stop(mul_stop),
-        .op1(op1),
-        .op2(op2),
-        .result(product),
+        .active(active),
+        .a(op1),
+        .b(op2),
+        .result(result),
         .overflow(carry_out),
         .round_loss(round_loss)
     );
+
+    // mul_multicycle MUL(
+    //     .clk(clk),
+    //     .nRST(nRST),
+    //     .start(mul_start),
+    //     .stop(mul_stop),
+    //     .op1(op1),
+    //     .op2(op2),
+    //     .result(product),
+    //     .overflow(carry_out),
+    //     .round_loss(round_loss)
+    // );
 
 endmodule  // MUL_step1

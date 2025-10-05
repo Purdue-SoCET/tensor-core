@@ -38,8 +38,10 @@ module sysarr_MAC(input logic clk, input logic nRST, systolic_array_MAC_if.MAC m
     logic [DW-1:0] input_x;
     logic [DW-1:0] nxt_input_x;
 
-    logic [DW-1:0] weight, nxt_weight;
-    assign mac_if.in_pass = mac_if.weight_en ? weight : input_x;
+    logic [DW-1:0] weight, nxt_weight, latched_weight_passon, nxt_latched_weight_passon;
+    logic next_weight_next_en;
+    assign mac_if.in_pass = mac_if.weight_next_en ? latched_weight_passon : input_x;
+    // assign mac_if.weight_next_en = mac_if.weight_en;                    // not able to get this to work latched
 
 
     // Latching MAC unit input value, to pass it on to the next 
@@ -47,19 +49,28 @@ module sysarr_MAC(input logic clk, input logic nRST, systolic_array_MAC_if.MAC m
         if(nRST == 1'b0)begin
             input_x <= '0;
             weight <= '0;
+            mac_if.weight_next_en <= 0;
+            latched_weight_passon <= 0;
         end else begin
             input_x <= nxt_input_x;
             weight <= nxt_weight;
+            mac_if.weight_next_en <= next_weight_next_en;
+            latched_weight_passon <= nxt_latched_weight_passon;
         end 
     end
     always_comb begin
         nxt_input_x = input_x;
         nxt_weight = weight;
+        nxt_latched_weight_passon = latched_weight_passon;
+        next_weight_next_en = mac_if.weight_next_en;
         if(mac_if.weight_en) begin
             nxt_weight = mac_if.in_value;
+            next_weight_next_en = 1;
+            nxt_latched_weight_passon = weight;
         end
         if (mac_if.MAC_shift)begin
             nxt_input_x = mac_if.in_value;
+            next_weight_next_en = 0;
         end
     end
 
@@ -105,14 +116,53 @@ module sysarr_MAC(input logic clk, input logic nRST, systolic_array_MAC_if.MAC m
     // assign mac_if.weight_read = weight;
     // assign mac_if.mul_result_read = mul_result_latched;
 
+    // ********************************************** Old garbage from multicycle multiplier
     // MUL takes in latched input_x from above
     // MUL_step1 is special in that contains a sequential multiplier. This means that other operations need to wait until it finishes, the MAC unit must not move to the next stage after just one clock cycle.
     // It also means that it needs an enable signal. This can be on for one or more clock cycles, I dont think it matters.
     // Since it is the very first thing in the MAC chain, i'm using mac_if.start as this enable signal.
     // The flipflop after this should hold its values, and NOT allow the start passthrough signal to advance until the the multiply finishes (mul_stall goes low)
-    logic mul_stall;
-    MUL_step1 mul1 (clk, nRST, mac_if.start, input_x, weight, mul_product_out, mul_carryout_out, mul_round_loss_s1_out, mul_stall);
+    // logic mul_stall;
+    // MUL_step1 mul1 (clk, nRST, mac_if.start, input_x, weight, mul_product_out, mul_carryout_out, mul_round_loss_s1_out, mul_stall);
     
+
+
+
+    // Logic to determine the "implilcit" leading bit of FP mantissa section prior to feeding it through multiplier
+    // If the exponent bits are zero, the implicit bit is 0, else its 1.
+    logic frac_leading_bit_fp1;
+    logic frac_leading_bit_fp2;
+    always_comb begin
+        if(input_x[14:10] == 5'b0)begin
+            frac_leading_bit_fp1 = 1'b0;
+        end
+        else begin
+            frac_leading_bit_fp1 = 1'b1;
+        end
+
+        if(weight[14:10] == 5'b0)begin
+            frac_leading_bit_fp2 = 1'b0;
+        end
+        else begin
+            frac_leading_bit_fp2 = 1'b1;
+        end
+    end
+
+    logic mul_ready, mul_stall;
+    mul_wallacetree wallaca (
+        .clk(clk),
+        .nRST(nRST),
+        .active(mac_if.start),
+        .a({frac_leading_bit_fp1, input_x[9:0]}),
+        .b({frac_leading_bit_fp2, weight[9:0]}),
+        .result(mul_product_out),
+        .overflow(mul_carryout_out),
+        .round_loss(mul_round_loss_s1_out),
+        .value_ready(mul_ready)
+    );
+    assign mul_stall = ~mul_ready;
+
+
     // latching the run signal an extra time to fix a timing issue with mul_stall and mac_if.start
     logic start_passthrough_0;
     always_ff @(posedge clk, negedge nRST) begin

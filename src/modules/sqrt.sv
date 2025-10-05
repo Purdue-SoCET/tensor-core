@@ -50,16 +50,19 @@ module sqrt (
     logic [15:0] normalized_mantissa;
     logic [3:0]  index;
     logic        is_subnormal;
+    logic        valid, valid_n;
 
     always_ff @(posedge CLK, negedge nRST) begin
         if (!nRST) begin
             sign     <= '0;
             exponent <= '0;
             mantissa <= '0;
+            valid <= '0;
         end else begin
             sign     <= sign_n;
             exponent <= exponent_n;
             mantissa <= mantissa_n;
+            valid <= valid_n;
         end
     end
 
@@ -68,6 +71,7 @@ module sqrt (
         sign_n     = input_val[15];
         exponent_n = input_val[14:10];
         mantissa_n = input_val[9:0];
+        valid_n = valid_data_in;
         
         // Determine if input is subnormal
         is_subnormal = ~|exponent;
@@ -128,17 +132,8 @@ module sqrt (
     // MULTIPLIER 1: slope * normalized_mantissa
     
     logic [15:0] mult1_product;
-    
-    sqrt_dmult1 #(
-        .LATENCY(MULT_LATENCY),
-        .PRECOMPUTED_RESULT(16'h37FE)
-    ) dmult1 (
-        .CLK(CLK),
-        .nRST(nRST),
-        .port_a(input_slope),
-        .port_b(normalized_mantissa),
-        .product(mult1_product)
-    );
+    logic mult1_done;
+    mul_fp16 mul1 (.clk(CLK), .nRST(nRST), .start(valid), .a(input_slope), .b(normalized_mantissa), .done(mult1_done));
 
     // PIPELINE STAGE: Delay intercept and odd exponent flag
     
@@ -195,16 +190,7 @@ module sqrt (
     
     logic [15:0] mult2_product;
     
-    sqrt_dmult1 #(
-        .LATENCY(MULT_LATENCY),
-        .PRECOMPUTED_RESULT(16'h3C00)
-    ) dmult2 (
-        .CLK(CLK),
-        .nRST(nRST),
-        .port_a(sqrt_sum),
-        .port_b(odd_exp_adj),
-        .product(mult2_product)
-    );
+    mul_fp16 mul2 (.clk(CLK), .nRST(nRST), .start(mult1_done), .a(sqrt_sum), .b(odd_exp_adj));
 
 
     // EXPONENT PIPELINE
@@ -265,24 +251,5 @@ module sqrt (
         end
     end
 
-
-    // VALID SIGNAL PIPELINE
-
-    
-    logic valid_pipe [0:(2*MULT_LATENCY)];
-    
-    always_ff @(posedge CLK, negedge nRST) begin
-        if (!nRST) begin
-            valid_pipe <= '{default:'0};
-        end else begin
-            valid_pipe[0] <= valid_data_in;
-            
-            for (int i = 1; i <= 2*MULT_LATENCY; i++) begin
-                valid_pipe[i] <= valid_pipe[i-1];
-            end
-        end
-    end
-    
-    assign valid_data_out = valid_pipe[2 * MULT_LATENCY];
 
 endmodule
