@@ -1,6 +1,6 @@
 `timescale 1 ns / 1 ns
 module sqrt_tb;
-    localparam MULT_LATENCY = 3;
+    localparam MULT_LATENCY = 2;
     localparam TOTAL_LATENCY = 2*MULT_LATENCY + 1; // include first register stage
 
     // Signals
@@ -24,7 +24,7 @@ module sqrt_tb;
     initial CLK = 0;
     always #5 CLK = ~CLK;
 
-    logic [15:0] special_cases [0:7];
+    logic [15:0] normal_cases [0:9];
     initial begin
         nRST = 0;
         input_val = 16'h0000;
@@ -32,18 +32,20 @@ module sqrt_tb;
 
         #12 nRST = 1;
 
-        special_cases[0] = 16'h0000; // +0
-        special_cases[1] = 16'h8000; // -0
-        special_cases[2] = 16'h7C00; // +inf
-        special_cases[3] = 16'hFC00; // -inf
-        special_cases[4] = 16'h7E00; // NaN
-        special_cases[5] = 16'hFE00; // another NaN
-        special_cases[6] = 16'hBC00; // negative normal
-        special_cases[7] = 16'hB800; // negative subnormal
+        normal_cases[0] = 16'h3C00; // 1.0
+        normal_cases[1] = 16'h4000; // 2.0
+        normal_cases[2] = 16'h4200; // 3.0
+        normal_cases[3] = 16'h4400; // 4.0
+        normal_cases[4] = 16'h4900; // 9.0
+        normal_cases[5] = 16'h4E00; // 16.0
+        normal_cases[6] = 16'h3800; // 0.5
+        normal_cases[7] = 16'h3400; // 0.25
+        normal_cases[8] = 16'h5640; // 100.0
+        normal_cases[9] = 16'h3A00; // 0.625
 
-        for (int i = 0; i < 8; i++) begin
+        for (int i = 0; i < 10; i++) begin
             @(posedge CLK);
-            input_val = special_cases[i];
+            input_val = normal_cases[i];
             valid_data_in = 1;
 
             @(posedge CLK);

@@ -37,7 +37,7 @@ module sqrt (
         16'h3711, 16'h3758, 16'h379D, 16'h37DF
     };
 
-    localparam MULT_LATENCY = 3;
+    localparam MULT_LATENCY = 2;
 
     // STAGE 1: INPUT DECOMPOSITION AND TABLE LOOKUP
     
@@ -133,7 +133,7 @@ module sqrt (
     
     logic [15:0] mult1_product;
     logic mult1_done;
-    mul_fp16 mul1 (.clk(CLK), .nRST(nRST), .start(valid), .a(input_slope), .b(normalized_mantissa), .done(mult1_done));
+    mul_fp16 mul1 (.clk(CLK), .nRST(nRST), .start(valid), .a(input_slope), .b(normalized_mantissa), .done(mult1_done), .result(mult1_product));
 
     // PIPELINE STAGE: Delay intercept and odd exponent flag
     
@@ -190,7 +190,7 @@ module sqrt (
     
     logic [15:0] mult2_product;
     
-    mul_fp16 mul2 (.clk(CLK), .nRST(nRST), .start(mult1_done), .a(sqrt_sum), .b(odd_exp_adj));
+    mul_fp16 mul2 (.clk(CLK), .nRST(nRST), .start(mult1_done), .a(sqrt_sum), .b(odd_exp_adj), .done(valid_data_out), .result(mult2_product));
 
 
     // EXPONENT PIPELINE

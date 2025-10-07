@@ -68,7 +68,7 @@ module system (
 
 
 
-  // // interfaces
+  // // interfacessssssss
   // cpu_ram_if                            prif ();
 
   // // scheduler core processor
