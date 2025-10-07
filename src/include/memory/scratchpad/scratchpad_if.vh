@@ -1,256 +1,378 @@
 /*
-  Akshath Raghav Ravikiran
-  araviki@purdue.edu
+    Unified scratchpad interface (V4)
+    
+    Interfaces are defined as arrays. 
+    Module instances can be parameterised with an `idx` value and slice the appropriate
+    element of each array internally.  
 
-  Scratchpad Interface V3
+    Author: Akshath Raghav Ravikiran
 */
 
 `ifndef SCPAD_IF_VH
 `define SCPAD_IF_VH
 
 interface scpad_if;
-    import scpad_types_pkg::*;
+    import spad_types_pkg::*;
 
-    ////////////////////////////////////////////////////////////////////////////
-
-    // Refer to `scpad_types_pkg.vh` for the parameters. 
-    // Below, we go through the typical workflow of Scratchpad Operations. 
-
-    ////////////////////////////////////////////////////////////////////////////
-
-    typedef enum logic [1:0] {
-        FRONTEND_VC_REQ = 2'b00, 
-        FRONTEND_SA_REQ = 2'b01, 
-        BACKEND_REQ = 2'b10, 
-    } sram_interaction_id_t;
-
-    ////////////////////////////////////////////////////////////////////////////
-    ////////////////////////////// Crossbar + SRAM Banks //////////////////////
-    ///////////////////////////////////////////////////////////////////////////
-
-    // We have one set of structs defining a request from the Frontend and Backend POV
-    // We have another set of structs defining the way the requests are ARB and propogated through xbar
-    // We have one final set of structs defining only the required ports to go into the SRAM banks
-
-    // Most of this looks overengineered, but will very easily simplify during synthesis. 
-
+    // ----------------------------------------------------------------------
+    // Struct Definitions
+    // ----------------------------------------------------------------------
+    // Crossbar descriptors
     typedef struct packed {
-        slot_mask   slot_mask;
-        shift_mask  shift_mask;
-        enable_mask  valid_mask;
+        slot_mask_t   slot_mask;
+        shift_mask_t  shift_mask;
+        enable_mask_t valid_mask;
     } xbar_desc_t;
 
+    // FE/BE request/response structures
     typedef struct packed {
-        sram_interaction_id_t int_id; 
-        logic valid;
-        xbar_desc_t xbar_desc; 
-        logic [SCPAD_ID_WIDTH-1:0] scpad_id; // which scpad to read from
-    } sram_r_req_t;
+        logic [SCPAD_ADDR_WIDTH-1:0] addr;
+        logic [MAX_DIM_WIDTH-1:0] num_rows;
+        logic [MAX_DIM_WIDTH-1:0] num_cols;
+        logic [MAX_DIM_WIDTH-1:0] row_id;
+        logic [MAX_DIM_WIDTH-1:0] col_id;
+        logic row_or_col;
+        xbar_desc_t xbar;
+    } rd_req_t;
 
     typedef struct packed {
-        sram_interaction_id_t int_id; 
-        logic valid;
-        scpad_data rdata;
-    } sram_r_res_t;
+        logic  complete;
+        scpad_data_t rdata;
+    } rd_res_t;
 
     typedef struct packed {
-        sram_interaction_id_t int_id; 
-        logic valid;
-        xbar_desc_t xbar_desc; 
-        scpad_data wdata;
-        logic [SCPAD_ID_WIDTH-1:0] scpad_id; // which scpad to write to
-    } sram_w_req_t;
+        logic [SCPAD_ADDR_WIDTH-1:0] addr;
+        logic [MAX_DIM_WIDTH-1:0] num_rows;
+        logic [MAX_DIM_WIDTH-1:0] num_cols;
+        logic [MAX_DIM_WIDTH-1:0] row_id;
+        logic [MAX_DIM_WIDTH-1:0] col_id;
+        logic row_or_col;
+        xbar_desc_t xbar;
+        scpad_data_twdata;
+    } wr_req_t;
 
     typedef struct packed {
-        sram_interaction_id_t int_id; 
-        logic valid;
-    } sram_w_res_t;
+        logic complete;
+    } wr_res_t;
 
+    // Router BE>FE selected requests/responses
     typedef struct packed {
-        logic  valid;
-        sram_interaction_id_t int_id;
-        logic [NUM_COLS-1:0]  mask;    
-    } inflight_tag_t;
-
-    typedef struct packed {
-        logic valid;
-        slot_mask  slot_mask;
-        enable_mask valid_mask;
+        src_t        src;
+        xbar_desc_t  xbar;
         scpad_data_t wdata;
+    } sel_wr_req_t;
+
+    typedef struct packed {
+        src_t src;
+    } sel_wr_res_t;
+
+    typedef struct packed {
+        src_t      src;
+        xbar_desc_t xbar;
+    } sel_rd_req_t;
+
+    typedef struct packed {
+        src_t        src;
+        scpad_data_t rdata;
+    } sel_rd_res_t;
+
+    // Crossbar side structs
+    typedef struct packed {
+        logic   valid;
+        enable_mask_t valid_mask;
+        slot_mask_t   slot_mask;
+        scpad_data_t  wdata;
     } xbar_sram_w_t;
 
-    // Backpressure. 
-    logic sram_busy; 
+    typedef struct packed {
+        logic   valid;
+        enable_mask_t valid_mask;
+        shift_mask_t  shift_mask;
+        scpad_data_t  rdata;
+    } sram_xbar_r_t;
 
-    // Read goes directly to the SRAM Control which ARBs. 
-    sram_r_req_t vc_sram_r_banks_req, sa_sram_r_banks_req, backend_sram_r_banks_req, sram_read_req;
-    sram_r_res_t vc_sram_r_banks_res, sa_sram_r_banks_res, backend_sram_r_banks_res, sram_read_res; 
-
-    // Writes get ARBs before they go into the Write Crossbar. 
-    sram_w_req_t vc_sram_w_banks_req, sa_sram_w_banks_req, backend_sram_w_banks_req, sram_write_req; 
-    sram_w_res_t vc_sram_w_banks_res, sa_sram_w_banks_res, backend_sram_w_banks_res, sram_write_res; 
-
-    // Then, we directly MUX out at the same done cycle. 
-    xbar_sram_w_t xbar_sram_w; // write_crossbar -> sram
-    sram_xbar_r_t sram_xbar_r; 
-
-    ////////////////////////////////////////////////////////////////////////////
-    /////////////////////// Frontend Internal + External //////////////////////
-    ///////////////////////////////////////////////////////////////////////////
-
-    typedef struct packed { 
-        logic valid; 
-        logic write; // if valid and !write -> then its a read
-        logic [SCPAD_ADDR_WIDTH-1:0] addr; // starting address of the tile
-        logic [MAX_DIM_WIDTH-1:0] num_rows, num_cols; // purely for sysarray.ld -> loading an entire tile/kernel into the SA
-        logic [MAX_DIM_WIDTH-1:0] row_id, col_id; // used by VC and SA -> tells us which row or which tile
-        logic row_or_col; // 0 to load a row, 1 to load a col | set by VC or SA
-        logic [SCPAD_ID_WIDTH-1:0] scpad_id; // which scpad to load from
-        scpad_data wdata; 
-    } frontend_req_t; 
+    // SRAM Cntrl. <=> Scratchpad
+    typedef struct packed {
+        logic   valid;
+        src_t         src;
+        xbar_sram_w_t swz;
+    } sram_w_port_req_t;
 
     typedef struct packed {
         logic valid;
-        logic complete;
-        scpad_data rdata;
-    } frontend_res_t;
+        src_t src;
+    } sram_w_port_res_t;
 
-    frontend_req_t tca_frontend_req, vc_frontend_req;
-    frontend_res_t frontend_tca_res, frontend_vc_res;
-    scpad_data_t frontend_xbar_data, xbar_frontend_data; // post-MUX
+    typedef struct packed {
+        logic valid;
+        src_t       src;
+        xbar_desc_t xbar;
+    } sram_r_port_req_t;
 
-    ////////////////////////////////////////////////////////////////////////////
-    /////////////////////// Backend Internal + External //////////////////////
-    ///////////////////////////////////////////////////////////////////////////
+    typedef struct packed {
+        logic   valid;
+        src_t         src;
+        sram_xbar_r_t bank;
+    } sram_r_port_res_t;
 
-    typedef struct packed { 
-        logic valid; 
-        logic write; 
-        logic [SCPAD_ADDR_WIDTH-1:0] addr; // always the BASE row, basically an identifier
-        logic [MAX_DIM_WIDTH-1:0] num_rows, num_cols; // purely for sysarray.ld -> loading an entire tile/kernel into the SA
-        logic [SCPAD_ID_WIDTH-1:0] scpad_id; // which scpad to load to
-    } scheduler_req_t; 
-
-    typedef struct packed { 
-        logic valid; 
-        logic complete; 
-    } scheduler_res_t;
-
-    scheduler_req_t scheduler_backend_req;
-    scheduler_res_t backend_scheduler_res;
-
-    typedef struct packed { 
-        logic valid; 
-        logic write; 
-        logic [DRAM_ADDR_WIDTH-1:0] dram_addr; 
-        logic [COL_IDX_WIDTH-1:0] num_bytes; 
-        scpad_data wdata; 
+    // DRAM Cntrl. <=> Backend
+    typedef struct packed {
+        logicwrite;
+        logic [DRAM_ID_WIDTH-1:0]   id;
+        logic [DRAM_ADDR_WIDTH-1:0] dram_addr;
+        logic [COL_IDX_WIDTH-1:0]   num_bytes;
+        scpad_data_t                wdata;
     } dram_req_t;
 
-    typedef struct packed { 
-        logic valid; 
-        logic complete; 
-        scpad_data rdata; 
+    typedef struct packed {
+        logic complete;
+        logic [DRAM_ID_WIDTH-1:0] id;
+        scpad_data_t              rdata;
     } dram_res_t;
 
-    dram_req_t backend_dram_req;
-    dram_res_t dram_backend_res;
+    // Scheduler FU <=> Backend
+    typedef struct packed {
+        logic write;
+        logic [SCPAD_ADDR_WIDTH-1:0] spad_addr;
+        logic [MAX_DIM_WIDTH-1:0] num_rows;
+        logic [MAX_DIM_WIDTH-1:0] num_cols;
+        logic [MAX_DIM_WIDTH-1:0] row_id;
+        logic [MAX_DIM_WIDTH-1:0] col_id;
+        logic row_or_col;
+        logic [SCPAD_ID_WIDTH-1:0]   scpad_id;
+    } sched_req_t;
 
+    typedef struct packed {
+        logic accepted;
+    } sched_rsp_t;
 
-    ////////////////////////////////////////////////////////////////////////////
-    /////////////////// External Modports to other Teams //////////////////////
-    ///////////////////////////////////////////////////////////////////////////
+    // ----------------------------------------------------------------------
+    // Wires
+    // ----------------------------------------------------------------------
 
-    // Scheduler: @JayShah
-    // DRAM: @AryanKadakia, @TriThan
-    // TCA: @SaandiyaM, @Nikhil 
-    // VC: @JosephG, @ChaseJ
-    modport top ( 
-        input  tca_frontend_req, vc_frontend_req, scheduler_backend_req, dram_backend_res,
-        output frontend_tca_res,  frontend_vc_res,  backend_scheduler_res, backend_dram_req
+    // Backend <=> DRAM Cntrl.
+    logicbe_dram_req_valid;
+    logicbe_dram_req_ready;
+    dram_req_t be_dram_req;
+    logicdram_be_res_valid;
+    logicdram_be_res_ready;
+    dram_res_t dram_be_res;
+
+    // Scheduler <=> Backend 
+    logic sched_req_valid [NUM_SCHED];
+    logic sched_req_ready [NUM_SCHED];
+    sched_req_t sched_req [NUM_SCHED];
+    logic sched_rsp_valid [NUM_SCHED];
+    sched_rsp_t sched_rsp [NUM_SCHED];
+
+    // Frontend <=> Scratchpad channels
+    // Read channels
+    logic  fe_rd_req_valid [NUM_SCPADS];
+    logic  fe_rd_req_ready [NUM_SCPADS];
+    rd_req_t  fe_rd_req       [NUM_SCPADS];
+    logic  fe_rd_res_valid [NUM_SCPADS];
+    logic  fe_rd_res_ready [NUM_SCPADS];
+    rd_res_t  fe_rd_res  [NUM_SCPADS];
+    // Write channels
+    logic  fe_wr_req_valid [NUM_SCPADS];
+    logic  fe_wr_req_ready [NUM_SCPADS];
+    wr_req_t  fe_wr_req       [NUM_SCPADS];
+    logic  fe_wr_res_valid [NUM_SCPADS];
+    logic  fe_wr_res_ready [NUM_SCPADS];
+    wr_res_t  fe_wr_res  [NUM_SCPADS];
+
+    // Backend <=>Scratchpad channels (arrays indexed by scratchpad)
+    logic  be_rd_req_valid [NUM_SCPADS];
+    logic  be_rd_req_ready [NUM_SCPADS];
+    rd_req_t  be_rd_req       [NUM_SCPADS];
+    logic  be_rd_res_valid [NUM_SCPADS];
+    logic  be_rd_res_ready [NUM_SCPADS];
+    rd_res_t  be_rd_res  [NUM_SCPADS];
+    logic  be_wr_req_valid [NUM_SCPADS];
+    logic  be_wr_req_ready [NUM_SCPADS];
+    wr_req_t  be_wr_req       [NUM_SCPADS];
+    logic  be_wr_res_valid [NUM_SCPADS];
+    logic  be_wr_res_ready [NUM_SCPADS];
+    wr_res_t  be_wr_res  [NUM_SCPADS];
+
+    // Router <=>Scratchpad (per scratchpad arrays)
+    // Head selections
+    logic  spad_wr_sel_valid [NUM_SCPADS];
+    logic  spad_wr_sel_ready [NUM_SCPADS];
+    sel_wr_req_t spad_wr_sel_req   [NUM_SCPADS];
+    logic  spad_rd_sel_valid [NUM_SCPADS];
+    logic  spad_rd_sel_ready [NUM_SCPADS];
+    sel_rd_req_t spad_rd_sel_req   [NUM_SCPADS];
+
+    // Write path: input to W‑XBAR and output to SRAM
+    logic   w_in_valid   [NUM_SCPADS];
+    logic   w_in_ready   [NUM_SCPADS];
+    xbar_desc_t   w_in_desc    [NUM_SCPADS];
+    scpad_data_t  w_in_wdata   [NUM_SCPADS];
+    xbar_sram_w_t w_to_sram    [NUM_SCPADS];
+    sram_w_port_req_t spad_w_port_req [NUM_SCPADS];
+    sram_w_port_res_t spad_w_port_res [NUM_SCPADS];
+
+    // Read path: requests to SRAM and data from R‑XBAR
+    sram_r_port_req_t spad_r_port_req [NUM_SCPADS];
+    sram_r_port_res_t spad_r_port_res [NUM_SCPADS];
+    logic  r_out_valid  [NUM_SCPADS];
+    logic  r_out_ready  [NUM_SCPADS];
+    sel_rd_res_t    r_out        [NUM_SCPADS];
+
+    // Tail responses (per scratchpad)
+    logic   spad_wr_resp_valid [NUM_SCPADS];
+    logic   spad_wr_resp_ready [NUM_SCPADS];
+    sel_wr_res_t  spad_wr_resp       [NUM_SCPADS];
+    logic   spad_rd_resp_valid [NUM_SCPADS];
+    logic   spad_rd_resp_ready [NUM_SCPADS];
+    sel_rd_res_t  spad_rd_resp       [NUM_SCPADS];
+
+    // ----------------------------------------------------------------------
+    // Modport definitions
+    // ----------------------------------------------------------------------
+
+    // Scheduler <=> Backend
+    modport sched_backend (
+        output sched_req_valid, sched_req,
+        input  sched_req_ready,
+        input  sched_rsp_valid, sched_rsp
     );
 
-    modport dram ( // @AryanKadakia, @TriThan
-        output dram_backend_res, 
-        input backend_dram_req
-    ); 
-
-    modport tca ( //  @SaandiyaM, @Nikhil 
-        output tca_frontend_req, 
-        input frontend_tca_res
+    modport backend_sched (
+        input  sched_req_valid, sched_req,
+        output sched_req_ready,
+        output sched_rsp_valid, sched_rsp
     );
 
-
-    modport vc ( //  @JosephG, @ChaseJ
-        output vc_frontend_req, 
-        input frontend_vc_res
-    );
-
-    modport scheduler_fu ( // @JayShah
-        output scheduler_backend_req
-        input  backend_scheduler_res
-    );
-
-    ////////////////////////////////////////////////////////////////////////////
-    ////////////////////////////// Internal Modports //////////////////////////
-    ///////////////////////////////////////////////////////////////////////////
-
+    // Backend <=> Scratchpads
     modport backend (
-        input sram_busy,
-
-        input scheduler_backend_req,
-        output backend_scheduler_res, 
-
-        input  backend_sram_r_banks_res, backend_sram_w_banks_res,
-        output backend_sram_r_banks_req, backend_sram_w_banks_req, 
-
-        input  dram_backend_res,
-        output backend_dram_req,
+        output be_rd_req_valid, be_rd_req, be_rd_res_ready,
+        input  be_rd_req_ready, be_rd_res_valid, be_rd_res,
+        output be_wr_req_valid, be_wr_req, be_wr_res_ready,
+        input  be_wr_req_ready, be_wr_res_valid, be_wr_res
     );
 
+    // Backend <=> DRAM
+    modport backend_dram (
+        output be_dram_req_valid, be_dram_req,
+        input  be_dram_req_ready,
+        input  dram_be_res_valid, dram_be_res,
+        output dram_be_res_ready
+    );
+
+    modport dram (
+        input  be_dram_req_valid, be_dram_req,
+        output be_dram_req_ready,
+        output dram_be_res_valid, dram_be_res,
+        input  dram_be_res_ready
+    );
+
+    // Frontend <=> Scratchpads 
     modport frontend (
-        input sram_busy,
-
-        input tca_read_complete, vc_read_complete, 
-        output frontend_ready, 
-
-        input tca_frontend_req, vc_frontend_req, 
-        output frontend_tca_res, frontend_vc_res, 
-
-        input frontend_sram_read_res, frontend_sram_write_res
-        output frontend_sram_read_req, frontend_sram_write_req
+        output fe_rd_req_valid, fe_rd_req, fe_rd_res_ready,
+        input  fe_rd_req_ready, fe_rd_res_valid, fe_rd_res,
+        output fe_wr_req_valid, fe_wr_req, fe_wr_res_ready,
+        input  fe_wr_req_ready, fe_wr_res_valid, fe_wr_res
     );
 
-    modport frontend_vc (
-        input vc_frontend_req,
-        output frontend_vc_res,
-
-        input  vc_sram_r_banks_res, vc_sram_w_banks_res,
-        output vc_sram_r_banks_req, vc_sram_w_banks_req
+    // Head (Req MUX with BE>FE priority) per scratchpad
+    modport spad_head (
+        // Inputs: FE and BE requests/responses arrays
+        input  fe_rd_req_valid, fe_rd_req, fe_rd_res_ready,
+               fe_wr_req_valid, fe_wr_req, fe_wr_res_ready,
+               be_rd_req_valid, be_rd_req, be_rd_res_ready,
+               be_wr_req_valid, be_wr_req, be_wr_res_ready,
+        // Outputs: ready signals back to FE and BE
+        output fe_rd_req_ready, fe_wr_req_ready,
+               be_rd_req_ready, be_wr_req_ready,
+        // Selected outputs toward the path
+        output spad_wr_sel_valid, spad_wr_sel_req,
+               spad_rd_sel_valid, spad_rd_sel_req,
+        input  spad_wr_sel_ready, spad_rd_sel_ready
     );
 
-    modport frontend_sa (
-        input sa_frontend_req,
-        output frontend_sa_res,
-
-        input  sa_sram_r_banks_res, sa_sram_w_banks_res,
-        output sa_sram_r_banks_req, sa_sram_w_banks_req
+    // Tail (Resp Arb/Demux back to FE/BE) per scratchpad
+    modport spad_tail (
+        // Inputs from SRAM write ack and R‑XBAR 
+        input  spad_wr_resp_valid, spad_wr_resp,
+               spad_rd_resp_valid, spad_rd_resp,
+        output spad_wr_resp_ready, spad_rd_resp_ready,
+        // Outputs to FE and BE
+        output fe_wr_res_valid, fe_wr_res,
+               fe_rd_res_valid, fe_rd_res,
+               be_wr_res_valid, be_wr_res,
+               be_rd_res_valid, be_rd_res,
+        input  fe_wr_res_ready, fe_rd_res_ready,
+               be_wr_res_ready, be_rd_res_ready
     );
 
-    modport read_xbar (
-        input  vc_sram_r_banks_req, sa_sram_r_banks_req, backend_sram_r_banks_req, sram_xbar_r, 
-        output vc_sram_r_banks_res, sa_sram_r_banks_res, backend_sram_r_banks_res, xbar_sram_r
+    // Write crossbars 
+    modport xbar_w (
+        input  w_in_valid, w_in_desc, w_in_wdata,
+        output w_in_ready,
+        output w_to_sram
     );
 
-    modport write_xbar (
-        input  vc_sram_w_banks_req, sa_sram_w_banks_req, backend_sram_w_banks_req,
-        output xbar_sram_w
+    // Read crossbars 
+    modport xbar_r (
+        input  spad_r_port_res,
+        output r_out_valid, r_out,
+        input  r_out_ready
     );
 
+    // SRAM Controller
     modport sram_ctrl (
-        input sram_read_req, sram_write_req,
-        output sram_read_res, sram_write_res 
+        input  spad_w_port_req, spad_r_port_req,
+        output spad_w_port_res, spad_r_port_res
+    );
+
+    // Path glue between Head ↔ XBARs ↔ SRAM ctrl ↔ XBARs ↔ Tail
+    modport spad_path (
+        // Head-selected requests
+        input  spad_wr_sel_valid, spad_wr_sel_req,
+               spad_rd_sel_valid, spad_rd_sel_req,
+        output spad_wr_sel_ready, spad_rd_sel_ready,
+        // W-XBAR
+        output w_in_valid, w_in_desc, w_in_wdata,
+        input  w_in_ready, w_to_sram,
+        // To/From SRAM controller
+        output spad_w_port_req, spad_r_port_req,
+        input  spad_w_port_res, spad_r_port_res,
+        // R-XBAR
+        input  r_out_valid, r_out,
+        output r_out_ready,
+        // To Tail
+        output spad_wr_resp_valid, spad_wr_resp,
+               spad_rd_resp_valid, spad_rd_resp,
+        input  spad_wr_resp_ready, spad_rd_resp_ready
+    );
+
+    // ----------------------------------------------------------------------
+    // Top-level modport
+    // ----------------------------------------------------------------------
+    modport top (
+        // Scheduler ↔ Backend
+        output sched_req_valid, sched_req,
+        input  sched_req_ready,
+        input  sched_rsp_valid, sched_rsp,
+        // Backend ↔ DRAM
+        output be_dram_req_valid, be_dram_req,
+        input  be_dram_req_ready,
+        input  dram_be_res_valid, dram_be_res,
+        output dram_be_res_ready,
+        // Frontend ↔ Scratchpad
+        output fe_rd_req_valid, fe_rd_req, fe_rd_res_ready,
+        input  fe_rd_req_ready, fe_rd_res_valid, fe_rd_res,
+        output fe_wr_req_valid, fe_wr_req, fe_wr_res_ready,
+        input  fe_wr_req_ready, fe_wr_res_valid, fe_wr_res,
+        // Backend ↔ Scratchpad
+        output be_rd_req_valid, be_rd_req, be_rd_res_ready,
+        input  be_rd_req_ready, be_rd_res_valid, be_rd_res,
+        output be_wr_req_valid, be_wr_req, be_wr_res_ready,
+        input  be_wr_req_ready, be_wr_res_valid, be_wr_res
     );
 
 endinterface
-`endif
+
+`endif 
