@@ -41,6 +41,7 @@ interface gsau_if;
     logic [7:0]   nvdst;         // next destination reg
     logic         nsvalid;       // next scoreboard valid
     logic         weight;        // 1 bit signal for weight indication
+    logic         nweight;       // latched weight
 
     // WB BUFFER
     // From GSAU to WB Buffer
