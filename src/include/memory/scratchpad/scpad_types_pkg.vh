@@ -49,7 +49,8 @@ package spad_types_pkg;
     endfunction
 
     // Not editable. Keep at 2. Hardcoded Logic. 
-    localparam NUM_SCPADS = 2; 
+    localparam int NUM_SCPADS = 2; 
+    localparam int NUM_SCHED = 2; 
     localparam int SCPAD_ID_WIDTH = $clog2(NUM_SCPADS);
 
     localparam int DRAM_ID_WIDTH = 6; 
