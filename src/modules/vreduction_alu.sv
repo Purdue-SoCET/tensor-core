@@ -19,6 +19,7 @@ vaddsub adder (CLK, nRST, as_if);
 always_comb begin
     as_if.port_a = vraluif.value_a;
     as_if.port_b = vraluif.value_b;
+    as_if.enable = 'b1;
 end
 
 //output logic
