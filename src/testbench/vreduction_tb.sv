@@ -54,16 +54,13 @@ module vreduction_tb;
             vruif.vector_input[i] = 16'hAAAA;
         end
         
-        #20;
+        @(posedge CLK);
+        @(posedge CLK);
         nRST = 1;
-        #10;
+        @(posedge CLK);
 
-        // =========================================================
         // Test 1: BROADCAST - all elements should get reduction result
-        // =========================================================
-        $display("\n========================================");
         $display("Test 1: BROADCAST MODE");
-        $display("========================================");
         $display("Expected: All 32 elements = reduction result (max of lane_input)");
         
         vruif.broadcast = 1;
@@ -77,12 +74,7 @@ module vreduction_tb;
         @(posedge CLK);
         display_vector();
 
-        // =========================================================
-        // Test 2: PARTIAL WRITE (no clear) - only index 5 should change
-        // =========================================================
-        $display("\n========================================");
         $display("Test 2: PARTIAL WRITE (imm=5, no clear)");
-        $display("========================================");
         $display("Expected: Index 5 = reduction result, others = previous output (from Test 1)");
         
         // Keep vector_input as-is (will read from vector_output in RTL)
@@ -97,12 +89,7 @@ module vreduction_tb;
         @(posedge CLK);
         display_vector();
 
-        // =========================================================
-        // Test 3: PARTIAL WRITE with CLEAR - only index 7 should have value
-        // =========================================================
-        $display("\n========================================");
         $display("Test 3: PARTIAL WRITE (imm=7, with clear)");
-        $display("========================================");
         $display("Expected: Index 7 = reduction result, all others = 0x0000");
         
         vruif.broadcast = 0;
@@ -116,12 +103,7 @@ module vreduction_tb;
         @(posedge CLK);
         display_vector();
 
-        // =========================================================
-        // Test 4: Another PARTIAL WRITE (no clear) to verify retention
-        // =========================================================
-        $display("\n========================================");
         $display("Test 4: PARTIAL WRITE (imm=10, no clear)");
-        $display("========================================");
         $display("Expected: Index 10 = reduction result, index 7 still has old value, others = 0");
         
         vruif.broadcast = 0;
@@ -135,10 +117,7 @@ module vreduction_tb;
         @(posedge CLK);
         display_vector();
 
-        #50;
-        $display("\n========================================");
-        $display("All tests completed.");
-        $display("========================================");
+        @(posedge CLK)
         $finish;
     end
 
