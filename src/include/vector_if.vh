@@ -8,6 +8,7 @@ interface vector_if;
   import vector_pkg::*;
 
   // Top level signals
+  logic CLK, nRST;
   /*
   logic CLK, nRST;
   control_t control;
@@ -28,11 +29,11 @@ interface vector_if;
 
   // VALU Signals GOING TO DELETE
   vreg_t vdat1, vdat2, result;
-
+  */
   // VEGGIE SIGNALS
   veggie_in_t veggie_in; 
   veggie_out_t veggie_out;
-
+/*
   // Lane Signals 
   lane_in_t lane_in;
   lane_out_t lane_out;
@@ -50,12 +51,14 @@ interface vector_if;
     input vdat1, vdat2, vop, vmask,
     output result
   );
+  */
   // Veggie
   modport veggie (
     input logic CLK, nRST, 
     input veggie_in,
     output veggie_out
   );
+  /*
   // Lane
   modport lane (
     input logic CLK, nRST,

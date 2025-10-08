@@ -18,6 +18,14 @@ package vector_pkg;
     parameter ESZ = 16; // Element Size
     parameter ESZ_W = $clog2(ESZ);
 
+    // VEGGIE Params
+    parameter READ_PORTS = 4;
+    parameter WRITE_PORTS = 4;
+    parameter MASK_PORTS = 2;
+    parameter NUM_MASKS = 16; // Total maskss
+    parameter MASK_BANK_COUNT=2;
+    parameter MASK_IDX = $clog2(NUM_MASKS);
+
     // Instruction Fields
     parameter OPCODE_W = 7;
     parameter VIDX_W = 8;
@@ -66,8 +74,6 @@ package vector_pkg;
     // --------------------------------------------------------------------------------
 
     // Data Structures ----------------------------------------------------------------
-   
-
     typedef struct packed {
         logic sign;
         logic [4:0] exp;
@@ -102,12 +108,14 @@ package vector_pkg;
 
     // Veggie Input Signals
     typedef struct packed {
-        vsel_t vd;
-        vsel_t vs1;
-        vsel_t vs2;
-        logic vs2_REN;
-        logic[4:0] vm; // LSB is enable, rest are offset
-        logic WEN;
+        vsel_t[WRITE_PORTS-1:0] vd;
+        vreg_t[WRITE_PORTS-1:0] vdata;
+        logic[WRITE_PORTS-1:0] WEN;
+        vsel_t[READ_PORTS-1:0] vs1;
+        logic[READ_PORTS-1] REN;
+        logic[MASK_IDX-1:0] vmd; 
+        logic[MASK_IDX-1:0] vms;
+        logic[MASK_BANK_COUNT-1:0] vm; // mask enable
     } veggie_in_t;
 
     typedef struct packed {
@@ -135,7 +143,8 @@ package vector_pkg;
 
     typedef enum logic [1:0] {
         IDLE,
-        READ
+        RW1,
+        RW2
     } conflict_state_t;
 
     typedef enum logic [1:0] {
@@ -143,7 +152,6 @@ package vector_pkg;
         RR_CONFLICT = 2'b01
     } conflict_type_t;
     // --------------------------------------------------------------------------------
-
 
     // MaskU Structs -------------------------------------------------------------------
     typedef struct packed {

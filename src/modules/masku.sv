@@ -19,13 +19,12 @@ module masku (
             vmask = '1; 
         end else begin
             for (int i = 0; i < NUM_ELEMENTS; i++) begin
-                /*if (vif.masku_in.vl <= i) begin
+                if (vif.masku_in.vl < i) begin
                     vmask[i] = 1'b0; 
                 end 
                 else begin
-                */
-                vmask[i] = logic'(vif.masku_in.vmask[i][vif.masku_in.imm]);
-                //end
+                    vmask[i] = logic'(vif.masku_in.vmask[i][vif.masku_in.imm]);
+                end
             end
         end
     end
