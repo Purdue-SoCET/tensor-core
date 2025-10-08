@@ -1,5 +1,6 @@
 `include "vector_types.vh"
 `include "vector_if.vh"
+`include "vaddsub_if.vh"
 //need to add a control signal for the subtract module to flip the sign of the second input
 module vaddsub(
     input logic CLK, 
