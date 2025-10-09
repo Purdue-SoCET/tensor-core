@@ -34,7 +34,7 @@ interface lfc_if #(parameter NUM_BANKS = 4, parameter UUID_SIZE = 4) (input logi
 
   modport ram
   (
-    input ram_mem_data, ram_mem_complete,
+    input n_rst, ram_mem_data, ram_mem_complete,
     output ram_mem_REN, ram_mem_WEN, ram_mem_addr, ram_mem_store
   );
 endinterface
