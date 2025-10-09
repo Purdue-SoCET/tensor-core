@@ -2,7 +2,8 @@ module gsau_control_unit #(
     parameter VEGGIEREGS = 256,
     parameter FIFOSIZE = 32*3*8
 ) (
-    CLK, nRST
+    input logic CLK, nRST,
+    gsau_if.gsau gsau_port
 );
 
     /*
@@ -15,8 +16,18 @@ module gsau_control_unit #(
         output              	empty, 				// FIFO is empty when high
                             	full 				// FIFO is full when high
     */
+    // ---------------------------------------------------------
+    // Internal signals for RD register queue (each entry = 768 bits)
+    // ---------------------------------------------------------
+    localparam int RD_ENTRY_WIDTH = 768;
 
-    logic wr_en, rd_en,
+    logic                       rdq_wr_en;
+    logic                       rdq_rd_en;
+    logic [RD_ENTRY_WIDTH-1:0]  rdq_din;
+    logic [RD_ENTRY_WIDTH-1:0]  rdq_dout;
+    logic                       rdq_empty;
+    logic                       rdq_full;
+    //logic wr_en, rd_en,
     logic [$clog2(VEGGIEREGS)-1:0] vdst_in, vdst_out;
     
 

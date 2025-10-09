@@ -1,25 +1,27 @@
 module sync_fifo #(parameter FIFODEPTH=8, DATAWIDTH=16) // DATAWIDTH = word size
 (
-        input               	rstn,               // Active low reset
+        input logic           rstn,               // Active low reset
                             	clk,                // Clock
                             	wr_en, 				// Write enable
                             	rd_en, 				// Read enable
-        input      [DDATAWIDTH-1:0] din, 				// Data written into FIFO
+        input logic  [DDATAWIDTH-1:0] din, 				// Data written into FIFO
         output logic [DDATAWIDTH-1:0] dout, 				// Data read from FIFO
-        output              	empty, 				// FIFO is empty when high
+        output logic          empty, 				// FIFO is empty when high
                             	full 				// FIFO is full when high
 );
 
 
   logic [$clog2(FIFODEPTH)-1:0]   wptr;
   logic [$clog2(FIFODEPTH)-1:0]   rptr;
+  logic [$clog2(FIFODEPTH):0]     count; // one extra bit to represent full==depth
 
   logic [DDATAWIDTH-1 : 0][FIFODEPTH] fifo; // *packed* array
 
-  always @(posedge clk, negedge rstn) begin
+  always @(posedge clk or negedge rstn) begin
     if (!rstn) begin
-      wptr <= 0;
-    end else begin
+      wptr <= '0;
+    end 
+    else begin
       if (wr_en & !full) begin
         fifo[wptr] <= din;
         wptr <= wptr + 1;
@@ -34,9 +36,10 @@ module sync_fifo #(parameter FIFODEPTH=8, DATAWIDTH=16) // DATAWIDTH = word size
              $time, wr_en, din, rd_en, dout, empty, full);
   end */
 
-  always @(posedge clk, negedge rstn) begin
+  always @(posedge clk or negedge rstn) begin
     if (!rstn) begin
-      rptr <= 0;
+      rptr <= '0;
+      dout  <= '0;
     end else begin
       if (rd_en & !empty) begin
         dout <= fifo[rptr];
@@ -45,6 +48,22 @@ module sync_fifo #(parameter FIFODEPTH=8, DATAWIDTH=16) // DATAWIDTH = word size
     end
   end
 
-  assign full  = (wptr + 1) == rptr;
-  assign empty = wptr == rptr;
+  // count logic (synchronous)
+  always_ff @(posedge clk or negedge rstn) begin
+    if (!rstn) begin
+      count <= '0;
+    end else begin
+      case ({wr_en & ~full, rd_en & ~empty})
+        2'b10: count <= count + 1; // write only
+        2'b01: count <= count - 1; // read only
+        default: count <= count;   // both or neither
+      endcase
+    end
+  end
+
+  assign full  = (count == FIFODEPTH);
+  assign empty = (count == 0);
+
+  // assign full  = (wptr + 1) == rptr;
+  // assign empty = wptr == rptr;
 endmodule

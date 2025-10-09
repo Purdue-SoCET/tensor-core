@@ -24,46 +24,46 @@ interface gsau_if;
 
     // VEGGIE FILE
     // From Veggie File to GSAU
-    vreg_t        vdata;         // [512 bits] vector data
-    logic         valid;         // indicates vdata valid
+    vreg_t        veg_vdata;         // [512 bits] vector data
+    logic         veg_valid;         // indicates vdata valid
 
     // From GSAU to Veggie File
-    logic         ready;        // indicates ready for value
+    logic         veg_ready;        // indicates ready for value
 
     // SCOREBOARD 
     // From GSAU to Scoreboard
-    logic         ready;         // ready to accept next instruction
-    logic [7:0]   vdst;          // destination vector register index
-    logic         svalid;        // scoreboard valid
+    logic         sb_ready;         // ready to accept next instruction
+    logic [7:0]   sb_vdst;          // destination vector register index
+    logic         sb_valid;         // scoreboard valid
 
     // From Scoreboard to GSAU
-    logic         nready;        // scoreboard ready
-    logic [7:0]   nvdst;         // next destination reg
-    logic         nsvalid;       // next scoreboard valid
-    logic         weight;        // 1 bit signal for weight indication
-    logic         nweight;       // latched weight
+    logic         sb_nready;        // scoreboard ready
+    logic [7:0]   sb_nvdst;         // next destination reg
+    logic         sb_nvalid;       // next scoreboard valid
+    logic         sb_weight;        // 1 bit signal for weight indication
+    //logic         nweight;       // latched weight
 
     // WB BUFFER
     // From GSAU to WB Buffer
-    vreg_t        psum;          // partial sum output
-    logic [7:0]   wbdst;         // destination vector register for writeback
+    vreg_t        wb_psum;          // partial sum output
+    logic [7:0]   wb_wbdst;         // destination vector register for writeback
     logic         wb_valid;      // valid signal for psum output
 
     // From WB Buffer to GSAU
-    logic         output_ready;  // WB buffer ready to accept data
+    logic         wb_output_ready;  // WB buffer ready to accept data
 
     // SYSTOLIC ARRAY 
     // To Systolic Array
-    logic [511:0] array_in;          // input data to systolic array
-    logic [511:0] array_in_partials; // partial sum inputs
-    logic         input_en;          // enable data input
-    logic         weight_en;         // enable weight load
-    logic         partial_en;        // enable partial sum load
+    logic [511:0] sa_array_in;          // input data to systolic array
+    logic [511:0] sa_array_in_partials; // partial sum inputs
+    logic         sa_input_en;          // enable data input
+    logic         sa_weight_en;         // enable weight load
+    logic         sa_partial_en;        // enable partial sum load
 
     // From Systolic Array
-    logic [511:0] array_output;      // output data
-    logic         out_en;            // output enable flag
-    logic         fifo_has_space     // to send activations
+    logic [511:0] sa_array_output;      // output data
+    logic         sa_out_en;            // output enable flag
+    logic         sa_fifo_has_space;    // to send activations
 
   ////////////////////////////////////////////////////////////////////////////
   ////////////////////////////// Modports ////////////////////////////////////
@@ -71,40 +71,47 @@ interface gsau_if;
 
     //GSAU 
     modport gsau (
-        // Inputs
-        input vdata, valid,
-            nvdst, nsvalid,
-            output_ready,
-            array_output, out_en,
-        // Outputs
-        output psum, wbdst, wb_valid,
-            ready, vdst, svalid,
-            array_in, array_in_partials,
-            input_en, weight_en, partial_en
+        // From Veggie File
+        input  veg_vdata, veg_valid,
+        output veg_ready,
+
+        // Scoreboard handshake (inputs from scoreboard)
+        input  sb_nready, sb_nvdst, sb_nvalid, sb_weight,
+
+        // From WB buffer
+        input  wb_output_ready,
+
+        // From Systolic Array
+        input  sa_array_output, sa_out_en, sa_fifo_has_space,
+
+        // Outputs from GSAU
+        output wb_psum, wb_wbdst, wb_valid,
+        output sb_ready, sb_vdst, sb_valid,
+        output sa_array_in, sa_array_in_partials, sa_input_en, sa_weight_en, sa_partial_en
     );
 
     //Veggie File
     modport veggie (
-        output vdata, valid,
-        input  nvdata, nvalid
+        output veg_vdata, veg_valid,
+        input  veg_ready
     );
 
     //Scoreboard
     modport scoreboard (
-        input  ready, vdst, svalid,
-        output nready, nvdst, nsvalid
+        input  sb_ready, sb_vdst, sb_valid,
+        output sb_nready, sb_nvdst, sb_nvalid, sb_weight
     );
 
     //WB Buffer
     modport wb_buffer (
-        input  psum, wbdst, wb_valid,
-        output output_ready
+        input  wb_psum, wb_wbdst, wb_valid,
+        output wb_output_ready
     );
 
     //Systolic Array
     modport systolic_array (
-        input array_in, array_in_partials, input_en, weight_en, partial_en,
-        output array_output, out_en, fifo_has_space
+        input  sa_array_in, sa_array_in_partials, sa_input_en, sa_weight_en, sa_partial_en,
+        output sa_array_output, sa_out_en, sa_fifo_has_space
     );
   
 endinterface
