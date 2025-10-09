@@ -8,9 +8,9 @@ module benes_network_tb;
 
     always #(PERIOD/2) CLK++;
     
-    logic [31:0] in [15:0];
+    logic [15:0] in [31:0];
     logic [143:0] control_bit;
-    logic [31:0] out [15:0];
+    logic [15:0] out [31:0];
 
     test #(.PERIOD(PERIOD)) PROG (
         .*
@@ -22,27 +22,50 @@ module benes_network_tb;
 
 endmodule
 
-program test (
+program test
+(
     input logic CLK, 
     output logic nRST,
-    output logic [31:0] in [15:0],
+    output logic [15:0] in [31:0],
     output logic [143:0] control_bit,
-    input logic [31:0] out [15:0]
+    input logic [15:0] out [31:0] 
 );
-initial begin
     parameter PERIOD = 10;
+    integer i;
+    logic [15:0] val;
+initial begin
     nRST = 0;
 
     #(PERIOD);
 
     nRST = 1;
+    val = 16'd0;
 
-    in = {16'h0, 16'h1, 16'h2, 16'h3, 16'h4, 16'h5, 16'h6, 16'h7, 16'h8, 16'h9, 16'h10, 16'h11, 16'h12, 16'h13, 16'h14, 16'h15};
-    control_bit = 144'b00110011_10101010_00011100_00000011_00000110_10100011_00000000_01011000_01000111_00111000_11001000_11000010_00011001_00011111_11110100_00001101_10110000_00001010;
+    for (i = 0; i < 32; i = i + 1) begin
+        in[i] = val;
+        val = val + 16'd1;
+    end
 
-    // perm = {23, 2, 10, 12, 3, 18, 20, 17, 5, 14, 29, 24, 0, 11, 8, 19, 25, 16, 22, 4, 30, 6, 26, 28, 27, 7, 13, 31, 9, 21, 15, 1};
+    $display("%d", in[25]);
+
+    // default (output = input)
+    // control_bit = 144'b0;
+
+    // perm = [27, 24, 2, 29, 4, 7, 20, 10, 1, 0, 8, 9, 3, 13, 16, 26, 12, 31, 17, 19, 28, 18, 23, 30, 5, 15, 6, 21, 11, 25, 22, 14]
+    control_bit = 144'b111000110101110001100100110011100111001110000000111100000001101100101011001100000000000000000000001000011001000001110110011110001011111001001100;  
     
     #(PERIOD);
+    #(PERIOD);
+    #(PERIOD);
+    #(PERIOD);
+    #(PERIOD);
+    #(PERIOD);
+    #(PERIOD);
+    #(PERIOD);
+    
+    for (i = 0; i < 32; i = i + 1) begin
+        $display("out %d: %d", i, out[i]);
+    end
     $finish;
 end
 endprogram
