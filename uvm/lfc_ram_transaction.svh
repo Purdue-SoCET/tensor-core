@@ -16,6 +16,7 @@ class lfc_ram_transaction #(parameter NUM_BANKS = 4) extends uvm_sequence_item;
 
 
     `uvm_object_utils_begin(lfc_ram_transaction)
+        `uvm_field_int(n_rst, UVM_DEFAULT)
         `uvm_field_int(ram_mem_data, UVM_DEFAULT);
         `uvm_field_int(ram_mem_complete, UVM_DEFAULT);
         `uvm_field_int(ram_mem_REN, UVM_DEFAULT);
