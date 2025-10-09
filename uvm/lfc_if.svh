@@ -2,14 +2,18 @@
 `define ADDER_IF_SVH
 
 interface lfc_if #(parameter NUM_BANKS = 4, parameter UUID_SIZE = 4) (input logic clk);
+  
+  // Reset Input for both CPU and RAM
   logic n_rst;
 
-  // CPU signals
+  // CPU Inputs
   logic mem_in;
   logic [31:0] mem_in_addr;
   logic mem_in_rw_mode; // 0 = read, 1 = write
   logic [31:0] mem_in_store_value;
   logic dp_in_halt;
+
+  // CPU Outputs
   logic [3:0] mem_out_uuid;
   logic stall;
   logic hit;
@@ -18,13 +22,15 @@ interface lfc_if #(parameter NUM_BANKS = 4, parameter UUID_SIZE = 4) (input logi
   logic [NUM_BANKS-1:0][UUID_SIZE-1:0] uuid_block;
   logic dp_out_flushed;
 
-  // RAM signals
+  // RAM Inputs
+  logic [NUM_BANKS-1:0][31:0] ram_mem_data;
+  logic [NUM_BANKS-1:0] ram_mem_complete;
+
+  // RAM Outputs
   logic [NUM_BANKS-1:0] ram_mem_REN;
   logic [NUM_BANKS-1:0] ram_mem_WEN;
   logic [NUM_BANKS-1:0][31:0] ram_mem_addr;
   logic [NUM_BANKS-1:0][31:0] ram_mem_store;
-  logic [NUM_BANKS-1:0][31:0] ram_mem_data;
-  logic [NUM_BANKS-1:0] ram_mem_complete;
 
   modport cpu
   (
