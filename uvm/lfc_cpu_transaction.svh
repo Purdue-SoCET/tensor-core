@@ -6,11 +6,13 @@ import uvm_pkg::*;
 
 class lfc_cpu_transaction #(parameter NUM_BANKS = 4, parameter UUID_SIZE = 4) extends uvm_sequence_item;
   
-  // CPU Inputs
+  // Reset Input
   logic n_rst;
+
+  // CPU Inputs
   logic mem_in;
   rand logic [31:0] mem_in_addr;
-  logic mem_in_rw_mode; // 0 = read, 1 = write
+  logic mem_in_rw_mode;
   rand logic [31:0] mem_in_store_value;
   logic dp_in_halt;
 
@@ -24,6 +26,12 @@ class lfc_cpu_transaction #(parameter NUM_BANKS = 4, parameter UUID_SIZE = 4) ex
   logic dp_out_flushed;
 
   `uvm_object_utils_begin(lfc_cpu_transaction)
+    `uvm_field_int(n_rst, UVM_DEFAULT)
+    `uvm_field_int(mem_in, UVM_DEFAULT)
+    `uvm_field_int(mem_in_addr, UVM_DEFAULT)
+    `uvm_field_int(mem_in_rw_mode, UVM_DEFAULT)
+    `uvm_field_int(mem_in_store_value, UVM_DEFAULT)
+    `uvm_field_int(dp_in_halt, UVM_DEFAULT)
     `uvm_field_int(mem_out_uuid, UVM_DEFAULT)
     `uvm_field_int(stall, UVM_DEFAULT)
     `uvm_field_int(hit, UVM_DEFAULT)
