@@ -5,7 +5,8 @@ module command_FSM (
     input logic CLK,
     input logic nRST,
     command_fsm_if.cmd_fsm mycmd,
-    row_open_if.cmd_fsm polif
+    row_open_if.cmd_fsm polif,
+    timing_signals_if.cmd_fsm timif
 );
     import dram_pkg::*;
     localparam logic [1:0] IDLE_R = 2'b00;
@@ -48,13 +49,13 @@ module command_FSM (
             end
 
             REFRESHING: begin
-                if (mycmd.tREF_done) begin
+                if (timif.tREF_done) begin
                     mycmd.ncmd_state = IDLE;     
                 end
             end
 
             IDLE: begin
-                if (mycmd.rf_req) mycmd.ncmd_state = REFRESH;
+                if (timif.rf_req) mycmd.ncmd_state = REFRESH;
                 else if (mycmd.dWEN || mycmd.dREN) begin
                     if (polif.row_stat == HIT) mycmd.ncmd_state = mycmd.dWEN ? WRITE : READ;
                     else if(polif.row_stat == CONFLICT) mycmd.ncmd_state = PRECHARGE;
@@ -63,28 +64,28 @@ module command_FSM (
             end
 
             ACTIVATE: begin
-                if (mycmd.rf_req) begin mycmd.ncmd_state = REFRESH;end
+                if (timif.rf_req) begin mycmd.ncmd_state = REFRESH;end
                 else begin mycmd.ncmd_state = ACTIVATING; end
             end
 
             ACTIVATING: begin
-                if (mycmd.tACT_done) begin
-                    mycmd.ncmd_state = mycmd.rf_req ? PRECHARGE : mycmd.dWEN ? WRITE : READ;
+                if (timif.tACT_done) begin
+                    mycmd.ncmd_state = timif.rf_req ? PRECHARGE : mycmd.dWEN ? WRITE : READ;
                 end
             end
 
-            WRITE: begin mycmd.ncmd_state = mycmd.rf_req ? PRECHARGE : WRITING; end
-            READ : begin mycmd.ncmd_state = mycmd.rf_req ? PRECHARGE : READING; end
+            WRITE: begin mycmd.ncmd_state = timif.rf_req ? PRECHARGE : WRITING; end
+            READ : begin mycmd.ncmd_state = timif.rf_req ? PRECHARGE : READING; end
             
             WRITING: begin
-                if (mycmd.tWR_done) begin
+                if (timif.tWR_done) begin
                     nram_wait = 1'b0;
-                    if (mycmd.rf_req) begin mycmd.ncmd_state = PRECHARGE; end
-                    else if (mycmd.dWEN || mycmd.dREN) begin
-                        if (polif.row_stat == HIT) mycmd.ncmd_state = mycmd.dWEN ? WRITE : READ;
-                        else if(polif.row_stat == CONFLICT) mycmd.ncmd_state = PRECHARGE;
-                        else if (polif.row_stat == MISS) mycmd.ncmd_state = ACTIVATE;
-                    end 
+                    if (timif.rf_req) begin mycmd.ncmd_state = PRECHARGE; end
+                    // else if (mycmd.dWEN || mycmd.dREN) begin
+                    //     if (polif.row_stat == HIT) mycmd.ncmd_state = mycmd.dWEN ? WRITE : READ;
+                    //     else if(polif.row_stat == CONFLICT) mycmd.ncmd_state = PRECHARGE;
+                    //     else if (polif.row_stat == MISS) mycmd.ncmd_state = ACTIVATE;
+                    // end 
                     else begin
                         mycmd.ncmd_state = IDLE;
                     end 
@@ -92,14 +93,14 @@ module command_FSM (
             end
 
             READING: begin
-                if (mycmd.tRD_done) begin
+                if (timif.tRD_done) begin
                     nram_wait = 1'b0;
-                    if (mycmd.rf_req) begin mycmd.ncmd_state = PRECHARGE; end
-                    else if (mycmd.dWEN || mycmd.dREN) begin
-                        if (polif.row_stat == HIT) mycmd.ncmd_state = mycmd.dWEN ? WRITE : READ;
-                        else if(polif.row_stat == CONFLICT) mycmd.ncmd_state = PRECHARGE;
-                        else if (polif.row_stat == MISS) mycmd.ncmd_state = ACTIVATE;
-                    end
+                    if (timif.rf_req) begin mycmd.ncmd_state = PRECHARGE; end
+                    // else if (mycmd.dWEN || mycmd.dREN) begin
+                    //     if (polif.row_stat == HIT) mycmd.ncmd_state = mycmd.dWEN ? WRITE : READ;
+                    //     else if(polif.row_stat == CONFLICT) mycmd.ncmd_state = PRECHARGE;
+                    //     else if (polif.row_stat == MISS) mycmd.ncmd_state = ACTIVATE;
+                    // end
                     else begin
                         mycmd.ncmd_state = IDLE;
                     end 
@@ -111,9 +112,9 @@ module command_FSM (
             end
 
             PRECHARGING: begin
-                if (mycmd.tPRE_done) begin
+                if (timif.tPRE_done) begin
                     mycmd.row_resolve = 1'b1;
-                    mycmd.ncmd_state = mycmd.rf_req ? REFRESH : IDLE;
+                    mycmd.ncmd_state = timif.rf_req ? REFRESH : IDLE;
                 end
 
             end
