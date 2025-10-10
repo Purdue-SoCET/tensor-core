@@ -9,7 +9,8 @@ module row_open # (
     input logic CLK,
     input logic nRST,
     row_open_if.row_open pol_if,
-    address_mapper_if.row_open amif
+    address_mapper_if.row_open amif,
+    timing_signals_if.row_open timif
 );
     import dram_pkg::*;
     // parameter int DEPTH = 16;
@@ -32,12 +33,12 @@ module row_open # (
     always_ff @(posedge CLK, negedge nRST) begin
         if (!nRST) begin
             reg_f <= 0;
-            pol_if.row_stat <= 0;
+            //pol_if.row_stat <= 0;
             pol_if.row_conflict <= 0;
             
         end else begin
             reg_f <= nreg_f;
-            pol_if.row_stat <= nrow_stat;
+            //pol_if.row_stat <= nrow_stat;
             pol_if.row_conflict <= nrow_conflict;
         end
     end
@@ -47,30 +48,51 @@ module row_open # (
         nrow_stat = 0;
         nrow_conflict = pol_if.row_conflict;
 
-        if (pol_if.refresh) begin
+        // if (pol_if.refresh) begin
+        if (timif.tREF_done) begin
             nreg_f = 0;
         end else begin
             if (pol_if.req_en) begin
                 if (reg_f[ptr].valid && reg_f[ptr].row == amif.row) begin
-                    nrow_stat = 2'b01; //HIT
+                    //nrow_stat = 2'b01; //HIT
                     if (pol_if.row_resolve) begin
                         nreg_f[ptr].valid = 0;
                     end
                 end else if (reg_f[ptr].valid) begin
-                    nrow_stat = 2'b11; //CONFLICT
+                    //nrow_stat = 2'b11; //CONFLICT
                     nrow_conflict = reg_f[ptr].row;
                     if (pol_if.row_resolve) begin
                         nreg_f[ptr].valid = 0;
-                        nrow_stat = 2'b0; //IDLE
+                        //nrow_stat = 2'b0; //IDLE
                     end
                     
                 end
                 else begin
                     nreg_f[ptr].valid = 1'b1;
                     nreg_f[ptr].row = amif.row;
-                    nrow_stat = 2'b10; //MISS
+                    //nrow_stat = 2'b10; //MISS
                 end
             end
         end
     end
+        
+    always_comb begin : ROW_STATUS_BLOCK
+        pol_if.row_stat = 2'b00;
+
+        if (reg_f[ptr].valid && reg_f[ptr].row == amif.row) begin
+            pol_if.row_stat = 2'b01; //HIT
+        end
+
+        else if (reg_f[ptr].valid) begin
+            pol_if.row_stat = 2'b11; //CONFLICT
+            
+            if (pol_if.row_resolve) begin
+                pol_if.row_stat = 2'b00; //IDLE
+            end
+        end
+
+        else begin
+            pol_if.row_stat = 2'b10; //MISS
+        end
+        end
 endmodule
