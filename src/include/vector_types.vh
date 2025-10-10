@@ -44,6 +44,9 @@ package vector_pkg;
     typedef logic [LANE_ID_W-1:0] lane_id_t;
     typedef logic [VL_W-1:0] vl_t;
 
+    typedef logic [$clog2(NUM_MASKS)-1:0] mask_sel_t;
+    typedef logic [VLMAX-1:0]              vmask_t;
+
     typedef struct packed {
         logic swizzle;
         logic transpose; // 0 = row, 1 = column
@@ -107,25 +110,43 @@ package vector_pkg;
     } control_t;
 
     // Veggie Input Signals
+    
     typedef struct packed {
         vsel_t[WRITE_PORTS-1:0] vd;
         vreg_t[WRITE_PORTS-1:0] vdata;
         logic[WRITE_PORTS-1:0] WEN;
-        vsel_t[READ_PORTS-1:0] vs1;
-        logic[READ_PORTS-1] REN;
+        vsel_t[READ_PORTS-1:0] vs;
+        logic[READ_PORTS-1:0] REN;
         logic[MASK_IDX-1:0] vmd; 
         logic[MASK_IDX-1:0] vms;
-        logic[MASK_BANK_COUNT-1:0] vm; // mask enable
+        logic[MASK_BANK_COUNT-1:0] MREN; // mask enable
+        logic[MASK_BANK_COUNT-1:0] MWEN; // mask enable
+        logic[31:0] mvdata;
     } veggie_in_t;
+    /*
+    typedef struct packed {
+        vsel_t      [WRITE_PORTS-1:0]       vd;
+        vreg_t      [WRITE_PORTS-1:0]       vdata;
+        logic       [WRITE_PORTS-1:0]       WEN;
+
+        vsel_t      [READ_PORTS-1:0]        vs;
+        logic       [READ_PORTS-1:0]        REN;            // <-- had missing :0
+
+        mask_sel_t  [MREAD_PORTS-1:0]       vms;            // <-- was scalar, needs per-port
+        mask_sel_t  [MWRITE_PORTS-1:0]      vmd;            // <-- was scalar, needs per-port
+        logic       [MREAD_PORTS-1:0]       MREN;           // <-- size by MREAD_PORTS
+        logic       [MWRITE_PORTS-1:0]      MWEN;           // <-- size by MWRITE_PORTS
+        logic       [MWRITE_PORTS-1:0][VLMAX-1:0] mvdata;   // 32-bit (1b x 32 elems) per mask write port
+    } veggie_in_t;
+    */
 
     typedef struct packed {
-        vreg_t v1;
-        vreg_t v2;
-        vreg_t vmask;
+        vreg_t[READ_PORTS-1:0] vreg;
+        vmask_t[1:0] vmask;
         logic ready; // to SB
     } veggie_out_t;
 
-    typedef struct packed {
+    typedef struct {
         logic REN;
         logic WEN;
         logic tag;
@@ -134,12 +155,13 @@ package vector_pkg;
         vreg_t vdata;
     } bank_in_t;
 
-    typedef struct packed {
-        logic vm;
-        logic WEN;
-        vsel_t vd;
-        vreg_t vdata;
-    } cntrl_bank_in_t;
+    typedef struct {
+        logic      MWEN;    // 1 bit
+        logic      MREN;    // 1 bit
+        mask_sel_t vmd;     // 3 bits (write row select, 0..7)
+        mask_sel_t vms;     // 3 bits (read  row select, 0..7)
+        vmask_t    mvdata;  // 32-bit mask write data
+    } mbank_in_t;
 
     typedef enum logic [1:0] {
         IDLE,
@@ -156,14 +178,12 @@ package vector_pkg;
     // MaskU Structs -------------------------------------------------------------------
     typedef struct packed {
         logic vm;
-        logic[ESZ_W-1:0] imm; 
-        vreg_t vmask;
-        vl_t vl;
+        logic[NUM_ELEMENTS-1:0] vmask;
     } masku_in_t;
 
     // Output to 16 lanes
     typedef struct packed {
-        logic[NUM_ELEMENTS-1:0] mask; // 2 bits per lane to be hard wired
+        logic[NUM_LANES-1:0][SLICE_W-1:0] mask; // 2 bits per lane to be hard wired
     } masku_out_t;
 
     // Lane Structs --------------------------------------------------------------------

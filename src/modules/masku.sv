@@ -4,30 +4,21 @@
 // Mask unit that sends specific mask bits to lanes
 // ========================================================================
 `include "vector_if.vh"
-`include "vector_types.vh"
+//`include "vector_types.vh"
 
 module masku (
     vector_if.masku vif
 );
     import vector_pkg::*;
 
-    logic [NUM_ELEMENTS-1:0] vmask;
-
-    always_comb begin : Extract_Mask
-        vmask = '0;
-        if (vif.masku_in.vm == 1'b0) begin
-            vmask = '1; 
-        end else begin
-            for (int i = 0; i < NUM_ELEMENTS; i++) begin
-                if (vif.masku_in.vl < i) begin
-                    vmask[i] = 1'b0; 
-                end 
-                else begin
-                    vmask[i] = logic'(vif.masku_in.vmask[i][vif.masku_in.imm]);
-                end
-            end
+    genvar l;
+    generate
+        for (l = 0; l < NUM_LANES; l++) begin : g_lane_mask
+            assign vif.masku_out.mask[l] =
+                (vif.masku_in.vm)
+                    ? vif.masku_in.vmask[l*SLICE_W +: SLICE_W]
+                    : {SLICE_W{1'b1}};
         end
-    end
+    endgenerate
 
-    assign vif.masku_out.mask = vmask;
 endmodule

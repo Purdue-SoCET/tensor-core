@@ -54,7 +54,7 @@ interface vector_if;
   */
   // Veggie
   modport veggie (
-    input logic CLK, nRST, 
+    input CLK, nRST, 
     input veggie_in,
     output veggie_out
   );
