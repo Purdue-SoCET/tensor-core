@@ -16,11 +16,12 @@ module command_FSM_tb ();
     //*****************************************************************************
     // Declare DUT Signals
     //*****************************************************************************
-    command_fsm_if tb_cfsmif ();
-    row_open_if tb_polif ();
+    command_fsm_if      tb_cfsmif ();
+    timing_signals_if   tb_timif ();
+    row_open_if         tb_polif ();
     
     //*****************************************************************************
     // DUT Instance
     //*****************************************************************************
-    command_FSM DUT (.CLK(tb_CLK), .nRST(tb_nRST), .mycmd(tb_cfsmif), .polif(tb_polif));
+    command_FSM DUT (.CLK(tb_CLK), .nRST(tb_nRST), .mycmd(tb_cfsmif), .polif(tb_polif), .timif(tb_timif));
 endmodule
