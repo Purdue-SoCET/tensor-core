@@ -50,7 +50,7 @@ module socetlib_counter
             n_count = count;
         end
             
-        if (n_count == overflow_val) begin
+        if (n_count == (overflow_val - 1)) begin
             n_of = 1'b1;
         end else begin
             n_of = 1'b0;
