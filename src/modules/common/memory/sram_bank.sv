@@ -7,6 +7,8 @@ module sram_bank # (
 ) (
   input logic clk, n_rst, 
 
+  output logic busy,
+
   input logic ren,
   input logic [ROW_IDX_WIDTH-1:0] raddr,
   output logic [ELEM_BITS-1:0] rdata,
@@ -27,6 +29,8 @@ module sram_bank # (
   localparam int WLW = (WRITE_LATENCY <= 1) ? 1 : $clog2(WRITE_LATENCY);
   logic [WLW-1:0] w_cnt;
   logic w_busy;
+
+  assign busy = r_busy || w_busy; 
 
   always_ff @(posedge clk, negedge n_rst) begin
     if (!n_rst) begin

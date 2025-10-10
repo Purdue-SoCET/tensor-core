@@ -15,6 +15,7 @@ package spad_types_pkg;
     parameter int SCPAD_SIZE_BYTES = 1024*1024;  // total scratchpad size 
     parameter int NUM_COLS = 32;  // always a power of 2 
     parameter int ELEM_BITS = 16;  // fp16 
+    parameter int MAX_SRAM_DELAY = 3; 
 
     parameter int MAX_TILE_SIZE = 32; // M x M 
     localparam int MAX_DIM_WIDTH  = $clog2(MAX_TILE_SIZE); // bit length
@@ -50,17 +51,17 @@ package spad_types_pkg;
 
     // Not editable. Keep at 2. Hardcoded Logic. 
     localparam int NUM_SCPADS = 2; 
-    localparam int NUM_SCHED = 2; 
     localparam int SCPAD_ID_WIDTH = $clog2(NUM_SCPADS);
 
     localparam int DRAM_ID_WIDTH = 6; 
     typedef enum logic { SRC_FE = 1'b0, SRC_BE = 1'b1 } src_t;
 
+    typedef logic [NUM_COLS-1:0] mask_t;    
     typedef logic [NUM_COLS-1:0][ELEM_BITS-1:0] scpad_data_t;      
-    typedef logic [NUM_COLS-1:0] enable_mask_t;    
     typedef logic [NUM_COLS-1:0][COL_IDX_WIDTH-1:0] shift_mask_t; 
     typedef logic [NUM_COLS-1:0][ROW_IDX_WIDTH-1:0] slot_mask_t; 
 
+    typedef enum string { "NAIVE", "BENES", "BATCHER" } xbar_types_t;
 
 endpackage
 `endif
