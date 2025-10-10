@@ -28,6 +28,10 @@ interface timing_signals_if;
         input wr_en, rd_en, clear
     );
 
+    modport row_open (
+        input tREF_done
+    );
+
 endinterface
 
 `endif //TIMING_SIGNALS_IF_VH
