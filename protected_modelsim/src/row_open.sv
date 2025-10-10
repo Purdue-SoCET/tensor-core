@@ -28,20 +28,23 @@ module row_open (
     always_ff @(posedge CLK, negedge nRST) begin
         if (!nRST) begin
             reg_f <= 0;
-            pol_if.row_stat <= 0;
-            pol_if.row_conflict <= 0;
+            // pol_if.row_stat <= 0;
+            // pol_if.row_conflict <= 0;
             
         end else begin
             reg_f <= nreg_f;
-            pol_if.row_stat <= nrow_stat;
-            pol_if.row_conflict <= nrow_conflict;
+            // pol_if.row_stat <= nrow_stat;
+            // pol_if.row_conflict <= nrow_conflict;
         end
     end
 
+    assign pol_if.row_stat = nrow_stat;
+    assign pol_if.row_conflict = nrow_conflict;
     always_comb begin
         nreg_f = reg_f;
         nrow_stat = 0;
-        nrow_conflict = pol_if.row_conflict;
+        // nrow_conflict = pol_if.row_conflict;
+        nrow_conflict = 0;
 
         if (pol_if.refresh) begin
             nreg_f = 0;

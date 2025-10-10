@@ -176,7 +176,7 @@ module signal_gen #(
                 cmd_addr = LOAD_MODE_CMD;
                 mysig.BG      = 2'h1;
                 mysig.BA      = 2'h1;
-                mysig.ADDR     = 14'h1000;
+                mysig.ADDR     = 14'b0001000_0000000;
             end
         end
 
@@ -203,7 +203,7 @@ module signal_gen #(
                 cmd_addr = LOAD_MODE_CMD;
                 mysig.BG      = 2'h0;
                 mysig.BA      = 2'h1;
-                mysig.ADDR    = 14'h0000;
+                mysig.ADDR    = 14'h0001;
                 //A[0] for DLL disable
                 // dr_ram.ADDR     = 14'h0001;
             end

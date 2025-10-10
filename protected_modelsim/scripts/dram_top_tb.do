@@ -4,34 +4,118 @@ add wave -noupdate /dram_top_tb/CLK
 add wave -noupdate /dram_top_tb/nRST
 add wave -noupdate /dram_top_tb/CLKx2
 add wave -noupdate /dram_top_tb/task_name
-add wave -noupdate -expand -group DRAM_1 /dram_top_tb/iDDR4_1/CONFIGURED_DQ_BITS
-add wave -noupdate -expand -group DRAM_1 /dram_top_tb/iDDR4_1/CONFIGURED_DQS_BITS
-add wave -noupdate -expand -group DRAM_1 /dram_top_tb/iDDR4_1/CONFIGURED_DM_BITS
-add wave -noupdate -expand -group DRAM_1 /dram_top_tb/iDDR4_1/CK
-add wave -noupdate -expand -group DRAM_1 /dram_top_tb/iDDR4_1/ACT_n
-add wave -noupdate -expand -group DRAM_1 /dram_top_tb/iDDR4_1/RAS_n_A16
-add wave -noupdate -expand -group DRAM_1 /dram_top_tb/iDDR4_1/CAS_n_A15
-add wave -noupdate -expand -group DRAM_1 /dram_top_tb/iDDR4_1/WE_n_A14
-add wave -noupdate -expand -group DRAM_1 /dram_top_tb/iDDR4_1/ALERT_n
-add wave -noupdate -expand -group DRAM_1 /dram_top_tb/iDDR4_1/PARITY
-add wave -noupdate -expand -group DRAM_1 /dram_top_tb/iDDR4_1/RESET_n
-add wave -noupdate -expand -group DRAM_1 /dram_top_tb/iDDR4_1/TEN
-add wave -noupdate -expand -group DRAM_1 /dram_top_tb/iDDR4_1/CS_n
-add wave -noupdate -expand -group DRAM_1 /dram_top_tb/iDDR4_1/CKE
-add wave -noupdate -expand -group DRAM_1 /dram_top_tb/iDDR4_1/ODT
-add wave -noupdate -expand -group DRAM_1 /dram_top_tb/iDDR4_1/C
-add wave -noupdate -expand -group DRAM_1 /dram_top_tb/iDDR4_1/BG
-add wave -noupdate -expand -group DRAM_1 /dram_top_tb/iDDR4_1/BA
-add wave -noupdate -expand -group DRAM_1 /dram_top_tb/iDDR4_1/ADDR
-add wave -noupdate -expand -group DRAM_1 /dram_top_tb/iDDR4_1/ADDR_17
-add wave -noupdate -expand -group DRAM_1 /dram_top_tb/iDDR4_1/DM_n
-add wave -noupdate -expand -group DRAM_1 /dram_top_tb/iDDR4_1/DQ
-add wave -noupdate -expand -group DRAM_1 /dram_top_tb/iDDR4_1/DQS_t
-add wave -noupdate -expand -group DRAM_1 /dram_top_tb/iDDR4_1/DQS_c
-add wave -noupdate -expand -group DRAM_1 /dram_top_tb/iDDR4_1/ZQ
-add wave -noupdate -expand -group DRAM_1 /dram_top_tb/iDDR4_1/PWR
-add wave -noupdate -expand -group DRAM_1 /dram_top_tb/iDDR4_1/VREF_CA
-add wave -noupdate -expand -group DRAM_1 /dram_top_tb/iDDR4_1/VREF_DQ
+add wave -noupdate -group DRAM_1 /dram_top_tb/iDDR4_1/CONFIGURED_DQ_BITS
+add wave -noupdate -group DRAM_1 /dram_top_tb/iDDR4_1/CONFIGURED_DQS_BITS
+add wave -noupdate -group DRAM_1 /dram_top_tb/iDDR4_1/CONFIGURED_DM_BITS
+add wave -noupdate -group DRAM_1 /dram_top_tb/iDDR4_1/CK
+add wave -noupdate -group DRAM_1 /dram_top_tb/iDDR4_1/ACT_n
+add wave -noupdate -group DRAM_1 /dram_top_tb/iDDR4_1/RAS_n_A16
+add wave -noupdate -group DRAM_1 /dram_top_tb/iDDR4_1/CAS_n_A15
+add wave -noupdate -group DRAM_1 /dram_top_tb/iDDR4_1/WE_n_A14
+add wave -noupdate -group DRAM_1 /dram_top_tb/iDDR4_1/ALERT_n
+add wave -noupdate -group DRAM_1 /dram_top_tb/iDDR4_1/PARITY
+add wave -noupdate -group DRAM_1 /dram_top_tb/iDDR4_1/RESET_n
+add wave -noupdate -group DRAM_1 /dram_top_tb/iDDR4_1/TEN
+add wave -noupdate -group DRAM_1 /dram_top_tb/iDDR4_1/CS_n
+add wave -noupdate -group DRAM_1 /dram_top_tb/iDDR4_1/CKE
+add wave -noupdate -group DRAM_1 /dram_top_tb/iDDR4_1/ODT
+add wave -noupdate -group DRAM_1 /dram_top_tb/iDDR4_1/C
+add wave -noupdate -group DRAM_1 /dram_top_tb/iDDR4_1/BG
+add wave -noupdate -group DRAM_1 /dram_top_tb/iDDR4_1/BA
+add wave -noupdate -group DRAM_1 /dram_top_tb/iDDR4_1/ADDR
+add wave -noupdate -group DRAM_1 /dram_top_tb/iDDR4_1/ADDR_17
+add wave -noupdate -group DRAM_1 /dram_top_tb/iDDR4_1/DM_n
+add wave -noupdate -group DRAM_1 /dram_top_tb/iDDR4_1/DQ
+add wave -noupdate -group DRAM_1 /dram_top_tb/iDDR4_1/DQS_t
+add wave -noupdate -group DRAM_1 /dram_top_tb/iDDR4_1/DQS_c
+add wave -noupdate -group DRAM_1 /dram_top_tb/iDDR4_1/ZQ
+add wave -noupdate -group DRAM_1 /dram_top_tb/iDDR4_1/PWR
+add wave -noupdate -group DRAM_1 /dram_top_tb/iDDR4_1/VREF_CA
+add wave -noupdate -group DRAM_1 /dram_top_tb/iDDR4_1/VREF_DQ
+add wave -noupdate -group DRAM_2 /dram_top_tb/iDDR4_2/CONFIGURED_DQ_BITS
+add wave -noupdate -group DRAM_2 /dram_top_tb/iDDR4_2/CONFIGURED_DQS_BITS
+add wave -noupdate -group DRAM_2 /dram_top_tb/iDDR4_2/CONFIGURED_DM_BITS
+add wave -noupdate -group DRAM_2 /dram_top_tb/iDDR4_2/CK
+add wave -noupdate -group DRAM_2 /dram_top_tb/iDDR4_2/ACT_n
+add wave -noupdate -group DRAM_2 /dram_top_tb/iDDR4_2/RAS_n_A16
+add wave -noupdate -group DRAM_2 /dram_top_tb/iDDR4_2/CAS_n_A15
+add wave -noupdate -group DRAM_2 /dram_top_tb/iDDR4_2/WE_n_A14
+add wave -noupdate -group DRAM_2 /dram_top_tb/iDDR4_2/ALERT_n
+add wave -noupdate -group DRAM_2 /dram_top_tb/iDDR4_2/PARITY
+add wave -noupdate -group DRAM_2 /dram_top_tb/iDDR4_2/RESET_n
+add wave -noupdate -group DRAM_2 /dram_top_tb/iDDR4_2/TEN
+add wave -noupdate -group DRAM_2 /dram_top_tb/iDDR4_2/CS_n
+add wave -noupdate -group DRAM_2 /dram_top_tb/iDDR4_2/CKE
+add wave -noupdate -group DRAM_2 /dram_top_tb/iDDR4_2/ODT
+add wave -noupdate -group DRAM_2 /dram_top_tb/iDDR4_2/C
+add wave -noupdate -group DRAM_2 /dram_top_tb/iDDR4_2/BG
+add wave -noupdate -group DRAM_2 /dram_top_tb/iDDR4_2/BA
+add wave -noupdate -group DRAM_2 /dram_top_tb/iDDR4_2/ADDR
+add wave -noupdate -group DRAM_2 /dram_top_tb/iDDR4_2/ADDR_17
+add wave -noupdate -group DRAM_2 /dram_top_tb/iDDR4_2/DM_n
+add wave -noupdate -group DRAM_2 /dram_top_tb/iDDR4_2/DQ
+add wave -noupdate -group DRAM_2 /dram_top_tb/iDDR4_2/DQS_t
+add wave -noupdate -group DRAM_2 /dram_top_tb/iDDR4_2/DQS_c
+add wave -noupdate -group DRAM_2 /dram_top_tb/iDDR4_2/ZQ
+add wave -noupdate -group DRAM_2 /dram_top_tb/iDDR4_2/PWR
+add wave -noupdate -group DRAM_2 /dram_top_tb/iDDR4_2/VREF_CA
+add wave -noupdate -group DRAM_2 /dram_top_tb/iDDR4_2/VREF_DQ
+add wave -noupdate -group DRAM_3 /dram_top_tb/iDDR4_3/CONFIGURED_DQ_BITS
+add wave -noupdate -group DRAM_3 /dram_top_tb/iDDR4_3/CONFIGURED_DQS_BITS
+add wave -noupdate -group DRAM_3 /dram_top_tb/iDDR4_3/CONFIGURED_DM_BITS
+add wave -noupdate -group DRAM_3 /dram_top_tb/iDDR4_3/CK
+add wave -noupdate -group DRAM_3 /dram_top_tb/iDDR4_3/ACT_n
+add wave -noupdate -group DRAM_3 /dram_top_tb/iDDR4_3/RAS_n_A16
+add wave -noupdate -group DRAM_3 /dram_top_tb/iDDR4_3/CAS_n_A15
+add wave -noupdate -group DRAM_3 /dram_top_tb/iDDR4_3/WE_n_A14
+add wave -noupdate -group DRAM_3 /dram_top_tb/iDDR4_3/ALERT_n
+add wave -noupdate -group DRAM_3 /dram_top_tb/iDDR4_3/PARITY
+add wave -noupdate -group DRAM_3 /dram_top_tb/iDDR4_3/RESET_n
+add wave -noupdate -group DRAM_3 /dram_top_tb/iDDR4_3/TEN
+add wave -noupdate -group DRAM_3 /dram_top_tb/iDDR4_3/CS_n
+add wave -noupdate -group DRAM_3 /dram_top_tb/iDDR4_3/CKE
+add wave -noupdate -group DRAM_3 /dram_top_tb/iDDR4_3/ODT
+add wave -noupdate -group DRAM_3 /dram_top_tb/iDDR4_3/C
+add wave -noupdate -group DRAM_3 /dram_top_tb/iDDR4_3/BG
+add wave -noupdate -group DRAM_3 /dram_top_tb/iDDR4_3/BA
+add wave -noupdate -group DRAM_3 /dram_top_tb/iDDR4_3/ADDR
+add wave -noupdate -group DRAM_3 /dram_top_tb/iDDR4_3/ADDR_17
+add wave -noupdate -group DRAM_3 /dram_top_tb/iDDR4_3/DM_n
+add wave -noupdate -group DRAM_3 /dram_top_tb/iDDR4_3/DQ
+add wave -noupdate -group DRAM_3 /dram_top_tb/iDDR4_3/DQS_t
+add wave -noupdate -group DRAM_3 /dram_top_tb/iDDR4_3/DQS_c
+add wave -noupdate -group DRAM_3 /dram_top_tb/iDDR4_3/ZQ
+add wave -noupdate -group DRAM_3 /dram_top_tb/iDDR4_3/PWR
+add wave -noupdate -group DRAM_3 /dram_top_tb/iDDR4_3/VREF_CA
+add wave -noupdate -group DRAM_3 /dram_top_tb/iDDR4_3/VREF_DQ
+add wave -noupdate -group DRAM_4 /dram_top_tb/iDDR4_4/CONFIGURED_DQ_BITS
+add wave -noupdate -group DRAM_4 /dram_top_tb/iDDR4_4/CONFIGURED_DQS_BITS
+add wave -noupdate -group DRAM_4 /dram_top_tb/iDDR4_4/CONFIGURED_DM_BITS
+add wave -noupdate -group DRAM_4 /dram_top_tb/iDDR4_4/CK
+add wave -noupdate -group DRAM_4 /dram_top_tb/iDDR4_4/ACT_n
+add wave -noupdate -group DRAM_4 /dram_top_tb/iDDR4_4/RAS_n_A16
+add wave -noupdate -group DRAM_4 /dram_top_tb/iDDR4_4/CAS_n_A15
+add wave -noupdate -group DRAM_4 /dram_top_tb/iDDR4_4/WE_n_A14
+add wave -noupdate -group DRAM_4 /dram_top_tb/iDDR4_4/ALERT_n
+add wave -noupdate -group DRAM_4 /dram_top_tb/iDDR4_4/PARITY
+add wave -noupdate -group DRAM_4 /dram_top_tb/iDDR4_4/RESET_n
+add wave -noupdate -group DRAM_4 /dram_top_tb/iDDR4_4/TEN
+add wave -noupdate -group DRAM_4 /dram_top_tb/iDDR4_4/CS_n
+add wave -noupdate -group DRAM_4 /dram_top_tb/iDDR4_4/CKE
+add wave -noupdate -group DRAM_4 /dram_top_tb/iDDR4_4/ODT
+add wave -noupdate -group DRAM_4 /dram_top_tb/iDDR4_4/C
+add wave -noupdate -group DRAM_4 /dram_top_tb/iDDR4_4/BG
+add wave -noupdate -group DRAM_4 /dram_top_tb/iDDR4_4/BA
+add wave -noupdate -group DRAM_4 /dram_top_tb/iDDR4_4/ADDR
+add wave -noupdate -group DRAM_4 /dram_top_tb/iDDR4_4/ADDR_17
+add wave -noupdate -group DRAM_4 /dram_top_tb/iDDR4_4/DM_n
+add wave -noupdate -group DRAM_4 /dram_top_tb/iDDR4_4/DQ
+add wave -noupdate -group DRAM_4 /dram_top_tb/iDDR4_4/DQS_t
+add wave -noupdate -group DRAM_4 /dram_top_tb/iDDR4_4/DQS_c
+add wave -noupdate -group DRAM_4 /dram_top_tb/iDDR4_4/ZQ
+add wave -noupdate -group DRAM_4 /dram_top_tb/iDDR4_4/PWR
+add wave -noupdate -group DRAM_4 /dram_top_tb/iDDR4_4/VREF_CA
+add wave -noupdate -group DRAM_4 /dram_top_tb/iDDR4_4/VREF_DQ
 add wave -noupdate -expand -group control_arb /dram_top_tb/DUT/myctrl/dWEN
 add wave -noupdate -expand -group control_arb /dram_top_tb/DUT/myctrl/dREN
 add wave -noupdate -expand -group control_arb /dram_top_tb/DUT/myctrl/ram_wait
@@ -107,15 +191,15 @@ add wave -noupdate -expand -group time_signal /dram_top_tb/DUT/ctrl/u4/time_load
 add wave -noupdate -expand -group time_signal -radix decimal /dram_top_tb/DUT/ctrl/u4/time_count
 add wave -noupdate -expand -group time_signal /dram_top_tb/DUT/ctrl/u4/time_counter_en
 add wave -noupdate -expand -group time_signal /dram_top_tb/DUT/ctrl/u4/time_count_done
-add wave -noupdate -group Scheduler_buff /dram_top_tb/sch_if/dREN
-add wave -noupdate -group Scheduler_buff /dram_top_tb/sch_if/dWEN
-add wave -noupdate -group Scheduler_buff /dram_top_tb/sch_if/ramaddr
-add wave -noupdate -group Scheduler_buff /dram_top_tb/sch_if/ramaddr_rq
-add wave -noupdate -group Scheduler_buff /dram_top_tb/sch_if/ramREN_curr
-add wave -noupdate -group Scheduler_buff /dram_top_tb/sch_if/ramWEN_curr
-add wave -noupdate -group Scheduler_buff /dram_top_tb/SCH_BUFF/fifo
-add wave -noupdate -group Scheduler_buff /dram_top_tb/SCH_BUFF/wptr
-add wave -noupdate -group Scheduler_buff /dram_top_tb/SCH_BUFF/rptr
+add wave -noupdate -expand -group Scheduler_buff /dram_top_tb/sch_if/dREN
+add wave -noupdate -expand -group Scheduler_buff /dram_top_tb/sch_if/dWEN
+add wave -noupdate -expand -group Scheduler_buff -radix binary /dram_top_tb/sch_if/ramaddr
+add wave -noupdate -expand -group Scheduler_buff /dram_top_tb/sch_if/ramaddr_rq
+add wave -noupdate -expand -group Scheduler_buff /dram_top_tb/sch_if/ramREN_curr
+add wave -noupdate -expand -group Scheduler_buff /dram_top_tb/sch_if/ramWEN_curr
+add wave -noupdate -expand -group Scheduler_buff /dram_top_tb/SCH_BUFF/fifo
+add wave -noupdate -expand -group Scheduler_buff /dram_top_tb/SCH_BUFF/wptr
+add wave -noupdate -expand -group Scheduler_buff /dram_top_tb/SCH_BUFF/rptr
 add wave -noupdate -expand -group data_transfer /dram_top_tb/dt_if/wr_en
 add wave -noupdate -expand -group data_transfer /dram_top_tb/dt_if/rd_en
 add wave -noupdate -expand -group data_transfer /dram_top_tb/dt_if/COL_choice
@@ -124,10 +208,10 @@ add wave -noupdate -expand -group data_transfer /dram_top_tb/dt_if/DQS_t
 add wave -noupdate -expand -group data_transfer /dram_top_tb/dt_if/DQS_c
 add wave -noupdate -expand -group data_transfer /dram_top_tb/dt_if/DM_n
 TreeUpdate [SetDefaultTree]
-WaveRestoreCursors {{Cursor 1} {3524618 ps} 0}
+WaveRestoreCursors {{Cursor 1} {3571514 ps} 0}
 quietly wave cursor active 1
 configure wave -namecolwidth 150
-configure wave -valuecolwidth 255
+configure wave -valuecolwidth 369
 configure wave -justifyvalue left
 configure wave -signalnamewidth 1
 configure wave -snapdistance 10
@@ -140,4 +224,4 @@ configure wave -griddelta 40
 configure wave -timeline 0
 configure wave -timelineunits ps
 update
-WaveRestoreZoom {0 ps} {3750863 ps}
+WaveRestoreZoom {3557023 ps} {3574640 ps}

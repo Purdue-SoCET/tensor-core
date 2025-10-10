@@ -47,6 +47,8 @@ module dram_top_tb;
     reg dq_en;
     reg dqs_en;
     
+    logic [31:0] prev_addr; 
+    
 
     always begin
         CLK = 1'b0;
@@ -88,10 +90,12 @@ module dram_top_tb;
       sch_if.request_done = !dc_if.ram_wait;
     
 
-      //Interface between dram command and the data_transfer
+      //Interface between scheduler buffer and the data_transfer
       dt_if.wr_en = dc_if.wr_en;
       dt_if.rd_en = dc_if.rd_en;
-      dt_if.memstore = sch_if.ramstore_rq;
+
+    //  Comment this out for testing with class sche_clas
+    //   dt_if.memstore = sch_if.ramstore_rq;
     end
 
     always @(posedge clk_val && clk_enb) begin
@@ -277,102 +281,146 @@ module dram_top_tb;
     assign dt_if.DM_n = ~dq_en ? iDDR4_1.DM_n: 1'bz;
     assign dt_if.COL_choice = dc_if.offset; //CHANGE
 
+    always_ff @(posedge CLK) begin
+        if (!nRST) begin
+            prev_addr <= 0;
+        end else begin
+            prev_addr <= sch.creating_addr;
+        end
+    end
 
-    // task writing_1();
-    //     task_name = "Write 1";
-    //     DM_debug = 1'b1;
-    //     add_request(.addr({16'hAAAA, 8'hAA, 8'b000_000_00}), .write(1'b1), .data(32'hAAAA_AAAA));
-    //     data_store1 = 32'h1111_1111;
-    //     data_store2 = 32'h2222_2222;
-    //     data_store3 = 32'h3333_3333;
-    //     data_store4 = 32'h4444_4444;
+    //Creating class for the transaction
+    class sche_trans;
+        virtual scheduler_buffer_if vif;
+
+        localparam logic [14:0] ROW_HIT    = 15'h1234;   // "open" row for the hit/conflict cases
+        localparam logic [14:0] ROW_OTHER  = 15'h2ACE;   // different row -> conflict
+
+        rand logic [RANK_BITS - 1:0] rank;
+        rand logic [BANK_GROUP_BITS - 1:0] BG;
+        rand logic [BANK_BITS - 1:0] bank;
+        rand logic [ROW_BITS - 1:0] row;
+        rand logic [COLUMN_BITS - 1:0] col;
+        rand logic [OFFSET_BITS - 1:0] offset;
+        logic [31:0] creating_addr;
+        //1. Creating covergroup
+        covergroup sch_group @(posedge CLK);
+            //2.Creating coverpoint
+            sch_point : coverpoint {vif.dREN, vif.dWEN} {
+                bins s00 = {2'b00};
+                bins s10 = {2'b10};
+                bins s01 = {2'b01};
+            }
+        endgroup        
+
+        //3. Creating the constraint
+        constraint req_cons {
+            {vif.dREN, vif.dWEN} != 2'b11;
+        }
+
+        constraint addr_rank {
+            rank == 1'b0;
+            row != '1;
+            offset == 0;
+        }
+
+        function new (virtual scheduler_buffer_if vif);
+            this.vif = vif;
+            sch_group = new();
+        endfunction
+
+        function create_addr (string testcase, input logic[31:0] prev_addr);
+            //If you want to add row conflict
+            if (testcase == "row conflict") begin
+                creating_addr = prev_addr;
+                creating_addr[30:16] = '1;
+                
+            end else if (testcase == "row hit") begin
+                creating_addr = prev_addr;
+            end else begin
+                creating_addr = {rank, row, bank, BG[1], col[9:3], BG[0], col[2:0], offset};
+            end
+        endfunction
+
+    endclass
+
+    class creating_dt;
+        rand logic [31:0] data_store;
+        function new ();
+
+        endfunction
+        function display;
+            $display ("data_store %0x", data_store);
+        endfunction
+    endclass
+
+    creating_dt dt_class;   
+
+
+    task writing_1(input logic [31:0] addr, input creating_dt dt_class);
+        begin
+        task_name = "Write 1";
         
-    //     while (!dt_if.wr_en) begin
-    //         @(posedge CLK);
-    //     end
-    //     dt_if.memstore = data_store1;
-    //     @(posedge CLKx2);
-    //     dt_if.memstore = data_store1;
-    //     @(posedge CLKx2);
-    //     dt_if.memstore = data_store2;
-    //     @(posedge CLKx2);
-    //     dt_if.memstore = data_store3;
-    //     @(posedge CLKx2);
-    //     dt_if.memstore = data_store4;
-    //     @(posedge CLKx2);
-    //     dt_if.memstore = 32'h5555_5555;
-    //     @(posedge CLKx2);
-    //     dt_if.memstore = 32'h6666_6666;
-    //     @(posedge CLKx2);
-    //     dt_if.memstore = 32'h7777_7777;
-    //     @(posedge CLKx2);
-    //     dt_if.memstore = 32'h8888_8888;
-    //     @(posedge CLK);
-    //     dt_if.clear = 1'b1;
-    //     @(posedge CLK);
-    //     dt_if.clear = 1'b0;
-    // endtask
+        // add_request(.addr({16'hAAAA, 8'hAA, 8'b000_000_00}), .write(1'b1), .data(32'hAAAA_AAAA));
+        add_request(.addr(addr), .write(1'b1), .data(32'hAAAA_AAAA));
+        data_store1 = 32'h1111_1111;
+        data_store2 = 32'h2222_2222;
+        data_store3 = 32'h3333_3333;
+        data_store4 = 32'h4444_4444;
+        while (!dt_if.wr_en) begin
+            @(posedge CLK);
+        end
+        for (int i = 0; i < 9; i++) begin
+            dt_class.randomize();
+            dt_class.display();
+            dt_if.memstore = dt_class.data_store;
+            @(posedge CLKx2);
+        end
+        dt_if.clear = 1'b1;
+        @(posedge CLK);
+        dt_if.clear = 1'b0;
+        end
+    endtask
 
-    // task writing_2();
-    //     task_name = "Write 2";
-    //     DM_debug = 1'b0;
-    //     add_request(.addr({16'hAAAA, 8'hAA, 8'b000_000_00}), .write(1'b1), .data(32'hAAAA_AAAA));
-    //     data_store1 = 32'hAAAA_AAAA;
-    //     data_store2 = 32'hBBBB_BBBB;
-    //     data_store3 = 32'hCCCC_CCCC;
-    //     data_store4 = 32'hDDDD_DDDD;
-    //     while (!dt_if.wr_en) begin
-    //         @(posedge CLK);
-    //     end
-    //     dt_if.memstore = data_store1;
-    //     @(posedge CLKx2);
-    //     dt_if.memstore = data_store1;
-    //     @(posedge CLKx2);
-    //     dt_if.memstore = data_store2;
-    //     @(posedge CLKx2);
-    //     dt_if.memstore = data_store3;
-    //     @(posedge CLKx2);
-    //     dt_if.memstore = data_store4;
-    //     @(posedge CLKx2);
-    //     dt_if.memstore = 32'hAABB_5555;
-    //     @(posedge CLKx2);
-    //     dt_if.memstore = 32'hAABB_6666;
-    //     @(posedge CLKx2);
-    //     dt_if.memstore = 32'hAABB_7777;
-    //     @(posedge CLKx2);
-    //     dt_if.memstore = 32'hAABB_8888;
-    //     @(posedge CLK);
+    task writing_read_row_hit(input creating_dt dt_class);
+        task_name = "Writing_Cycle";
+        //Case 2 check the writing cycle
+        // add_request(.addr({16'hAAAA, 8'hAA, 8'b000_000_00}), .write(1'b1), .data(32'hAAAA_AAAA));
+        //Case checking the writing burst
+        //Creating new addr
+        sch.randomize();
+        sch.create_addr("row miss", prev_addr);
+        writing_1(sch.creating_addr, dt_class);
+        repeat (50) @(posedge CLK);
+
         
-    //     dt_if.clear = 1'b1;
-        
-    //     @(posedge CLK);
-    //     dt_if.clear = 1'b0;
-    // endtask
+        task_name = "Reading_Cycle";
+        dq_en = 1'b0;
+        // //Case 3 check the reading cycle
+        // add_request(.addr({16'hAAAA, 8'hAA, 8'b000_000_00}), .write(1'b0), .data(32'hAAAA_AAAA));
+        add_request(.addr(sch.creating_addr), .write(1'b0), .data(32'hAAAA_AAAA));
+        repeat (50) @(posedge CLK);
+    endtask
 
-    // task read_chk();
-    //     DM_debug = 1'bzz;
-    //     task_name = "Add Read";
-    //     add_request(.addr({16'hAAAA, 8'hAA, 8'b000_000_00}), .write(1'b0), .data(32'hDDCC_BBAA));
-    //     //   add_request(.addr({'0, 3'd1,2'b00}), .write(1'b0), .data(32'hDDCC_BBAA));
-    //     dq_en = 1'b0;
-    //     //   task_name = "Done add Read";
-    //     //   repeat (200) @(posedge CLK);
-    //     //   task_name = "After 400 cycle Read";
-    //     repeat (100) @(posedge CLK);
-    // endtask
-
+    sche_trans sch;
     initial begin
-      iDDR4_1.CK <= 2'b01;
-      clk_enb <= 1'b1;
-      clk_val <= 1'b1;  
+      iDDR4_1.CK = 2'b01;
+      clk_enb = 1'b1;
+      clk_val = 1'b1;  
       model_enable_val = 1;
       dq_en = 1'b1;
-
+      //Creating class for data
+      
+      dt_class = new();
+      
+      sch = new(sch_if);
+      
       nRST = 1'b0;
       @(posedge CLK);
       @(posedge CLK);
       nRST = 1'b1;
 
+      
       task_name = "Power_up";
       #((tRESET + tPWUP + tRESETCKE + tPDc + tXPR + tDLLKc + tMOD * 7 + tZQinitc) * PERIOD);
       repeat (25) @(posedge CLK);
@@ -383,24 +431,41 @@ module dram_top_tb;
     
     task_name = "Writing_Cycle";
     //Case 2 check the writing cycle
-    add_request(.addr({16'hAAAA, 8'hAA, 8'b000_000_00}), .write(1'b1), .data(32'hAAAA_AAAA));
+    //Case checking the writing burst
+    //Creating new addr
+    sch.randomize();
+    sch.create_addr("row miss", prev_addr);
+    writing_1(sch.creating_addr, dt_class);
     repeat (50) @(posedge CLK);
 
     
     task_name = "Reading_Cycle";
     dq_en = 1'b0;
+    //dt_if.clear = 1'b1;
     //Case 3 check the reading cycle
-    add_request(.addr({16'hAAAA, 8'hAA, 8'b000_000_00}), .write(1'b0), .data(32'hAAAA_AAAA));
+    add_request(.addr(sch.creating_addr), .write(1'b0), .data(32'hAAAA_AAAA));
     repeat (50) @(posedge CLK);
+    //dt_if.clear = 1'b0;
     
+    // //CHECKPOINT: checking the write - write - read row hit
+    // task_name = "write - write - read - row hit";
+    // dq_en = 1'b1;
 
+    // writing_1(prev_addr, dt_class);
+    // while (dc_if.ram_wait) begin
+    //     @(posedge CLK);
+    // end
+    // repeat(10) @(posedge CLK);
+    // dq_en = 1'b0;
+    // add_request(.addr(prev_addr), .write(1'b0), .data(32'hAAAA_AAAA));
 
-    //   writing_1();
-    //   read_chk();
-    //   dq_en = 1'b1;
-    //   writing_2();
-    //   read_chk();
-      $finish;
+    // while (dc_if.ram_wait) begin
+    //     @(posedge CLK);
+    // end
+
+    // repeat(10) @(posedge CLK);
+
+    $finish;
 
     end
 
