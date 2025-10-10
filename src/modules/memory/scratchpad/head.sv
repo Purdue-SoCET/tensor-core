@@ -41,8 +41,8 @@ module head #(
         be_rd_v = hif.be_rd_req_valid[IDX];
         fe_rd_v = hif.fe_rd_req_valid[IDX];
 
-        rd_grant_be = (!rd_pipe_busy) && be_rd_v;
-        rd_grant_fe = (!rd_pipe_busy) && (!be_rd_v) && fe_rd_v;
+        rd_grant_be = (!hif.r_stall) && be_rd_v;
+        rd_grant_fe = (!hif.r_stall) && (!be_rd_v) && fe_rd_v;
 
         if (rd_grant_be) rd_req_d = hif.be_rd_req[IDX];
         else if (rd_grant_fe) rd_req_d = hif.fe_rd_req[IDX];
@@ -54,8 +54,8 @@ module head #(
         be_wr_v = hif.be_wr_req_valid[IDX];
         fe_wr_v = hif.fe_wr_req_valid[IDX];
 
-        wr_grant_be = (!wr_pipe_busy) && be_wr_v;
-        wr_grant_fe = (!wr_pipe_busy) && (!be_wr_v) && fe_wr_v;
+        wr_grant_be = (!hif.w_stall) && be_wr_v;
+        wr_grant_fe = (!hif.w_stall) && (!be_wr_v) && fe_wr_v;
 
         if (wr_grant_be) wr_req_d = hif.be_wr_req[IDX];
         else if (wr_grant_fe) wr_req_d = hif.fe_wr_req[IDX];
