@@ -61,7 +61,7 @@ package spad_types_pkg;
     typedef logic [NUM_COLS-1:0][COL_IDX_WIDTH-1:0] shift_mask_t; 
     typedef logic [NUM_COLS-1:0][ROW_IDX_WIDTH-1:0] slot_mask_t; 
 
-    typedef enum string { "NAIVE", "BENES", "BATCHER" } xbar_types_t;
+    typedef enum { "NAIVE", "BENES", "BATCHER" } xbar_types_t;
 
 endpackage
 `endif

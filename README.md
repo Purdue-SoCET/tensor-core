@@ -1,13 +1,9 @@
 # Purdue SoCET - Atalla x01 
 
-> **“Building the first fully open, end-to-end AI accelerator platform — by students, for researchers.”**
- 
 
 ## Overview 
 
-The Atalla x01 Project is a student-led initiative to design and implement a complete **AI Hardware-Software** stack -- from RTL to PyTorch integration. Unlike isolated academic prototypes, this project aims to become an open, reproducible, and research-grade infrastructure that unites all key accelerator components under one roof.
-
-> This project is not just a course assignment — it is part of a long-term open-source effort to build a full-stack AI system.
+The Atalla x01 Project is a student-led initiative to design and implement a complete **AI Hardware-Software** stack -- from RTL to PyTorch integration. This project aims to become an open, reproducible, and research-grade infrastructure that unites all key accelerator components under one roof.
 
 ## Repository Structure 
 
