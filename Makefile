@@ -2,14 +2,14 @@ SHELL := /bin/bash
 
 SIMTIME    ?= 100us
 TOPDIR     := .
-INCDIRROOT := $(TOPDIR)/src/include
-MODROOT    := $(TOPDIR)/src/modules
-TBROOT     := $(TOPDIR)/src/testbench
+INCDIRROOT := $(TOPDIR)/rtl/include
+MODROOT    := $(TOPDIR)/rtl/modules
+TBROOT     := $(TOPDIR)/rtl/tests
 WORK       := work
 
 INCFLAGS := $(shell find $(INCDIRROOT) -type d -print0 2>/dev/null | xargs -0 -I{} echo +incdir+{})
 
-PKG_SRCS := $(shell find $(TOPDIR)/src -type f \( -name "*_pkg.sv" -o -name "pkg_*.sv" \) 2>/dev/null | sort)
+PKG_SRCS := $(shell find $(TOPDIR)/rtl -type f \( -name "*_pkg.sv" -o -name "pkg_*.sv" \) 2>/dev/null | sort)
 
 RTL_SRCS := $(shell \
   find $(INCDIRROOT) $(MODROOT) -type f -name "*.sv" \

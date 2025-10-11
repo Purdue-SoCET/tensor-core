@@ -5,3 +5,4 @@ vsim.*
 *.txt
 .deps/
 .mti_uselibs/
+.deps/
