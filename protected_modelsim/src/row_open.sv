@@ -46,9 +46,11 @@ module row_open (
         // nrow_conflict = pol_if.row_conflict;
         nrow_conflict = 0;
 
+        //Comment out for check the refresh state
         if (pol_if.refresh) begin
             nreg_f = 0;
-        end else begin
+        end 
+        else begin
             if (pol_if.req_en) begin
                 if (reg_f[ptr].valid && reg_f[ptr].row == pol_if.row) begin
                     nrow_stat = 2'b01; //HIT

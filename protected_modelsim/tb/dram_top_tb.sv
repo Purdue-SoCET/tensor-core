@@ -7,6 +7,17 @@
 `include "dimm.vh"
 `timescale 1 ns / 1 ps
 
+
+//Welcome to the mess, here is just a bunch of code that trying to verify DDR4!
+// 1. Test the power up state
+// 2. Test the refresh cycle 
+// 3. Test row miss write row hit read
+// 4. Test row hit write row hit read
+// 5. Test the refresh and row miss read
+// 6. Test 3 consectutive  row miss write
+// 7. Test row conflict write row hit read
+// 8. Test row conflcit read (the old address that cause write)
+
 module dram_top_tb;
     parameter PERIOD = 1.5;
     parameter tCK = 1.5;
@@ -46,7 +57,7 @@ module dram_top_tb;
     //Signal flag to choose write or read
     reg dq_en;
     reg dqs_en;
-    
+    logic don_t_write;
     logic [31:0] prev_addr; 
     
 
@@ -79,6 +90,8 @@ module dram_top_tb;
     dram_top DUT (.CLK(CLK), .nRST(nRST), .myctrl(dc_if), .myctrl_sig(dc_if), .mysig(sig_if));
     scheduler_buffer SCH_BUFF (.CLK(CLK), .nRST(nRST), .mysche(sch_if));
     data_transfer DT (.CLK(CLK), .CLKx2(CLKx2),.nRST(nRST), .mydata(dt_if));
+
+    //Instantiate cache for verify
 
     //Scheduler interface with the 
     always_comb begin
@@ -285,7 +298,10 @@ module dram_top_tb;
         if (!nRST) begin
             prev_addr <= 0;
         end else begin
-            prev_addr <= sch.creating_addr;
+            if (!don_t_write) begin
+                prev_addr <= sch.creating_addr;
+            end
+
         end
     end
 
@@ -333,8 +349,7 @@ module dram_top_tb;
             //If you want to add row conflict
             if (testcase == "row conflict") begin
                 creating_addr = prev_addr;
-                creating_addr[30:16] = '1;
-                
+                creating_addr[30:17] = '1;
             end else if (testcase == "row hit") begin
                 creating_addr = prev_addr;
             end else begin
@@ -359,14 +374,10 @@ module dram_top_tb;
 
     task writing_1(input logic [31:0] addr, input creating_dt dt_class);
         begin
-        task_name = "Write 1";
+        // task_name = "Write 1";
         
         // add_request(.addr({16'hAAAA, 8'hAA, 8'b000_000_00}), .write(1'b1), .data(32'hAAAA_AAAA));
         add_request(.addr(addr), .write(1'b1), .data(32'hAAAA_AAAA));
-        data_store1 = 32'h1111_1111;
-        data_store2 = 32'h2222_2222;
-        data_store3 = 32'h3333_3333;
-        data_store4 = 32'h4444_4444;
         while (!dt_if.wr_en) begin
             @(posedge CLK);
         end
@@ -409,12 +420,11 @@ module dram_top_tb;
       clk_val = 1'b1;  
       model_enable_val = 1;
       dq_en = 1'b1;
+      don_t_write = 0;
       //Creating class for data
       
       dt_class = new();
-      
       sch = new(sch_if);
-      
       nRST = 1'b0;
       @(posedge CLK);
       @(posedge CLK);
@@ -447,7 +457,7 @@ module dram_top_tb;
     repeat (50) @(posedge CLK);
     //dt_if.clear = 1'b0;
     
-    // //CHECKPOINT: checking the write - write - read row hit
+    // //checking the write - write - read row hit
     // task_name = "write - write - read - row hit";
     // dq_en = 1'b1;
 
@@ -458,13 +468,72 @@ module dram_top_tb;
     // repeat(10) @(posedge CLK);
     // dq_en = 1'b0;
     // add_request(.addr(prev_addr), .write(1'b0), .data(32'hAAAA_AAAA));
-
     // while (dc_if.ram_wait) begin
     //     @(posedge CLK);
     // end
-
     // repeat(10) @(posedge CLK);
 
+    // //Case wait for refreshing refresh everything
+    // repeat(150) @(posedge CLK);
+
+    // // For the purpose of checking the refresh command
+    // // We will load the same address and observe
+    // // 1. Command FSM IDLE -> ACT -> READ
+    // // 2. Row policy is updated
+    // add_request(.addr(prev_addr), .write(1'b0), .data(32'hAAAA_AAAA));
+    // while (dc_if.ram_wait) begin
+    //     @(posedge CLK);
+    // end
+    // repeat(10) @(posedge CLK);
+
+    // //Test case: Testing row miss case with 3 consecutive writes of random address
+    // task_name = "3 consectutive writing";
+    // dq_en = 1'b1;
+    // //1 consectutive
+    // sch.randomize();
+    // sch.create_addr("row miss", prev_addr);
+    // writing_1(sch.creating_addr, dt_class);
+    // while (dc_if.ram_wait) begin
+    //     @(posedge CLK);
+    // end
+    // repeat(10) @(posedge CLK);
+
+    // //2 consectutive
+    // sch.randomize();
+    // sch.create_addr("row miss", prev_addr);
+    // writing_1(sch.creating_addr, dt_class);
+    // while (dc_if.ram_wait) begin
+    //     @(posedge CLK);
+    // end
+    // repeat(10) @(posedge CLK);
+
+    // //3 consectutive
+    // sch.randomize();
+    // sch.create_addr("row miss", prev_addr);
+    // writing_1(sch.creating_addr, dt_class);
+    // while (dc_if.ram_wait) begin
+    //     @(posedge CLK);
+    // end
+    // repeat(10) @(posedge CLK);
+
+
+    // //After that we use the last consecutive write to test the conflict case
+    // task_name = "Test row conflict write row hit read";
+    // don_t_write = 1'b1;
+    // sch.create_addr("row conflict", prev_addr);
+    // writing_1(sch.creating_addr, dt_class);
+    // while(dc_if.ram_wait) begin
+    //     @(posedge CLK);
+    // end
+    // repeat(10) @(posedge CLK);
+
+    // task_name = "Test row conflcit read (the old address that cause write)";
+    // dq_en = 1'b0;
+    // add_request(.addr(prev_addr), .write(1'b0), .data(32'hAAAA_AAAA));
+    // while (dc_if.ram_wait) begin
+    //     @(posedge CLK);
+    // end
+    // repeat(10) @(posedge CLK);
     $finish;
 
     end
@@ -485,6 +554,43 @@ module dram_top_tb;
       sch_if.dWEN = 1'b0;
       sch_if.dREN = 1'b0;
     endtask
+endmodule
+
+module sw_cache #( parameter ROW_BITS = 15)
+(
+    input logic CLKx2,
+    input logic nRST,
+    input logic wr_en,
+    input logic rd_en,
+    input logic [ROW_BITS-1:0] row_addr,
+    input logic [2:0] offset,
+    input logic [63:0] dmemstore,
+    output logic [63:0] dmemload
+);
+
+    typedef struct packed {
+        logic [63:0][7:0] arr;
+    } data_8bytes;
+
+    data_8bytes sw_cache [ROW_BITS-1:0];
+
+    always_ff @(posedge CLKx2, negedge nRST) begin
+        if(!nRST) begin
+            for (int i = 0; i < ROW_BITS; i++) begin
+                sw_cache[i] <= 0;
+            end
+        end else begin
+            if (wr_en) begin
+                sw_cache[row_addr].arr[offset] <= dmemstore;
+            end
+        end
+    end
+
+    always_comb begin
+        if (rd_en) begin
+            dmemload = sw_cache[row_addr].arr[offset];
+        end
+    end
 
 
 

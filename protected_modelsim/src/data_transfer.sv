@@ -52,10 +52,12 @@ module data_transfer (
                 cnt1 <= count_burst;
             end else if (mydata.rd_en) begin
                 count_burst <= ncount_burst;
+            end else begin
+                count_burst <= 0;
             end
-            if (mydata.clear) begin
-                count_burst <= '0;
-            end
+            // if (mydata.clear) begin
+            //     count_burst <= '0;
+            // end
             DQS_t_2 = nDQS_t;
         end
     end
