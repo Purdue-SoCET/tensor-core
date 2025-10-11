@@ -1,0 +1,4 @@
+[submodule "AMP-sim"]
+	path = AMP-sim
+	url = git@github.com:Purdue-SoCET/AMP-sim.git
+	branch = atalla
