@@ -6,3 +6,7 @@
 	path = UVM_1.2
 	url = git@github.com:Purdue-SoCET/UVM_1.2.git
 	branch = main
+[submodule "aihw-ppci-compiler"]
+	path = aihw-ppci-compiler
+	url = git@github.com:Purdue-SoCET/aihw-ppci-compiler.git
+	branch = master
