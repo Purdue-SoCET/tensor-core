@@ -36,6 +36,7 @@
 
 //         output xbar_desc
 //     );
+<<<<<<< Updated upstream
 
 // modport backend (
 //         input sram_busy,
@@ -88,6 +89,8 @@
 //         scpad_data wdata;
 //         logic [SCPAD_ID_WIDTH-1:0] scpad_id; // which scpad to write to
 //     } sram_w_req_t backend_sram_w_banks_req;
+=======
+>>>>>>> Stashed changes
 
 module backend (
     input logic clk, n_rst, scratchpad_if.backend_sched be_sche,

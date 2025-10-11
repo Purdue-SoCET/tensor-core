@@ -55,7 +55,10 @@ package spad_types_pkg;
     localparam int SCPAD_ID_WIDTH = $clog2(NUM_SCPADS);
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 =======
+=======
+>>>>>>> Stashed changes
     localparam int DRAM_ID_WIDTH = 5; 
     typedef enum logic { SRC_FE = 1'b0, SRC_BE = 1'b1 } src_t;
 
