@@ -14,7 +14,9 @@
 package spad_types_pkg;
     parameter int SCPAD_SIZE_BYTES = 1024*1024;  // total scratchpad size 
     parameter int NUM_COLS = 32;  // always a power of 2 
-    parameter int ELEM_BITS = 16;  // fp16 
+    parameter int ELEM_BITS = 16;  // fp16
+    parameter int QUEUE_LATCH_BLOCK_SIZE = 32;
+    parameter int QUEUE_LATCH_BLOCK_WIDTH = $clog2(QUEUE_LATCH_BLOCK_SIZE);
 
     parameter int MAX_TILE_SIZE = 32; // M x M 
     localparam int MAX_DIM_WIDTH  = $clog2(MAX_TILE_SIZE); // bit length
@@ -52,6 +54,12 @@ package spad_types_pkg;
     localparam NUM_SCPADS = 2; 
     localparam int SCPAD_ID_WIDTH = $clog2(NUM_SCPADS);
 
+<<<<<<< Updated upstream
+=======
+    localparam int DRAM_ID_WIDTH = 5; 
+    typedef enum logic { SRC_FE = 1'b0, SRC_BE = 1'b1 } src_t;
+
+>>>>>>> Stashed changes
     typedef logic [NUM_COLS-1:0][ELEM_BITS-1:0] scpad_data_t;      
     typedef logic [NUM_COLS-1:0] enable_mask_t;    
     typedef logic [NUM_COLS-1:0][COL_IDX_WIDTH-1:0] shift_mask_t; 
