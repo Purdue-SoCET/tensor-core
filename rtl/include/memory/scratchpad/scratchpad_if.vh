@@ -43,7 +43,7 @@ interface scpad_if;
 
     // DRAM Cntrl. <=> Backend
     typedef struct packed {
-        logicwrite;
+        logic write;
         logic [DRAM_ID_WIDTH-1:0]   id;
         logic [DRAM_ADDR_WIDTH-1:0] dram_addr;
         logic [COL_IDX_WIDTH-1:0]   num_bytes;
@@ -87,7 +87,7 @@ interface scpad_if;
         logic [MAX_DIM_WIDTH-1:0] col_id;
         logic row_or_col;
         xbar_desc_t xbar;
-        scpad_data_twdata;
+        scpad_data_t wdata;
     } wr_req_t;
 
     typedef struct packed {
