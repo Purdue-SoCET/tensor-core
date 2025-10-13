@@ -192,6 +192,8 @@ interface scpad_if;
     sel_rd_res_t spad_xbar_rd_req [NUM_SCPADS]; // into rd xbar
     sel_rd_res_t stomach_tail_rd_res [NUM_SCPADS]; // into tail 
 
+    mask_t sram_busy [NUM_SCPADS]; 
+
     // Spad Done.
     mask_t spad_cntrl_rd_res [NUM_SCPADS]; 
     mask_t spad_cntrl_wr_res [NUM_SCPADS]; 
@@ -285,6 +287,7 @@ interface scpad_if;
     // SRAM Controller
     modport sram_ctrl (
         output w_stall, r_stall,
+        input sram_busy, 
         // READ path
         input  head_stomach_rd_req,
         output cntrl_spad_rd_req,

@@ -1,16 +1,6 @@
 `ifndef SCPAD_TYPES_PKG_VH
 `define SCPAD_TYPES_PKG_VH
 
-// The Scratchpad is a SW Controlled Cache for the AMP1 Tensor Core. It is similar to the Unified Local Buffer in TPUV3 Arch, and is meant to be programmable using TMA-like instrinsics of the Nvidia Hopper arch (supports async copies). 
-// The Scratchpad will deal with loading tiles of data (at the maximum of 32x32) from DRAM, and passing them around to Systolic Array and Vector Core units. Specifically, to the TCA and VReg Controller.
-// The Micro-Arch RTL of Scratchpad will contain the following units: 
-//      1. Backend Prefetcher 
-//      2. Frontend Systolic Array 
-//      3. Frontend Vector Core 
-//      4. Crossbar
-//      5. SRAM Controller 
-//      6. Frontend Arb. 
-
 package spad_types_pkg;
     parameter int SCPAD_SIZE_BYTES = 1024*1024;  // total scratchpad size 
     parameter int NUM_COLS = 32;  // always a power of 2 
@@ -62,6 +52,8 @@ package spad_types_pkg;
     typedef logic [NUM_COLS-1:0][ROW_IDX_WIDTH-1:0] slot_mask_t; 
 
     typedef enum { "NAIVE", "BENES", "BATCHER" } xbar_types_t;
+    parameter xbar_types_t MODE = "NAIVE";
+    parameter int XBAR_LATENCY = 14; 
 
 endpackage
 `endif

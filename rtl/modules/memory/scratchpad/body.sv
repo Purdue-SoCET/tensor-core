@@ -9,8 +9,6 @@ module body #(
 ); 
     import scpad_types_pkg::*;
 
-    mask_t busy [NUM_SCPADS]; 
-
     head #(.IDX(IDX)) u_head (.clk(clk), .n_rst(n_rst), .hif(bif));
 
     wxbar #(.IDX(IDX)) u_write_xbar_ti (.clk(clk), .n_rst(n_rst), .wif(bif));
@@ -21,7 +19,7 @@ module body #(
     generate
         for (gi = 0; gi < NUM_COLS; gi++) begin : g_bank
             sram_bank #(.READ_LATENCY (2), .WRITE_LATENCY(2)) u_bank (
-                .clk(clk), .n_rst(n_rst), .busy(busy[ti][gi]), 
+                .clk(clk), .n_rst(n_rst), .busy(sram_busy[ti][gi]), 
 
                 .ren(bif.cntrl_spad_rd_req[ti].valid_mask[gi] && bif.cntrl_spad_rd_req[ti].valid),
                 .raddr((bif.cntrl_spad_rd_req[ti].slot_mask[gi]),
