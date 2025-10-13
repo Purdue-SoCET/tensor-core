@@ -1,7 +1,7 @@
 `timescale 1 ns / 1 ns
 module sqrt_tb;
     localparam MULT_LATENCY = 2;
-    localparam TOTAL_LATENCY = 2*MULT_LATENCY + 1; // include first register stage
+    localparam TOTAL_LATENCY = 2*MULT_LATENCY + 1;
 
     // Signals
     logic CLK, nRST;
@@ -25,6 +25,7 @@ module sqrt_tb;
     always #5 CLK = ~CLK;
 
     logic [15:0] normal_cases [0:9];
+    
     initial begin
         nRST = 0;
         input_val = 16'h0000;
@@ -36,12 +37,12 @@ module sqrt_tb;
         normal_cases[1] = 16'h4000; // 2.0
         normal_cases[2] = 16'h4200; // 3.0
         normal_cases[3] = 16'h4400; // 4.0
-        normal_cases[4] = 16'h4900; // 9.0
-        normal_cases[5] = 16'h4E00; // 16.0
+        normal_cases[4] = 16'h4880; // 9.0
+        normal_cases[5] = 16'h4c00; // 16.0
         normal_cases[6] = 16'h3800; // 0.5
         normal_cases[7] = 16'h3400; // 0.25
         normal_cases[8] = 16'h5640; // 100.0
-        normal_cases[9] = 16'h3A00; // 0.625
+        normal_cases[9] = 16'h3900; // 0.625
 
         for (int i = 0; i < 10; i++) begin
             @(posedge CLK);
@@ -50,7 +51,6 @@ module sqrt_tb;
 
             @(posedge CLK);
             valid_data_in = 0;
-
         end
 
         repeat (TOTAL_LATENCY + 5) @(posedge CLK);
@@ -59,8 +59,9 @@ module sqrt_tb;
     end
 
     always @(posedge CLK) begin
-        if (valid_data_out) begin
-            $display("Time %0t: Output valid! Output_val = 0x%h", $time, output_val);
+        if (dut.mult1_done) begin
+            $display("Mult1 Done! Slope=0x%h, NormMant=0x%h, Result=0x%h", 
+                     dut.input_slope, dut.normalized_mantissa, dut.mult1_product);
         end
     end
 endmodule
