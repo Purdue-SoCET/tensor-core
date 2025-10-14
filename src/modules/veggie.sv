@@ -54,8 +54,7 @@ module veggie #(
     logic conflict, d_conflict, m_conflict, nxt_conflict;
     conflict_state_t state, state_nxt;
 
-    // SINGLE-STATE FSM
-    always_comb begin : SINGLE_STATE_FSM
+    always_comb begin : CONFLICT_FSM
         for (int b = 0; b < BANK_COUNT; b++) begin
             bank_rreqs[b] = '0;
             bank_wreqs[b] = '0;
