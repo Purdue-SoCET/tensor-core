@@ -112,16 +112,20 @@ package vector_pkg;
     // Veggie Input Signals
     
     typedef struct packed {
+        // VDATA Writes
         vsel_t[WRITE_PORTS-1:0] vd;
         vreg_t[WRITE_PORTS-1:0] vdata;
         logic[WRITE_PORTS-1:0] WEN;
+        // VDATA Reads
         vsel_t[READ_PORTS-1:0] vs;
         logic[READ_PORTS-1:0] REN;
-        logic[MASK_IDX-1:0] vmd; 
-        logic[MASK_IDX-1:0] vms;
-        logic[MASK_BANK_COUNT-1:0] MREN; // mask enable
+        // MASK Reads/Writes
+        mask_sel_t[MASK_BANK_COUNT-1:0] vmd; 
+        vmask_t[MASK_BANK_COUNT-1:0] mvdata;
         logic[MASK_BANK_COUNT-1:0] MWEN; // mask enable
-        logic[31:0] mvdata;
+        // VMASK Reads
+        mask_sel_t[MASK_BANK_COUNT-1:0] vms;
+        logic[MASK_BANK_COUNT-1:0] MREN; // mask enable
     } veggie_in_t;
     /*
     typedef struct packed {
@@ -142,14 +146,16 @@ package vector_pkg;
 
     typedef struct packed {
         vreg_t[READ_PORTS-1:0] vreg;
+        logic [READ_PORTS-1:0] dvalid;
         vmask_t[1:0] vmask;
+        logic [1:0] mvalid;
         logic ready; // to SB
     } veggie_out_t;
 
     typedef struct {
         logic REN;
         logic WEN;
-        logic tag;
+        logic[READ_PORTS-1:0] tag;
         vsel_t vs;
         vsel_t vd;
         vreg_t vdata;
@@ -161,18 +167,24 @@ package vector_pkg;
         mask_sel_t vmd;     // 3 bits (write row select, 0..7)
         mask_sel_t vms;     // 3 bits (read  row select, 0..7)
         vmask_t    mvdata;  // 32-bit mask write data
+        logic[MASK_BANK_COUNT-1:0] tag;
     } mbank_in_t;
 
-    typedef enum logic [1:0] {
-        IDLE,
-        RW1,
-        RW2
-    } conflict_state_t;
+
+    typedef struct {
+        logic valid;
+        logic [ESZ*NUM_ELEMENTS-1:0] ddata;
+    } bank_out_t;
+
+    typedef struct {
+        logic valid;
+        logic [NUM_ELEMENTS-1:0] mdata;
+    } mbank_out_t;
 
     typedef enum logic [1:0] {
-        RW_CONFLICT = 2'b1x,
-        RR_CONFLICT = 2'b01
-    } conflict_type_t;
+        READY,
+        CONFLICT
+    } conflict_state_t;
     // --------------------------------------------------------------------------------
 
     // MaskU Structs -------------------------------------------------------------------

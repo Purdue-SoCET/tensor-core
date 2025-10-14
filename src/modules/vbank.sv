@@ -20,6 +20,7 @@ module vbank #(
   logic [DATA_WIDTH-1:0] mem [NUM_ROWS-1:0][NUM_ELEMENTS-1:0];
 
   // Read logic
+  /*
   always_ff @ (posedge clk) begin
     if (ren) begin
       for (int i = 0; i < NUM_ELEMENTS; i++) begin
@@ -27,6 +28,7 @@ module vbank #(
       end
     end
   end
+  */
 
   // Write logic
   always_ff @ (posedge clk) begin
@@ -35,6 +37,12 @@ module vbank #(
         if (wstrb[i]) begin
           mem[waddr][i] <= wdata[i*DATA_WIDTH +: DATA_WIDTH];
         end
+      end
+    end
+
+    if (ren) begin
+      for (int i = 0; i < NUM_ELEMENTS; i++) begin
+        rdata[i*DATA_WIDTH +: DATA_WIDTH] <= mem[raddr][i];
       end
     end
   end

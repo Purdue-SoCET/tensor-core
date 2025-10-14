@@ -159,7 +159,7 @@ module vbank_tb;
         
         
         $display("\nvbank_tb: All required tests complete.");
-        $finish;
+        $stop;
     end
 
 endmodule

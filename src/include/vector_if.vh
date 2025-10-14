@@ -8,9 +8,9 @@ interface vector_if;
   import vector_pkg::*;
 
   // Top level signals
+  
   logic CLK, nRST;
   /*
-  logic CLK, nRST;
   control_t control;
   vreg_t v1, v2, vdata; // FP16 Vector Data
   vsel_t vd;
@@ -54,7 +54,7 @@ interface vector_if;
   */
   // Veggie
   modport veggie (
-    input CLK, nRST, 
+    input CLK, nRST,
     input veggie_in,
     output veggie_out
   );

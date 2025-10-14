@@ -42,7 +42,20 @@ module veggie #(
     logic [MREAD_PORTS-1:0]  bank_mrreqs[MASK_BANK_COUNT-1:0], bank_mrpend[MASK_BANK_COUNT-1:0], bank_mrpend_nxt[MASK_BANK_COUNT-1:0];
     logic [MWRITE_PORTS-1:0] bank_mwreqs[MASK_BANK_COUNT-1:0], bank_mwpend[MASK_BANK_COUNT-1:0], bank_mwpend_nxt[MASK_BANK_COUNT-1:0];
 
-    always_comb begin
+    // BANK MANAGEMENT BUSES AND WIRES
+    bank_in_t      bank_in[BANK_COUNT-1:0]; 
+    bank_out_t     bank_out[BANK_COUNT-1:0]; 
+    mbank_in_t     mbank_in[MASK_BANK_COUNT-1:0];
+    mbank_out_t    mbank_out[MASK_BANK_COUNT-1:0];
+    vreg_t         bank_rdata[BANK_COUNT-1:0];
+    logic [63:0]   bank_mrdata[MASK_BANK_COUNT-1:0]; 
+    logic [DREAD_PORTS-1:0]  read_grants;
+    logic [MREAD_PORTS-1:0]  mread_grants;
+    logic conflict, d_conflict, m_conflict, nxt_conflict;
+    conflict_state_t state, state_nxt;
+
+    // SINGLE-STATE FSM
+    always_comb begin : SINGLE_STATE_FSM
         for (int b = 0; b < BANK_COUNT; b++) begin
             bank_rreqs[b] = '0;
             bank_wreqs[b] = '0;
@@ -55,59 +68,91 @@ module veggie #(
         for (int i = 0; i < DWRITE_PORTS; i++) if (vif.veggie_in.WEN[i])  bank_wreqs[vd_bnum[i]][i] = 1'b1;
         for (int i = 0; i < MREAD_PORTS; i++)  if (vif.veggie_in.MREN[i]) bank_mrreqs[vms_bnum[i]][i] = 1'b1;
         for (int i = 0; i < MWRITE_PORTS; i++) if (vif.veggie_in.MWEN[i]) bank_mwreqs[vmd_bnum[i]][i] = 1'b1;
-    end
 
-    // BANK MANAGEMENT BUSES AND WIRES
-    bank_in_t      bank_in[BANK_COUNT-1:0]; 
-    mbank_in_t     mbank_in[MASK_BANK_COUNT-1:0];
-    vreg_t         bank_rdata[BANK_COUNT-1:0];
-    logic [63:0]   bank_mrdata[MASK_BANK_COUNT-1:0]; 
-    logic [DREAD_PORTS-1:0]  read_grants;
-    logic [MREAD_PORTS-1:0]  mread_grants;
-    logic any_rpend, any_wpend, any_mrpend, any_mwpend;
-
-    // SINGLE-STATE FSM
-        always_comb begin : SINGLE_STATE_FSM
-        logic [DREAD_PORTS-1:0]  total_rreqs[BANK_COUNT];
-        logic [DWRITE_PORTS-1:0] total_wreqs[BANK_COUNT];
-        logic [MREAD_PORTS-1:0]  total_mrreqs[MASK_BANK_COUNT];
-        logic [MWRITE_PORTS-1:0] total_mwreqs[MASK_BANK_COUNT];
-
+        //enabled = |vif.veggie_in.REN || |vif.veggie_in.WEN || |vif.veggie_in.MREN || |vif.veggie_in.MWEN;
+        //conflict = |{<<{bank_rpend_nxt, bank_wpend_nxt, bank_mrpend_nxt, bank_mwpend_nxt}};
+        
+        d_conflict = 1'b0;
         for (int b = 0; b < BANK_COUNT; b++) begin
-            total_rreqs[b] = bank_rpend[b] | bank_rreqs[b];
-            total_wreqs[b] = bank_wpend[b] | bank_wreqs[b];
+            if ( ($countones(bank_rreqs[b]) > 1) || ($countones(bank_wreqs[b]) > 1)) begin
+                d_conflict = 1'b1;
+            end
         end
+        m_conflict = 1'b0;
         for (int b = 0; b < MASK_BANK_COUNT; b++) begin
-            total_mrreqs[b] = bank_mrpend[b] | bank_mrreqs[b];
-            total_mwreqs[b] = bank_mwpend[b] | bank_mwreqs[b];
+            if ( ($countones(bank_mrreqs[b]) > 1) || ($countones(bank_mwreqs[b]) > 1) ) begin
+                m_conflict = 1'b1;
+            end
         end
+        conflict = d_conflict || m_conflict;
 
-        bank_rpend_nxt  = total_rreqs;
-        bank_wpend_nxt  = total_wreqs;
-        bank_mrpend_nxt = total_mrreqs;
-        bank_mwpend_nxt = total_mwreqs;
+        case(state)
+            READY: begin
+                bank_rpend_nxt = bank_rreqs;
+                bank_wpend_nxt = bank_wreqs;
+                bank_mrpend_nxt = bank_mrreqs;
+                bank_mwpend_nxt = bank_mwreqs;
+
+                vif.veggie_out.ready = conflict;
+                //conflict = |{<<{bank_rpend_nxt, bank_wpend_nxt, bank_mrpend_nxt, bank_mwpend_nxt}};
+                state_nxt = (conflict) ? CONFLICT : READY;
+            end
+            CONFLICT: begin
+
+                bank_rpend_nxt = bank_rpend;
+                bank_wpend_nxt = bank_wpend;
+                bank_mrpend_nxt = bank_mrpend;
+                bank_mwpend_nxt = bank_mwpend;
+
+                bank_rreqs = bank_rpend;
+                bank_wreqs = bank_wpend;
+                bank_mrreqs = bank_mrpend;
+                bank_mwreqs = bank_mwpend;
+
+                vif.veggie_out.ready = 1'b0;
+
+                nxt_conflict = 1'b0;
+
+                for (int b = 0; b < BANK_COUNT; b++) begin
+                    if ( ($countones(bank_rpend_nxt[b]) > 1) || ($countones(bank_wpend_nxt[b]) > 1)) begin
+                        nxt_conflict = 1'b1;
+                    end
+                end
+                m_conflict = 1'b0;
+                for (int b = 0; b < MASK_BANK_COUNT; b++) begin
+                    if ( ($countones(bank_mrpend_nxt[b]) > 1) || ($countones(bank_mwpend_nxt[b]) > 1) ) begin
+                        nxt_conflict = 1'b1;
+                    end
+                end
+                state_nxt = (nxt_conflict/* && enabled*/) ? CONFLICT : READY;
+            end
+            default: begin vif.veggie_out.ready = 1'b0; state_nxt = READY; end
+        endcase 
+
         read_grants     = '0;
         mread_grants    = '0;
+
         for (int b = 0; b < BANK_COUNT; b++) bank_in[b] = '{default:'0};
         for (int b = 0; b < MASK_BANK_COUNT; b++) mbank_in[b] = '{default:'0};
-        
+
         for (int b = 0; b < BANK_COUNT; b++) begin
-            if (|(total_rreqs[b])) begin
+            if (|(bank_rreqs[b])) begin
                 logic [DREAD_PORTS-1:0] winner;
                 int winner_idx; 
-                winner = total_rreqs[b] & -total_rreqs[b]; 
+                winner = bank_rreqs[b] & -bank_rreqs[b]; 
                 winner_idx = $clog2(winner);
                 
                 // Bank Read Bus
                 bank_in[b].REN = vif.veggie_in.REN[winner_idx];
-                bank_in[b].vs = vif.veggie_in.REN[winner_idx];
+                bank_in[b].vs = vif.veggie_in.vs[winner_idx];
+                bank_in[b].tag = winner;
 
                 bank_rpend_nxt[b] &= ~winner;
                 read_grants[winner_idx] = 1'b1;
             end
-            if (|(total_wreqs[b])) begin
+            if (|(bank_wreqs[b])) begin
                 logic [DWRITE_PORTS-1:0] winner;
-                winner = total_wreqs[b] & -total_wreqs[b]; 
+                winner = bank_wreqs[b] & -bank_wreqs[b]; 
 
                 // Setting Write Bus
                 bank_in[b].WEN   = vif.veggie_in.WEN[$clog2(winner)];
@@ -118,22 +163,23 @@ module veggie #(
             end
         end
         for (int b = 0; b < MASK_BANK_COUNT; b++) begin
-            if (|(total_mrreqs[b])) begin
+            if (|(bank_mrreqs[b])) begin
                 logic [MREAD_PORTS-1:0] winner; 
                 int winner_idx;  
-                winner = total_mrreqs[b] & -total_mrreqs[b]; 
+                winner = bank_mrreqs[b] & -bank_mrreqs[b]; 
                 winner_idx = $clog2(winner);
 
                 // Mask Read Bus
                 mbank_in[b].MREN = vif.veggie_in.MREN[winner_idx];
                 mbank_in[b].vms  = vif.veggie_in.vms[winner_idx];
+                mbank_in[b].tag  = winner;
 
                 bank_mrpend_nxt[b] &= ~winner;
                 mread_grants[winner_idx] = 1'b1;
             end
-            if (|(total_mwreqs[b])) begin
+            if (|(bank_mwreqs[b])) begin
                 logic [MWRITE_PORTS-1:0] winner;
-                winner = total_mwreqs[b] & -total_mwreqs[b];
+                winner = bank_mwreqs[b] & -bank_mwreqs[b];
 
                 // Mask Write Bus
                 mbank_in[b].MWEN   = vif.veggie_in.MWEN[$clog2(winner)];
@@ -143,26 +189,17 @@ module veggie #(
                 bank_mwpend_nxt[b] &= ~winner;
             end
         end
-
-        for (int b = 0; b < BANK_COUNT; b++) begin
-            any_rpend |= |bank_rpend_nxt[b];
-            any_wpend |= |bank_wpend_nxt[b];
-        end
-        for (int b = 0; b < MASK_BANK_COUNT; b++) begin
-            any_mrpend |= |bank_mrpend_nxt[b];
-            any_mwpend |= |bank_mwpend_nxt[b];
-        end
-
-        vif.veggie_out.ready = !(any_rpend | any_wpend | any_mrpend | any_mwpend);
     end
 
     always_ff @(posedge CLK, negedge nRST) begin
         if (!nRST) begin
-            bank_rpend  <= bank_rreqs; 
+            state <= READY;
+            bank_rpend  <= bank_rreqs;
             bank_wpend  <= bank_wreqs;
-            bank_mrpend <= bank_mrreqs; 
+            bank_mrpend <= bank_mrreqs;
             bank_mwpend <= bank_mwreqs;
         end else begin
+            state <= state_nxt;
             bank_rpend  <= bank_rpend_nxt;
             bank_wpend  <= bank_wpend_nxt;
             bank_mrpend <= bank_mrpend_nxt;
@@ -180,7 +217,7 @@ module veggie #(
                 .INDEX_WIDTH($clog2(NUM_MASKS))        // 3 bits
             ) `BANKNAME(M, i_mb) (
                 .clk(CLK),
-                .ren(mbank_in[i_mb].MREN),   .raddr(mbank_in[i_mb].vms),    .rdata(vif.veggie_out.vmask[i_mb]),
+                .ren(mbank_in[i_mb].MREN),   .raddr(mbank_in[i_mb].vms),    .rdata(mbank_out[i_mb].mdata),
                 .wen(mbank_in[i_mb].MWEN),   .waddr(mbank_in[i_mb].vmd),    .wdata(mbank_in[i_mb].mvdata), .wstrb('1)
             );
         end
@@ -192,9 +229,39 @@ module veggie #(
                 .INDEX_WIDTH(8) 
             )`BANKNAME(D, i_db) (
                 .clk(CLK),
-                .ren(bank_in[i_db].REN),     .raddr(bank_in[i_db].vs),      .rdata(vif.veggie_out.vreg[i_db]),
+                .ren(bank_in[i_db].REN),     .raddr(bank_in[i_db].vs),      .rdata(bank_out[i_db].ddata),
                 .wen(bank_in[i_db].WEN),     .waddr(bank_in[i_db].vd),      .wdata(bank_in[i_db].vdata),   .wstrb('1)
             );
         end
     endgenerate
+
+    always_comb begin : OUTPUTS
+    vif.veggie_out.vreg   = '{default:'0};
+    vif.veggie_out.dvalid = '0;
+    vif.veggie_out.vmask   = '{default:'0};
+    vif.veggie_out.mvalid  = '0;
+
+    for (int b = 0; b < BANK_COUNT; b++) begin
+        if (bank_in[b].REN) begin
+        for (int p = 0; p < DREAD_PORTS; p++) begin
+            if (bank_in[b].tag[p]) begin
+                vif.veggie_out.vreg[p]   = bank_out[b].ddata;
+                vif.veggie_out.dvalid[p] = 1'b1;
+            end
+        end
+        end
+    end
+
+    for (int b = 0; b < MASK_BANK_COUNT; b++) begin
+        if (mbank_in[b].MREN) begin
+        for (int p = 0; p < MREAD_PORTS; p++) begin
+            if (mbank_in[b].tag[p]) begin
+                vif.veggie_out.vmask[p]   = mbank_out[b].mdata;
+                vif.veggie_out.mvalid[p]  = 1'b1;
+            end
+        end
+        end
+    end
+    end
+
 endmodule
