@@ -65,8 +65,13 @@ assign baddr.row_or_col = be_sche.sched_req.row_or_col;
 assign baddr.spad_addr = be_sche.sched_req.spad_addr;
 assign baddr.num_rows = be_sche.sched_req.num_rows;
 assign baddr.num_cols = be_sche.sched_req.num_cols;
-assign baddr.row_id = uuid  // no matter which orientation we are in the uuid keeps track         
-assign baddr.col_id = uuid  // of the row_id or col_id, since it only counts up when moving on the next row/col.
+assign baddr.row_id = (be_sche.sched_write) ? be_dram.id : uuid  // no matter which orientation we are in the uuid keeps track         
+assign baddr.col_id = (be_sche.sched_write) ? be_dram.id : uuid  // of the row_id or col_id, since it only counts up when moving on the next row/col.
+// If it's a sched_write then we are doing a dram read and sram load
+// If we are doing an sram load then we want the calculated xbar to based off the incoming id
+// Should tighten up timings and make mistakes in latched data less likely
+// If sched_write is 0 then we are doing a sram read and dram load which means we need xbar to be
+// calced based off the uuid to put it in order for the sram read req fifo
 
 dram_read_request_queue dr_rd_req_q(clk, n_rst, be_dr_rd_req_q);
 assign be_dr_rd_req_q.dram_addr = be_sche.sched_req.dram_addr;

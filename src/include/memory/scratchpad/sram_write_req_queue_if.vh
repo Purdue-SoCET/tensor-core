@@ -19,16 +19,19 @@ interface sram_write_req_queue_if;
             scpad_data_t wdata;
     } sram_write_req_t;
 
-    logic [DRAM_ID_WIDTH-1:0]   id;
+
+    sram_write_req_t sram_write_req
+    logic [DRAM_ID_WIDTH-1:0] dram_data_id;
     xbar_desc_t  xbar;
     scpad_data_t dr_rdata;
-    logic be_wr_req_complete
+    logic be_dr_wr_req_complete
+    logic sram_write_queue_full, sram_write_req_latched, be_sram_wr_req_accepted;
 
     modport baceknd_sram_write_req_queue ( 
-        input  xbar, id, dr_rdata,
-        input be_wr_req_complete.
+        input xbar, dram_data_id, dr_rdata, be_sram_wr_req_accepted,
+        input be_dr_rd_req_complete,
 
-        output sram_write_req_t
+        output sram_write_req, sram_write_queue_full, sram_write_req_latched
     );
 
 endinterface
