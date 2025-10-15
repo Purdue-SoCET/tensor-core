@@ -14,7 +14,7 @@ module gsau_control_unit_tb;
   always #5 CLK = ~CLK;  // 100 MHz
 
   // Interface
-  gsau_if gsau_if_inst();
+  gsau_control_unit_if gsau_if_inst();
 
   // DUT
   gsau_control_unit #(

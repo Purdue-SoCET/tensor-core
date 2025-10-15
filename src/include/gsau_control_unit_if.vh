@@ -5,10 +5,10 @@
   GSAU Interface V1
 */
 
-`ifndef GSAU_IF_VH
-`define GSAU_IF_VH
+`ifndef GSAU_CONTROL_UNIT_IF_VH
+`define GSAU_CONTROL_UNIT_IF_VH
 
-interface gsau_if;
+interface gsau_control_unit_if;
   import vector_pkg::*;   // reuse basic typedefs (data, addr, etc.)
   import sys_arr_pkg::*;  // systolic-specific typedefs
   import types_pkg::*;

@@ -1,3 +1,5 @@
+`include "gsau_control_unit_if.vh"
+
 module gsau_control_unit #(
     parameter int VEGGIEREGS = 256,
     // FIFOSIZE is in bits in your design notes (32 regs * 3 * 8 = 768 bits).
@@ -6,8 +8,12 @@ module gsau_control_unit #(
 ) (
     input  logic        CLK,
     input  logic        nRST,
-    gsau_if.gsau        gsau_port
+    gsau_control_unit_if.gsau        gsau_port
 );
+
+  import vector_pkg::*;   // reuse basic typedefs (data, addr, etc.)
+  import sys_arr_pkg::*;  // systolic-specific typedefs
+  import types_pkg::*;
 
   // local constants
   localparam int ENTRY_BITS = 8;
