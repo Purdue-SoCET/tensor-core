@@ -76,10 +76,12 @@ module row_open (
                     end
                 end
                 else begin
-                    nreg_f[ptr].valid = 1'b1;
-                    nreg_f[ptr].row = pol_if.row;
-                    nrow_open_cnt = row_open_cnt + 1;
                     nrow_stat = 2'b10; //MISS
+                    if (pol_if.tACT_done) begin
+                        nreg_f[ptr].valid = 1'b1;
+                        nreg_f[ptr].row = pol_if.row;
+                        nrow_open_cnt = row_open_cnt + 1;
+                    end
                 end
             end
         end

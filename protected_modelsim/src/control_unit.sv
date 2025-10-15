@@ -49,6 +49,7 @@ module control_unit(
     assign mycmd.rf_req =    mytime.rf_req;
     assign mycmd.tRD_done =  mytime.tRD_done;
     assign mycmd.tREF_done = mytime.tREF_done;
+    assign myrow.tACT_done = mytime.tACT_done;
     
 
     //Request interface between memory arbiter and command FSM
