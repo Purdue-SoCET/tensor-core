@@ -9,16 +9,17 @@ interface data_transfer_if ();
     parameter WORD_W = 32;
 
     logic wr_en, rd_en, clear;
+    logic edge_flag;
     logic [WORD_W - 1: 0] memstore, memload;
     logic [2:0] COL_choice;
-    wire [WORD_W - 1cd ..
-     : 0] DQ;
+    wire [WORD_W - 1 :0] DQ;
     wire DQS_t, DQS_c, DM_n;
+    
 
     modport data_trans (
         input wr_en, rd_en, clear, memstore, COL_choice,
         inout DQ, DQS_t, DQS_c, DM_n,
-        output memload
+        output memload, edge_flag
     );
 
 endinterface

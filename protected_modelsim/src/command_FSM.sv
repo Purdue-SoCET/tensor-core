@@ -53,7 +53,9 @@ module command_FSM (
             end
 
             IDLE: begin
-                if (mycmd.rf_req) mycmd.ncmd_state = REFRESH;
+                if (mycmd.rf_req) begin
+                    mycmd.ncmd_state = (mycmd.all_row_closed) ? REFRESH : PRECHARGE;
+                end
                 else if (mycmd.dWEN || mycmd.dREN) begin
                     if (mycmd.row_stat == HIT) mycmd.ncmd_state = mycmd.dWEN ? WRITE : READ;
                     else if(mycmd.row_stat == CONFLICT) mycmd.ncmd_state = PRECHARGE;
@@ -62,7 +64,7 @@ module command_FSM (
             end
 
             ACTIVATE: begin
-                if (mycmd.rf_req) begin mycmd.ncmd_state = REFRESH;end
+                if (mycmd.rf_req) begin mycmd.ncmd_state = (mycmd.all_row_closed) ? REFRESH : PRECHARGE; end
                 else begin mycmd.ncmd_state = ACTIVATING; end
             end
 

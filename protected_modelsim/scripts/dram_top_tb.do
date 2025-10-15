@@ -132,62 +132,64 @@ add wave -noupdate -group init_state /dram_top_tb/DUT/ctrl/myinit/init
 add wave -noupdate -group init_state /dram_top_tb/DUT/ctrl/myinit/init_done
 add wave -noupdate -group init_state /dram_top_tb/DUT/ctrl/myinit/init_state
 add wave -noupdate -group init_state /dram_top_tb/DUT/ctrl/myinit/ninit_state
-add wave -noupdate -expand -group signal_gen /dram_top_tb/DUT/mysig/RA0
-add wave -noupdate -expand -group signal_gen /dram_top_tb/DUT/mysig/BG0
-add wave -noupdate -expand -group signal_gen /dram_top_tb/DUT/mysig/BA0
-add wave -noupdate -expand -group signal_gen /dram_top_tb/DUT/mysig/R0
-add wave -noupdate -expand -group signal_gen /dram_top_tb/DUT/mysig/C0
-add wave -noupdate -expand -group signal_gen /dram_top_tb/DUT/mysig/ACT_n
-add wave -noupdate -expand -group signal_gen /dram_top_tb/DUT/mysig/RAS_n_A16
-add wave -noupdate -expand -group signal_gen /dram_top_tb/DUT/mysig/CAS_n_A15
-add wave -noupdate -expand -group signal_gen /dram_top_tb/DUT/mysig/WE_n_A14
-add wave -noupdate -expand -group signal_gen /dram_top_tb/DUT/mysig/ALERT_n
-add wave -noupdate -expand -group signal_gen /dram_top_tb/DUT/mysig/PARITY
-add wave -noupdate -expand -group signal_gen /dram_top_tb/DUT/mysig/RESET_n
-add wave -noupdate -expand -group signal_gen /dram_top_tb/DUT/mysig/TEN
-add wave -noupdate -expand -group signal_gen /dram_top_tb/DUT/mysig/CS_n
-add wave -noupdate -expand -group signal_gen /dram_top_tb/DUT/mysig/CKE
-add wave -noupdate -expand -group signal_gen /dram_top_tb/DUT/mysig/ODT
-add wave -noupdate -expand -group signal_gen /dram_top_tb/DUT/mysig/ZQ
-add wave -noupdate -expand -group signal_gen /dram_top_tb/DUT/mysig/PWR
-add wave -noupdate -expand -group signal_gen /dram_top_tb/DUT/mysig/VREF_CA
-add wave -noupdate -expand -group signal_gen /dram_top_tb/DUT/mysig/VREF_DQ
-add wave -noupdate -expand -group signal_gen /dram_top_tb/DUT/mysig/C
-add wave -noupdate -expand -group signal_gen /dram_top_tb/DUT/mysig/BG
-add wave -noupdate -expand -group signal_gen /dram_top_tb/DUT/mysig/BA
-add wave -noupdate -expand -group signal_gen /dram_top_tb/DUT/mysig/ADDR
-add wave -noupdate -expand -group signal_gen /dram_top_tb/DUT/mysig/ADDR_17
-add wave -noupdate -expand -group signal_gen /dram_top_tb/DUT/sig_gen/cmd_addr
-add wave -noupdate -expand -group signal_gen /dram_top_tb/DUT/sig_gen/issue
-add wave -noupdate -expand -group signal_gen /dram_top_tb/DUT/mysig/ref_re
-add wave -noupdate -expand -group signal_gen /dram_top_tb/DUT/mysig/state
-add wave -noupdate -expand -group signal_gen /dram_top_tb/DUT/mysig/nstate
-add wave -noupdate -expand -group cmd_FSM /dram_top_tb/DUT/ctrl/mycmd/dREN
-add wave -noupdate -expand -group cmd_FSM /dram_top_tb/DUT/ctrl/mycmd/dWEN
-add wave -noupdate -expand -group cmd_FSM /dram_top_tb/DUT/ctrl/mycmd/init_done
-add wave -noupdate -expand -group cmd_FSM /dram_top_tb/DUT/ctrl/mycmd/init_req
-add wave -noupdate -expand -group cmd_FSM /dram_top_tb/DUT/ctrl/mycmd/tACT_done
-add wave -noupdate -expand -group cmd_FSM /dram_top_tb/DUT/ctrl/mycmd/tWR_done
-add wave -noupdate -expand -group cmd_FSM /dram_top_tb/DUT/ctrl/mycmd/tRD_done
-add wave -noupdate -expand -group cmd_FSM /dram_top_tb/DUT/ctrl/mycmd/tPRE_done
-add wave -noupdate -expand -group cmd_FSM /dram_top_tb/DUT/ctrl/mycmd/tREF_done
-add wave -noupdate -expand -group cmd_FSM -color Magenta /dram_top_tb/DUT/ctrl/mycmd/rf_req
-add wave -noupdate -expand -group cmd_FSM /dram_top_tb/DUT/ctrl/mycmd/row_stat
-add wave -noupdate -expand -group cmd_FSM /dram_top_tb/DUT/ctrl/mycmd/ram_wait
-add wave -noupdate -expand -group cmd_FSM /dram_top_tb/DUT/ctrl/mycmd/row_resolve
-add wave -noupdate -expand -group cmd_FSM /dram_top_tb/task_name
-add wave -noupdate -expand -group cmd_FSM -color Cyan /dram_top_tb/DUT/ctrl/mycmd/cmd_state
-add wave -noupdate -expand -group cmd_FSM /dram_top_tb/DUT/ctrl/mycmd/ncmd_state
-add wave -noupdate -expand -group row_policy -color Orange /dram_top_tb/DUT/ctrl/myrow/row
-add wave -noupdate -expand -group row_policy -color Orange /dram_top_tb/DUT/ctrl/myrow/bank
-add wave -noupdate -expand -group row_policy -color Orange /dram_top_tb/DUT/ctrl/myrow/bank_group
-add wave -noupdate -expand -group row_policy -color Orange /dram_top_tb/DUT/ctrl/myrow/row_conflict
-add wave -noupdate -expand -group row_policy /dram_top_tb/DUT/ctrl/myrow/req_en
-add wave -noupdate -expand -group row_policy /dram_top_tb/DUT/ctrl/myrow/refresh
-add wave -noupdate -expand -group row_policy /dram_top_tb/DUT/ctrl/myrow/row_resolve
-add wave -noupdate -expand -group row_policy /dram_top_tb/DUT/ctrl/myrow/row_stat
+add wave -noupdate -group signal_gen /dram_top_tb/DUT/mysig/RA0
+add wave -noupdate -group signal_gen /dram_top_tb/DUT/mysig/BG0
+add wave -noupdate -group signal_gen /dram_top_tb/DUT/mysig/BA0
+add wave -noupdate -group signal_gen /dram_top_tb/DUT/mysig/R0
+add wave -noupdate -group signal_gen /dram_top_tb/DUT/mysig/C0
+add wave -noupdate -group signal_gen /dram_top_tb/DUT/mysig/ACT_n
+add wave -noupdate -group signal_gen /dram_top_tb/DUT/mysig/RAS_n_A16
+add wave -noupdate -group signal_gen /dram_top_tb/DUT/mysig/CAS_n_A15
+add wave -noupdate -group signal_gen /dram_top_tb/DUT/mysig/WE_n_A14
+add wave -noupdate -group signal_gen /dram_top_tb/DUT/mysig/ALERT_n
+add wave -noupdate -group signal_gen /dram_top_tb/DUT/mysig/PARITY
+add wave -noupdate -group signal_gen /dram_top_tb/DUT/mysig/RESET_n
+add wave -noupdate -group signal_gen /dram_top_tb/DUT/mysig/TEN
+add wave -noupdate -group signal_gen /dram_top_tb/DUT/mysig/CS_n
+add wave -noupdate -group signal_gen /dram_top_tb/DUT/mysig/CKE
+add wave -noupdate -group signal_gen /dram_top_tb/DUT/mysig/ODT
+add wave -noupdate -group signal_gen /dram_top_tb/DUT/mysig/ZQ
+add wave -noupdate -group signal_gen /dram_top_tb/DUT/mysig/PWR
+add wave -noupdate -group signal_gen /dram_top_tb/DUT/mysig/VREF_CA
+add wave -noupdate -group signal_gen /dram_top_tb/DUT/mysig/VREF_DQ
+add wave -noupdate -group signal_gen /dram_top_tb/DUT/mysig/C
+add wave -noupdate -group signal_gen /dram_top_tb/DUT/mysig/BG
+add wave -noupdate -group signal_gen /dram_top_tb/DUT/mysig/BA
+add wave -noupdate -group signal_gen /dram_top_tb/DUT/mysig/ADDR
+add wave -noupdate -group signal_gen /dram_top_tb/DUT/mysig/ADDR_17
+add wave -noupdate -group signal_gen /dram_top_tb/DUT/sig_gen/cmd_addr
+add wave -noupdate -group signal_gen /dram_top_tb/DUT/sig_gen/issue
+add wave -noupdate -group signal_gen /dram_top_tb/DUT/mysig/ref_re
+add wave -noupdate -group signal_gen /dram_top_tb/DUT/mysig/state
+add wave -noupdate -group signal_gen /dram_top_tb/DUT/mysig/nstate
+add wave -noupdate -group cmd_FSM /dram_top_tb/DUT/ctrl/mycmd/dREN
+add wave -noupdate -group cmd_FSM /dram_top_tb/DUT/ctrl/mycmd/dWEN
+add wave -noupdate -group cmd_FSM /dram_top_tb/DUT/ctrl/mycmd/init_done
+add wave -noupdate -group cmd_FSM /dram_top_tb/DUT/ctrl/mycmd/init_req
+add wave -noupdate -group cmd_FSM /dram_top_tb/DUT/ctrl/mycmd/tACT_done
+add wave -noupdate -group cmd_FSM /dram_top_tb/DUT/ctrl/mycmd/tWR_done
+add wave -noupdate -group cmd_FSM /dram_top_tb/DUT/ctrl/mycmd/tRD_done
+add wave -noupdate -group cmd_FSM /dram_top_tb/DUT/ctrl/mycmd/tPRE_done
+add wave -noupdate -group cmd_FSM /dram_top_tb/DUT/ctrl/mycmd/tREF_done
+add wave -noupdate -group cmd_FSM -color Magenta /dram_top_tb/DUT/ctrl/mycmd/rf_req
+add wave -noupdate -group cmd_FSM /dram_top_tb/DUT/ctrl/mycmd/row_stat
+add wave -noupdate -group cmd_FSM /dram_top_tb/DUT/ctrl/mycmd/ram_wait
+add wave -noupdate -group cmd_FSM /dram_top_tb/DUT/ctrl/mycmd/row_resolve
+add wave -noupdate -group cmd_FSM /dram_top_tb/task_name
+add wave -noupdate -group cmd_FSM -color Cyan /dram_top_tb/DUT/ctrl/mycmd/cmd_state
+add wave -noupdate -group cmd_FSM /dram_top_tb/DUT/ctrl/mycmd/ncmd_state
+add wave -noupdate -group row_policy -color Orange /dram_top_tb/DUT/ctrl/myrow/row
+add wave -noupdate -group row_policy -color Orange /dram_top_tb/DUT/ctrl/myrow/bank
+add wave -noupdate -group row_policy -color Orange /dram_top_tb/DUT/ctrl/myrow/bank_group
+add wave -noupdate -group row_policy -color Orange /dram_top_tb/DUT/ctrl/myrow/row_conflict
+add wave -noupdate -group row_policy /dram_top_tb/DUT/ctrl/myrow/req_en
+add wave -noupdate -group row_policy /dram_top_tb/DUT/ctrl/myrow/refresh
+add wave -noupdate -group row_policy /dram_top_tb/DUT/ctrl/myrow/row_resolve
+add wave -noupdate -group row_policy /dram_top_tb/DUT/ctrl/myrow/row_stat
+add wave -noupdate -group row_policy /dram_top_tb/DUT/ctrl/u1/row_open_cnt
+add wave -noupdate -group row_policy /dram_top_tb/DUT/ctrl/myrow/all_row_closed
 add wave -noupdate /dram_top_tb/DUT/ctrl/u1/ptr
-add wave -noupdate -expand /dram_top_tb/DUT/ctrl/u1/reg_f
+add wave -noupdate /dram_top_tb/DUT/ctrl/u1/reg_f
 add wave -noupdate -group time_signal /dram_top_tb/DUT/ctrl/mytime/tACT_done
 add wave -noupdate -group time_signal /dram_top_tb/DUT/ctrl/mytime/tWR_done
 add wave -noupdate -group time_signal /dram_top_tb/DUT/ctrl/mytime/tRD_done
@@ -219,8 +221,18 @@ add wave -noupdate -expand -group data_transfer /dram_top_tb/dt_if/DQS_t
 add wave -noupdate -expand -group data_transfer /dram_top_tb/dt_if/DQS_c
 add wave -noupdate -expand -group data_transfer /dram_top_tb/dt_if/DM_n
 add wave -noupdate -expand -group data_transfer /dram_top_tb/DT/count_burst
+add wave -noupdate -expand -group data_transfer /dram_top_tb/dt_if/edge_flag
+add wave -noupdate -expand -group data_transfer /dram_top_tb/dt_if/memload
+add wave -noupdate -expand -group data_transfer /dram_top_tb/dt_if/COL_choice
+add wave -noupdate -expand -group cache_debug /dram_top_tb/CACHE/wr_en
+add wave -noupdate -expand -group cache_debug /dram_top_tb/CACHE/rd_en
+add wave -noupdate -expand -group cache_debug /dram_top_tb/CACHE/row_addr
+add wave -noupdate -expand -group cache_debug /dram_top_tb/CACHE/offset
+add wave -noupdate -expand -group cache_debug /dram_top_tb/CACHE/dmemstore
+add wave -noupdate -expand -group cache_debug /dram_top_tb/dt_if/DQ
+add wave -noupdate -expand -group cache_debug /dram_top_tb/CACHE/dmemload
 TreeUpdate [SetDefaultTree]
-WaveRestoreCursors {{Cursor 1} {4217250 ps} 0}
+WaveRestoreCursors {{Cursor 1} {3565061 ps} 0}
 quietly wave cursor active 1
 configure wave -namecolwidth 150
 configure wave -valuecolwidth 369
@@ -236,4 +248,4 @@ configure wave -griddelta 40
 configure wave -timeline 0
 configure wave -timelineunits ps
 update
-WaveRestoreZoom {3915018 ps} {4168954 ps}
+WaveRestoreZoom {0 ps} {3851663 ps}

@@ -10,6 +10,7 @@ interface row_open_if();
 
     //Conflicted row
     logic [ROW_BITS-1:0] row_conflict;
+    logic all_row_closed;
 
     //Memory request
     logic req_en, refresh, row_resolve;
@@ -17,7 +18,7 @@ interface row_open_if();
 
     modport dut (
         input bank_group, bank, row, req_en, refresh, row_resolve,
-        output row_stat, row_conflict
+        output row_stat, row_conflict, all_row_closed
     );
 
     modport tb  (

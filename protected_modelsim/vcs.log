@@ -1,5 +1,5 @@
 QuestaSim-64 vlog 2021.4 Compiler 2021.10 Oct 13 2021
-Start time: 01:22:59 on Oct 11,2025
+Start time: 02:16:05 on Oct 15,2025
 vlog -work work "+acc" -l vcs.log -sv "+incdir+./include" "+define+DDR4_4G_X8" ./arch_defines.v ./dimm.vh ./arch_package.sv ./proj_package.sv ./interface.sv ./ddr4_model.svp ./src/timing_signal.sv ./src/dram_top.sv ./src/flex_counter.sv ./src/signal_gen.sv ./src/init_state.sv ./src/command_FSM.sv ./src/control_unit.sv ./src/address_mapper.sv ./src/socetlib_counter.sv ./src/scheduler_buffer.sv ./src/edge_det.sv ./src/row_open.sv ./src/data_transfer.sv ./tb/dram_top_tb.sv 
 -- Compiling package dimm_vh_unit
 -- Compiling package arch_package
@@ -95,11 +95,11 @@ vlog -work work "+acc" -l vcs.log -sv "+incdir+./include" "+define+DDR4_4G_X8" .
 -- Compiling module row_open
 -- Compiling package dram_pack
 ** Warning: ** while parsing file included at ./src/data_transfer.sv(1)
-** while parsing file included at data_transfer_if.vh(4)
+** while parsing file included at ./include/data_transfer_if.vh(4)
 ** at dram_command_if.vh(4): (vlog-2275) Existing package 'dram_pack' at line 4 will be overwritten.
 -- Compiling interface dram_command_if
 ** Warning: ** while parsing file included at ./src/data_transfer.sv(1)
-** while parsing file included at data_transfer_if.vh(4)
+** while parsing file included at ./include/data_transfer_if.vh(4)
 ** at dram_command_if.vh(158): (vlog-2275) Existing interface 'dram_command_if' at line 158 will be overwritten.
 -- Compiling interface data_transfer_if
 -- Compiling interface edge_det_if
@@ -122,7 +122,7 @@ vlog -work work "+acc" -l vcs.log -sv "+incdir+./include" "+define+DDR4_4G_X8" .
 ** at scheduler_buffer_if.vh(6): (vlog-2275) Existing interface 'scheduler_buffer_if' at line 6 will be overwritten.
 -- Compiling interface data_transfer_if
 ** Warning: ** while parsing file included at ./tb/dram_top_tb.sv(3)
-** at data_transfer_if.vh(6): (vlog-2275) Existing interface 'data_transfer_if' at line 6 will be overwritten.
+** at ./include/data_transfer_if.vh(6): (vlog-2275) Existing interface 'data_transfer_if' at line 6 will be overwritten.
 -- Compiling interface control_unit_if
 ** Warning: ** while parsing file included at ./tb/dram_top_tb.sv(4)
 ** at ./include/control_unit_if.vh(6): (vlog-2275) Existing interface 'control_unit_if' at line 6 will be overwritten.
@@ -131,23 +131,21 @@ vlog -work work "+acc" -l vcs.log -sv "+incdir+./include" "+define+DDR4_4G_X8" .
 ** at ./include/signal_gen_if.vh(6): (vlog-2275) Existing interface 'signal_gen_if' at line 6 will be overwritten.
 -- Compiling package dram_top_tb_sv_unit
 -- Compiling module dram_top_tb
-** Warning: ./tb/dram_top_tb.sv(385): (vlog-2240) Treating stand-alone use of function 'randomize' as an implicit VOID cast.
-** Warning: ./tb/dram_top_tb.sv(386): (vlog-2240) Treating stand-alone use of function 'display' as an implicit VOID cast.
-** Warning: ./tb/dram_top_tb.sv(402): (vlog-2240) Treating stand-alone use of function 'randomize' as an implicit VOID cast.
-** Warning: ./tb/dram_top_tb.sv(403): (vlog-2240) Treating stand-alone use of function 'create_addr' as an implicit VOID cast.
-** Warning: ./tb/dram_top_tb.sv(446): (vlog-2240) Treating stand-alone use of function 'randomize' as an implicit VOID cast.
-** Warning: ./tb/dram_top_tb.sv(447): (vlog-2240) Treating stand-alone use of function 'create_addr' as an implicit VOID cast.
-** Warning: ./tb/dram_top_tb.sv(493): (vlog-2240) Treating stand-alone use of function 'randomize' as an implicit VOID cast.
-** Warning: ./tb/dram_top_tb.sv(494): (vlog-2240) Treating stand-alone use of function 'create_addr' as an implicit VOID cast.
-** Warning: ./tb/dram_top_tb.sv(502): (vlog-2240) Treating stand-alone use of function 'randomize' as an implicit VOID cast.
-** Warning: ./tb/dram_top_tb.sv(503): (vlog-2240) Treating stand-alone use of function 'create_addr' as an implicit VOID cast.
-** Warning: ./tb/dram_top_tb.sv(511): (vlog-2240) Treating stand-alone use of function 'randomize' as an implicit VOID cast.
-** Warning: ./tb/dram_top_tb.sv(512): (vlog-2240) Treating stand-alone use of function 'create_addr' as an implicit VOID cast.
-** Warning: ./tb/dram_top_tb.sv(523): (vlog-2240) Treating stand-alone use of function 'create_addr' as an implicit VOID cast.
+** Warning: ./tb/dram_top_tb.sv(391): (vlog-2240) Treating stand-alone use of function 'randomize' as an implicit VOID cast.
+** Warning: ./tb/dram_top_tb.sv(416): (vlog-2240) Treating stand-alone use of function 'randomize' as an implicit VOID cast.
+** Warning: ./tb/dram_top_tb.sv(417): (vlog-2240) Treating stand-alone use of function 'create_addr' as an implicit VOID cast.
+** Warning: ./tb/dram_top_tb.sv(501): (vlog-2240) Treating stand-alone use of function 'randomize' as an implicit VOID cast.
+** Warning: ./tb/dram_top_tb.sv(502): (vlog-2240) Treating stand-alone use of function 'create_addr' as an implicit VOID cast.
+** Warning: ./tb/dram_top_tb.sv(538): (vlog-2240) Treating stand-alone use of function 'randomize' as an implicit VOID cast.
+** Warning: ./tb/dram_top_tb.sv(539): (vlog-2240) Treating stand-alone use of function 'create_addr' as an implicit VOID cast.
+** Warning: ./tb/dram_top_tb.sv(547): (vlog-2240) Treating stand-alone use of function 'randomize' as an implicit VOID cast.
+** Warning: ./tb/dram_top_tb.sv(548): (vlog-2240) Treating stand-alone use of function 'create_addr' as an implicit VOID cast.
+** Warning: ./tb/dram_top_tb.sv(556): (vlog-2240) Treating stand-alone use of function 'randomize' as an implicit VOID cast.
+** Warning: ./tb/dram_top_tb.sv(557): (vlog-2240) Treating stand-alone use of function 'create_addr' as an implicit VOID cast.
+** Warning: ./tb/dram_top_tb.sv(568): (vlog-2240) Treating stand-alone use of function 'create_addr' as an implicit VOID cast.
 -- Compiling module sw_cache
 
 Top level modules:
 	dram_top_tb
-	sw_cache
-End time: 01:22:59 on Oct 11,2025, Elapsed time: 0:00:00
-Errors: 0, Warnings: 40
+End time: 02:16:05 on Oct 15,2025, Elapsed time: 0:00:00
+Errors: 0, Warnings: 39

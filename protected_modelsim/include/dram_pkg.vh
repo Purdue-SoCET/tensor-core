@@ -27,7 +27,8 @@ package dram_pkg;
     parameter tCL = 10;
     parameter tBURST = 4;
     parameter tCWL = 10;
-    parameter tREFI = 96000; //The actual value is ___, but we put __ for observing
+    // parameter tREFI = 96000; //The actual value is ___, but we put __ for observing
+    parameter tREFI = 250; //The actual value is ___, but we put __ for observing
     parameter tRP = 10;
     parameter tRFC = 10;
     parameter tRAS = 10;

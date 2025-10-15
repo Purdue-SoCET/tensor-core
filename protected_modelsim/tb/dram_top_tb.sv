@@ -59,6 +59,14 @@ module dram_top_tb;
     reg dqs_en;
     logic don_t_write;
     logic [31:0] prev_addr; 
+
+    //Cache signals
+    logic cache_write;
+    logic cache_read;
+    logic [ROW_BITS-1:0] cache_addr;
+    logic [2:0] cache_offset;
+    logic [63:0] cache_store;
+    logic [63:0] cache_load;
     
 
     always begin
@@ -92,6 +100,7 @@ module dram_top_tb;
     data_transfer DT (.CLK(CLK), .CLKx2(CLKx2),.nRST(nRST), .mydata(dt_if));
 
     //Instantiate cache for verify
+    sw_cache CACHE (.CLKx2(CLKx2), .nRST(nRST), .wr_en(cache_write), .rd_en(cache_read), .row_addr(cache_addr), .offset(cache_offset), .dmemstore(cache_store), .dmemload(cache_load));
 
     //Scheduler interface with the 
     always_comb begin
@@ -223,8 +232,6 @@ module dram_top_tb;
         iDDR4_4.VREF_DQ   <= sig_if.VREF_DQ;
     end
 
-    
-
     // Component instantiation
     //Only use 4 chips only
     ddr4_model #(.CONFIGURED_DQ_BITS(CONFIGURED_DQ_BITS),  .CONFIGURED_RANKS(CONFIGURED_RANKS)) u0_r0(.model_enable(model_enable), .iDDR4(iDDR4_1));
@@ -308,10 +315,8 @@ module dram_top_tb;
     //Creating class for the transaction
     class sche_trans;
         virtual scheduler_buffer_if vif;
-
         localparam logic [14:0] ROW_HIT    = 15'h1234;   // "open" row for the hit/conflict cases
         localparam logic [14:0] ROW_OTHER  = 15'h2ACE;   // different row -> conflict
-
         rand logic [RANK_BITS - 1:0] rank;
         rand logic [BANK_GROUP_BITS - 1:0] BG;
         rand logic [BANK_BITS - 1:0] bank;
@@ -338,6 +343,7 @@ module dram_top_tb;
             rank == 1'b0;
             row != '1;
             offset == 0;
+            col[2:0] == 0; //8-byte align
         }
 
         function new (virtual scheduler_buffer_if vif);
@@ -370,7 +376,7 @@ module dram_top_tb;
     endclass
 
     creating_dt dt_class;   
-
+    sche_trans sch;
 
     task writing_1(input logic [31:0] addr, input creating_dt dt_class);
         begin
@@ -383,11 +389,19 @@ module dram_top_tb;
         end
         for (int i = 0; i < 9; i++) begin
             dt_class.randomize();
-            dt_class.display();
+            // dt_class.display();
             dt_if.memstore = dt_class.data_store;
+            // $display ("Here is  i : %0x, and memstore: %0x", i, dt_class.data_store);
+            if (i != 0) begin
+                cache_addr = addr[30:16];
+                cache_write = 1'b1;
+                cache_store = dt_class.data_store;
+                cache_offset = i - 1;
+            end
             @(posedge CLKx2);
         end
         dt_if.clear = 1'b1;
+        cache_write = 1'b0;
         @(posedge CLK);
         dt_if.clear = 1'b0;
         end
@@ -413,7 +427,41 @@ module dram_top_tb;
         repeat (50) @(posedge CLK);
     endtask
 
-    sche_trans sch;
+    task read_with_verify (
+        input logic [31:0] addr,
+        input sche_trans sch
+    );
+        dq_en = 0;
+        add_request(.addr(addr), .write(1'b0), .data(32'hAAAA_AAAA));
+        while (dc_if.ram_wait) begin
+            cache_read = 1;
+            if (dt_if.edge_flag) begin
+                cache_addr = sch.creating_addr[30:16];
+                cache_offset = cache_offset + 1;
+                @(posedge CLKx2);
+            end else begin
+                cache_offset = 0;
+                @(posedge CLKx2);
+            end
+        end
+        dq_en = 1;
+        cache_read = 1;
+        dt_if.clear = 0;
+        repeat(10) @(posedge CLK);
+    endtask
+
+    
+
+    //Creating the assert to check the failed case
+    // property wr_verify;
+    //     @(posedge CLK) disable iff (!nRST)
+    //     dt_if.rd_en && (dt_if.edge_flag) |-> (cache_load == dt_if.memload);
+    // endproperty
+
+    // assert property (wr_verify)
+    // else 
+    //     $error("Addr: %0x, offset: %0x, cache load: %0x, dt_memload: %0x", sch.creating_addr[30:16], cache_offset, cache_load, dt_if.memload);
+
     initial begin
       iDDR4_1.CK = 2'b01;
       clk_enb = 1'b1;
@@ -421,7 +469,14 @@ module dram_top_tb;
       model_enable_val = 1;
       dq_en = 1'b1;
       don_t_write = 0;
-      //Creating class for data
+      
+      //Cache
+      cache_addr = 0;
+      cache_write = 0;
+      cache_read = 0;
+      cache_offset = 0;
+      cache_store = 0;
+      
       
       dt_class = new();
       sch = new(sch_if);
@@ -451,89 +506,80 @@ module dram_top_tb;
     
     task_name = "Reading_Cycle";
     dq_en = 1'b0;
-    //dt_if.clear = 1'b1;
     //Case 3 check the reading cycle
-    add_request(.addr(sch.creating_addr), .write(1'b0), .data(32'hAAAA_AAAA));
-    repeat (50) @(posedge CLK);
-    //dt_if.clear = 1'b0;
+    read_with_verify(sch.creating_addr, sch);
     
-    // //checking the write - write - read row hit
-    // task_name = "write - write - read - row hit";
-    // dq_en = 1'b1;
+    
+    //checking the write - write - read row hit
+    task_name = "write - write - read - row hit";
+    dq_en = 1'b1;
+    writing_1(prev_addr, dt_class);
+    while (dc_if.ram_wait) begin
+        @(posedge CLK);
+    end
+    repeat(10) @(posedge CLK);
+    read_with_verify(prev_addr, sch);
+    
 
-    // writing_1(prev_addr, dt_class);
-    // while (dc_if.ram_wait) begin
-    //     @(posedge CLK);
-    // end
-    // repeat(10) @(posedge CLK);
-    // dq_en = 1'b0;
-    // add_request(.addr(prev_addr), .write(1'b0), .data(32'hAAAA_AAAA));
-    // while (dc_if.ram_wait) begin
-    //     @(posedge CLK);
-    // end
-    // repeat(10) @(posedge CLK);
+    //Case wait for refreshing refresh everything
+    task_name = "refresh 150 cycles";
+    repeat(150) @(posedge CLK);
 
-    // //Case wait for refreshing refresh everything
-    // repeat(150) @(posedge CLK);
+    // For the purpose of checking the refresh command
+    // We will load the same address and observe
+    // 1. Command FSM IDLE -> ACT -> READ
+    // 2. Row policy is updated
+    read_with_verify(prev_addr, sch);
 
-    // // For the purpose of checking the refresh command
-    // // We will load the same address and observe
-    // // 1. Command FSM IDLE -> ACT -> READ
-    // // 2. Row policy is updated
-    // add_request(.addr(prev_addr), .write(1'b0), .data(32'hAAAA_AAAA));
-    // while (dc_if.ram_wait) begin
-    //     @(posedge CLK);
-    // end
-    // repeat(10) @(posedge CLK);
+    //Test case: Testing row miss case with 3 consecutive writes of random address
+    task_name = "3 consectutive writing";
+    dq_en = 1'b1;
+    //1 consectutive
+    sch.randomize();
+    sch.create_addr("row miss", prev_addr);
+    writing_1(sch.creating_addr, dt_class);
+    while (dc_if.ram_wait) begin
+        @(posedge CLK);
+    end
+    repeat(10) @(posedge CLK);
 
-    // //Test case: Testing row miss case with 3 consecutive writes of random address
-    // task_name = "3 consectutive writing";
-    // dq_en = 1'b1;
-    // //1 consectutive
-    // sch.randomize();
-    // sch.create_addr("row miss", prev_addr);
-    // writing_1(sch.creating_addr, dt_class);
-    // while (dc_if.ram_wait) begin
-    //     @(posedge CLK);
-    // end
-    // repeat(10) @(posedge CLK);
+    //2 consectutive
+    sch.randomize();
+    sch.create_addr("row miss", prev_addr);
+    writing_1(sch.creating_addr, dt_class);
+    while (dc_if.ram_wait) begin
+        @(posedge CLK);
+    end
+    repeat(10) @(posedge CLK);
 
-    // //2 consectutive
-    // sch.randomize();
-    // sch.create_addr("row miss", prev_addr);
-    // writing_1(sch.creating_addr, dt_class);
-    // while (dc_if.ram_wait) begin
-    //     @(posedge CLK);
-    // end
-    // repeat(10) @(posedge CLK);
-
-    // //3 consectutive
-    // sch.randomize();
-    // sch.create_addr("row miss", prev_addr);
-    // writing_1(sch.creating_addr, dt_class);
-    // while (dc_if.ram_wait) begin
-    //     @(posedge CLK);
-    // end
-    // repeat(10) @(posedge CLK);
+    //3 consectutive
+    sch.randomize();
+    sch.create_addr("row miss", prev_addr);
+    writing_1(sch.creating_addr, dt_class);
+    while (dc_if.ram_wait) begin
+        @(posedge CLK);
+    end
+    repeat(10) @(posedge CLK);
 
 
-    // //After that we use the last consecutive write to test the conflict case
-    // task_name = "Test row conflict write row hit read";
-    // don_t_write = 1'b1;
-    // sch.create_addr("row conflict", prev_addr);
-    // writing_1(sch.creating_addr, dt_class);
-    // while(dc_if.ram_wait) begin
-    //     @(posedge CLK);
-    // end
-    // repeat(10) @(posedge CLK);
+    //After that we use the last consecutive write to test the conflict case
+    task_name = "Test row conflict write row hit read";
+    don_t_write = 1'b1;
+    sch.create_addr("row conflict", prev_addr);
+    writing_1(sch.creating_addr, dt_class);
+    while(dc_if.ram_wait) begin
+        @(posedge CLK);
+    end
+    repeat(10) @(posedge CLK);
 
-    // task_name = "Test row conflcit read (the old address that cause write)";
-    // dq_en = 1'b0;
-    // add_request(.addr(prev_addr), .write(1'b0), .data(32'hAAAA_AAAA));
-    // while (dc_if.ram_wait) begin
-    //     @(posedge CLK);
-    // end
-    // repeat(10) @(posedge CLK);
+    task_name = "Test row conflcit read (the old address that cause write)";
+    read_with_verify(prev_addr, sch);
+
+
+    // Checkpoint
+    // 1. REFRESH timing too early, need to check again
+    // 2. Something off with consecutive write 3 times in a row
+
     $finish;
 
     end
@@ -569,10 +615,10 @@ module sw_cache #( parameter ROW_BITS = 15)
 );
 
     typedef struct packed {
-        logic [63:0][7:0] arr;
+        logic [7:0][63:0] arr;
     } data_8bytes;
 
-    data_8bytes sw_cache [ROW_BITS-1:0];
+    data_8bytes sw_cache [2**ROW_BITS-1:0];
 
     always_ff @(posedge CLKx2, negedge nRST) begin
         if(!nRST) begin
@@ -587,6 +633,7 @@ module sw_cache #( parameter ROW_BITS = 15)
     end
 
     always_comb begin
+        dmemload = 0;
         if (rd_en) begin
             dmemload = sw_cache[row_addr].arr[offset];
         end

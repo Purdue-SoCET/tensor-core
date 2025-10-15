@@ -39,7 +39,7 @@ module timing_signal (
                 end
 
                 else begin                              // ACT -> READ/WRITE time
-                    time_load = tRCD - tAL;             // tAL = 0 if AL command not set. Only tRCD is a safer option
+                    time_load = tRCD - tAL + 1;             // tAL = 0 if AL command not set. Only tRCD is a safer option
                 end
 
                 // TODO for consecutive commands
@@ -57,7 +57,8 @@ module timing_signal (
 
             READ : begin
                 time_counter_en = 1'b1;
-                time_load = tRL + tBURST;
+                //TODO rd_en turn off too early, we havent dont receive data
+                time_load = tRL + tBURST + 1;
 
                 // TODO for consecutive reads
                 // tCCD_S = diff BG

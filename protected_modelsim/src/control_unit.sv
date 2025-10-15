@@ -73,6 +73,7 @@ module control_unit(
     assign myrow.row_resolve = mycmd.row_resolve;
     assign myrow.refresh = mytime.tREF_done;
     assign mycmd.row_stat = myrow.row_stat;
+    assign mycmd.all_row_closed = myrow.all_row_closed;
 
     //Interface between control unit and data transfer
     assign mytop.wr_en = mytime.wr_en;
