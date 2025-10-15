@@ -1,9 +1,10 @@
 `timescale 1ns/1ps
+`include "sys_arr_pkg.vh"
+`include "vector_pkg.vh"
 
 module gsau_control_unit_tb;
   import vector_pkg::*;
   import sys_arr_pkg::*;
-  import types_pkg::*;
 
   // Parameters
   localparam VEGGIEREGS = 256;

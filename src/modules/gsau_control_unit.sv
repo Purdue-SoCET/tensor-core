@@ -1,4 +1,6 @@
 `include "gsau_control_unit_if.vh"
+`include "sys_arr_pkg.vh"
+`include "vector_pkg.vh"
 
 module gsau_control_unit #(
     parameter int VEGGIEREGS = 256,
@@ -13,7 +15,6 @@ module gsau_control_unit #(
 
   import vector_pkg::*;   // reuse basic typedefs (data, addr, etc.)
   import sys_arr_pkg::*;  // systolic-specific typedefs
-  import types_pkg::*;
 
   // local constants
   localparam int ENTRY_BITS = 8;
