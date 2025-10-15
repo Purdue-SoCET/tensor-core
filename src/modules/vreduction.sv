@@ -41,7 +41,7 @@ module vreduction #(
 
     //pipeline allignment for the needed output signals
     logic [4:0] imm_final;
-    sqrt_pipe #(
+    param_sr #(
         .DATA_WIDTH(5),
         .STAGES(PIPE_STAGES)
     ) imm_pipe (
@@ -52,7 +52,7 @@ module vreduction #(
         .data_out(imm_final)
     );
     logic broadcast_final;
-    sqrt_pipe #(
+    param_sr #(
         .DATA_WIDTH(5),
         .STAGES(PIPE_STAGES)
     ) broadcast_pipe (
@@ -63,7 +63,7 @@ module vreduction #(
         .data_out(broadcast_final)
     );
     logic clear_final;
-    sqrt_pipe #(
+    param_sr #(
         .DATA_WIDTH(5),
         .STAGES(PIPE_STAGES)
     ) clear_pipe (
