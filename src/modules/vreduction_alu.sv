@@ -19,10 +19,8 @@ vaddsub adder (CLK, nRST, as_if);
 logic a_is_nan, b_is_nan, any_nan;
 
 always_comb begin
-    // Check if value_a is NaN (exponent all 1s, mantissa non-zero)
     a_is_nan = (&vraluif.value_a[14:10]) && (|vraluif.value_a[9:0]);
     
-    // Check if value_b is NaN (exponent all 1s, mantissa non-zero)
     b_is_nan = (&vraluif.value_b[14:10]) && (|vraluif.value_b[9:0]);
     
     // Set flag if any input is NaN
@@ -39,7 +37,7 @@ end
 //output logic
 always_comb begin
     if (any_nan) begin
-        // If any input is NaN, output NaN (canonical NaN: sign=0, exp=all 1s, mantissa=0x200)
+        // If any input is NaN, output NaN
         vraluif.value_out = 16'h7E00;
     end
     else if (vraluif.alu_op == VR_SUM) begin
