@@ -125,9 +125,6 @@ module vreduction_tb;
         vruif.reduction_type = 2'b00;
     endtask
 
-    // ------------------------------------------------------------
-    // Test Control
-    // ------------------------------------------------------------
     parameter int NUM_TESTS = 2;
     reduction_tv_t test_vecs[NUM_TESTS];
     fp16_t [NUM_ELEMENTS-1:0] expected_results[NUM_TESTS];
@@ -222,9 +219,7 @@ module vreduction_tb;
 
     end
 
-    // ------------------------------------------------------------
-    // Output checking
-    // ------------------------------------------------------------
+    //Chat wrote the file IO stuff to save me time
     always @(posedge CLK) begin
         automatic string expected_line;
         automatic string actual_line;

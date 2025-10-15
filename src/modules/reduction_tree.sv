@@ -22,9 +22,6 @@ module reduction_tree #(
     logic [1:0]  stage_op   [0:TREE_DEPTH];
     logic        stage_valid[0:TREE_DEPTH];
 
-    // ---------------------------------------------
-    // Stage 0: Input register — latch only on valid
-    // ---------------------------------------------
     always_ff @(posedge CLK or negedge nRST) begin
         if (!nRST) begin
             for (int i = 0; i < LANES; i++)
@@ -47,9 +44,7 @@ module reduction_tree #(
         end
     end
 
-    // --------------------------------------------------
-    // Reduction tree pipeline — always shifts forward
-    // --------------------------------------------------
+
     genvar stage, lane;
     generate
         for (stage = 0; stage < TREE_DEPTH; stage++) begin : gen_stage
@@ -90,9 +85,6 @@ module reduction_tree #(
         end
     endgenerate
 
-    // --------------------------------------------------
-    // Final output register
-    // --------------------------------------------------
     always_ff @(posedge CLK or negedge nRST) begin
         if (!nRST) begin
             data_out  <= '0;

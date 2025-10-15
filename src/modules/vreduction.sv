@@ -103,15 +103,12 @@ module vreduction #(
     always_comb begin
         for (int i = 0; i < NUM_ELEMENTS; i++) begin
             if (broadcast_final) begin
-                // Broadcast mode: every element = reduction result
                 final_vector[i] = final_value;
             end
             else if (clear_final) begin
-                // Clear + partial write: only imm index gets value, others zero
                 final_vector[i] = (i == int'(imm_final)) ? final_value : '0;
             end
             else begin
-                // Regular partial write: only imm index gets value, others retain pipelined input
                 final_vector[i] = (i == int'(imm_final)) ? final_value : vector_pipe[PIPE_STAGES-1][i];
             end
         end
@@ -127,14 +124,12 @@ module vreduction #(
                 registered_output[i] <= '{default: '0};
             registered_valid <= 1'b0;
         end else begin
-            // register vector outputs and valid
             for (int i = 0; i < NUM_ELEMENTS; i++)
                 registered_output[i] <= final_vector[i];
             registered_valid <= tree_valid_out;
         end
     end
 
-    // Direct output assignment (reduction tree output is already registered)
     always_comb begin
         for (int i = 0; i < NUM_ELEMENTS; i++)
             vruif.vector_output[i] = registered_output[i];
