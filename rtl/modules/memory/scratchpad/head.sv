@@ -1,13 +1,6 @@
-`include "scpad_types_pkg.vh"
-`include "scratchpad_if.vh"
+import scpad_pkg::*;
 
-module head #(
-    parameter logic [SCPAD_ID_WIDTH-1:0] IDX = '0
-) (
-    input logic clk, n_rst,
-    scpad_if.spad_head hif
-);
-    import scpad_types_pkg::*;
+module head #(parameter logic [SCPAD_ID_WIDTH-1:0] IDX = '0) (scpad_if.spad_head hif);
 
     logic downstream_stall;
     logic be_rd_v, fe_rd_v;
@@ -22,8 +15,8 @@ module head #(
     rd_req_t rd_req_d, rd_req_q;
     wr_req_t wr_req_d, wr_req_q;
 
-    always_ff @(posedge clk, negedge n_rst) begin
-        if (!n_rst) begin
+    always_ff @(posedge hif.clk, negedge hif.n_rst) begin
+        if (!hif.n_rst) begin
             rd_pipe_busy <= 1'b0;
             wr_pipe_busy <= 1'b0;
         end else begin
@@ -58,8 +51,8 @@ module head #(
         else if (wr_grant_fe) wr_req_d = hif.fe_wr_req[IDX];
     end
  
-    latch #(.T(rd_req_t)) u_latch_rd (.clk(clk), .n_rst(n_rst), .en(rd_grant_be || rd_grant_fe), .in(rd_req_d), .out(rd_req_q));
-    latch #(.T(wr_req_t)) u_latch_wr (.clk(clk), .n_rst(n_rst), .en(wr_grant_be || wr_grant_fe), .in(wr_req_d), .out(wr_req_q));
+    latch #(.T(rd_req_t)) u_latch_rd (.clk(hif.clk), .n_rst(hif.n_rst), .en(rd_grant_be || rd_grant_fe), .in(rd_req_d), .out(rd_req_q));
+    latch #(.T(wr_req_t)) u_latch_wr (.clk(hif.clk), .n_rst(hif.n_rst), .en(wr_grant_be || wr_grant_fe), .in(wr_req_d), .out(wr_req_q));
 
     assign downstream_stall = hif.w_stall || hif.r_stall;
 

@@ -1,5 +1,7 @@
-`include "scpad_types_pkg.vh"
-`include "scratchpad_if.vh"
+`include "scpad_params.svh"
+`include "scpad_if.sv"
+
+import scpad_pkg::*;
 
 module sram_bank # ( 
   parameter int READ_LATENCY = 2, 

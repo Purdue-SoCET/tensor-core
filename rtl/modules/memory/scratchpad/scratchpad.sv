@@ -1,18 +1,13 @@
-`include "scpad_types_pkg.vh"
-`include "scratchpad_if.vh"
+import scpad_pkg::*;
 
-module scratchpad (
-    input logic clk, n_rst,
-    scpad_if.top sif
-); 
-    import scpad_types_pkg::*;
+module scratchpad (scpad_if.top sif); 
 
     genvar ti;
     generate
         for (ti = 0; ti < NUM_SCPADS; ti++) begin : g_scpad
-            frontend #(.IDX(ti)) u_frontend (.clk(clk), .n_rst(n_rst), .fcif(sif));
-            backend #(.IDX(ti)) u_backend (.clk(clk), .n_rst(n_rst), .bif(sif));
-            body #(.IDX(ti)) u_body (.clk(clk), .n_rst(n_rst), .bif(sif));
+            frontend #(.IDX(ti)) u_frontend (.fcif(sif));
+            backend #(.IDX(ti)) u_backend (.bif(sif));
+            body #(.IDX(ti)) u_body (.bif(sif));
         end
     endgenerate
 

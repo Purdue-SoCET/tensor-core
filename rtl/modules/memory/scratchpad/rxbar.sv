@@ -1,13 +1,8 @@
-`include "scpad_types_pkg.vh"
-`include "scratchpad_if.vh"
+`include "xbar_if.sv"
 
-module rxbar #(
-    parameter logic [SCPAD_ID_WIDTH-1:0] IDX = '0
-) (
-    input logic clk, n_rst,
-    scpad_if.xbar_r wif
-); 
-    import scpad_types_pkg::*;
+import scpad_pkg::*;
+
+module rxbar #(parameter logic [SCPAD_ID_WIDTH-1:0] IDX = '0) (scpad_if.xbar_r rif); 
 
     typedef struct packed {
         logic valid;
@@ -17,8 +12,7 @@ module rxbar #(
     } rd_pass_t;
 
     sync_fifo #(.DEPTH(XBAR_LATENCY), .DWIDTH($bits(rd_pass_t))) pass_through_fifo (
-        .clk(clk),
-        .rstn(n_rst),
+        .clk(rif.clk), .rstn(rif.n_rst),
         .wr_en(!rif.r_stall[IDX]),
         .din({rif.spad_xbar_rd_req[IDX].valid, rif.spad_xbar_rd_req[IDX].src, rif.spad_xbar_rd_req[IDX].xbar.slot_mask, rif.spad_xbar_rd_req[IDX].xbar.valid_mask}),
         .rd_en(!rif.r_stall[IDX]),
@@ -27,29 +21,19 @@ module rxbar #(
         .empty()
     );
 
+    xbar_if #(.SIZE(NUM_COLS), .DWIDTH(ELEM_BITS)) rxbar_vif (
+        .clk(rif.clk), .n_rst(rif.n_rst), 
+        .en(!rif.r_stall[IDX]), 
+        .din(rif.spad_xbar_rd_req[IDX].wdata), 
+        .shift(rif.spad_xbar_rd_req[IDX].xbar.shift_mask), 
+        .dout(rif.stomach_tail_rd_res[IDX].wdata)
+    );
+
     generate
-        unique case (MODE)
-            "NAIVE": naive_xbar #(.SIZE(NUM_COLS), .DWIDTH(ELEM_BITS) u_wxbar (
-                    .clk(clk), .n_rst(n_rst), 
-                    .en(!rif.r_stall[IDX]), // enables the entire pipe. stalls all stages 
-                    .din(rif.spad_xbar_rd_req[IDX].wdata), 
-                    .shift(rif.spad_xbar_rd_req[IDX].xbar.shift_mask), 
-                    .dout(rif.stomach_tail_rd_res[IDX].wdata)
-                );
-            "BENES": benes_xbar #(.SIZE(NUM_COLS), .DWIDTH(ELEM_BITS) u_wxbar (
-                    .clk(clk), .n_rst(n_rst), 
-                    .en(!rif.r_stall[IDX]), 
-                    .din(rif.spad_xbar_rd_req[IDX].wdata), 
-                    .shift(rif.spad_xbar_rd_req[IDX].xbar.shift_mask), 
-                    .dout(rif.stomach_tail_rd_res[IDX].wdata)
-                );
-            "BATCHER": batcher_xbar #(.SIZE(NUM_COLS), .DWIDTH(ELEM_BITS) u_wxbar (
-                    .clk(clk), .n_rst(n_rst), 
-                    .en(!rif.r_stall[IDX]),
-                    .din(rif.spad_xbar_rd_req[IDX].wdata), 
-                    .shift(rif.spad_xbar_rd_req[IDX].xbar.shift_mask), 
-                    .dout(rif.stomach_tail_rd_res[IDX].wdata)
-                );
+        case (XBAR_TYPE)
+            "NAIVE": naive_xbar #(.SIZE(NUM_COLS), .DWIDTH(ELEM_BITS)) u_rxbar (rxbar_vif);
+            "BENES": benes_xbar #(.SIZE(NUM_COLS), .DWIDTH(ELEM_BITS)) u_rxbar (rxbar_vif);
+            "BATCHER": batcher_xbar #(.SIZE(NUM_COLS), .DWIDTH(ELEM_BITS)) u_rxbar (rxbar_vif);
         endcase
     endgenerate
 

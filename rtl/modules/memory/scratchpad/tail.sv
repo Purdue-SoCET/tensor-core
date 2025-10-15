@@ -1,20 +1,13 @@
-`include "scpad_types_pkg.vh"
-`include "scratchpad_if.vh"
+import scpad_pkg::*;
 
-module tail  #(
-    parameter logic [SCPAD_ID_WIDTH-1:0] IDX = '0
-) (
-    input  logic clk, n_rst,
-    scpad_if.spad_tail tif
-);
-    import scpad_types_pkg::*;
+module tail  #(parameter logic [SCPAD_ID_WIDTH-1:0] IDX = '0) (scpad_if.spad_tail tif);
 
     sel_rd_res_t rd_res_q;
     sel_wr_res_t wr_res_q;
 
-    latch #(.T(sel_rd_res_t)) u_latch_rd (.clk(clk), .n_rst(n_rst), .en(tif.stomach_tail_rd_res[IDX].valid), .in(tif.stomach_tail_rd_res[IDX]), .out(rd_res_q));
+    latch #(.T(sel_rd_res_t)) u_latch_rd (.clk(tif.clk), .n_rst(tif.n_rst), .en(tif.stomach_tail_rd_res[IDX].valid), .in(tif.stomach_tail_rd_res[IDX]), .out(rd_res_q));
 
-    latch #(.T(sel_wr_res_t)) u_latch_wr (.clk(clk), .n_rst(n_rst), .en(tif.stomach_tail_wr_res[IDX].valid), .in(tif.stomach_tail_wr_res[IDX]), .out(wr_res_q));
+    latch #(.T(sel_wr_res_t)) u_latch_wr (.clk(tif.clk), .n_rst(tif.n_rst), .en(tif.stomach_tail_wr_res[IDX].valid), .in(tif.stomach_tail_wr_res[IDX]), .out(wr_res_q));
 
     always_comb begin
         tif.fe_rd_res_valid[IDX] = 1'b0; tif.fe_wr_res_valid[IDX] = 1'b0;
