@@ -17,7 +17,7 @@ module sync_fifo #(parameter FIFODEPTH=8, DATAWIDTH=16) // DATAWIDTH = word size
 
   logic [DDATAWIDTH-1 : 0][FIFODEPTH] fifo; // *packed* array
 
-  always @(posedge clk or negedge rstn) begin
+  always_ff @(posedge clk or negedge rstn) begin
     if (!rstn) begin
       wptr <= '0;
     end 
@@ -36,7 +36,7 @@ module sync_fifo #(parameter FIFODEPTH=8, DATAWIDTH=16) // DATAWIDTH = word size
              $time, wr_en, din, rd_en, dout, empty, full);
   end */
 
-  always @(posedge clk or negedge rstn) begin
+  always_ff @(posedge clk or negedge rstn) begin
     if (!rstn) begin
       rptr <= '0;
       dout  <= '0;
