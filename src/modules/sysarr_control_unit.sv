@@ -7,6 +7,7 @@ import sys_arr_pkg::*;
 module sysarr_control_unit(
     input logic clk, 
     input logic nRST,
+    input logic stall_sa, //name of the stall signal 
     systolic_array_control_unit_if.control_unit cu
 );
     logic start_flag;
@@ -38,6 +39,7 @@ module sysarr_control_unit(
     // we have space for another instruction to start loading in inputs 
     assign cu.iteration = iteration;
 
+
     always_comb begin : input_buses // if we are receiving inputs tell the fifos where to load them :D
         // cu.input_type = 1'b0; 
         cu.input_row = '0;
@@ -61,7 +63,7 @@ module sysarr_control_unit(
     end
     
     // start an instruction the cycle after the first row of input loads (only need first entry)
-    assign start_flag = cu.input_en && (cu.row_in_en == 0);
+    assign start_flag = cu.input_en && (cu.row_in_en == 0) && !stall_sa;
 
     // iteration tracker
     always_ff @(posedge clk, negedge nRST) begin
@@ -216,6 +218,7 @@ module sysarr_control_unit(
     // if any iteration slot is still in the backend of the fifos then there is no space
     assign cu.fifo_has_space = input_loading == 1'b0 & partial_loading == 1'b0;
     logic fulll /*verilator public*/;
+
     always_comb begin
         nxt_MAC_start = 1'b0;
         nxt_first_mac = first_mac;
@@ -247,12 +250,16 @@ module sysarr_control_unit(
                 nxt_MAC_start = 1'b1;
                 nxt_MAC_ready = 1'b0;
             end
+            
         end else if (first_mac == 1'b1 && start_flag)begin
             nxt_MAC_start = 1'b1;
             nxt_first_mac = 1'b0;
             nxt_MAC_ready = 1'b0;
         end
+        nxt_MAC_start &= ~stall_sa;
+        nxt_MAC_ready |= stall_sa;
     end
+
     always_comb begin
         cu.add_start = 1'b0;
         if (output_loading && cu.MAC_start)begin
