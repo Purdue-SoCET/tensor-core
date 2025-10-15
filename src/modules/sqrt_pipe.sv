@@ -17,7 +17,7 @@ module sqrt_pipe #(
     end
     else begin
         // Stage 0: latch new input only if enable is high
-        pipe_regs[0] <= enable ? data_in : pipe_regs[0];
+        pipe_regs[0] <= enable ? data_in : 'b0;
 
         // Shift remaining stages unconditionally
         for (int i = 1; i < STAGES; i++)
