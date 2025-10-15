@@ -1,7 +1,7 @@
 `include "vector_types.vh"
 `include "vreduction_alu_if.vh"
 
-module pipelined_reduction_tree #(
+module reduction_tree #(
     parameter LANES = 16        // Must be power of 2
 ) (
     input  logic CLK,
