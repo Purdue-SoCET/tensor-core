@@ -4,8 +4,8 @@ module sync_fifo #(parameter FIFODEPTH=8, DATAWIDTH=16) // DATAWIDTH = word size
                             	clk,                // Clock
                             	wr_en, 				// Write enable
                             	rd_en, 				// Read enable
-        input logic  [DDATAWIDTH-1:0] din, 				// Data written into FIFO
-        output logic [DDATAWIDTH-1:0] dout, 				// Data read from FIFO
+        input logic  [DATAWIDTH-1:0] din, 				// Data written into FIFO
+        output logic [DATAWIDTH-1:0] dout, 				// Data read from FIFO
         output logic          empty, 				// FIFO is empty when high
                             	full 				// FIFO is full when high
 );
@@ -15,7 +15,7 @@ module sync_fifo #(parameter FIFODEPTH=8, DATAWIDTH=16) // DATAWIDTH = word size
   logic [$clog2(FIFODEPTH)-1:0]   rptr;
   logic [$clog2(FIFODEPTH):0]     count; // one extra bit to represent full==depth
 
-  logic [DDATAWIDTH-1 : 0][FIFODEPTH] fifo; // *packed* array
+  logic [FIFODEPTH-1:0][DATAWIDTH-1:0] fifo; // *packed* array
 
   always_ff @(posedge clk or negedge rstn) begin
     if (!rstn) begin
