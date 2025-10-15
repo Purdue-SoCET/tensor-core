@@ -5,7 +5,7 @@
 
 module vreduction_tb;
     import vector_pkg::*;
-    parameter int WIDTH        = 8;
+    parameter int WIDTH        = 16;
     parameter int NUM_ELEMENTS = 32;
     parameter int PERIOD       = 10;
     logic CLK = 0, nRST;
