@@ -15,7 +15,10 @@ module body #(parameter logic [SCPAD_ID_WIDTH-1:0] IDX = '0) (scpad_if.spad_body
             // SRAM_BANK is dual ported. 
             // But, we use it as single ported, because the workload doesn't demand it. 
             // the ren and wen are mutually exclusive.
-            sram_bank #(.READ_LATENCY (2), .WRITE_LATENCY(2)) u_bank (
+            sram_bank #(
+                .READ_LATENCY (2), .WRITE_LATENCY(2), 
+                .NUM_ROWS(NUM_ROWS), .ELEM_BITS(ELEM_BITS)
+            ) u_bank (
                 .clk(bif.clk), .n_rst(bif.n_rst), .busy(bif.spad_busy[ti][gi]), 
 
                 .ren(bif.cntrl_spad_req[ti].valid_mask[gi] && bif.cntrl_spad_req[ti].valid && !bif.cntrl_spad_req.write),
