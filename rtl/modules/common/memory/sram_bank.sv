@@ -1,11 +1,9 @@
-`include "scpad_params.svh"
-`include "scpad_if.sv"
-
-import scpad_pkg::*;
-
 module sram_bank # ( 
   parameter int READ_LATENCY = 2, 
   parameter int WRITE_LATENCY = 4
+  parameter int NUM_ROWS = 16,
+  parameter int ELEM_BITS = 16,
+  localparam int ROW_IDX_WIDTH = $clog2(NUM_ROWS)
 ) (
   input logic clk, n_rst, 
 
@@ -21,14 +19,12 @@ module sram_bank # (
   input logic [ELEM_BITS-1:0] wdata, 
   output logic wdone
 );  
-  import scpad_types_pkg::*;
-
   logic [NUM_ROWS-1:0][ELEM_BITS-1:0] mem;
 
   localparam int RLW = (READ_LATENCY <= 1) ? 1 : $clog2(READ_LATENCY);
+  localparam int WLW = (WRITE_LATENCY <= 1) ? 1 : $clog2(WRITE_LATENCY);
   logic [RLW-1:0] r_cnt;
   logic  r_busy;
-  localparam int WLW = (WRITE_LATENCY <= 1) ? 1 : $clog2(WRITE_LATENCY);
   logic [WLW-1:0] w_cnt;
   logic w_busy;
 

@@ -59,6 +59,7 @@ package scpad_pkg;
 
     // Scheduler FU <=> Backend
     typedef struct packed {
+        logic valid; 
         logic write;
         logic [SCPAD_ADDR_WIDTH-1:0] spad_addr;
         logic [MAX_DIM_WIDTH-1:0] num_rows;
@@ -66,26 +67,28 @@ package scpad_pkg;
         logic [MAX_DIM_WIDTH-1:0] row_id;
         logic [MAX_DIM_WIDTH-1:0] col_id;
         logic row_or_col;
-        logic [SCPAD_ID_WIDTH-1:0]   scpad_id;
+        logic [SCPAD_ID_WIDTH-1:0] scpad_id;
     } sched_req_t;
 
     typedef struct packed {
-        logic accepted;
+        logic valid;
     } sched_res_t;
 
     // DRAM Cntrl. <=> Backend
     typedef struct packed {
+        logic valid; 
         logic write;
         logic [DRAM_ID_WIDTH-1:0]   id;
         logic [DRAM_ADDR_WIDTH-1:0] dram_addr;
         logic [COL_IDX_WIDTH-1:0]   num_bytes;
-        scpad_data_t                wdata;
+        scpad_data_t wdata;
     } dram_req_t;
 
     typedef struct packed {
-        logic complete;
+        logic valid; 
+        logic write; 
         logic [DRAM_ID_WIDTH-1:0] id;
-        scpad_data_t              rdata;
+        scpad_data_t rdata;
     } dram_res_t;
 
     // Crossbar descriptors
@@ -97,21 +100,8 @@ package scpad_pkg;
 
     // FE/BE request/response structures
     typedef struct packed {
-        logic [SCPAD_ADDR_WIDTH-1:0] addr;
-        logic [MAX_DIM_WIDTH-1:0] num_rows;
-        logic [MAX_DIM_WIDTH-1:0] num_cols;
-        logic [MAX_DIM_WIDTH-1:0] row_id;
-        logic [MAX_DIM_WIDTH-1:0] col_id;
-        logic row_or_col;
-        xbar_desc_t xbar;
-    } rd_req_t;
-
-    typedef struct packed {
-        logic  complete;
-        scpad_data_t rdata;
-    } rd_res_t;
-
-    typedef struct packed {
+        logic valid;
+        logic write; 
         logic [SCPAD_ADDR_WIDTH-1:0] addr;
         logic [MAX_DIM_WIDTH-1:0] num_rows;
         logic [MAX_DIM_WIDTH-1:0] num_cols;
@@ -120,36 +110,29 @@ package scpad_pkg;
         logic row_or_col;
         xbar_desc_t xbar;
         scpad_data_t wdata;
-    } wr_req_t;
-
-    typedef struct packed {
-        logic complete;
-    } wr_res_t;
-
-    // Router BE > FE selected requests/responses
-    typedef struct packed {
-        logic  valid;
-        src_t    src;
-        xbar_desc_t  xbar;
-        scpad_data_t wdata;
-    } sel_wr_req_t;
-
-    typedef struct packed {
-        logic valid; 
-        src_t src;
-    } sel_wr_res_t;
+    } req_t;
 
     typedef struct packed {
         logic valid;
-        src_t src;
-        xbar_desc_t xbar;
-    } sel_rd_req_t;
+        logic write; 
+        scpad_data_t rdata;
+    } res_t;
+
+    // Router BE > FE selected requests/responses
+    typedef struct packed {
+        logic valid;
+        logic write; 
+        src_t  src;
+        xbar_desc_t  xbar;
+        scpad_data_t wdata;
+    } sel_req_t;
 
     typedef struct packed {
         logic valid; 
+        logic write; 
         src_t src;
         scpad_data_t rdata;
-    } sel_rd_res_t;
+    } sel_res_t;
 
 
 endpackage

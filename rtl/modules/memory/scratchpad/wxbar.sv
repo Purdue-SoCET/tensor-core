@@ -8,15 +8,25 @@ module wxbar #(parameter logic [SCPAD_ID_WIDTH-1:0] IDX = '0) (scpad_if.xbar_w w
         logic valid;
         src_t src;
         slot_mask_t  slot_mask;
-        mask_t  valid_mask;
-    } wr_pass_t;
+        mask_t valid_mask;
+    } pass_t;
 
-    sync_fifo #(.DEPTH(XBAR_LATENCY), .DWIDTH($bits(wr_pass_t))) pass_through_fifo (
+    sync_fifo #(.DEPTH(XBAR_LATENCY), .DWIDTH($bits(pass_t))) pass_through_fifo (
         .clk(wif.clk), .rstn(wif.n_rst),
         .wr_en(!rif.w_stall[IDX]),
-        .din({rif.head_stomach_wr_req[IDX].valid, rif.head_stomach_wr_req[IDX].src, rif.head_stomach_wr_req[IDX].xbar.slot_mask, rif.head_stomach_wr_req[IDX].xbar.valid_mask}),
+        .din(rif.head_stomach_req[IDX].write ? {
+                rif.head_stomach_req[IDX].valid, 
+                rif.head_stomach_req[IDX].src, 
+                rif.head_stomach_req[IDX].xbar.slot_mask, 
+                rif.head_stomach_req[IDX].xbar.valid_mask
+            } : '0),
         .rd_en(!rif.w_stall[IDX]),
-        .dout({rif.xbar_cntrl_wr_req[IDX].valid, rif.xbar_cntrl_wr_req[IDX].src, rif.xbar_cntrl_wr_req[IDX].xbar.slot_mask, rif.xbar_cntrl_wr_req[IDX].xbar.valid_mask}),
+        .dout({
+                rif.xbar_cntrl_req[IDX].valid, 
+                rif.xbar_cntrl_req[IDX].src, 
+                rif.xbar_cntrl_req[IDX].xbar.slot_mask, 
+                rif.xbar_cntrl_req[IDX].xbar.valid_mask
+            }),
         .full(),
         .empty()
     );
@@ -25,9 +35,9 @@ module wxbar #(parameter logic [SCPAD_ID_WIDTH-1:0] IDX = '0) (scpad_if.xbar_w w
     xbar_if #(.SIZE(NUM_COLS), .DWIDTH(ELEM_BITS)) wxbar_vif (
         .clk(wif.clk), .n_rst(wif.n_rst),
         .en(!rif.w_stall[IDX]), 
-        .din(rif.head_stomach_wr_req[IDX].wdata),
-        .shift(rif.head_stomach_wr_req[IDX].xbar.shift_mask),
-        .dout(rif.xbar_cntrl_wr_req[IDX].wdata)
+        .din(rif.head_stomach_req[IDX].write ? rif.head_stomach_req[IDX].wdata : '0),
+        .shift(rif.head_stomach_req[IDX].xbar.shift_mask),
+        .dout(rif.xbar_cntrl_req[IDX].wdata)
     );
 
     generate
