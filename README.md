@@ -13,11 +13,14 @@ The Atalla x01 Project is a student-led initiative to design and implement a com
 /rtl/ 
     /include/ -> Headers. 
     /modules/ -> RTL Design.  
-    /tests/ -> .sv Testbenches (QuestaSim). 
-    /waves/ -> `.do` Waveform Scripts (QuestaSim). 
-/scripts/ -> Scripts runnable on `asicfab`.  
+/tb/ 
+    /formal/ -> Formal assertions/bind files. 
+    /unit/ -> .sv Testbenches 
+    /uvm/ -> UVM Testbenches
+/waves/ -> `.do` Waveform Scripts (QuestaSim). 
+/scripts/ 
 /aihw-ppci-compiler/ -> PPCI Infra, adapted for Atalla SW Stack.
-/AMP-Sim/ -> Cycle-Accurate Simulator of Atalla x01 in Python. 
+/AMP-Sim/ -> Cycle-Accurate Simulator of Atalla x01. 
 /UVM_1.2/ -> UVM Core Libs. 
 /LICENSE 
 /Makefile  
