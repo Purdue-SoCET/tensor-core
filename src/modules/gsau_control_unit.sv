@@ -36,9 +36,9 @@ module gsau_control_unit #(
   logic [ENTRY_BITS-1:0] fifo_dout;
   logic         fifo_empty, fifo_full;
 
-  // captured instruction fields
-  logic [7:0]   captured_vdst;
-  logic         captured_weight;
+  // // captured instruction fields
+  // logic [7:0]   captured_vdst;
+  // logic         captured_weight;
 
   // outputs that we drive (local registered versions)
   logic [511:0] o_sa_array_in;
@@ -56,6 +56,11 @@ module gsau_control_unit #(
   logic         o_sb_valid;
 
   logic         o_veg_ready;
+
+  // NEXT signals for sequential outputs
+  logic [ENTRY_BITS-1:0] latched_vdst, latched_vdst_next;
+  logic [7:0] o_wb_wbdst_next, o_sb_vdst_next;
+  logic o_wb_valid_next, o_sb_valid_next;
 
   // alias interface signals for clarity
   // From Veggie File
@@ -117,21 +122,37 @@ module gsau_control_unit #(
 
   always_ff @(posedge CLK or negedge nRST) begin
     if (!nRST) begin
-      state <= IDLE;
+      state         <= IDLE;
+      latched_vdst  <= '0;
+      o_wb_wbdst    <= '0;
+      o_wb_valid    <= 1'b0;
+      o_sb_vdst     <= '0;
+      o_sb_valid    <= 1'b0;
     end else begin
-      state <= next_state;
+      state         <= next_state;
+      latched_vdst  <= latched_vdst_next;
+      o_wb_wbdst    <= o_wb_wbdst_next;
+      o_wb_valid    <= o_wb_valid_next;
+      o_sb_vdst     <= o_sb_vdst_next;
+      o_sb_valid    <= o_sb_valid_next;
     end
   end
 
   always_comb begin
     next_state = state;
 
+    latched_vdst_next = latched_vdst;
+    o_wb_wbdst_next   = o_wb_wbdst;
+    o_wb_valid_next   = 1'b0;
+    o_sb_vdst_next    = o_sb_vdst;
+    o_sb_valid_next   = 1'b0;
+
     fifo_wr        = 1'b0;
     fifo_rd        = 1'b0;
     fifo_din       = '0;
 
-    captured_vdst  = '0;
-    captured_weight = 1'b0;
+    // captured_vdst  = '0;
+    // captured_weight = 1'b0;
 
     o_sa_array_in         = '0;
     o_sa_array_in_partials= '0;
@@ -139,15 +160,15 @@ module gsau_control_unit #(
     o_sa_weight_en        = 1'b0;
     o_sa_partial_en       = 1'b0;
 
-    o_wb_psum   = '0;
-    o_wb_wbdst  = '0;
-    o_wb_valid   = 1'b0;
+    // o_wb_psum   = '0;
+    // o_wb_wbdst  = '0;
+    // o_wb_valid   = 1'b0;
 
-    o_sb_ready  = 1'b0;
-    o_sb_vdst   = '0;
-    o_sb_valid  = 1'b0;
+    // o_sb_ready  = 1'b0;
+    // o_sb_vdst   = '0;
+    // o_sb_valid  = 1'b0;
 
-    o_veg_ready = 1'b0;
+    // o_veg_ready = 1'b0;
 
     // Default handshake semantics:
     // - sb_ready asserted when FIFO not full (we can accept more RD's)
@@ -192,7 +213,8 @@ module gsau_control_unit #(
           // We cannot directly use fifo_dout in always_comb if FIFO produces dout registered on read,
           // but this FIFO returns dout synchronous when rd_en asserted (dout updated on rising edge in module).
           // To be safe, we'll latch fifo_dout in sequential block below and then assert wb_valid there.
-          o_wb_valid = 1'b1;
+          o_wb_valid_next = 1'b1;
+          latched_vdst_next = fifo_dout;
           // move to SEND_OUTPUT to manage handshake with WB buffer
           next_state = SEND_OUTPUT;
         end else begin
@@ -206,7 +228,9 @@ module gsau_control_unit #(
         // When wb_output_ready is asserted we consider transaction complete and go back to IDLE.
         // NOTE: o_wb_wbdst must come from fifo_dout captured in sequential logic below.
         o_wb_psum  = sa_array_output; // continue driving current PSUM until accepted
-        o_wb_valid = 1'b1;
+        // o_wb_valid = 1'b1;
+        o_wb_wbdst_next = latched_vdst;
+        o_wb_valid_next = !wb_output_ready;
 
         if (wb_output_ready) begin
           // WB accepted output; return to IDLE to accept next instruction
@@ -222,48 +246,48 @@ module gsau_control_unit #(
     endcase
   end
 
-  // Sequential block to latch fifo output and drive WB/scoreboard outputs that require registered values.
-  // The idea: fifo_dout is updated by FIFO on read, but it's safe to capture in this always_ff and use it.
-  logic [ENTRY_BITS-1:0] latched_vdst;
-  always_ff @(posedge CLK or negedge nRST) begin
-    if (!nRST) begin
-      latched_vdst <= '0;
-      o_wb_wbdst   <= '0;
-      o_sb_vdst    <= '0;
-      o_sb_valid   <= 1'b0;
-      o_wb_valid   <= 1'b0;
-    end else begin
-      // capture FIFO dout when fifo_rd is asserted (we popped)
-      if (fifo_rd) begin
-        latched_vdst <= fifo_dout;
-      end
+  // // Sequential block to latch fifo output and drive WB/scoreboard outputs that require registered values.
+  // // The idea: fifo_dout is updated by FIFO on read, but it's safe to capture in this always_ff and use it.
+  // logic [ENTRY_BITS-1:0] latched_vdst;
+  // always_ff @(posedge CLK or negedge nRST) begin
+  //   if (!nRST) begin
+  //     latched_vdst <= '0;
+  //     o_wb_wbdst   <= '0;
+  //     o_sb_vdst    <= '0;
+  //     o_sb_valid   <= 1'b0;
+  //     o_wb_valid   <= 1'b0;
+  //   end else begin
+  //     // capture FIFO dout when fifo_rd is asserted (we popped)
+  //     if (fifo_rd) begin
+  //       latched_vdst <= fifo_dout;
+  //     end
 
-      // Manage wb_valid and wb_wbdst: when in SEND_OUTPUT we keep driving until WB accepts
-      if (state == SEND_OUTPUT) begin
-        o_wb_wbdst <= latched_vdst;
-        // o_wb_valid is driven combinationally as 1 in SEND_OUTPUT; to reflect it in sequential,
-        // keep it high until wb_output_ready is seen.
-        if (wb_output_ready) begin
-          o_wb_valid <= 1'b0;
-          o_wb_wbdst <= '0;
-        end else begin
-          o_wb_valid <= 1'b1;
-        end
-      end else begin
-        // not sending
-        o_wb_valid <= 1'b0;
-        o_wb_wbdst <= '0;
-      end
+  //     // Manage wb_valid and wb_wbdst: when in SEND_OUTPUT we keep driving until WB accepts
+  //     if (state == SEND_OUTPUT) begin
+  //       o_wb_wbdst <= latched_vdst;
+  //       // o_wb_valid is driven combinationally as 1 in SEND_OUTPUT; to reflect it in sequential,
+  //       // keep it high until wb_output_ready is seen.
+  //       if (wb_output_ready) begin
+  //         o_wb_valid <= 1'b0;
+  //         o_wb_wbdst <= '0;
+  //       end else begin
+  //         o_wb_valid <= 1'b1;
+  //       end
+  //     end else begin
+  //       // not sending
+  //       o_wb_valid <= 1'b0;
+  //       o_wb_wbdst <= '0;
+  //     end
 
-      // Drive scoreboard outputs: indicate valid when we accepted an instruction (fifo_wr)
-      if (fifo_wr) begin
-        // The sb_vdst is the value scoreboard gave (sb_nvdst).
-        o_sb_vdst  <= sb_nvdst;
-        o_sb_valid <= 1'b1;
-      end else begin
-        o_sb_valid <= 1'b0;
-      end
-    end
-  end
+  //     // Drive scoreboard outputs: indicate valid when we accepted an instruction (fifo_wr)
+  //     if (fifo_wr) begin
+  //       // The sb_vdst is the value scoreboard gave (sb_nvdst).
+  //       o_sb_vdst  <= sb_nvdst;
+  //       o_sb_valid <= 1'b1;
+  //     end else begin
+  //       o_sb_valid <= 1'b0;
+  //     end
+  //   end
+  // end
 
 endmodule
