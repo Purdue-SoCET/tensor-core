@@ -1,4 +1,4 @@
-module sqrt_pipe #(
+module param_sr #(
     parameter int DATA_WIDTH = 16,
     parameter int STAGES = 1
 ) (
@@ -10,7 +10,6 @@ module sqrt_pipe #(
 );
 
     logic [DATA_WIDTH-1:0] pipe_regs [0:STAGES-1];
-
     always_ff @(posedge CLK, negedge nRST) begin
     if (!nRST) begin
         pipe_regs <= '{default:'0};
