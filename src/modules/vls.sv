@@ -117,6 +117,9 @@ end
                             vlsif.sp_store_data_a = v2_a_r;
                             vlsif.sp_store_data_b = v2_b_r;
                         end
+                        else begin
+                            next_state = DATA:
+                        end
                     end 
                     else if (vlsif.op = LOAD) begin
                         vlsif.sp_op = op_r;
@@ -130,10 +133,15 @@ end
                         vlsif.sp_id_b = id_b_r;
                         vslif.sp_addr1_reg = imm_a_r + rs1_a_r;
                         vslif.sp_addr2_reg = imm_b_r + rs1_b_r;
+                        vslif.vd_a = vd_a_r;
+                        vslif.vd_b = vd_b_r;
                         if (sls_if.dhit) begin
                             next_state = IDLE;
                             vlsif.sp_load_data_a = load_data_a_r;
                             vlsif.sp_load_data_b = load_data_b_r;
+                        end 
+                        else begin
+                            next_state = DATA;
                         end
                     end
                 end

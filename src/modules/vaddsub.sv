@@ -55,7 +55,7 @@ always_comb begin
                 frac_sum = frac_b_ext - frac_a_ext;
                 sign_r = sign_b;
             end
-        end
+        end`
 
         //normalization
         for (int i = 0; i < 12; i++) begin
