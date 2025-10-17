@@ -14,6 +14,9 @@ module addr_mapper_tb ();
 
     parameter PERIOD = 10;
     parameter INDEX_BITS = 11;
+    
+    // localparam
+    localparam LOOP = 32'h00FF_FFFF;
 
     logic tb_CLK = 0, tb_nRST;
 
@@ -86,60 +89,58 @@ module addr_mapper_tb ();
             tb_check    = 1'b1;
             
             if (tb_expected_amif.rank == tb_amif.rank) begin
-                $display("Correct 'rank' output during %s test case", tb_test_case);
+            //     $display("Correct 'rank' output during %s test case", tb_test_case);
             end
             else begin
                 tb_mismatch = 1'b1;
                 $display("Incorrect 'rank' output during %s test case", tb_test_case);
+                $display("Expected rank = %d, actual rank = %d", tb_expected_amif.rank, tb_amif.rank);
             end
 
             if (tb_expected_amif.BG == tb_amif.BG) begin
-                $display("Correct 'BG' output during %s test case", tb_test_case);
+            //     $display("Correct 'BG' output during %s test case", tb_test_case);
             end
             else begin
                 tb_mismatch = 1'b1;
                 $display("Incorrect 'BG' output during %s test case", tb_test_case);
+                $display("Expected BG = %d, actual BG = %d", tb_expected_amif.BG, tb_amif.BG);
             end
 
             if (tb_expected_amif.bank == tb_amif.bank) begin
-                $display("Correct 'bank' output during %s test case", tb_test_case);
+            //     $display("Correct 'bank' output during %s test case", tb_test_case);
             end
             else begin
                 tb_mismatch = 1'b1;
                 $display("Incorrect 'bank' output during %s test case", tb_test_case);
+                $display("Expected bank = %d, actual bank = %d", tb_expected_amif.bank, tb_amif.bank);
             end
 
             if (tb_expected_amif.row == tb_amif.row) begin
-                $display("Correct 'row' output during %s test case", tb_test_case);
+            //     $display("Correct 'row' output during %s test case", tb_test_case);
             end
             else begin
                 tb_mismatch = 1'b1;
                 $display("Incorrect 'row' output during %s test case", tb_test_case);
+                $display("Expected row = %d, actual row = %d", tb_expected_amif.row, tb_amif.row);
             end
 
             if (tb_expected_amif.col == tb_amif.col) begin
-                $display("Correct 'col' output during %s test case", tb_test_case);
+            //     $display("Correct 'col' output during %s test case", tb_test_case);
             end
             else begin
                 tb_mismatch = 1'b1;
                 $display("Incorrect 'col' output during %s test case", tb_test_case);
+                $display("Expected col = %d, actual col = %d", tb_expected_amif.col, tb_amif.col);
             end
 
             if (tb_expected_amif.offset == tb_amif.offset) begin
-                $display("Correct 'offset' output during %s test case", tb_test_case);
+            //     $display("Correct 'offset' output during %s test case", tb_test_case);
             end
             else begin
                 tb_mismatch = 1'b1;
                 $display("Incorrect 'offset' output during %s test case", tb_test_case);
+                $display("Expected  = %d, actual  = %d", tb_expected_amif.offset, tb_amif.offset);
             end
-
-            // if (tb_expected_amif.ignore == tb_amif.ignore) begin
-            //     $display("Correct 'ignore' output during %s test case", tb_test_case);
-            // end
-            // else begin
-            //     tb_mismatch = 1'b1;
-            //     $display("Incorrect 'ignore' output during %s test case", tb_test_case);
-            // end
 
             // Wait some small amount of time so check pulse timing is visible on waves
             #(0.1);
@@ -235,6 +236,7 @@ module addr_mapper_tb ();
         @(negedge tb_CLK)
         tb_amif.address = 32'hDEAD_BEEF;
         tb_amif.configs = x16;
+        //BANK_GROUP_BITS = 1;
 
         tb_expected_amif.rank = '1;
         tb_expected_amif.BG = '1;
@@ -248,6 +250,85 @@ module addr_mapper_tb ();
         check_output();
 
         #(tb_CLK * 3);
+
+        //*****************************************************************************
+        // x4
+        //*****************************************************************************
+        tb_test_case     = "Config = x4, multiple random addresses";
+        //BANK_GROUP_BITS = 2;
+        for (tb_i = 0; tb_i < LOOP; tb_i++) begin
+            tb_test_case_num = tb_test_case_num + 1;
+
+            @(negedge tb_CLK)
+            tb_amif.address = $urandom();
+            tb_amif.configs = x4;
+
+            tb_expected_amif.rank = tb_amif.address[31];
+            tb_expected_amif.BG = {tb_amif.address[13],tb_amif.address[5]};
+            tb_expected_amif.bank = tb_amif.address[15:14];
+            tb_expected_amif.row = tb_amif.address[30:16];
+            tb_expected_amif.col = {tb_amif.address[12:6],tb_amif.address[4:2]};
+            tb_expected_amif.offset = tb_amif.address[1:0];
+
+            @(posedge tb_CLK)
+            check_output();
+
+            #(tb_CLK * 3);
+        end
+
+        //*****************************************************************************
+        // x8
+        //*****************************************************************************
+        tb_test_case     = "Config = x8, multiple random addresses";
+        //BANK_GROUP_BITS = 2;
+
+        for (tb_i = 0; tb_i < LOOP; tb_i++) begin
+            tb_test_case_num = tb_test_case_num + 1;
+
+            @(negedge tb_CLK)
+            tb_amif.address = $urandom();
+            tb_amif.configs = x8;
+
+            tb_expected_amif.rank = tb_amif.address[31];
+            tb_expected_amif.BG = {tb_amif.address[13],tb_amif.address[5]};
+            tb_expected_amif.bank = tb_amif.address[15:14];
+            tb_expected_amif.row = tb_amif.address[30:16];
+            tb_expected_amif.col = {tb_amif.address[12:6],tb_amif.address[4:2]};
+            tb_expected_amif.offset = tb_amif.address[1:0];
+
+            @(posedge tb_CLK)
+            check_output();
+
+            #(tb_CLK * 3);
+        end
+
+        //*****************************************************************************
+        // x16
+        //*****************************************************************************
+        // tb_test_case     = "Config = x16, multiple random addresses";
+        // BANK_GROUP_BITS = 1;
+
+        // for (tb_i = 0; tb_i < LOOP; tb_i++) begin
+        //     tb_test_case_num = tb_test_case_num + 1;
+
+        //     @(negedge tb_CLK)
+        //     tb_amif.address = $urandom();
+        //     tb_amif.configs = x16;
+
+        //     tb_expected_amif.rank = tb_amif.address[31];
+        //     tb_expected_amif.BG = {tb_amif.address[13],tb_amif.address[5]};
+        //     tb_expected_amif.bank = tb_amif.address[15:14];
+        //     tb_expected_amif.row = tb_amif.address[30:16];
+        //     tb_expected_amif.col = {tb_amif.address[12:6],tb_amif.address[4:2]};
+        //     tb_expected_amif.offset = tb_amif.address[1:0];
+
+        //     @(posedge tb_CLK)
+        //     check_output();
+
+        //     #(tb_CLK * 3);
+        // end
+
+        $finish;
 
     end
 endmodule
