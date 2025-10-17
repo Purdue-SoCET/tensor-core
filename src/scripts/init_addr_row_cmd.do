@@ -29,20 +29,22 @@ add wave -noupdate -expand -group {row policy} /init_addr_row_cmd_tb/DUT/row_ope
 add wave -noupdate -expand -group {row policy} /init_addr_row_cmd_tb/tb_polif/req_en
 add wave -noupdate -expand -group {row policy} /init_addr_row_cmd_tb/tb_polif/refresh
 add wave -noupdate -expand -group {row policy} /init_addr_row_cmd_tb/tb_polif/row_resolve
-add wave -noupdate -group {command FSM} /init_addr_row_cmd_tb/tb_cfsmif/dREN
-add wave -noupdate -group {command FSM} /init_addr_row_cmd_tb/tb_cfsmif/dWEN
-add wave -noupdate -group {command FSM} /init_addr_row_cmd_tb/tb_cfsmif/init_done
-add wave -noupdate -group {command FSM} /init_addr_row_cmd_tb/tb_cfsmif/init_req
-add wave -noupdate -group {command FSM} /init_addr_row_cmd_tb/tb_cfsmif/tACT_done
-add wave -noupdate -group {command FSM} /init_addr_row_cmd_tb/tb_cfsmif/tWR_done
-add wave -noupdate -group {command FSM} /init_addr_row_cmd_tb/tb_cfsmif/tRD_done
-add wave -noupdate -group {command FSM} /init_addr_row_cmd_tb/tb_cfsmif/tPRE_done
-add wave -noupdate -group {command FSM} /init_addr_row_cmd_tb/tb_cfsmif/tREF_done
-add wave -noupdate -group {command FSM} /init_addr_row_cmd_tb/tb_cfsmif/rf_req
-add wave -noupdate -group {command FSM} /init_addr_row_cmd_tb/tb_cfsmif/row_resolve
-add wave -noupdate -group {command FSM} /init_addr_row_cmd_tb/tb_cfsmif/ram_wait
-add wave -noupdate -group {command FSM} /init_addr_row_cmd_tb/tb_cfsmif/cmd_state
-add wave -noupdate -group {command FSM} /init_addr_row_cmd_tb/tb_cfsmif/ncmd_state
+add wave -noupdate -expand -group {Expected value signals} /init_addr_row_cmd_tb/tb_expected_cfsmif/cmd_state
+add wave -noupdate -expand -group {Expected value signals} /init_addr_row_cmd_tb/tb_expected_polif/row_stat
+add wave -noupdate -expand -group {command FSM} /init_addr_row_cmd_tb/tb_cfsmif/dREN
+add wave -noupdate -expand -group {command FSM} /init_addr_row_cmd_tb/tb_cfsmif/dWEN
+add wave -noupdate -expand -group {command FSM} /init_addr_row_cmd_tb/tb_cfsmif/init_done
+add wave -noupdate -expand -group {command FSM} /init_addr_row_cmd_tb/tb_cfsmif/init_req
+add wave -noupdate -expand -group {command FSM} /init_addr_row_cmd_tb/tb_cfsmif/tACT_done
+add wave -noupdate -expand -group {command FSM} /init_addr_row_cmd_tb/tb_cfsmif/tWR_done
+add wave -noupdate -expand -group {command FSM} /init_addr_row_cmd_tb/tb_cfsmif/tRD_done
+add wave -noupdate -expand -group {command FSM} /init_addr_row_cmd_tb/tb_cfsmif/tPRE_done
+add wave -noupdate -expand -group {command FSM} /init_addr_row_cmd_tb/tb_cfsmif/tREF_done
+add wave -noupdate -expand -group {command FSM} /init_addr_row_cmd_tb/tb_cfsmif/rf_req
+add wave -noupdate -expand -group {command FSM} /init_addr_row_cmd_tb/tb_cfsmif/row_resolve
+add wave -noupdate -expand -group {command FSM} /init_addr_row_cmd_tb/tb_cfsmif/ram_wait
+add wave -noupdate -expand -group {command FSM} /init_addr_row_cmd_tb/tb_cfsmif/cmd_state
+add wave -noupdate -expand -group {command FSM} /init_addr_row_cmd_tb/tb_cfsmif/ncmd_state
 add wave -noupdate -group Counter /init_addr_row_cmd_tb/DUT/init_state/time_counter/clear
 add wave -noupdate -group Counter /init_addr_row_cmd_tb/DUT/init_state/time_counter/count_enable
 add wave -noupdate -group Counter /init_addr_row_cmd_tb/DUT/init_state/time_counter/overflow_val
@@ -62,7 +64,7 @@ add wave -noupdate -group {Timing Signals} /init_addr_row_cmd_tb/tb_timif/wr_en
 add wave -noupdate -group {Timing Signals} /init_addr_row_cmd_tb/tb_timif/rd_en
 add wave -noupdate -group {Timing Signals} /init_addr_row_cmd_tb/tb_timif/clear
 TreeUpdate [SetDefaultTree]
-WaveRestoreCursors {{Cursor 1} {22690296 ps} 0}
+WaveRestoreCursors {{Cursor 1} {22669730 ps} 0}
 quietly wave cursor active 1
 configure wave -namecolwidth 369
 configure wave -valuecolwidth 100
@@ -78,4 +80,4 @@ configure wave -griddelta 40
 configure wave -timeline 0
 configure wave -timelineunits ns
 update
-WaveRestoreZoom {22533473 ps} {23003153 ps}
+WaveRestoreZoom {22482128 ps} {23421488 ps}

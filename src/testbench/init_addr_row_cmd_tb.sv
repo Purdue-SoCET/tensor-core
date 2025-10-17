@@ -55,7 +55,7 @@ module init_addr_row_cmd_tb ();
     //*****************************************************************************
     string   tb_test_case;
     integer  tb_test_case_num;
-    integer  tb_i;
+    integer  tb_i, tb_j, tb_k;
     logic    tb_mismatch;
     logic    tb_check;
 
@@ -124,24 +124,196 @@ module init_addr_row_cmd_tb ();
             tb_check    = 1'b1;
 
             if (tb_expected_polif.row_stat == tb_polif.row_stat) begin
-                $display("Correct 'row status' output during %s test case", tb_test_case);
+                //$display("Correct 'row status' output during %s test case", tb_test_case);
             end
             else begin
                 tb_mismatch = 1'b1;
                 $display("Incorrect 'row_status' output during %s test case", tb_test_case);
+                $display("Expected row_status = %d, actual row_status = %d", tb_expected_polif.row_stat, tb_polif.row_stat);
             end
 
             if (tb_expected_cfsmif.cmd_state == tb_cfsmif.cmd_state) begin
-                $display("Correct 'cmd_state' output during %s test case", tb_test_case);
+                //$display("Correct 'cmd_state' output during %s test case", tb_test_case);
             end
             else begin
                 tb_mismatch = 1'b1;
                 $display("Incorrect 'cmd_state' output during %s test case", tb_test_case);
+                $display("Expected cmd_state = %d, actual cmd_state = %d", tb_expected_cfsmif.cmd_state, tb_cfsmif.cmd_state);
             end
 
             #(tb_CLK * 3);
             tb_check    = 1'b0;
         end
+    endtask
+
+    task do_row_miss;
+        tb_expected_polif.row_stat = 2'b10; // row status should be MISS (2'b10)
+        #(PERIOD * 0.1);
+        check_row();
+
+        // continue activating the row
+        @(posedge tb_CLK)
+        
+        @(negedge tb_CLK)
+        tb_expected_cfsmif.cmd_state = ACTIVATE;
+        check_row();
+
+        @(posedge tb_CLK)               // cmd_state should now be ACTIVATING
+        
+        @(negedge tb_CLK)
+        tb_timif.tACT_done = 1'b1;        // setting the ACT_done high
+        tb_expected_cfsmif.cmd_state = ACTIVATING;
+        check_row();
+
+        @(posedge tb_CLK)               // cmd_state should now be READ/WRITE
+        
+        @(negedge tb_CLK)
+        tb_timif.tACT_done = 1'b0;              // setting the ACT_done low
+        tb_expected_polif.row_stat = 2'b01;     // row status should be HIT (2'b01) because status table updated
+        tb_expected_cfsmif.cmd_state = (tb_cfsmif.dWEN) ? WRITE : READ;
+        check_row();
+
+        @(posedge tb_CLK)               // cmd_state should now be READING/WRITING
+
+        @(negedge tb_CLK)
+        if (tb_cfsmif.dWEN == 1'b1) begin
+            tb_timif.tWR_done = 1'b1;        // setting the WR_done high
+        end
+        else begin
+            tb_timif.tRD_done = 1'b1;       // setting the RD_done high
+        end
+        tb_expected_cfsmif.cmd_state = (tb_cfsmif.dWEN) ? WRITING : READING;
+        
+        if (tb_cfsmif.dWEN == 1'b1) begin
+            tb_cfsmif.dWEN = 1'b0;
+        end
+        else begin
+            tb_cfsmif.dREN = 1'b0;
+        end
+        check_row();
+
+        @(posedge tb_CLK)               // cmd_state should now be IDLE
+        
+        @(negedge tb_CLK)
+        tb_timif.tWR_done = 1'b0;        // setting the WR_done high
+        tb_timif.tRD_done = 1'b0;       // setting the RD_done high
+        tb_expected_cfsmif.cmd_state = IDLE;
+        tb_expected_polif.row_stat = 2'b01;         
+        check_row();
+
+        #(tb_CLK * 3);
+
+    endtask
+
+    task do_row_hit;
+        tb_expected_polif.row_stat = 2'b01;  // row status should be HIT (2'b01)
+        check_row();
+
+        @(posedge tb_CLK)           // cmd_state should now be WRITE
+        
+        @(negedge tb_CLK)
+        tb_expected_cfsmif.cmd_state = (tb_cfsmif.dWEN) ? WRITE : READ;
+        check_row();
+
+        @(posedge tb_CLK)               // cmd_state should now be WRITING
+
+        @(negedge tb_CLK)
+        if (tb_cfsmif.dWEN == 1'b1) begin
+            tb_timif.tWR_done = 1'b1;        // setting the WR_done high
+        end
+        else begin
+            tb_timif.tRD_done = 1'b1;
+        end
+        tb_expected_cfsmif.cmd_state = (tb_cfsmif.dWEN) ? WRITING : READING;
+        
+        if (tb_cfsmif.dWEN == 1'b1) begin
+            tb_cfsmif.dWEN = 1'b0;
+        end
+        else begin
+            tb_cfsmif.dREN = 1'b0;
+        end
+
+        check_row();
+
+        @(posedge tb_CLK)               // cmd_state should now be IDLE
+        
+        @(negedge tb_CLK)
+        tb_timif.tWR_done = 1'b0;        // setting the WR_done low
+        tb_timif.tRD_done = 1'b0;       // setting the RD_done low
+        tb_expected_cfsmif.cmd_state = IDLE;
+        tb_expected_polif.row_stat = 2'b01;         // row status should be HIT (2'b01)
+        check_row();
+
+        #(tb_CLK * 3);
+    endtask
+
+    task do_row_conflict;
+        tb_expected_cfsmif.cmd_state = IDLE;
+        tb_expected_polif.row_stat = 2'b11;     // row status should be CONFLICT (2'b11)
+        check_row();
+
+        @(negedge tb_CLK)
+        tb_expected_cfsmif.cmd_state = PRECHARGE;   // state should now be PRECHARGE
+        check_row();
+
+        @(negedge tb_CLK)
+        tb_expected_cfsmif.cmd_state = PRECHARGING;   // state should now be PRECHARGING
+        tb_timif.tPRE_done = 1'b1;                  // setting tPRE_done high
+        check_row();
+
+        @(negedge tb_CLK)
+        tb_expected_cfsmif.cmd_state = IDLE;    // state should now be IDLE
+        tb_expected_polif.row_stat = 2'b10;     // row status should be MISS (2'b10)
+        check_row();
+
+        @(negedge tb_CLK)
+        tb_expected_cfsmif.cmd_state = ACTIVATE;   // state should now be ACTIVATE
+        check_row();
+
+        @(posedge tb_CLK)               // cmd_state should now be ACTIVATING
+        
+        @(negedge tb_CLK)
+        tb_timif.tACT_done = 1'b1;        // setting the ACT_done high
+        tb_expected_cfsmif.cmd_state = ACTIVATING;
+        check_row();
+
+        @(posedge tb_CLK)               // cmd_state should now be READ/WRITE
+        
+        @(negedge tb_CLK)
+        tb_timif.tACT_done = 1'b0;              // setting the ACT_done low
+        tb_expected_polif.row_stat = 2'b01;     // row status should be HIT (2'b01) because status table updated
+        tb_expected_cfsmif.cmd_state = (tb_cfsmif.dWEN) ? WRITE : READ;
+        check_row();
+
+        @(posedge tb_CLK)               // cmd_state should now be READING/WRITING
+
+        @(negedge tb_CLK)
+        if (tb_cfsmif.dWEN == 1'b1) begin
+            tb_timif.tWR_done = 1'b1;        // setting the WR_done high
+        end
+        else begin
+            tb_timif.tRD_done = 1'b1;       // setting the RD_done high
+        end
+        tb_expected_cfsmif.cmd_state = (tb_cfsmif.dWEN) ? WRITING : READING;
+        
+        if (tb_cfsmif.dWEN == 1'b1) begin
+            tb_cfsmif.dWEN = 1'b0;
+        end
+        else begin
+            tb_cfsmif.dREN = 1'b0;
+        end
+        check_row();
+
+        @(posedge tb_CLK)               // cmd_state should now be IDLE
+        
+        @(negedge tb_CLK)
+        tb_timif.tWR_done = 1'b0;        // setting the WR_done high
+        tb_timif.tRD_done = 1'b0;       // setting the RD_done high
+        tb_expected_cfsmif.cmd_state = IDLE;
+        tb_expected_polif.row_stat = 2'b01;         
+        check_row();
+
+        #(tb_CLK * 3);
     endtask
 
 
@@ -212,60 +384,26 @@ module init_addr_row_cmd_tb ();
         tb_test_case_num = tb_test_case_num + 1;
 
         // Set a read request to address all 0s to activate a row
-        @(negedge tb_CLK)
-        tb_cfsmif.dREN              = 1'b1;      //
         tb_amif.address             = '0;
-        // tb_amif.BG                  = '0;
-        // tb_amif.bank                = '0;
-        // tb_amif.row                 = '0;
-
-        //@(posedge tb_CLK)           // row open policy should see the row miss now
-
-        //@(negedge tb_CLK)
-        tb_expected_polif.row_stat = 2'b10; // row status should be MISS (2'b10)
-        check_row();
-
-        // continue activating the row
-        @(posedge tb_CLK)
         
-        @(negedge tb_CLK)
-        tb_expected_polif.row_stat = 2'b01; // row status should be HIT (2'b01) because status table updated
-        tb_expected_cfsmif.cmd_state = ACTIVATE;
-        check_row();
+        for (tb_k = 0; tb_k < 1; tb_k++) begin
+            //for (tb_i = 0; tb_i < 2**BANK_GROUP_BITS; tb_i++) begin
+            for (tb_i = 0; tb_i < 1; tb_i++) begin
+                for (tb_j = 0; tb_j < 2**BANK_BITS; tb_j++) begin
+    
+                    @(negedge tb_CLK)
+                    tb_cfsmif.dREN              = 1'b1;
+                    {tb_amif.address[13],tb_amif.address[5]} = tb_i;
+                    tb_amif.address[15:14]                   = tb_j;
+                    tb_amif.address[30:16]                   = tb_k;
+                    do_row_miss();
 
-        @(posedge tb_CLK)               // cmd_state should now be ACTIVATING
-        
-        @(negedge tb_CLK)
-        tb_timif.tACT_done = 1'b1;        // setting the ACT_done high
-        tb_expected_cfsmif.cmd_state = ACTIVATING;
-        check_row();
+                    @(posedge tb_CLK)
 
-        @(posedge tb_CLK)               // cmd_state should now be READ
-        
-        @(negedge tb_CLK)
-        tb_timif.tACT_done = 1'b0;        // setting the ACT_done low
-        tb_expected_cfsmif.cmd_state = READ;
-        check_row();
-
-        @(posedge tb_CLK)               // cmd_state should now be READING
-
-        @(negedge tb_CLK)
-        tb_timif.tRD_done = 1'b1;        // setting the RD_done high
-        tb_expected_cfsmif.cmd_state = READING;
-        tb_cfsmif.dREN = 1'b0;
-        check_row();
-
-        @(posedge tb_CLK)               // cmd_state should now be IDLE
-        
-        @(negedge tb_CLK)
-        tb_timif.tRD_done = 1'b0;        // setting the RD_done high
-        tb_expected_cfsmif.cmd_state = IDLE;
-        tb_expected_polif.row_stat = 2'b01;         // WHY IS THE DEFAULT 0?
-        check_row();
-
-        #(tb_CLK * 3);
-
-        @(posedge tb_CLK)
+                    #(tb_CLK * 3);
+                end
+            end
+        end
 
         //*****************************************************************************
         // Row hit interaction
@@ -276,35 +414,7 @@ module init_addr_row_cmd_tb ();
         @(negedge tb_CLK)
         tb_cfsmif.dWEN = 1'b1;
 
-        //@(posedge tb_CLK)           // row open policy should see the row hit now
-
-        //@(negedge tb_CLK)
-        tb_expected_polif.row_stat = 2'b01;  // row status should be HIT (2'b01)
-        check_row();
-
-        @(posedge tb_CLK)           // cmd_state should now be WRITE
-        
-        @(negedge tb_CLK)
-        tb_expected_cfsmif.cmd_state = WRITE;
-        check_row();
-
-        @(posedge tb_CLK)               // cmd_state should now be WRITING
-
-        @(negedge tb_CLK)
-        tb_timif.tWR_done = 1'b1;        // setting the WR_done high
-        tb_expected_cfsmif.cmd_state = WRITING;
-        tb_cfsmif.dWEN = 1'b0;
-        check_row();
-
-        @(posedge tb_CLK)               // cmd_state should now be IDLE
-        
-        @(negedge tb_CLK)
-        tb_timif.tWR_done = 1'b0;        // setting the RD_done high
-        tb_expected_cfsmif.cmd_state = IDLE;
-        tb_expected_polif.row_stat = 2'b01;         //
-        check_row();
-
-        #(tb_CLK * 3);
+        do_row_hit();
 
         @(posedge tb_CLK)
 
@@ -314,15 +424,12 @@ module init_addr_row_cmd_tb ();
         tb_test_case     = "Row conflict interaction";
         tb_test_case_num = tb_test_case_num + 1;
 
-        @(negedge tb_CLK)
         tb_amif.address[30:16] = 15'h1;         // same BG and bank but diff row. Should be row conflict
-        tb_expected_polif.row_stat = 2'b11;
+        tb_cfsmif.dREN = 1'b1;
 
-        #(tb_CLK * 3);
-
-        @(posedge tb_CLK)
+        @(negedge tb_CLK)
+        do_row_conflict();
         
-
 
     end
 
