@@ -68,9 +68,11 @@ module row_open # (
                     
                 end
                 else begin
-                    nreg_f[ptr].valid = 1'b1;
-                    nreg_f[ptr].row = amif.row;
-                    //nrow_stat = 2'b10; //MISS
+                    if (timif.tACT_done) begin
+                        nreg_f[ptr].valid = 1'b1;
+                        nreg_f[ptr].row = amif.row;
+                        //nrow_stat = 2'b10; //MISS
+                    end
                 end
             end
         end
@@ -94,5 +96,5 @@ module row_open # (
         else begin
             pol_if.row_stat = 2'b10; //MISS
         end
-        end
+    end
 endmodule

@@ -29,7 +29,7 @@ interface timing_signals_if;
     );
 
     modport row_open (
-        input tREF_done
+        input tREF_done, tACT_done
     );
 
 endinterface
