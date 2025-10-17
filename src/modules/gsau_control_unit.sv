@@ -17,18 +17,8 @@ module gsau_control_unit #(
   import sys_arr_pkg::*;  // systolic-specific typedefs
 
   // local constants
-  localparam int ENTRY_BITS = 8;
+  localparam int ENTRY_BITS = $clog2(VEGGIEREGS);
   localparam int FIFO_DEPTH = (FIFOSIZE / ENTRY_BITS);
-
-  typedef enum logic [2:0] {
-    IDLE         = 3'd0,
-    ACCEPT_INST  = 3'd1, // accept scoreboard + veggie data and issue to SA
-    WAIT_OUTPUT  = 3'd2, // waiting for SA to produce output
-    SEND_OUTPUT  = 3'd3  // drive WB with psum + vdst until accepted
-  } state_t;
-
-  // internal registers
-  state_t       state, next_state;
 
   // FIFO interface signals
   logic         fifo_wr, fifo_rd;
@@ -100,12 +90,6 @@ module gsau_control_unit #(
 
   assign gsau_port.veg_ready = o_veg_ready;
 
-  // module sync_fifo #(parameter FIFODEPTH=8, DATAWIDTH=16) (
-  //   input logic rstn, clk, wr_en, rd_en,
-  //   input logic [DDATAWIDTH-1:0] din,
-  //   output logic [DDATAWIDTH-1:0] dout,
-  //   output logic empty, full
-  // );
   sync_fifo #(
     .FIFODEPTH(FIFO_DEPTH),
     .DATAWIDTH(ENTRY_BITS)
@@ -176,118 +160,9 @@ module gsau_control_unit #(
     o_sb_ready  = !fifo_full;                 // allow scoreboard to send new inst when space
     o_veg_ready = (!fifo_full) && sa_fifo_has_space;
 
-    case (state)
-      IDLE: begin
-        // Wait for next instruction from scoreboard (sb_nvalid) and data from veggie (veg_valid).
-        // We accept instruction when scoreboard presents a valid vdst and veggie has valid data.
-        // Also sb_nready is an input from scoreboard side; we don't depend on it here (it's their readiness)
-        if (sb_nvalid && veg_valid && o_sb_ready && o_veg_ready) begin
-          // Accept instruction: write vdst into FIFO and issue data to systolic array
-          fifo_wr   = 1'b1;
-          fifo_din  = sb_nvdst;
+    
+    if (sb_valid && veg_valid)
 
-          // decide based on weight flag
-          if (sb_weight) begin
-            o_sa_array_in = veg_vdata;      // weight payload on array_in for weight path
-            o_sa_weight_en = 1'b1;
-          end else begin
-            o_sa_array_in = veg_vdata;
-            o_sa_input_en  = 1'b1;
-          end
-
-          // after issuing, move to WAIT_OUTPUT to wait for SA to produce result
-          next_state = WAIT_OUTPUT;
-        end else begin
-          // remain in IDLE
-          next_state = IDLE;
-        end
-      end // IDLE
-
-      WAIT_OUTPUT: begin
-        // Waiting for systolic array to assert sa_out_en (result ready)
-        // If sa_out_en appears, read vdst out of FIFO and prepare to send to WB
-        if (sa_out_en && !fifo_empty) begin
-          fifo_rd = 1'b1; // pop destination corresponding to produced output
-          // drive writeback outputs for one cycle (or until wb accepts)
-          o_wb_psum  = sa_array_output;
-          // We cannot directly use fifo_dout in always_comb if FIFO produces dout registered on read,
-          // but this FIFO returns dout synchronous when rd_en asserted (dout updated on rising edge in module).
-          // To be safe, we'll latch fifo_dout in sequential block below and then assert wb_valid there.
-          o_wb_valid_next = 1'b1;
-          latched_vdst_next = fifo_dout;
-          // move to SEND_OUTPUT to manage handshake with WB buffer
-          next_state = SEND_OUTPUT;
-        end else begin
-          // Stay here until SA produces output
-          next_state = WAIT_OUTPUT;
-        end
-      end // WAIT_OUTPUT
-
-      SEND_OUTPUT: begin
-        // Attempt to send output to WB buffer. Wait until WB accepts (wb_output_ready).
-        // When wb_output_ready is asserted we consider transaction complete and go back to IDLE.
-        // NOTE: o_wb_wbdst must come from fifo_dout captured in sequential logic below.
-        o_wb_psum  = sa_array_output; // continue driving current PSUM until accepted
-        // o_wb_valid = 1'b1;
-        o_wb_wbdst_next = latched_vdst;
-        o_wb_valid_next = !wb_output_ready;
-
-        if (wb_output_ready) begin
-          // WB accepted output; return to IDLE to accept next instruction
-          next_state = IDLE;
-        end else begin
-          next_state = SEND_OUTPUT;
-        end
-      end // SEND_OUTPUT
-
-      default: begin
-        next_state = IDLE;
-      end
-    endcase
   end
-
-  // // Sequential block to latch fifo output and drive WB/scoreboard outputs that require registered values.
-  // // The idea: fifo_dout is updated by FIFO on read, but it's safe to capture in this always_ff and use it.
-  // logic [ENTRY_BITS-1:0] latched_vdst;
-  // always_ff @(posedge CLK or negedge nRST) begin
-  //   if (!nRST) begin
-  //     latched_vdst <= '0;
-  //     o_wb_wbdst   <= '0;
-  //     o_sb_vdst    <= '0;
-  //     o_sb_valid   <= 1'b0;
-  //     o_wb_valid   <= 1'b0;
-  //   end else begin
-  //     // capture FIFO dout when fifo_rd is asserted (we popped)
-  //     if (fifo_rd) begin
-  //       latched_vdst <= fifo_dout;
-  //     end
-
-  //     // Manage wb_valid and wb_wbdst: when in SEND_OUTPUT we keep driving until WB accepts
-  //     if (state == SEND_OUTPUT) begin
-  //       o_wb_wbdst <= latched_vdst;
-  //       // o_wb_valid is driven combinationally as 1 in SEND_OUTPUT; to reflect it in sequential,
-  //       // keep it high until wb_output_ready is seen.
-  //       if (wb_output_ready) begin
-  //         o_wb_valid <= 1'b0;
-  //         o_wb_wbdst <= '0;
-  //       end else begin
-  //         o_wb_valid <= 1'b1;
-  //       end
-  //     end else begin
-  //       // not sending
-  //       o_wb_valid <= 1'b0;
-  //       o_wb_wbdst <= '0;
-  //     end
-
-  //     // Drive scoreboard outputs: indicate valid when we accepted an instruction (fifo_wr)
-  //     if (fifo_wr) begin
-  //       // The sb_vdst is the value scoreboard gave (sb_nvdst).
-  //       o_sb_vdst  <= sb_nvdst;
-  //       o_sb_valid <= 1'b1;
-  //     end else begin
-  //       o_sb_valid <= 1'b0;
-  //     end
-  //   end
-  // end
 
 endmodule
