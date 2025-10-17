@@ -6,7 +6,7 @@ import uvm_pkg::*;
 
 class lfc_ram_transaction #(parameter NUM_BANKS = 4) extends uvm_sequence_item;
     logic n_rst;
-    rand logic [NUM_BANKS-1:0][31:0] ram_mem_data;
+    rand logic [NUM_BANKS-1:0][31:0] ram_mem_data; // check what to register as with param_utils
     logic [NUM_BANKS-1:0] ram_mem_complete;
 
     logic [NUM_BANKS-1:0] ram_mem_REN;
@@ -15,7 +15,7 @@ class lfc_ram_transaction #(parameter NUM_BANKS = 4) extends uvm_sequence_item;
     logic [NUM_BANKS-1:0][31:0] ram_mem_store;
 
 
-    `uvm_object_utils_begin(lfc_ram_transaction)
+    `uvm_object_utils_begin(lfc_ram_transaction) // change these to uvm_field_array_int if not a single bit signal
         `uvm_field_int(n_rst, UVM_DEFAULT)
         `uvm_field_int(ram_mem_data, UVM_DEFAULT);
         `uvm_field_int(ram_mem_complete, UVM_DEFAULT);
