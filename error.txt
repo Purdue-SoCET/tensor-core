@@ -1,486 +1,98 @@
-vlog -sv ./src/modules/system.sv ./src/modules/ram.sv ./src/modules/scheduler_core.sv ./src/modules/sc_datapath.sv ./src/modules/memory_control.sv ./src/modules/caches.sv ./src/modules/icache.sv ./src/modules/dcache.sv ./src/modules/scoreboard.sv ./src/modules/fetch.sv ./src/modules/execute.sv ./src/modules/fetch_branch.sv ./src/modules/dispatch.sv ./src/modules/issue.sv ./src/modules/scoreboard.sv ./src/modules/fu_alu.sv ./src/modules/fu_scalar_ls.sv ./src/modules/fu_matrix_ls.sv ./src/modules/fu_gemm.sv ./src/modules/fu_branch_predictor.sv ./src/modules/fu_branch.sv ./src/modules/writeback.sv ./src/modules/memory_arbiter_basic.sv ./src/modules/fust_g.sv ./src/modules/fust_m.sv ./src/modules/fust_s.sv ./src/modules/rst_m.sv ./src/modules/rst_s.sv +incdir+./src/include/ 
+vlog -sv +incdir+./src/include ./src/include/gsau_control_unit_if.vh ./src/testbench/gsau_control_unit_tb.sv ./src/modules/gsau_control_unit.sv ./src/modules/sync_fifo.sv
 QuestaSim-64 vlog 2021.4 Compiler 2021.10 Oct 13 2021
-Start time: 15:13:18 on Mar 02,2025
-vlog -sv ./src/modules/system.sv ./src/modules/ram.sv ./src/modules/scheduler_core.sv ./src/modules/sc_datapath.sv ./src/modules/memory_control.sv ./src/modules/caches.sv ./src/modules/icache.sv ./src/modules/dcache.sv ./src/modules/scoreboard.sv ./src/modules/fetch.sv ./src/modules/execute.sv ./src/modules/fetch_branch.sv ./src/modules/dispatch.sv ./src/modules/issue.sv ./src/modules/scoreboard.sv ./src/modules/fu_alu.sv ./src/modules/fu_scalar_ls.sv ./src/modules/fu_matrix_ls.sv ./src/modules/fu_gemm.sv ./src/modules/fu_branch_predictor.sv ./src/modules/fu_branch.sv ./src/modules/writeback.sv ./src/modules/memory_arbiter_basic.sv ./src/modules/fust_g.sv ./src/modules/fust_m.sv ./src/modules/fust_s.sv ./src/modules/rst_m.sv ./src/modules/rst_s.sv "+incdir+./src/include/" 
--- Compiling package isa_pkg
--- Compiling interface system_if
--- Importing package isa_pkg
--- Compiling package ram_pkg
--- Compiling interface ram_if
--- Importing package ram_pkg
--- Compiling module system
--- Compiling package isa_pkg
-** Warning: ** while parsing file included at ./src/modules/ram.sv(1)
-** while parsing file included at ./src/include//ram_if.vh(5)
-** while parsing file included at ./src/include//ram_pkg.vh(5)
-** at ./src/include//isa_types.vh(4): (vlog-2275) Existing package 'isa_pkg' at line 4 will be overwritten.
--- Compiling package ram_pkg
-** Warning: ** while parsing file included at ./src/modules/ram.sv(1)
-** while parsing file included at ./src/include//ram_if.vh(5)
-** at ./src/include//ram_pkg.vh(7): (vlog-2275) Existing package 'ram_pkg' at line 7 will be overwritten.
--- Compiling interface ram_if
-** Warning: ** while parsing file included at ./src/modules/ram.sv(1)
-** at ./src/include//ram_if.vh(8): (vlog-2275) Existing interface 'ram_if' at line 8 will be overwritten.
--- Compiling module ram
--- Compiling package caches_pkg
--- Compiling interface caches_if
--- Importing package caches_pkg
--- Compiling package isa_pkg
-** Warning: ** while parsing file included at ./src/modules/scheduler_core.sv(11)
-** while parsing file included at ./src/include//cache_control_if.vh(13)
-** while parsing file included at ./src/include//ram_pkg.vh(5)
-** at ./src/include//isa_types.vh(4): (vlog-2275) Existing package 'isa_pkg' at line 4 will be overwritten.
--- Compiling package ram_pkg
-** Warning: ** while parsing file included at ./src/modules/scheduler_core.sv(11)
-** while parsing file included at ./src/include//cache_control_if.vh(13)
-** at ./src/include//ram_pkg.vh(7): (vlog-2275) Existing package 'ram_pkg' at line 7 will be overwritten.
--- Compiling interface cache_control_if
--- Compiling interface scratchpad_if
--- Compiling interface datapath_cache_if
--- Compiling interface arbiter_caches_if
--- Compiling module scheduler_core
--- Compiling package isa_pkg
-** Warning: ** while parsing file included at ./src/modules/sc_datapath.sv(2)
-** while parsing file included at ./src/include//pipeline_types.vh(5)
-** at ./src/include//isa_types.vh(4): (vlog-2275) Existing package 'isa_pkg' at line 4 will be overwritten.
--- Compiling package pipeline_pkg
-** Warning: ** while parsing file included at ./src/modules/sc_datapath.sv(2)
-** at ./src/include//pipeline_types.vh(29): (vlog-2283) Extra semicolon in $unit (global) scope.
--- Compiling interface datapath_cache_if
-** Warning: ** while parsing file included at ./src/modules/sc_datapath.sv(12)
-** at ./src/include//datapath_cache_if.vh(7): (vlog-2275) Existing interface 'datapath_cache_if' at line 7 will be overwritten.
-** Warning: ./src/modules/sc_datapath.sv(158): (vlog-2284) Empty $unit scope found.
--- Compiling package sc_datapath_sv_unit
--- Compiling interface fetch_if
--- Compiling package datapath_pkg
--- Compiling interface scoreboard_if
--- Importing package datapath_pkg
--- Compiling interface dispatch_if
--- Compiling interface issue_if
--- Compiling interface regfile_if
--- Compiling interface execute_if
--- Compiling interface writeback_if
--- Compiling interface datapath_cache_if
--- Compiling module sc_datapath
--- Importing package pipeline_pkg
--- Compiling package isa_pkg
-** Warning: ** while parsing file included at ./src/modules/memory_control.sv(3)
-** while parsing file included at ./src/include//ram_pkg.vh(5)
-** at ./src/include//isa_types.vh(4): (vlog-2275) Existing package 'isa_pkg' at line 4 will be overwritten.
--- Compiling package ram_pkg
-** Warning: ** while parsing file included at ./src/modules/memory_control.sv(3)
-** at ./src/include//ram_pkg.vh(7): (vlog-2275) Existing package 'ram_pkg' at line 7 will be overwritten.
--- Compiling interface cache_control_if
-** Warning: ** while parsing file included at ./src/modules/memory_control.sv(4)
-** at ./src/include//cache_control_if.vh(17): (vlog-2275) Existing interface 'cache_control_if' at line 17 will be overwritten.
--- Compiling module memory_control
--- Compiling module caches
--- Compiling package isa_pkg
-** Warning: ** while parsing file included at ./src/modules/icache.sv(1)
-** while parsing file included at ./src/include//fetch_if.vh(4)
-** at ./src/include//isa_types.vh(4): (vlog-2275) Existing package 'isa_pkg' at line 4 will be overwritten.
--- Compiling interface fetch_if
-** Warning: ** while parsing file included at ./src/modules/icache.sv(1)
-** at ./src/include//fetch_if.vh(6): (vlog-2275) Existing interface 'fetch_if' at line 6 will be overwritten.
--- Compiling package caches_pkg
-** Warning: ** while parsing file included at ./src/modules/icache.sv(2)
-** while parsing file included at ./src/include//arbiter_caches_if.vh(6)
-** at ./src/include//caches_pkg.vh(10): (vlog-2275) Existing package 'caches_pkg' at line 10 will be overwritten.
--- Compiling interface caches_if
-** Warning: ** while parsing file included at ./src/modules/icache.sv(2)
-** while parsing file included at ./src/include//arbiter_caches_if.vh(7)
-** at ./src/include//caches_if.vh(7): (vlog-2275) Existing interface 'caches_if' at line 7 will be overwritten.
--- Compiling interface arbiter_caches_if
-** Warning: ** while parsing file included at ./src/modules/icache.sv(2)
-** at ./src/include//arbiter_caches_if.vh(9): (vlog-2275) Existing interface 'arbiter_caches_if' at line 9 will be overwritten.
--- Compiling module icache
--- Compiling package caches_pkg
-** Warning: ** while parsing file included at ./src/modules/dcache.sv(1)
-** at ./src/include//caches_pkg.vh(10): (vlog-2275) Existing package 'caches_pkg' at line 10 will be overwritten.
--- Compiling module dcache
--- Compiling package isa_pkg
-** Warning: ** while parsing file included at ./src/modules/scoreboard.sv(1)
-** while parsing file included at ./src/include//datapath_types.vh(4)
-** at ./src/include//isa_types.vh(4): (vlog-2275) Existing package 'isa_pkg' at line 4 will be overwritten.
--- Compiling package datapath_pkg
-** Warning: ** while parsing file included at ./src/modules/scoreboard.sv(1)
-** at ./src/include//datapath_types.vh(6): (vlog-2275) Existing package 'datapath_pkg' at line 6 will be overwritten.
--- Compiling interface scoreboard_if
-** Warning: ** while parsing file included at ./src/modules/scoreboard.sv(2)
-** at ./src/include//scoreboard_if.vh(6): (vlog-2275) Existing interface 'scoreboard_if' at line 6 will be overwritten.
--- Compiling interface dispatch_if
-** Warning: ** while parsing file included at ./src/modules/scoreboard.sv(3)
-** while parsing file included at ./src/modules/dispatch.sv(2)
-** at ./src/include//dispatch_if.vh(5): (vlog-2275) Existing interface 'dispatch_if' at line 5 will be overwritten.
--- Compiling interface control_unit_if
--- Compiling module control_unit
--- Compiling interface rst_s_if
--- Compiling module rst_s
--- Compiling interface rst_m_if
--- Compiling module rst_m
--- Compiling module dispatch
--- Compiling interface issue_if
-** Warning: ** while parsing file included at ./src/modules/scoreboard.sv(5)
-** while parsing file included at ./src/modules/issue.sv(4)
-** at ./src/include//issue_if.vh(6): (vlog-2275) Existing interface 'issue_if' at line 6 will be overwritten.
--- Compiling interface regfile_if
-** Warning: ** while parsing file included at ./src/modules/scoreboard.sv(5)
-** while parsing file included at ./src/modules/issue.sv(5)
-** while parsing file included at ./src/modules/regfile.sv(8)
-** at ./src/include//regfile_if.vh(7): (vlog-2275) Existing interface 'regfile_if' at line 7 will be overwritten.
--- Compiling module regfile
--- Compiling interface fust_s_if
--- Compiling module fust_s
--- Compiling interface fust_m_if
--- Compiling module fust_m
--- Compiling interface fust_g_if
--- Compiling module fust_g
--- Compiling module issue
--- Compiling module scoreboard
--- Compiling package isa_pkg
-** Warning: ** while parsing file included at ./src/modules/fetch.sv(1)
-** while parsing file included at ./src/include//fetch_if.vh(4)
-** at ./src/include//isa_types.vh(4): (vlog-2275) Existing package 'isa_pkg' at line 4 will be overwritten.
--- Compiling interface fetch_if
-** Warning: ** while parsing file included at ./src/modules/fetch.sv(1)
-** at ./src/include//fetch_if.vh(6): (vlog-2275) Existing interface 'fetch_if' at line 6 will be overwritten.
--- Compiling module fetch
--- Compiling package isa_pkg
-** Warning: ** while parsing file included at ./src/modules/execute.sv(2)
-** while parsing file included at ./src/include//datapath_types.vh(4)
-** at ./src/include//isa_types.vh(4): (vlog-2275) Existing package 'isa_pkg' at line 4 will be overwritten.
--- Compiling package datapath_pkg
-** Warning: ** while parsing file included at ./src/modules/execute.sv(2)
-** at ./src/include//datapath_types.vh(6): (vlog-2275) Existing package 'datapath_pkg' at line 6 will be overwritten.
--- Compiling interface fu_branch_if
--- Compiling interface fu_alu_if
--- Compiling interface fu_scalar_ls_if
--- Compiling interface fu_matrix_ls_if
--- Compiling interface fu_gemm_if
--- Compiling interface execute_if
-** Warning: ** while parsing file included at ./src/modules/execute.sv(8)
-** at ./src/include//execute_if.vh(22): (vlog-2275) Existing interface 'execute_if' at line 22 will be overwritten.
--- Compiling module execute
--- Compiling package isa_pkg
-** Warning: ** while parsing file included at ./src/modules/fetch_branch.sv(1)
-** at ./src/include//isa_types.vh(4): (vlog-2275) Existing package 'isa_pkg' at line 4 will be overwritten.
--- Compiling package datapath_pkg
-** Warning: ** while parsing file included at ./src/modules/fetch_branch.sv(2)
-** at ./src/include//datapath_types.vh(6): (vlog-2275) Existing package 'datapath_pkg' at line 6 will be overwritten.
--- Compiling interface fu_branch_predictor_if
--- Compiling interface fetch_if
-** Warning: ** while parsing file included at ./src/modules/fetch_branch.sv(4)
-** at ./src/include//fetch_if.vh(6): (vlog-2275) Existing interface 'fetch_if' at line 6 will be overwritten.
--- Compiling interface fetch_branch_if
--- Compiling interface fu_branch_if
-** Warning: ** while parsing file included at ./src/modules/fetch_branch.sv(6)
-** at ./src/include//fu_branch_if.vh(6): (vlog-2275) Existing interface 'fu_branch_if' at line 6 will be overwritten.
--- Compiling module fetch_branch
--- Compiling package isa_pkg
-** Warning: ** while parsing file included at ./src/modules/dispatch.sv(1)
-** while parsing file included at ./src/include//datapath_types.vh(4)
-** at ./src/include//isa_types.vh(4): (vlog-2275) Existing package 'isa_pkg' at line 4 will be overwritten.
--- Compiling package datapath_pkg
-** Warning: ** while parsing file included at ./src/modules/dispatch.sv(1)
-** at ./src/include//datapath_types.vh(6): (vlog-2275) Existing package 'datapath_pkg' at line 6 will be overwritten.
--- Compiling interface dispatch_if
-** Warning: ** while parsing file included at ./src/modules/dispatch.sv(2)
-** at ./src/include//dispatch_if.vh(5): (vlog-2275) Existing interface 'dispatch_if' at line 5 will be overwritten.
--- Compiling interface control_unit_if
-** Warning: ** while parsing file included at ./src/modules/dispatch.sv(3)
-** at ./src/include//control_unit_if.vh(6): (vlog-2275) Existing interface 'control_unit_if' at line 6 will be overwritten.
--- Compiling module control_unit
-** Warning: ** while parsing file included at ./src/modules/dispatch.sv(4)
-** at ./src/modules/control_unit.sv(8): (vlog-2275) Existing module 'control_unit' at line 8 will be overwritten.
--- Compiling interface rst_s_if
-** Warning: ** while parsing file included at ./src/modules/dispatch.sv(5)
-** while parsing file included at ./src/modules/rst_s.sv(1)
-** at ./src/include//rst_s_if.vh(5): (vlog-2275) Existing interface 'rst_s_if' at line 5 will be overwritten.
--- Compiling module rst_s
-** Warning: ** while parsing file included at ./src/modules/dispatch.sv(5)
-** at ./src/modules/rst_s.sv(4): (vlog-2275) Existing module 'rst_s' at line 4 will be overwritten.
--- Compiling interface rst_m_if
-** Warning: ** while parsing file included at ./src/modules/dispatch.sv(6)
-** while parsing file included at ./src/modules/rst_m.sv(1)
-** at ./src/include//rst_m_if.vh(5): (vlog-2275) Existing interface 'rst_m_if' at line 5 will be overwritten.
--- Compiling module rst_m
-** Warning: ** while parsing file included at ./src/modules/dispatch.sv(6)
-** at ./src/modules/rst_m.sv(4): (vlog-2275) Existing module 'rst_m' at line 4 will be overwritten.
--- Compiling module dispatch
-** Warning: ./src/modules/dispatch.sv(10): (vlog-2275) Existing module 'dispatch' at line 10 will be overwritten.
--- Compiling package isa_pkg
-** Warning: ** while parsing file included at ./src/modules/issue.sv(3)
-** while parsing file included at ./src/include//datapath_types.vh(4)
-** at ./src/include//isa_types.vh(4): (vlog-2275) Existing package 'isa_pkg' at line 4 will be overwritten.
--- Compiling package datapath_pkg
-** Warning: ** while parsing file included at ./src/modules/issue.sv(3)
-** at ./src/include//datapath_types.vh(6): (vlog-2275) Existing package 'datapath_pkg' at line 6 will be overwritten.
--- Compiling interface issue_if
-** Warning: ** while parsing file included at ./src/modules/issue.sv(4)
-** at ./src/include//issue_if.vh(6): (vlog-2275) Existing interface 'issue_if' at line 6 will be overwritten.
--- Compiling interface regfile_if
-** Warning: ** while parsing file included at ./src/modules/issue.sv(5)
-** while parsing file included at ./src/modules/regfile.sv(8)
-** at ./src/include//regfile_if.vh(7): (vlog-2275) Existing interface 'regfile_if' at line 7 will be overwritten.
--- Compiling module regfile
-** Warning: ** while parsing file included at ./src/modules/issue.sv(5)
-** at ./src/modules/regfile.sv(10): (vlog-2275) Existing module 'regfile' at line 10 will be overwritten.
--- Compiling interface fust_s_if
-** Warning: ** while parsing file included at ./src/modules/issue.sv(7)
-** while parsing file included at ./src/modules/fust_s.sv(1)
-** at ./src/include//fust_s_if.vh(5): (vlog-2275) Existing interface 'fust_s_if' at line 5 will be overwritten.
--- Compiling module fust_s
-** Warning: ** while parsing file included at ./src/modules/issue.sv(7)
-** at ./src/modules/fust_s.sv(4): (vlog-2275) Existing module 'fust_s' at line 4 will be overwritten.
--- Compiling interface fust_m_if
-** Warning: ** while parsing file included at ./src/modules/issue.sv(9)
-** while parsing file included at ./src/modules/fust_m.sv(1)
-** at ./src/include//fust_m_if.vh(5): (vlog-2275) Existing interface 'fust_m_if' at line 5 will be overwritten.
--- Compiling module fust_m
-** Warning: ** while parsing file included at ./src/modules/issue.sv(9)
-** at ./src/modules/fust_m.sv(4): (vlog-2275) Existing module 'fust_m' at line 4 will be overwritten.
--- Compiling interface fust_g_if
-** Warning: ** while parsing file included at ./src/modules/issue.sv(11)
-** while parsing file included at ./src/modules/fust_g.sv(1)
-** at ./src/include//fust_g_if.vh(5): (vlog-2275) Existing interface 'fust_g_if' at line 5 will be overwritten.
--- Compiling module fust_g
-** Warning: ** while parsing file included at ./src/modules/issue.sv(11)
-** at ./src/modules/fust_g.sv(4): (vlog-2275) Existing module 'fust_g' at line 4 will be overwritten.
--- Compiling module issue
-** Warning: ./src/modules/issue.sv(14): (vlog-2275) Existing module 'issue' at line 14 will be overwritten.
--- Compiling package isa_pkg
-** Warning: ** while parsing file included at ./src/modules/scoreboard.sv(1)
-** while parsing file included at ./src/include//datapath_types.vh(4)
-** at ./src/include//isa_types.vh(4): (vlog-2275) Existing package 'isa_pkg' at line 4 will be overwritten.
--- Compiling package datapath_pkg
-** Warning: ** while parsing file included at ./src/modules/scoreboard.sv(1)
-** at ./src/include//datapath_types.vh(6): (vlog-2275) Existing package 'datapath_pkg' at line 6 will be overwritten.
--- Compiling interface scoreboard_if
-** Warning: ** while parsing file included at ./src/modules/scoreboard.sv(2)
-** at ./src/include//scoreboard_if.vh(6): (vlog-2275) Existing interface 'scoreboard_if' at line 6 will be overwritten.
--- Compiling interface dispatch_if
-** Warning: ** while parsing file included at ./src/modules/scoreboard.sv(3)
-** while parsing file included at ./src/modules/dispatch.sv(2)
-** at ./src/include//dispatch_if.vh(5): (vlog-2275) Existing interface 'dispatch_if' at line 5 will be overwritten.
--- Compiling interface control_unit_if
-** Warning: ** while parsing file included at ./src/modules/scoreboard.sv(3)
-** while parsing file included at ./src/modules/dispatch.sv(3)
-** at ./src/include//control_unit_if.vh(6): (vlog-2275) Existing interface 'control_unit_if' at line 6 will be overwritten.
--- Compiling module control_unit
-** Warning: ** while parsing file included at ./src/modules/scoreboard.sv(3)
-** while parsing file included at ./src/modules/dispatch.sv(4)
-** at ./src/modules/control_unit.sv(8): (vlog-2275) Existing module 'control_unit' at line 8 will be overwritten.
--- Compiling interface rst_s_if
-** Warning: ** while parsing file included at ./src/modules/scoreboard.sv(3)
-** while parsing file included at ./src/modules/dispatch.sv(5)
-** while parsing file included at ./src/modules/rst_s.sv(1)
-** at ./src/include//rst_s_if.vh(5): (vlog-2275) Existing interface 'rst_s_if' at line 5 will be overwritten.
--- Compiling module rst_s
-** Warning: ** while parsing file included at ./src/modules/scoreboard.sv(3)
-** while parsing file included at ./src/modules/dispatch.sv(5)
-** at ./src/modules/rst_s.sv(4): (vlog-2275) Existing module 'rst_s' at line 4 will be overwritten.
--- Compiling interface rst_m_if
-** Warning: ** while parsing file included at ./src/modules/scoreboard.sv(3)
-** while parsing file included at ./src/modules/dispatch.sv(6)
-** while parsing file included at ./src/modules/rst_m.sv(1)
-** at ./src/include//rst_m_if.vh(5): (vlog-2275) Existing interface 'rst_m_if' at line 5 will be overwritten.
--- Compiling module rst_m
-** Warning: ** while parsing file included at ./src/modules/scoreboard.sv(3)
-** while parsing file included at ./src/modules/dispatch.sv(6)
-** at ./src/modules/rst_m.sv(4): (vlog-2275) Existing module 'rst_m' at line 4 will be overwritten.
--- Compiling module dispatch
-** Warning: ** while parsing file included at ./src/modules/scoreboard.sv(3)
-** at ./src/modules/dispatch.sv(10): (vlog-2275) Existing module 'dispatch' at line 10 will be overwritten.
--- Compiling interface issue_if
-** Warning: ** while parsing file included at ./src/modules/scoreboard.sv(5)
-** while parsing file included at ./src/modules/issue.sv(4)
-** at ./src/include//issue_if.vh(6): (vlog-2275) Existing interface 'issue_if' at line 6 will be overwritten.
--- Compiling interface regfile_if
-** Warning: ** while parsing file included at ./src/modules/scoreboard.sv(5)
-** while parsing file included at ./src/modules/issue.sv(5)
-** while parsing file included at ./src/modules/regfile.sv(8)
-** at ./src/include//regfile_if.vh(7): (vlog-2275) Existing interface 'regfile_if' at line 7 will be overwritten.
--- Compiling module regfile
-** Warning: ** while parsing file included at ./src/modules/scoreboard.sv(5)
-** while parsing file included at ./src/modules/issue.sv(5)
-** at ./src/modules/regfile.sv(10): (vlog-2275) Existing module 'regfile' at line 10 will be overwritten.
--- Compiling interface fust_s_if
-** Warning: ** while parsing file included at ./src/modules/scoreboard.sv(5)
-** while parsing file included at ./src/modules/issue.sv(7)
-** while parsing file included at ./src/modules/fust_s.sv(1)
-** at ./src/include//fust_s_if.vh(5): (vlog-2275) Existing interface 'fust_s_if' at line 5 will be overwritten.
--- Compiling module fust_s
-** Warning: ** while parsing file included at ./src/modules/scoreboard.sv(5)
-** while parsing file included at ./src/modules/issue.sv(7)
-** at ./src/modules/fust_s.sv(4): (vlog-2275) Existing module 'fust_s' at line 4 will be overwritten.
--- Compiling interface fust_m_if
-** Warning: ** while parsing file included at ./src/modules/scoreboard.sv(5)
-** while parsing file included at ./src/modules/issue.sv(9)
-** while parsing file included at ./src/modules/fust_m.sv(1)
-** at ./src/include//fust_m_if.vh(5): (vlog-2275) Existing interface 'fust_m_if' at line 5 will be overwritten.
--- Compiling module fust_m
-** Warning: ** while parsing file included at ./src/modules/scoreboard.sv(5)
-** while parsing file included at ./src/modules/issue.sv(9)
-** at ./src/modules/fust_m.sv(4): (vlog-2275) Existing module 'fust_m' at line 4 will be overwritten.
--- Compiling interface fust_g_if
-** Warning: ** while parsing file included at ./src/modules/scoreboard.sv(5)
-** while parsing file included at ./src/modules/issue.sv(11)
-** while parsing file included at ./src/modules/fust_g.sv(1)
-** at ./src/include//fust_g_if.vh(5): (vlog-2275) Existing interface 'fust_g_if' at line 5 will be overwritten.
--- Compiling module fust_g
-** Warning: ** while parsing file included at ./src/modules/scoreboard.sv(5)
-** while parsing file included at ./src/modules/issue.sv(11)
-** at ./src/modules/fust_g.sv(4): (vlog-2275) Existing module 'fust_g' at line 4 will be overwritten.
--- Compiling module issue
-** Warning: ** while parsing file included at ./src/modules/scoreboard.sv(5)
-** at ./src/modules/issue.sv(14): (vlog-2275) Existing module 'issue' at line 14 will be overwritten.
--- Compiling module scoreboard
-** Warning: ./src/modules/scoreboard.sv(8): (vlog-2275) Existing module 'scoreboard' at line 8 will be overwritten.
--- Compiling package isa_pkg
-** Warning: ** while parsing file included at ./src/modules/fu_alu.sv(1)
-** while parsing file included at ./src/include//fu_alu_if.vh(3)
-** at ./src/include//isa_types.vh(4): (vlog-2275) Existing package 'isa_pkg' at line 4 will be overwritten.
--- Compiling package datapath_pkg
-** Warning: ** while parsing file included at ./src/modules/fu_alu.sv(1)
-** while parsing file included at ./src/include//fu_alu_if.vh(4)
-** at ./src/include//datapath_types.vh(6): (vlog-2275) Existing package 'datapath_pkg' at line 6 will be overwritten.
--- Compiling interface fu_alu_if
-** Warning: ** while parsing file included at ./src/modules/fu_alu.sv(1)
-** at ./src/include//fu_alu_if.vh(6): (vlog-2275) Existing interface 'fu_alu_if' at line 6 will be overwritten.
--- Compiling module fu_alu
--- Compiling package isa_pkg
-** Warning: ** while parsing file included at ./src/modules/fu_scalar_ls.sv(1)
-** while parsing file included at ./src/include//fu_scalar_ls_if.vh(4)
-** while parsing file included at ./src/include//datapath_types.vh(4)
-** at ./src/include//isa_types.vh(4): (vlog-2275) Existing package 'isa_pkg' at line 4 will be overwritten.
--- Compiling package datapath_pkg
-** Warning: ** while parsing file included at ./src/modules/fu_scalar_ls.sv(1)
-** while parsing file included at ./src/include//fu_scalar_ls_if.vh(4)
-** at ./src/include//datapath_types.vh(6): (vlog-2275) Existing package 'datapath_pkg' at line 6 will be overwritten.
--- Compiling interface fu_scalar_ls_if
-** Warning: ** while parsing file included at ./src/modules/fu_scalar_ls.sv(1)
-** at ./src/include//fu_scalar_ls_if.vh(6): (vlog-2275) Existing interface 'fu_scalar_ls_if' at line 6 will be overwritten.
--- Compiling module fu_scalar_ls
--- Compiling package isa_pkg
-** Warning: ** while parsing file included at ./src/modules/fu_matrix_ls.sv(3)
-** while parsing file included at ./src/include//datapath_types.vh(4)
-** at ./src/include//isa_types.vh(4): (vlog-2275) Existing package 'isa_pkg' at line 4 will be overwritten.
--- Compiling package datapath_pkg
-** Warning: ** while parsing file included at ./src/modules/fu_matrix_ls.sv(3)
-** at ./src/include//datapath_types.vh(6): (vlog-2275) Existing package 'datapath_pkg' at line 6 will be overwritten.
--- Compiling interface fu_matrix_ls_if
-** Warning: ** while parsing file included at ./src/modules/fu_matrix_ls.sv(5)
-** at ./src/include//fu_matrix_ls_if.vh(11): (vlog-2275) Existing interface 'fu_matrix_ls_if' at line 11 will be overwritten.
--- Compiling module fu_matrix_ls
--- Compiling package isa_pkg
-** Warning: ** while parsing file included at ./src/modules/fu_gemm.sv(1)
-** at ./src/include//isa_types.vh(4): (vlog-2275) Existing package 'isa_pkg' at line 4 will be overwritten.
--- Compiling package datapath_pkg
-** Warning: ** while parsing file included at ./src/modules/fu_gemm.sv(2)
-** at ./src/include//datapath_types.vh(6): (vlog-2275) Existing package 'datapath_pkg' at line 6 will be overwritten.
--- Compiling interface fu_gemm_if
-** Warning: ** while parsing file included at ./src/modules/fu_gemm.sv(3)
-** at ./src/include//fu_gemm_if.vh(6): (vlog-2275) Existing interface 'fu_gemm_if' at line 6 will be overwritten.
--- Compiling module fu_gemm
--- Compiling package isa_pkg
-** Warning: ** while parsing file included at ./src/modules/fu_branch_predictor.sv(1)
-** while parsing file included at ./src/include//fu_branch_predictor_if.vh(4)
-** at ./src/include//isa_types.vh(4): (vlog-2275) Existing package 'isa_pkg' at line 4 will be overwritten.
--- Compiling interface fu_branch_predictor_if
-** Warning: ** while parsing file included at ./src/modules/fu_branch_predictor.sv(1)
-** at ./src/include//fu_branch_predictor_if.vh(6): (vlog-2275) Existing interface 'fu_branch_predictor_if' at line 6 will be overwritten.
--- Compiling module fu_branch_predictor
--- Compiling package isa_pkg
-** Warning: ** while parsing file included at ./src/modules/fu_branch.sv(1)
-** while parsing file included at ./src/include//fu_branch_if.vh(4)
-** at ./src/include//isa_types.vh(4): (vlog-2275) Existing package 'isa_pkg' at line 4 will be overwritten.
--- Compiling interface fu_branch_if
-** Warning: ** while parsing file included at ./src/modules/fu_branch.sv(1)
-** at ./src/include//fu_branch_if.vh(6): (vlog-2275) Existing interface 'fu_branch_if' at line 6 will be overwritten.
--- Compiling module fu_branch
--- Compiling package isa_pkg
-** Warning: ** while parsing file included at ./src/modules/writeback.sv(3)
-** while parsing file included at ./src/include//datapath_types.vh(4)
-** at ./src/include//isa_types.vh(4): (vlog-2275) Existing package 'isa_pkg' at line 4 will be overwritten.
--- Compiling package datapath_pkg
-** Warning: ** while parsing file included at ./src/modules/writeback.sv(3)
-** at ./src/include//datapath_types.vh(6): (vlog-2275) Existing package 'datapath_pkg' at line 6 will be overwritten.
--- Compiling interface writeback_if
-** Warning: ** while parsing file included at ./src/modules/writeback.sv(5)
-** at ./src/include//writeback_if.vh(10): (vlog-2275) Existing interface 'writeback_if' at line 10 will be overwritten.
--- Compiling module writeback
--- Compiling module memory_arbiter_basic
-** Error: ./src/modules/memory_arbiter_basic.sv(109): (vlog-2730) Undefined variable: 'ACCESS'.
-** Error: ./src/modules/memory_arbiter_basic.sv(116): (vlog-2730) Undefined variable: 'BUSY'.
--- Compiling package isa_pkg
-** Warning: ** while parsing file included at ./src/modules/fust_g.sv(1)
-** while parsing file included at ./src/include//fust_g_if.vh(3)
-** while parsing file included at ./src/include//datapath_types.vh(4)
-** at ./src/include//isa_types.vh(4): (vlog-2275) Existing package 'isa_pkg' at line 4 will be overwritten.
--- Compiling package datapath_pkg
-** Warning: ** while parsing file included at ./src/modules/fust_g.sv(1)
-** while parsing file included at ./src/include//fust_g_if.vh(3)
-** at ./src/include//datapath_types.vh(6): (vlog-2275) Existing package 'datapath_pkg' at line 6 will be overwritten.
--- Compiling interface fust_g_if
-** Warning: ** while parsing file included at ./src/modules/fust_g.sv(1)
-** at ./src/include//fust_g_if.vh(5): (vlog-2275) Existing interface 'fust_g_if' at line 5 will be overwritten.
--- Compiling module fust_g
-** Warning: ./src/modules/fust_g.sv(4): (vlog-2275) Existing module 'fust_g' at line 4 will be overwritten.
--- Compiling package isa_pkg
-** Warning: ** while parsing file included at ./src/modules/fust_m.sv(1)
-** while parsing file included at ./src/include//fust_m_if.vh(3)
-** while parsing file included at ./src/include//datapath_types.vh(4)
-** at ./src/include//isa_types.vh(4): (vlog-2275) Existing package 'isa_pkg' at line 4 will be overwritten.
--- Compiling package datapath_pkg
-** Warning: ** while parsing file included at ./src/modules/fust_m.sv(1)
-** while parsing file included at ./src/include//fust_m_if.vh(3)
-** at ./src/include//datapath_types.vh(6): (vlog-2275) Existing package 'datapath_pkg' at line 6 will be overwritten.
--- Compiling interface fust_m_if
-** Warning: ** while parsing file included at ./src/modules/fust_m.sv(1)
-** at ./src/include//fust_m_if.vh(5): (vlog-2275) Existing interface 'fust_m_if' at line 5 will be overwritten.
--- Compiling module fust_m
-** Warning: ./src/modules/fust_m.sv(4): (vlog-2275) Existing module 'fust_m' at line 4 will be overwritten.
--- Compiling package isa_pkg
-** Warning: ** while parsing file included at ./src/modules/fust_s.sv(1)
-** while parsing file included at ./src/include//fust_s_if.vh(3)
-** while parsing file included at ./src/include//datapath_types.vh(4)
-** at ./src/include//isa_types.vh(4): (vlog-2275) Existing package 'isa_pkg' at line 4 will be overwritten.
--- Compiling package datapath_pkg
-** Warning: ** while parsing file included at ./src/modules/fust_s.sv(1)
-** while parsing file included at ./src/include//fust_s_if.vh(3)
-** at ./src/include//datapath_types.vh(6): (vlog-2275) Existing package 'datapath_pkg' at line 6 will be overwritten.
--- Compiling interface fust_s_if
-** Warning: ** while parsing file included at ./src/modules/fust_s.sv(1)
-** at ./src/include//fust_s_if.vh(5): (vlog-2275) Existing interface 'fust_s_if' at line 5 will be overwritten.
--- Compiling module fust_s
-** Warning: ./src/modules/fust_s.sv(4): (vlog-2275) Existing module 'fust_s' at line 4 will be overwritten.
--- Compiling package isa_pkg
-** Warning: ** while parsing file included at ./src/modules/rst_m.sv(1)
-** while parsing file included at ./src/include//rst_m_if.vh(3)
-** while parsing file included at ./src/include//datapath_types.vh(4)
-** at ./src/include//isa_types.vh(4): (vlog-2275) Existing package 'isa_pkg' at line 4 will be overwritten.
--- Compiling package datapath_pkg
-** Warning: ** while parsing file included at ./src/modules/rst_m.sv(1)
-** while parsing file included at ./src/include//rst_m_if.vh(3)
-** at ./src/include//datapath_types.vh(6): (vlog-2275) Existing package 'datapath_pkg' at line 6 will be overwritten.
--- Compiling interface rst_m_if
-** Warning: ** while parsing file included at ./src/modules/rst_m.sv(1)
-** at ./src/include//rst_m_if.vh(5): (vlog-2275) Existing interface 'rst_m_if' at line 5 will be overwritten.
--- Compiling module rst_m
-** Warning: ./src/modules/rst_m.sv(4): (vlog-2275) Existing module 'rst_m' at line 4 will be overwritten.
--- Compiling package isa_pkg
-** Warning: ** while parsing file included at ./src/modules/rst_s.sv(1)
-** while parsing file included at ./src/include//rst_s_if.vh(3)
-** while parsing file included at ./src/include//datapath_types.vh(4)
-** at ./src/include//isa_types.vh(4): (vlog-2275) Existing package 'isa_pkg' at line 4 will be overwritten.
--- Compiling package datapath_pkg
-** Warning: ** while parsing file included at ./src/modules/rst_s.sv(1)
-** while parsing file included at ./src/include//rst_s_if.vh(3)
-** at ./src/include//datapath_types.vh(6): (vlog-2275) Existing package 'datapath_pkg' at line 6 will be overwritten.
--- Compiling interface rst_s_if
-** Warning: ** while parsing file included at ./src/modules/rst_s.sv(1)
-** at ./src/include//rst_s_if.vh(5): (vlog-2275) Existing interface 'rst_s_if' at line 5 will be overwritten.
--- Compiling module rst_s
-** Warning: ./src/modules/rst_s.sv(4): (vlog-2275) Existing module 'rst_s' at line 4 will be overwritten.
-End time: 15:13:18 on Mar 02,2025, Elapsed time: 0:00:00
-Errors: 2, Warnings: 116
+Start time: 13:07:02 on Oct 17,2025
+vlog -sv "+incdir+./src/include" ./src/include/gsau_control_unit_if.vh ./src/testbench/gsau_control_unit_tb.sv ./src/modules/gsau_control_unit.sv ./src/modules/sync_fifo.sv 
+-- Compiling package sys_arr_pkg
+-- Compiling package vector_pkg
+-- Compiling interface gsau_control_unit_if
+-- Importing package vector_pkg
+-- Importing package sys_arr_pkg
+-- Compiling package sys_arr_pkg
+** Warning: ** while parsing file included at ./src/testbench/gsau_control_unit_tb.sv(2)
+** while parsing file included at ./src/include/gsau_control_unit_if.vh(11)
+** at ./src/include/sys_arr_pkg.vh(4): (vlog-2275) Existing package 'sys_arr_pkg' at line 4 will be overwritten.
+-- Compiling package vector_pkg
+** Warning: ** while parsing file included at ./src/testbench/gsau_control_unit_tb.sv(2)
+** while parsing file included at ./src/include/gsau_control_unit_if.vh(12)
+** at ./src/include/vector_pkg.vh(4): (vlog-2275) Existing package 'vector_pkg' at line 4 will be overwritten.
+-- Compiling interface gsau_control_unit_if
+** Warning: ** while parsing file included at ./src/testbench/gsau_control_unit_tb.sv(2)
+** at ./src/include/gsau_control_unit_if.vh(14): (vlog-2275) Existing interface 'gsau_control_unit_if' at line 14 will be overwritten.
+-- Compiling module gsau_control_unit_tb
+-- Compiling package sys_arr_pkg
+** Warning: ** while parsing file included at ./src/modules/gsau_control_unit.sv(1)
+** while parsing file included at ./src/include/gsau_control_unit_if.vh(11)
+** at ./src/include/sys_arr_pkg.vh(4): (vlog-2275) Existing package 'sys_arr_pkg' at line 4 will be overwritten.
+-- Compiling package vector_pkg
+** Warning: ** while parsing file included at ./src/modules/gsau_control_unit.sv(1)
+** while parsing file included at ./src/include/gsau_control_unit_if.vh(12)
+** at ./src/include/vector_pkg.vh(4): (vlog-2275) Existing package 'vector_pkg' at line 4 will be overwritten.
+-- Compiling interface gsau_control_unit_if
+** Warning: ** while parsing file included at ./src/modules/gsau_control_unit.sv(1)
+** at ./src/include/gsau_control_unit_if.vh(14): (vlog-2275) Existing interface 'gsau_control_unit_if' at line 14 will be overwritten.
+-- Compiling module gsau_control_unit
+-- Compiling module sync_fifo
+
+Top level modules:
+	gsau_control_unit_tb
+End time: 13:07:02 on Oct 17,2025, Elapsed time: 0:00:00
+Errors: 0, Warnings: 6
+vsim -voptargs="+acc" -suppress 3015 -suppress 2275  -c work.gsau_control_unit_tb -do "run -all;" -onfinish stop 
+Reading pref.tcl
+
+# 2021.4
+
+# vsim -voptargs="+acc" -suppress 3015 -suppress 2275 -c work.gsau_control_unit_tb -do "run -all;" -onfinish stop 
+# Start time: 13:07:03 on Oct 17,2025
+# ** Note: (vsim-3812) Design is being optimized...
+# ** Note: (vopt-143) Recognized 1 FSM in module "gsau_control_unit(fast)".
+# //  Questa Sim-64
+# //  Version 2021.4 linux_x86_64 Oct 13 2021
+# //
+# //  Copyright 1991-2021 Mentor Graphics Corporation
+# //  All Rights Reserved.
+# //
+# //  QuestaSim and its associated documentation contain trade
+# //  secrets and commercial or financial information that are the property of
+# //  Mentor Graphics Corporation and are privileged, confidential,
+# //  and exempt from disclosure under the Freedom of Information Act,
+# //  5 U.S.C. Section 552. Furthermore, this information
+# //  is prohibited from disclosure under the Trade Secrets Act,
+# //  18 U.S.C. Section 1905.
+# //
+# Loading sv_std.std
+# Loading work.sys_arr_pkg(fast)
+# Loading work.vector_pkg(fast)
+# Loading work.gsau_control_unit_tb(fast)
+# Loading work.gsau_control_unit_if(fast__1)
+# Loading work.gsau_control_unit(fast)
+# Loading work.sync_fifo(fast)
+# run -all
+# Starting GSAU Control Unit Testbench
+# Test 0: Power-on reset
+# Test 1: FSM correctness
+# Test 2: RD Queue full handling
+# ** Warning: (vsim-PLI-8496) $fatal : Argument number 1 is invalid. Expecting 0, 1, or 2. Using default value of 1
+#    Time: 1055 ns  Iteration: 1  Process: /gsau_control_unit_tb/#INITIAL#214 File: ./src/testbench/gsau_control_unit_tb.sv Line: 101
+# ** Fatal: FIFO should be full
+#    Time: 1055 ns  Scope: gsau_control_unit_tb.test_rd_queue_full File: ./src/testbench/gsau_control_unit_tb.sv Line: 101
+# ** Note: $finish    : ./src/testbench/gsau_control_unit_tb.sv(101)
+#    Time: 1055 ns  Iteration: 1  Instance: /gsau_control_unit_tb
+# Break in Task test_rd_queue_full at ./src/testbench/gsau_control_unit_tb.sv line 101
+# Stopped at ./src/testbench/gsau_control_unit_tb.sv line 101
+# 
+VSIM 2> # Break key hit
+# Break key hit
+# Break key hit
+# Break key hit
+# Break key hit
+# Break key hit
+# Break key hit
+# Break key hit
+# Break key hit
+# Break key hit
+# Break key hit
+> VSIM 2> > VSIM 2> # 
+# <EOF>
+# End time: 13:07:16 on Oct 17,2025, Elapsed time: 0:00:13
+# Errors: 1, Warnings: 1

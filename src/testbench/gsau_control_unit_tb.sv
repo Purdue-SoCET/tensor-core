@@ -1,10 +1,13 @@
 `timescale 1ns/1ps
 `include "gsau_control_unit_if.vh"
-`include "sync_fifo.sv"
+//`include "sync_fifo.sv"
 `include "sys_arr_pkg.vh"
 `include "vector_pkg.vh"
 
 module gsau_control_unit_tb;
+
+  import vector_pkg::*;
+  import sys_arr_pkg::*;
 
   //Parameters
   localparam VEGGIEREGS = 256;
@@ -15,7 +18,7 @@ module gsau_control_unit_tb;
   logic nRST;
 
   // GSAU interface
-  gsau_control_unit_if.gsau gsau_port();
+  gsau_control_unit_if gsau_port();
 
   // Instantiate GSAU Control Unit
   gsau_control_unit #(
@@ -24,7 +27,7 @@ module gsau_control_unit_tb;
   ) dut (
     .CLK(CLK),
     .nRST(nRST),
-    .gsau_port(gsau_if_inst)
+    .gsau_port(gsau_port)
   );
 
   // --------------------------
@@ -85,8 +88,8 @@ module gsau_control_unit_tb;
     begin
       $display("Test 2: RD Queue full handling");
       // Fill FIFO
-      int i;
-      for (i=0; i<dut.FIFO_DEPTH; i++) begin
+      //int unsigned i;
+      for (int unsigned i=0; i<dut.FIFO_DEPTH; i++) begin
         gsau_port.sb_nvalid = 1;
         gsau_port.sb_nvdst  = i;
         gsau_port.veg_valid = 1;
