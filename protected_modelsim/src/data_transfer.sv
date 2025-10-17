@@ -47,18 +47,21 @@ module data_transfer (
             cnt1 <= '0;
             DQS_t_2 <= 1;
         end else begin
-            if (mydata.wr_en ) begin
+            if (mydata.wr_en) begin
                 count_burst <= ncount_burst;
                 cnt1 <= count_burst;
+                DQS_t_2 = nDQS_t;
             end else if (mydata.rd_en) begin
                 count_burst <= ncount_burst;
+                DQS_t_2 = nDQS_t;
             end else begin
                 count_burst <= 0;
+                DQS_t_2 = 1;
             end
             // if (mydata.clear) begin
             //     count_burst <= '0;
             // end
-            DQS_t_2 = nDQS_t;
+            
         end
     end
 

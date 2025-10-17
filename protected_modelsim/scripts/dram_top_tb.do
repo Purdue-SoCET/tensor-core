@@ -162,22 +162,22 @@ add wave -noupdate -group signal_gen /dram_top_tb/DUT/sig_gen/issue
 add wave -noupdate -group signal_gen /dram_top_tb/DUT/mysig/ref_re
 add wave -noupdate -group signal_gen /dram_top_tb/DUT/mysig/state
 add wave -noupdate -group signal_gen /dram_top_tb/DUT/mysig/nstate
-add wave -noupdate -group cmd_FSM /dram_top_tb/DUT/ctrl/mycmd/dREN
-add wave -noupdate -group cmd_FSM /dram_top_tb/DUT/ctrl/mycmd/dWEN
-add wave -noupdate -group cmd_FSM /dram_top_tb/DUT/ctrl/mycmd/init_done
-add wave -noupdate -group cmd_FSM /dram_top_tb/DUT/ctrl/mycmd/init_req
-add wave -noupdate -group cmd_FSM /dram_top_tb/DUT/ctrl/mycmd/tACT_done
-add wave -noupdate -group cmd_FSM /dram_top_tb/DUT/ctrl/mycmd/tWR_done
-add wave -noupdate -group cmd_FSM /dram_top_tb/DUT/ctrl/mycmd/tRD_done
-add wave -noupdate -group cmd_FSM /dram_top_tb/DUT/ctrl/mycmd/tPRE_done
-add wave -noupdate -group cmd_FSM /dram_top_tb/DUT/ctrl/mycmd/tREF_done
-add wave -noupdate -group cmd_FSM -color Magenta /dram_top_tb/DUT/ctrl/mycmd/rf_req
-add wave -noupdate -group cmd_FSM /dram_top_tb/DUT/ctrl/mycmd/row_stat
-add wave -noupdate -group cmd_FSM /dram_top_tb/DUT/ctrl/mycmd/ram_wait
-add wave -noupdate -group cmd_FSM /dram_top_tb/DUT/ctrl/mycmd/row_resolve
-add wave -noupdate -group cmd_FSM /dram_top_tb/task_name
-add wave -noupdate -group cmd_FSM -color Cyan /dram_top_tb/DUT/ctrl/mycmd/cmd_state
-add wave -noupdate -group cmd_FSM /dram_top_tb/DUT/ctrl/mycmd/ncmd_state
+add wave -noupdate -expand -group cmd_FSM /dram_top_tb/DUT/ctrl/mycmd/dREN
+add wave -noupdate -expand -group cmd_FSM /dram_top_tb/DUT/ctrl/mycmd/dWEN
+add wave -noupdate -expand -group cmd_FSM /dram_top_tb/DUT/ctrl/mycmd/init_done
+add wave -noupdate -expand -group cmd_FSM /dram_top_tb/DUT/ctrl/mycmd/init_req
+add wave -noupdate -expand -group cmd_FSM /dram_top_tb/DUT/ctrl/mycmd/tACT_done
+add wave -noupdate -expand -group cmd_FSM /dram_top_tb/DUT/ctrl/mycmd/tWR_done
+add wave -noupdate -expand -group cmd_FSM /dram_top_tb/DUT/ctrl/mycmd/tRD_done
+add wave -noupdate -expand -group cmd_FSM /dram_top_tb/DUT/ctrl/mycmd/tPRE_done
+add wave -noupdate -expand -group cmd_FSM /dram_top_tb/DUT/ctrl/mycmd/tREF_done
+add wave -noupdate -expand -group cmd_FSM -color Magenta /dram_top_tb/DUT/ctrl/mycmd/rf_req
+add wave -noupdate -expand -group cmd_FSM /dram_top_tb/DUT/ctrl/mycmd/row_stat
+add wave -noupdate -expand -group cmd_FSM /dram_top_tb/DUT/ctrl/mycmd/ram_wait
+add wave -noupdate -expand -group cmd_FSM /dram_top_tb/DUT/ctrl/mycmd/row_resolve
+add wave -noupdate -expand -group cmd_FSM /dram_top_tb/task_name
+add wave -noupdate -expand -group cmd_FSM -color Cyan /dram_top_tb/DUT/ctrl/mycmd/cmd_state
+add wave -noupdate -expand -group cmd_FSM /dram_top_tb/DUT/ctrl/mycmd/ncmd_state
 add wave -noupdate -group row_policy -color Orange /dram_top_tb/DUT/ctrl/myrow/row
 add wave -noupdate -group row_policy -color Orange /dram_top_tb/DUT/ctrl/myrow/bank
 add wave -noupdate -group row_policy -color Orange /dram_top_tb/DUT/ctrl/myrow/bank_group
@@ -231,8 +231,9 @@ add wave -noupdate -expand -group cache_debug /dram_top_tb/CACHE/offset
 add wave -noupdate -expand -group cache_debug /dram_top_tb/CACHE/dmemstore
 add wave -noupdate -expand -group cache_debug /dram_top_tb/dt_if/DQ
 add wave -noupdate -expand -group cache_debug /dram_top_tb/CACHE/dmemload
+add wave -noupdate -expand -group cache_debug /dram_top_tb/prev_addr
 TreeUpdate [SetDefaultTree]
-WaveRestoreCursors {{Cursor 1} {3565061 ps} 0}
+WaveRestoreCursors {{Cursor 1} {4248767 ps} 0}
 quietly wave cursor active 1
 configure wave -namecolwidth 150
 configure wave -valuecolwidth 369
@@ -248,4 +249,4 @@ configure wave -griddelta 40
 configure wave -timeline 0
 configure wave -timelineunits ps
 update
-WaveRestoreZoom {0 ps} {3851663 ps}
+WaveRestoreZoom {4252558 ps} {4360889 ps}

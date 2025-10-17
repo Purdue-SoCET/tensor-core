@@ -30,7 +30,8 @@ package dram_pkg;
     // parameter tREFI = 96000; //The actual value is ___, but we put __ for observing
     parameter tREFI = 250; //The actual value is ___, but we put __ for observing
     parameter tRP = 10;
-    parameter tRFC = 10;
+    // parameter tRFC = 10;
+    parameter tRFC = 172;  //This is not the actual __ value, but we put it for solving timing constraint
     parameter tRAS = 10;
     parameter tRC = tRAS + tRP;
     parameter tRL = tAL + tCL;        // Read Latency

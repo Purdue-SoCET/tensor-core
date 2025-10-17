@@ -1,5 +1,5 @@
 QuestaSim-64 vlog 2021.4 Compiler 2021.10 Oct 13 2021
-Start time: 19:56:29 on Oct 15,2025
+Start time: 01:29:29 on Oct 17,2025
 vlog -work work "+acc" -l vcs.log -sv "+incdir+./include" "+define+DDR4_4G_X8" ./arch_defines.v ./dimm.vh ./arch_package.sv ./proj_package.sv ./interface.sv ./ddr4_model.svp ./src/timing_signal.sv ./src/dram_top.sv ./src/flex_counter.sv ./src/signal_gen.sv ./src/init_state.sv ./src/command_FSM.sv ./src/control_unit.sv ./src/address_mapper.sv ./src/socetlib_counter.sv ./src/scheduler_buffer.sv ./src/edge_det.sv ./src/row_open.sv ./src/data_transfer.sv ./tb/dram_top_tb.sv 
 -- Compiling package dimm_vh_unit
 -- Compiling package arch_package
@@ -131,21 +131,23 @@ vlog -work work "+acc" -l vcs.log -sv "+incdir+./include" "+define+DDR4_4G_X8" .
 ** at ./include/signal_gen_if.vh(6): (vlog-2275) Existing interface 'signal_gen_if' at line 6 will be overwritten.
 -- Compiling package dram_top_tb_sv_unit
 -- Compiling module dram_top_tb
-** Warning: ./tb/dram_top_tb.sv(391): (vlog-2240) Treating stand-alone use of function 'randomize' as an implicit VOID cast.
-** Warning: ./tb/dram_top_tb.sv(416): (vlog-2240) Treating stand-alone use of function 'randomize' as an implicit VOID cast.
-** Warning: ./tb/dram_top_tb.sv(417): (vlog-2240) Treating stand-alone use of function 'create_addr' as an implicit VOID cast.
-** Warning: ./tb/dram_top_tb.sv(501): (vlog-2240) Treating stand-alone use of function 'randomize' as an implicit VOID cast.
-** Warning: ./tb/dram_top_tb.sv(502): (vlog-2240) Treating stand-alone use of function 'create_addr' as an implicit VOID cast.
-** Warning: ./tb/dram_top_tb.sv(538): (vlog-2240) Treating stand-alone use of function 'randomize' as an implicit VOID cast.
-** Warning: ./tb/dram_top_tb.sv(539): (vlog-2240) Treating stand-alone use of function 'create_addr' as an implicit VOID cast.
-** Warning: ./tb/dram_top_tb.sv(547): (vlog-2240) Treating stand-alone use of function 'randomize' as an implicit VOID cast.
-** Warning: ./tb/dram_top_tb.sv(548): (vlog-2240) Treating stand-alone use of function 'create_addr' as an implicit VOID cast.
+** Warning: ./tb/dram_top_tb.sv(393): (vlog-2240) Treating stand-alone use of function 'randomize' as an implicit VOID cast.
+** Warning: ./tb/dram_top_tb.sv(418): (vlog-2240) Treating stand-alone use of function 'randomize' as an implicit VOID cast.
+** Warning: ./tb/dram_top_tb.sv(419): (vlog-2240) Treating stand-alone use of function 'create_addr' as an implicit VOID cast.
+** Warning: ./tb/dram_top_tb.sv(472): (vlog-2240) Treating stand-alone use of function 'randomize' as an implicit VOID cast.
+** Warning: ./tb/dram_top_tb.sv(473): (vlog-2240) Treating stand-alone use of function 'create_addr' as an implicit VOID cast.
+** Warning: ./tb/dram_top_tb.sv(518): (vlog-2240) Treating stand-alone use of function 'randomize' as an implicit VOID cast.
+** Warning: ./tb/dram_top_tb.sv(519): (vlog-2240) Treating stand-alone use of function 'create_addr' as an implicit VOID cast.
 ** Warning: ./tb/dram_top_tb.sv(556): (vlog-2240) Treating stand-alone use of function 'randomize' as an implicit VOID cast.
 ** Warning: ./tb/dram_top_tb.sv(557): (vlog-2240) Treating stand-alone use of function 'create_addr' as an implicit VOID cast.
-** Warning: ./tb/dram_top_tb.sv(568): (vlog-2240) Treating stand-alone use of function 'create_addr' as an implicit VOID cast.
+** Warning: ./tb/dram_top_tb.sv(565): (vlog-2240) Treating stand-alone use of function 'randomize' as an implicit VOID cast.
+** Warning: ./tb/dram_top_tb.sv(566): (vlog-2240) Treating stand-alone use of function 'create_addr' as an implicit VOID cast.
+** Warning: ./tb/dram_top_tb.sv(575): (vlog-2240) Treating stand-alone use of function 'randomize' as an implicit VOID cast.
+** Warning: ./tb/dram_top_tb.sv(576): (vlog-2240) Treating stand-alone use of function 'create_addr' as an implicit VOID cast.
+** Warning: ./tb/dram_top_tb.sv(587): (vlog-2240) Treating stand-alone use of function 'create_addr' as an implicit VOID cast.
 -- Compiling module sw_cache
 
 Top level modules:
 	dram_top_tb
-End time: 19:56:29 on Oct 15,2025, Elapsed time: 0:00:00
-Errors: 0, Warnings: 39
+End time: 01:29:30 on Oct 17,2025, Elapsed time: 0:00:01
+Errors: 0, Warnings: 41

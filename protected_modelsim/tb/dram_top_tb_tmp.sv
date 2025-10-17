@@ -8,21 +8,12 @@
 `timescale 1 ns / 1 ps
 
 
-//Welcome to the mess, here is just a bunch of code that trying to verify DDR4!
-// 1. Test the power up state
-// 2. Test the refresh cycle 
-// 3. Test row miss write row hit read
-// 4. Test row hit write row hit read
-// 5. Test the refresh and row miss read
-// 6. Test 3 consectutive  row miss write
-// 7. Test row conflict write row hit read
-// 8. Test row conflcit read (the old address that cause write)
+//DRAM template by Tri Than
 
 module dram_top_tb;
     parameter PERIOD = 1.5;
     parameter tCK = 1.5;
     import dram_pkg::*;
-    // import arch_package::*;
     import proj_package::*;
 
     //parameter from dram_command_if.vh
@@ -40,18 +31,8 @@ module dram_top_tb;
     reg model_enable_val;
     string task_name;
 
-    //Instantiate the the iDDR4_1 version
-    // addr_x4_t ramaddr_phy, ramaddr_phy_ft, ramstore_phy, ramstore_phy_ft;
     reg clk_val, clk_enb;
-    // DQ transmit
-    reg[MAX_DQ_BITS-1:0] dq_out;
-    reg[MAX_DQS_BITS-1:0] dqs_out;
-    reg[MAX_DM_BITS-1:0] dm_out;
-    logic [31:0] data_store1;
-    logic [31:0] data_store2;
-    logic [31:0] data_store3;
-    logic [31:0] data_store4;
-    logic DM_debug;
+    logic DM_debug; //This is used for write mask
     assign model_enable = model_enable_val;
 
     //Signal flag to choose write or read
@@ -107,17 +88,12 @@ module dram_top_tb;
       dc_if.dREN = (!dc_if.ram_wait) ? 0 : sch_if.ramREN_curr;
       dc_if.dWEN = (!dc_if.ram_wait) ? 0 : sch_if.ramWEN_curr;
       dc_if.ram_addr = sch_if.ramaddr_rq;
-      
-    //   dc_if.ramWEN_ftrt = sch_if.ramWEN_ftrt;
       sch_if.request_done = !dc_if.ram_wait;
     
 
       //Interface between scheduler buffer and the data_transfer
       dt_if.wr_en = dc_if.wr_en;
       dt_if.rd_en = dc_if.rd_en;
-
-    //  Comment this out for testing with class sche_clas
-    //   dt_if.memstore = sch_if.ramstore_rq;
     end
 
     always @(posedge clk_val && clk_enb) begin
@@ -466,7 +442,7 @@ module dram_top_tb;
 
 
     task consecutive_16_write();
-        for (int i = 0; i < 7; i++) begin
+        for (int i = 0; i < 10; i++) begin
             task_name = ("16 write-dif bank " + i + 16);
             dq_en = 1'b1;
             sch.randomize();
@@ -596,11 +572,13 @@ module dram_top_tb;
     read_with_verify(prev_addr, sch);
     repeat(200) @(posedge CLK);
 
-    //CHECKPOINT: DONE ALL PREVIOUS CASES
-
-    //Task 16_consecutive writes //TODO: Faile at bank 6, issue where while waiting WRITING, refresh happened
+    //Task 16_consecutive writes
     task_name = "16 write-dif bank";
     consecutive_16_write();
+    
+    // // Checkpoint
+    // // 1. Something off with consecutive write 3 times in a row
+
     $finish;
 
     end

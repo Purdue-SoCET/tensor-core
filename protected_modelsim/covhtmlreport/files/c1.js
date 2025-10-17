@@ -1,2 +1,2 @@
-var g_data = {"36":{"cvpc":[{"h":["sch_point",4,1,37],"sc":[5,325],"cov":[3,1,33.33],"opts":{"goal":"100"}}],"cvg":["/dram_top_tb/sche_trans/sch_group",1],"cvgdata":[3,1,0,0]}};
+var g_data = {"37":{"cvpc":[{"h":["sch_point",4,1,38],"sc":[5,330],"cov":[3,1,33.33],"opts":{"goal":"100"}}],"cvg":["/dram_top_tb/sche_trans/sch_group",1],"cvgdata":[3,1,0,0]}};
 processCoverpointsData(g_data);
