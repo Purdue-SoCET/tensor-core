@@ -6,18 +6,257 @@
 
 module vaddsub_tb;
 
-    parameter PERIOD = 10;
+    parameter PERIOD = 10ns;
     logic CLK = 0, nRST;
-
-    always #(PERIOD/2) CLK++;
 
     vaddsub_if vaddsubif ();
     vaddsub DUT (.CLK(CLK), .nRST(nRST), .vaddsubif(vaddsubif));
 
-    int casenum;
-    string casename;
+    // Clock generation
+    always #(PERIOD/2) CLK = ~CLK;
+
+
+    task automatic test_case(
+        input logic [15:0] a,
+        input logic [15:0] b,
+        input logic sub,
+    );
+    begin
+
+        vaddsubif.enable = 1;
+        vaddsubif.sub = sub;
+        vaddsubif.port_a = a;
+        vaddsubif.port_b = b;
+
+        @(posedge CLK);
+
+        vaddsubif.enable = 0;
+    end
+    endtask //automatic
+
+    task automatic check_case(
+        input string casename,
+        input logic [15:0] expected);
+    begin
+        if (vaddsubif.out !== expected) begin
+            $display("Test for %s has failed: A=%h B=%h Got=%h Exp=%h", tag, vaddsubif.port_a, vaddsubif.port_b, vaddsubif.out, expected);
+        end
+        else begin
+            $display("Passed %s | A=%h B=%h Got=%h Exp=%h", tag, vaddsubif.port_a, vaddsubif.port_b, vaddsubif.out, expected);
+        end
+    end
+    endtask //automatic
+
+    // Special Case Values
+    localparam logic [15:0] P_INF = 16'b0_11111_0000000000,
+    N_INF   = 16'b1_11111_0000000000,
+    NAN = 16'b0_11111_1000000000,
+    P_ZERO = 16'b0_00000_0000000000,
+    P_ZERO = 16'b1_00000_0000000000,
+    ONE = 16'b0_01111_0000000000,
+    TWO = 16'b0_10000_0000000000,
+    MIN = 16'b0_00000_0000000001,
+    MAX_FINITE= 16'b0_11110_1111111111;
+
 
 initial begin
+
+    nRST = '0;
+
+    #(PERIOD);
+
+    nRST = 1;
+
+    test_case(ONE, ONE, 0);
+    exp = 16'b0_10000_0000000000;
+    #(PERIOD);
+    check_case("1 + 1 = 2", exp);
+    #(PERIOD);
+
+
+    test_case(TWO, ONE, 1);
+    exp = 16'b0_01111_0000000000; 
+    #(PERIOD);
+    check_case("2 - 1 = 1", exp);
+    #(PERIOD);
+
+    test_case(16'b1_10000_1000000000, 16'b0_10000_0000000000, 0);
+    exp = 16'b1_01111_0000000000;
+    #(PERIOD);
+    check_case("(-3) + 2 = -1", exp);
+    #(PERIOD);
+
+    // ---------------- Zeroes ----------------
+    test_case(P_ZERO, P_ZERO, 0);
+    exp = P_ZERO;
+    #(PERIOD);
+    check_case("+0 + +0", exp);
+    #(PERIOD);
+
+    test_case(P_ZERO, N_ZERO, 0);
+    exp = P_ZERO;
+    #(PERIOD);
+    check_case("+0 + -0", exp);
+    #(PERIOD);
+
+    test_case(N_ZERO, N_ZERO, 1);
+    exp = P_ZERO;
+    #(PERIOD);
+    check_case("-0 - -0", exp);
+    #(PERIOD);
+
+    test_case(ONE, P_ZERO, 0);
+    exp = ONE;
+    #(PERIOD);
+    check_case("+x + 0", exp);
+    #(PERIOD);
+
+    // ---------------- Infinities ----------------
+    test_case(P_INF, ONE, 0);
+    exp = P_INF;
+    #(PERIOD);
+    check_case("+Inf + finite", exp);
+    #(PERIOD);
+
+    test_case(N_INF, ONE, 1);
+    exp = N_INF;
+    #(PERIOD);
+    check_case("-Inf - finite", exp);
+    #(PERIOD);
+
+    test_case(P_INF, P_INF, 0);
+    exp = P_INF;
+    #(PERIOD);
+    check_case("+Inf + +Inf", exp);
+    #(PERIOD);
+
+    test_case(N_INF, N_INF, 0);
+    exp = N_INF;
+    #(PERIOD);
+    check_case("-Inf + -Inf", exp);
+    #(PERIOD);
+
+    test_case(P_INF, N_INF, 0);
+    exp = NAN;
+    #(PERIOD);
+    check_case("+Inf + -Inf = NaN", exp);
+    #(PERIOD);
+
+    test_case(P_INF, P_INF, 1);
+    exp = NAN;
+    #(PERIOD);
+    check_case("+Inf - +Inf = NaN", exp);
+    #(PERIOD);
+
+    test_case(ONE, N_INF, 1);
+    exp = P_INF;
+    #(PERIOD);
+    check_case("finite - (-Inf) = +Inf", exp);
+    #(PERIOD);
+
+    test_case(ONE, P_INF, 1);
+    exp = N_INF;
+    #(PERIOD);
+    check_case("finite - (+Inf) = -Inf", exp);
+    #(PERIOD);
+
+    // ---------------- NaN ----------------
+    test_case(NAN, ONE, 0);
+    exp = NAN;
+    #(PERIOD);
+    check_case("NaN + 1 = NaN", exp);
+    #(PERIOD);
+
+    test_case(ONE, NAN, 1);
+    exp = NAN;
+    #(PERIOD);
+    check_case("1 - NaN = NaN", exp);
+    #(PERIOD);
+
+    // ---------------- Subnormals ----------------
+    test_case(MIN, ONE, 0);
+    exp = ONE;
+    #(PERIOD);
+    check_case("subnormal + 1 ≈ 1", exp);
+    #(PERIOD);
+
+    test_case(MIN, MIN, 0);
+    exp = 16'b0_00000_0000000010;
+    #(PERIOD);
+    check_case("subnormal + subnormal", exp);
+    #(PERIOD);
+
+    test_case(MIN, MIN, 1);
+    exp = P_ZERO;
+    #(PERIOD);
+    check_case("subnormal - subnormal = 0", exp);
+    #(PERIOD);
+
+    test_case(TWO, MIN, 0);
+    exp = TWO;
+    #(PERIOD);
+    check_case("large + subnormal ≈ large", exp);
+    #(PERIOD);
+
+    // ---------------- Overflow / Underflow ----------------
+    test_case(MAX_FINITE, MAX_FINITE, 0);
+    exp = P_INF;
+    #(PERIOD);
+    check_case("overflow: max + max = +Inf", exp);
+    #(PERIOD);
+
+    test_case(16'b1_11110_1111111111, 16'b1_11110_1111111111, 0);
+    exp = N_INF;
+    #(PERIOD);
+    check_case("overflow: -max + -max = -Inf", exp);
+    #(PERIOD);
+
+    test_case(MIN, MIN, 1);
+    exp = P_ZERO;
+    #(PERIOD);
+    check_case("underflow: tiny - tiny = 0", exp);
+    #(PERIOD);
+
+    // ---------------- Cancellation ----------------
+    test_case(16'b0_10000_1000000000, 16'b1_10000_1000000000, 0);
+    exp = P_ZERO;
+    #(PERIOD);
+    check_case("+x + (-x) = +0", exp);
+    #(PERIOD);
+
+    test_case(16'b0_10000_1000000000, 16'b0_10000_1000000000, 1);
+    exp = P_ZERO;
+    #(PERIOD);
+    check_case("+x - (+x) = +0", exp);
+    #(PERIOD);
+
+    // ---------------- Sign checks ----------------
+    test_case(16'b0_10000_0000000000, 16'b0_10000_0000000000, 0);
+    exp = 16'b0_10001_0000000000;
+    #(PERIOD);
+    check_case("+a + +b = +", exp);
+    #(PERIOD);
+
+    test_case(16'b1_10000_0000000000, 16'b1_10000_0000000000, 0);
+    exp = 16'b1_10001_0000000000;
+    #(PERIOD);
+    check_case("-a + -b = -", exp);
+    #(PERIOD);
+
+    test_case(16'b0_10000_0000000000, 16'b1_10000_0000000000, 1);
+    exp = 16'b0_10001_0000000000;
+    #(PERIOD);
+    check_case("+a - (-b) = +", exp);
+    #(PERIOD);
+
+    test_case(16'b1_10000_0000000000, 16'b0_10000_0000000000, 1);
+    exp = 16'b1_10001_0000000000;
+    #(PERIOD);
+    check_case("-a - (+b) = -", exp);
+    #(PERIOD);
+
+// Did not change this but have commented it out for now
+/*
     casenum = '0;
     casename = "nRST";
 
@@ -103,7 +342,7 @@ initial begin
     vaddsubif.port_b = 16'b1_10000_1000000000;
     
     #(PERIOD);
-
+*/
 
     $stop;
 end
