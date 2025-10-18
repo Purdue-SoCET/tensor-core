@@ -1,7 +1,8 @@
+`include "scpad_pkg.sv"
+`include "scpad_if.sv"
 import scpad_pkg::*;
 
 module body #(parameter logic [SCPAD_ID_WIDTH-1:0] IDX = '0) (scpad_if.spad_body bif); 
-
 
     head #(.IDX(IDX)) head (.hif(bif));
 
@@ -9,28 +10,36 @@ module body #(parameter logic [SCPAD_ID_WIDTH-1:0] IDX = '0) (scpad_if.spad_body
 
     scpad_cntrl #(.IDX(IDX)) scpad_cntrl (.srif(bif));
 
-    genvar gi;
+    genvar gi, ti;
     generate
         for (gi = 0; gi < NUM_COLS; gi++) begin : g_bank
-            // SRAM_BANK is dual ported. 
-            // But, we use it as single ported, because the workload doesn't demand it. 
-            // the ren and wen are mutually exclusive.
-            sram_bank #(
-                .READ_LATENCY (2), .WRITE_LATENCY(2), 
-                .NUM_ROWS(NUM_ROWS), .ELEM_BITS(ELEM_BITS)
-            ) u_bank (
-                .clk(bif.clk), .n_rst(bif.n_rst), .busy(bif.spad_busy[ti][gi]), 
+            for (ti = 0; ti < SRAM_VERT_FOLD_FACTOR; ti++) begin : g_subarray
+                logic rdone [SRAM_VERT_FOLD_FACTOR];
+                logic wdone [SRAM_VERT_FOLD_FACTOR]; 
+                logic [ELEM_BITS-1:0] rdata [SRAM_VERT_FOLD_FACTOR];
 
-                .ren(bif.cntrl_spad_req[ti].valid_mask[gi] && bif.cntrl_spad_req[ti].valid && !bif.cntrl_spad_req.write),
-                .raddr(bif.cntrl_spad_req[ti].slot_mask[gi]),
-                .rdone(bif.spad_cntrl_res[ti][gi]),
-                .rdata(bif.spad_xbar_req.rdata[ti][gi]),
+                logic is_data_in_arr = (bif.cntrl_spad_req[IDX].slot_mask[gi][SRAM_SUBARRAY_WIDTH_BITS-1:0] == ti); 
 
-                .wen(bif.cntrl_spad_req[ti].xbar.valid_mask[gi] && bif.cntrl_spad_req[ti].valid && !bif.cntrl_spad_req.write),
-                .waddr(bif.cntrl_spad_req[ti].xbar.slot_mask[gi]),
-                .wdone(bif.spad_cntrl_res[ti][gi]),
-                .wdata(bif.cntrl_spad_req[ti].wdata[gi])
-            );
+                sram_bank #(
+                    .READ_LATENCY (2), .WRITE_LATENCY(2), 
+                    .HEIGHT(SRAM_SUBARRAY_HEIGHT), .WIDTH(ELEM_BITS)
+                ) u_bank (
+                    .clk(bif.clk), .n_rst(bif.n_rst), .busy(bif.spad_busy[IDX][gi]), 
+
+                    .ren(bif.cntrl_spad_req[IDX].valid_mask[gi] && bif.cntrl_spad_req[IDX].valid && !bif.cntrl_spad_req.write && is_data_in_arr),
+                    .raddr(bif.cntrl_spad_req[IDX].slot_mask[gi][SRAM_SUBARRAY_HEIGHT_BITS-1:0]),
+                    .rdone(rdone),
+                    .rdata(rdata),
+
+                    .wen(bif.cntrl_spad_req[IDX].xbar.valid_mask[gi] && bif.cntrl_spad_req[IDX].valid && !bif.cntrl_spad_req.write && is_data_in_arr),
+                    .waddr(bif.cntrl_spad_req[IDX].xbar.slot_mask[gi][SRAM_SUBARRAY_HEIGHT_BITS-1:0]),
+                    .wdone(wdone),
+                    .wdata(bif.cntrl_spad_req[IDX].wdata[gi])
+                );
+
+                assign bif.spad_cntrl_res[IDX][gi] = (rdone[ti] && is_data_in_arr) || (wdone[ti] && is_data_in_arr); 
+                assign bif.spad_xbar_req.rdata[IDX][gi] = rdata[ti]; 
+            end 
         end
     endgenerate
 

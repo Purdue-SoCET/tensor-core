@@ -19,6 +19,12 @@ interface xbar_if #(
         output dout
     );
 
+    modport xbar_tb (
+        output clk, n_rst,
+        output en, din, shift, 
+        input dout
+    );
+
 endinterface
 
 `endif 

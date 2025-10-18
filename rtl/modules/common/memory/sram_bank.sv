@@ -1,9 +1,9 @@
 module sram_bank # ( 
   parameter int READ_LATENCY = 2, 
   parameter int WRITE_LATENCY = 4
-  parameter int NUM_ROWS = 16,
-  parameter int ELEM_BITS = 16,
-  localparam int ROW_IDX_WIDTH = $clog2(NUM_ROWS)
+  parameter int HEIGHT = 16,
+  parameter int WIDTH = 16,
+  localparam int ROW_IDX_WIDTH = $clog2(HEIGHT)
 ) (
   input logic clk, n_rst, 
 
@@ -11,15 +11,15 @@ module sram_bank # (
 
   input logic ren,
   input logic [ROW_IDX_WIDTH-1:0] raddr,
-  output logic [ELEM_BITS-1:0] rdata,
+  output logic [WIDTH-1:0] rdata,
   output logic rdone, 
 
   input logic wen,
   input logic [ROW_IDX_WIDTH-1:0] waddr,
-  input logic [ELEM_BITS-1:0] wdata, 
+  input logic [WIDTH-1:0] wdata, 
   output logic wdone
 );  
-  logic [NUM_ROWS-1:0][ELEM_BITS-1:0] mem;
+  logic [HEIGHT-1:0][WIDTH-1:0] mem;
 
   localparam int RLW = (READ_LATENCY <= 1) ? 1 : $clog2(READ_LATENCY);
   localparam int WLW = (WRITE_LATENCY <= 1) ? 1 : $clog2(WRITE_LATENCY);

@@ -2,19 +2,21 @@ import scpad_pkg::*;
 
 module head #(parameter logic [SCPAD_ID_WIDTH-1:0] IDX = '0) (scpad_if.spad_head hif);
 
+    // Stalls
     logic downstream_stall;
-    logic be_v, fe_v;
     logic pipe_busy; 
+
+    // Tracking grants
+    // Need to hold fe_stall high on the N+1th cycle to ensure we don't overwrite the request. 
+    logic be_v, fe_v;
     logic grant_be, grant_fe;
 
-    req_t req_d, req_q;
+    // Intermediate
+    req_t req_d;
 
     always_ff @(posedge hif.clk, negedge hif.n_rst) begin
-        if (!hif.n_rst) begin
-            pipe_busy <= 1'b0;
-        end else begin
-            pipe_busy <= (grant_be || grant_fe);
-        end
+        if (!hif.n_rst) pipe_busy <= 1'b0;
+        else pipe_busy <= (grant_be || grant_fe);
     end
 
     always_comb begin
@@ -30,13 +32,11 @@ module head #(parameter logic [SCPAD_ID_WIDTH-1:0] IDX = '0) (scpad_if.spad_head
         else if (grant_fe) req_d = hif.fe_req[IDX];
     end
  
-    latch #(.T(req_t)) u_latch_wr (.clk(hif.clk), .n_rst(hif.n_rst), .en(grant_be || grant_fe), .in(req_d), .out(req_q));
+    // head_stomach_req will either go into the scpad_cntrl FIFO or xbar. 
+    // No need to latch here -> LATCH_INT
+    assign hif.head_stomach_req = fvif.vec_req[IDX];
 
     assign downstream_stall = hif.w_stall || hif.r_stall;
-
-    assign hif.stomach_head_req.valid = pipe_busy;
-    assign hif.stomach_head_req = req_q;
-
     assign hif.fe_stall[IDX] = downstream_stall || (fe_v && (pipe_busy || be_v));
     assign hif.be_stall[IDX] = downstream_stall || (be_v && pipe_busy);
 

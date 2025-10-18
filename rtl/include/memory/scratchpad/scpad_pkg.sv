@@ -5,6 +5,8 @@ package scpad_pkg;
     `include "scpad_params.svh"
     `include "xbar_params.svh"
 
+
+    
     //////////////////////////////////////////////////////////////////////
     ///////////////////////// Derived Parameters /////////////////////////
     //////////////////////////////////////////////////////////////////////
@@ -12,13 +14,17 @@ package scpad_pkg;
     localparam int MAX_DIM_WIDTH  = $clog2(NUM_COLS); // bit length
     localparam int XBAR_LATENCY = (XBAR_TYPE == "BENES") ? BENES_LATENCY : 
                                 (XBAR_TYPE == "BATCHER") ? BATCHER_LATENCY :  NAIVE_LATENCY;
-    localparam int ELEM_BYTES  = ELEM_BITS/8; // always a multiple of 8        
+    localparam int ELEM_BYTES  = ELEM_BITS/8;     
     localparam int ROW_BYTES = (NUM_COLS * ELEM_BITS)/8;   
-    localparam int NUM_ROWS = SCPAD_SIZE_BYTES / ROW_BYTES;  // num slots in each bank 
+    localparam int SRAM_HEIGHT = (SCPAD_SIZE_BYTES / ROW_BYTES);  // num slots in each bank 
+    
+    localparam int SRAM_SUBARRAY_HEIGHT = (SRAM_HEIGHT / SRAM_VERT_FOLD_FACTOR);
+    localparam int SRAM_SUBARRAY_HEIGHT_BITS = $clog2(SRAM_SUBARRAY_HEIGHT); 
+    localparam int SRAM_SUBARRAY_WIDTH_BITS = $clog2(SRAM_VERT_FOLD_FACTOR);
 
     localparam int SCPAD_ADDR_WIDTH = $clog2(SCPAD_SIZE_BYTES); // imagine scpad is flattened, and then addressable. 
 
-    localparam int ROW_IDX_WIDTH  = $clog2(NUM_ROWS);
+    localparam int ROW_IDX_WIDTH  = $clog2(SRAM_HEIGHT);
     localparam int COL_IDX_WIDTH = $clog2(NUM_COLS);
 
     localparam int ROW_SHIFT = $clog2(ROW_BYTES);    

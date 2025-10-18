@@ -194,6 +194,17 @@ interface scpad_if (input logic clk, input logic n_rst);
     );
 
     // ----------------------------------------------------------------------
+    // Performance Counters
+    // ----------------------------------------------------------------------
+
+    `ifndef SYNTHESIS
+        logic [63:0] scpad_backpressure_buffer_read_empty [NUM_SCPADS];  
+        logic [63:0] scpad_backpressure_buffer_read_stall [NUM_SCPADS];  
+        logic [63:0] scpad_backpressure_buffer_write_empty [NUM_SCPADS]; 
+        logic [63:0] scpad_backpressure_buffer_write_stall [NUM_SCPADS];  
+    `endif
+
+    // ----------------------------------------------------------------------
     // Testbench Definitions
     // ----------------------------------------------------------------------
 
