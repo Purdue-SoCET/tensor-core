@@ -162,6 +162,7 @@ add wave -noupdate -group signal_gen /dram_top_tb/DUT/sig_gen/issue
 add wave -noupdate -group signal_gen /dram_top_tb/DUT/mysig/ref_re
 add wave -noupdate -group signal_gen /dram_top_tb/DUT/mysig/state
 add wave -noupdate -group signal_gen /dram_top_tb/DUT/mysig/nstate
+add wave -noupdate -expand -group cmd_FSM /dram_top_tb/CLK
 add wave -noupdate -expand -group cmd_FSM /dram_top_tb/DUT/ctrl/mycmd/dREN
 add wave -noupdate -expand -group cmd_FSM /dram_top_tb/DUT/ctrl/mycmd/dWEN
 add wave -noupdate -expand -group cmd_FSM /dram_top_tb/DUT/ctrl/mycmd/init_done
@@ -172,8 +173,8 @@ add wave -noupdate -expand -group cmd_FSM /dram_top_tb/DUT/ctrl/mycmd/tRD_done
 add wave -noupdate -expand -group cmd_FSM /dram_top_tb/DUT/ctrl/mycmd/tPRE_done
 add wave -noupdate -expand -group cmd_FSM /dram_top_tb/DUT/ctrl/mycmd/tREF_done
 add wave -noupdate -expand -group cmd_FSM -color Magenta /dram_top_tb/DUT/ctrl/mycmd/rf_req
+add wave -noupdate -expand -group cmd_FSM -color Gold /dram_top_tb/DUT/ctrl/mycmd/ram_wait
 add wave -noupdate -expand -group cmd_FSM /dram_top_tb/DUT/ctrl/mycmd/row_stat
-add wave -noupdate -expand -group cmd_FSM /dram_top_tb/DUT/ctrl/mycmd/ram_wait
 add wave -noupdate -expand -group cmd_FSM /dram_top_tb/DUT/ctrl/mycmd/row_resolve
 add wave -noupdate -expand -group cmd_FSM /dram_top_tb/task_name
 add wave -noupdate -expand -group cmd_FSM -color Cyan /dram_top_tb/DUT/ctrl/mycmd/cmd_state
@@ -190,29 +191,30 @@ add wave -noupdate -group row_policy /dram_top_tb/DUT/ctrl/u1/row_open_cnt
 add wave -noupdate -group row_policy /dram_top_tb/DUT/ctrl/myrow/all_row_closed
 add wave -noupdate /dram_top_tb/DUT/ctrl/u1/ptr
 add wave -noupdate /dram_top_tb/DUT/ctrl/u1/reg_f
-add wave -noupdate -group time_signal /dram_top_tb/DUT/ctrl/mytime/tACT_done
-add wave -noupdate -group time_signal /dram_top_tb/DUT/ctrl/mytime/tWR_done
-add wave -noupdate -group time_signal /dram_top_tb/DUT/ctrl/mytime/tRD_done
-add wave -noupdate -group time_signal /dram_top_tb/DUT/ctrl/mytime/tPRE_done
-add wave -noupdate -group time_signal -divider refresh
-add wave -noupdate -group time_signal /dram_top_tb/DUT/ctrl/mytime/tREF_done
-add wave -noupdate -group time_signal /dram_top_tb/DUT/ctrl/mytime/rf_req
-add wave -noupdate -group time_signal -radix unsigned /dram_top_tb/DUT/ctrl/u4/refresh_limit
-add wave -noupdate -group time_signal -radix decimal /dram_top_tb/DUT/ctrl/u4/refresh_count
-add wave -noupdate -group time_signal -divider timing_trk
-add wave -noupdate -group time_signal /dram_top_tb/DUT/ctrl/u4/time_load
-add wave -noupdate -group time_signal -radix decimal /dram_top_tb/DUT/ctrl/u4/time_count
-add wave -noupdate -group time_signal /dram_top_tb/DUT/ctrl/u4/time_counter_en
-add wave -noupdate -group time_signal /dram_top_tb/DUT/ctrl/u4/time_count_done
+add wave -noupdate -expand -group time_signal /dram_top_tb/DUT/ctrl/mytime/tACT_done
+add wave -noupdate -expand -group time_signal /dram_top_tb/DUT/ctrl/mytime/tWR_done
+add wave -noupdate -expand -group time_signal /dram_top_tb/DUT/ctrl/mytime/tRD_done
+add wave -noupdate -expand -group time_signal /dram_top_tb/DUT/ctrl/mytime/tPRE_done
+add wave -noupdate -expand -group time_signal -divider refresh
+add wave -noupdate -expand -group time_signal /dram_top_tb/DUT/ctrl/mytime/tREF_done
+add wave -noupdate -expand -group time_signal /dram_top_tb/DUT/ctrl/mytime/rf_req
+add wave -noupdate -expand -group time_signal -radix unsigned /dram_top_tb/DUT/ctrl/u4/refresh_limit
+add wave -noupdate -expand -group time_signal -radix decimal /dram_top_tb/DUT/ctrl/u4/refresh_count
+add wave -noupdate -expand -group time_signal -divider timing_trk
+add wave -noupdate -expand -group time_signal -radix decimal /dram_top_tb/DUT/ctrl/u4/time_load
+add wave -noupdate -expand -group time_signal -radix decimal /dram_top_tb/DUT/ctrl/u4/time_count
+add wave -noupdate -expand -group time_signal /dram_top_tb/DUT/ctrl/u4/time_counter_en
+add wave -noupdate -expand -group time_signal /dram_top_tb/DUT/ctrl/u4/time_count_done
 add wave -noupdate -group Scheduler_buff /dram_top_tb/sch_if/dREN
 add wave -noupdate -group Scheduler_buff /dram_top_tb/sch_if/dWEN
 add wave -noupdate -group Scheduler_buff -radix binary /dram_top_tb/sch_if/ramaddr
 add wave -noupdate -group Scheduler_buff /dram_top_tb/sch_if/ramaddr_rq
 add wave -noupdate -group Scheduler_buff /dram_top_tb/sch_if/ramREN_curr
 add wave -noupdate -group Scheduler_buff /dram_top_tb/sch_if/ramWEN_curr
-add wave -noupdate -group Scheduler_buff /dram_top_tb/SCH_BUFF/fifo
-add wave -noupdate -group Scheduler_buff /dram_top_tb/SCH_BUFF/wptr
-add wave -noupdate -group Scheduler_buff /dram_top_tb/SCH_BUFF/rptr
+add wave -noupdate -group Scheduler_buff -expand /dram_top_tb/SCH_BUFF/fifo
+add wave -noupdate -group Scheduler_buff -radix unsigned /dram_top_tb/SCH_BUFF/wptr
+add wave -noupdate -group Scheduler_buff -radix unsigned /dram_top_tb/SCH_BUFF/rptr
+add wave -noupdate /dram_top_tb/SCH_BUFF/full
 add wave -noupdate -expand -group data_transfer /dram_top_tb/dt_if/wr_en
 add wave -noupdate -expand -group data_transfer /dram_top_tb/dt_if/rd_en
 add wave -noupdate -expand -group data_transfer /dram_top_tb/dt_if/COL_choice
@@ -232,8 +234,9 @@ add wave -noupdate -expand -group cache_debug /dram_top_tb/CACHE/dmemstore
 add wave -noupdate -expand -group cache_debug /dram_top_tb/dt_if/DQ
 add wave -noupdate -expand -group cache_debug /dram_top_tb/CACHE/dmemload
 add wave -noupdate -expand -group cache_debug /dram_top_tb/prev_addr
+add wave -noupdate /dram_top_tb/random_req/wr_or_rd
 TreeUpdate [SetDefaultTree]
-WaveRestoreCursors {{Cursor 1} {4248767 ps} 0}
+WaveRestoreCursors {{Cursor 1} {14169739 ps} 0}
 quietly wave cursor active 1
 configure wave -namecolwidth 150
 configure wave -valuecolwidth 369
@@ -249,4 +252,4 @@ configure wave -griddelta 40
 configure wave -timeline 0
 configure wave -timelineunits ps
 update
-WaveRestoreZoom {4252558 ps} {4360889 ps}
+WaveRestoreZoom {12776824 ps} {21390307 ps}

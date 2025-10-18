@@ -2,6 +2,7 @@ module flex_counter #( parameter N=5 ) (
     input  logic  CLK, nRST,
     input  logic  enable,
     input  logic  [N-1:0] count_load,
+    input  logic  clear, //Add by Tri for pressing into 0
     output logic  [N-1:0] count,
     output logic  count_done
 );
@@ -29,7 +30,9 @@ always_ff @(posedge CLK, negedge nRST) begin
         //count <= count_load;
         count <= '0;
     end
-    
+    else if (clear) begin
+        count <= 0;
+    end
     else begin
         count <= next_count;
     end    

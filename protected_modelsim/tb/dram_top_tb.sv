@@ -15,14 +15,15 @@
 // 4. Test row hit write row hit read
 // 5. Test the refresh and row miss read
 // 6. Test 3 consectutive  row miss write
-// 7. Test row conflict write row hit read
-// 8. Test row conflcit read (the old address that cause write)
+// 7. Test row conflict write (after 3 consecutive write, I write the conflict row into last row of consecutive writes) (REFRESH happened during writing)
+// 8. Test row conflcit read (the last consecutive addr conflict number 7)
+// 9. Test 16 consecutive write with different bank
+// 10. Test 1000 random read and write of different commands
 
 module dram_top_tb;
     parameter PERIOD = 1.5;
     parameter tCK = 1.5;
     import dram_pkg::*;
-    // import arch_package::*;
     import proj_package::*;
 
     //parameter from dram_command_if.vh
@@ -34,41 +35,35 @@ module dram_top_tb;
     parameter CONFIGURED_DM_BITS     = (16 == CONFIGURED_DQ_BITS) ? 2 : 1;
     parameter CONFIGURED_RANKS = 1;
     
-    // signals
+    //CLK and debug signals
     logic CLK = 1, nRST;
     logic CLKx2=0;
     reg model_enable_val;
     string task_name;
 
     //Instantiate the the iDDR4_1 version
-    // addr_x4_t ramaddr_phy, ramaddr_phy_ft, ramstore_phy, ramstore_phy_ft;
     reg clk_val, clk_enb;
-    // DQ transmit
-    reg[MAX_DQ_BITS-1:0] dq_out;
-    reg[MAX_DQS_BITS-1:0] dqs_out;
-    reg[MAX_DM_BITS-1:0] dm_out;
-    logic [31:0] data_store1;
-    logic [31:0] data_store2;
-    logic [31:0] data_store3;
-    logic [31:0] data_store4;
-    logic DM_debug;
+    logic DM_debug; //Used it if you want to debug with writing mask
     assign model_enable = model_enable_val;
 
     //Signal flag to choose write or read
     reg dq_en;
     reg dqs_en;
-    logic don_t_write;
-    logic [31:0] prev_addr; 
+    
 
-    //Cache signals
+    //Cache signals and signals for verifying the data transmission
     logic cache_write;
     logic cache_read;
     logic [ROW_BITS-1:0] cache_addr;
     logic [2:0] cache_offset;
     logic [63:0] cache_store;
     logic [63:0] cache_load;
+    logic don_t_write; //Signals it use for telling whether you want to latch prev addr or not
+    logic [31:0] prev_addr; 
     
-
+    //Clock generation of CK and CKx2
+    //Issue right now, CK is follow TS_1500 tCK is 1.5ns
+    //I want to figure out a way that can change different configurations to choose TS_1500 (right now micron dram is TS_1250 - 1.25ns)
     always begin
         CLK = 1'b0;
         #(PERIOD / 2.0);
@@ -83,23 +78,22 @@ module dram_top_tb;
         #(PERIOD / 4.0);
     end
 
-    // ddr4_module_if iDDR4_1();
+    //Instantiate the interface of DRAM controller and DDR4 DRAM
     control_unit_if dc_if();
     signal_gen_if sig_if();
     scheduler_buffer_if sch_if();
     data_transfer_if dt_if();
-    
+
     DDR4_if #(.CONFIGURED_DQ_BITS(CONFIGURED_DQ_BITS)) iDDR4_1();
     DDR4_if #(.CONFIGURED_DQ_BITS(CONFIGURED_DQ_BITS)) iDDR4_2();
     DDR4_if #(.CONFIGURED_DQ_BITS(CONFIGURED_DQ_BITS)) iDDR4_3();
     DDR4_if #(.CONFIGURED_DQ_BITS(CONFIGURED_DQ_BITS)) iDDR4_4();
 
-
     dram_top DUT (.CLK(CLK), .nRST(nRST), .myctrl(dc_if), .myctrl_sig(dc_if), .mysig(sig_if));
     scheduler_buffer SCH_BUFF (.CLK(CLK), .nRST(nRST), .mysche(sch_if));
     data_transfer DT (.CLK(CLK), .CLKx2(CLKx2),.nRST(nRST), .mydata(dt_if));
 
-    //Instantiate cache for verify
+    //Instantiate cache as a referrence model to verify data load
     sw_cache CACHE (.CLKx2(CLKx2), .nRST(nRST), .wr_en(cache_write), .rd_en(cache_read), .row_addr(cache_addr), .offset(cache_offset), .dmemstore(cache_store), .dmemload(cache_load));
 
     //Scheduler interface with the 
@@ -107,19 +101,14 @@ module dram_top_tb;
       dc_if.dREN = (!dc_if.ram_wait) ? 0 : sch_if.ramREN_curr;
       dc_if.dWEN = (!dc_if.ram_wait) ? 0 : sch_if.ramWEN_curr;
       dc_if.ram_addr = sch_if.ramaddr_rq;
-      
-    //   dc_if.ramWEN_ftrt = sch_if.ramWEN_ftrt;
       sch_if.request_done = !dc_if.ram_wait;
-    
-
       //Interface between scheduler buffer and the data_transfer
       dt_if.wr_en = dc_if.wr_en;
       dt_if.rd_en = dc_if.rd_en;
-
-    //  Comment this out for testing with class sche_clas
-    //   dt_if.memstore = sch_if.ramstore_rq;
     end
 
+    
+    //DRAM interface latch
     always @(posedge clk_val && clk_enb) begin
         clk_val <= #(tCK/2) 1'b0;
         clk_val <= #(tCK) 1'b1;
@@ -233,7 +222,7 @@ module dram_top_tb;
     end
 
     // Component instantiation
-    //Only use 4 chips only
+    //Only use 4 chips only, so 32-bit data
     ddr4_model #(.CONFIGURED_DQ_BITS(CONFIGURED_DQ_BITS),  .CONFIGURED_RANKS(CONFIGURED_RANKS)) u0_r0(.model_enable(model_enable), .iDDR4(iDDR4_1));
     ddr4_model #(.CONFIGURED_DQ_BITS(CONFIGURED_DQ_BITS),  .CONFIGURED_RANKS(CONFIGURED_RANKS)) u1_r0(.model_enable(model_enable), .iDDR4(iDDR4_2));
     ddr4_model #(.CONFIGURED_DQ_BITS(CONFIGURED_DQ_BITS),  .CONFIGURED_RANKS(CONFIGURED_RANKS)) u2_r0(.model_enable(model_enable), .iDDR4(iDDR4_3));
@@ -244,6 +233,8 @@ module dram_top_tb;
     // ddr4_model #(.CONFIGURED_DQ_BITS(CONFIGURED_DQ_BITS),  .CONFIGURED_RANKS(CONFIGURED_RANKS)) u7_r0(.model_enable(model_enable), .iDDR4(iDDR4_1.u7_r0));
 
     //Interface between iDDR4 and data transfer example
+    // Connect DQ, DQS_t, DQS_c, DM_n
+    // Note DM_n is the signal for the writing mask
     assign {
         iDDR4_1.DQ,
         iDDR4_2.DQ,
@@ -295,12 +286,13 @@ module dram_top_tb;
         iDDR4_4.DQ
     } : {32{1'bz}};
 
-
+    //Assign these DQ signals back with data transfer (bidirectional)
     assign dt_if.DQS_t = ~dq_en ? iDDR4_1.DQS_t : 1'bz;
     assign dt_if.DQS_c = ~dq_en ? iDDR4_1.DQS_c: 1'bz;
     assign dt_if.DM_n = ~dq_en ? iDDR4_1.DM_n: 1'bz;
-    assign dt_if.COL_choice = dc_if.offset; //CHANGE
+    assign dt_if.COL_choice = dc_if.offset; 
 
+    //Latch for the prev_addr, I use this for row hit, row conflict case
     always_ff @(posedge CLK) begin
         if (!nRST) begin
             prev_addr <= 0;
@@ -308,23 +300,26 @@ module dram_top_tb;
             if (!don_t_write) begin
                 prev_addr <= sch.creating_addr;
             end
-
         end
     end
 
     //Creating class for the transaction
     class sche_trans;
+        //Getting the scheduler buffer interface
         virtual scheduler_buffer_if vif;
-        localparam logic [14:0] ROW_HIT    = 15'h1234;   // "open" row for the hit/conflict cases
-        localparam logic [14:0] ROW_OTHER  = 15'h2ACE;   // different row -> conflict
+
+        //Random rank, bank group, bank, row, col, offset
         rand logic [RANK_BITS - 1:0] rank;
         randc logic [BANK_GROUP_BITS - 1:0] BG;
         randc logic [BANK_BITS - 1:0] bank;
         rand logic [ROW_BITS - 1:0] row;
         rand logic [COLUMN_BITS - 1:0] col;
         rand logic [OFFSET_BITS - 1:0] offset;
-        logic [31:0] creating_addr;
-        //1. Creating covergroup
+
+        logic [31:0] creating_addr; //the actual address
+
+
+        //1. Creating covergroup (IGNORE THIS)
         covergroup sch_group @(posedge CLK);
             //2.Creating coverpoint
             sch_point : coverpoint {vif.dREN, vif.dWEN} {
@@ -335,10 +330,12 @@ module dram_top_tb;
         endgroup        
 
         //3. Creating the constraint
+        //dREN and dWEN should never goes high at the same time
         constraint req_cons {
             {vif.dREN, vif.dWEN} != 2'b11;
         }
 
+        //constraint of addr_rank
         constraint addr_rank {
             rank == 1'b0;
             row != '1;
@@ -346,14 +343,14 @@ module dram_top_tb;
             col[2:0] == 0; //8-byte align
         }
 
-        // constraint 
 
         function new (virtual scheduler_buffer_if vif);
             this.vif = vif;
             sch_group = new();
         endfunction
 
-        function create_addr (string testcase, input logic[31:0] prev_addr);
+        //function for generate the address
+        function gen_addr (string testcase, input logic[31:0] prev_addr);
             //If you want to add row conflict
             if (testcase == "row conflict") begin
                 creating_addr = prev_addr;
@@ -364,9 +361,9 @@ module dram_top_tb;
                 creating_addr = {rank, row, bank, BG[1], col[9:3], BG[0], col[2:0], offset};
             end
         endfunction
-
     endclass
 
+    //Class for generate data (This is not necessary)
     class creating_dt;
         rand logic [31:0] data_store;
         function new ();
@@ -377,14 +374,31 @@ module dram_top_tb;
         endfunction
     endclass
 
+    //Define class
     creating_dt dt_class;   
     sche_trans sch;
 
+    //Use this task to add a request into scheduler FIFO
+    task add_request(input logic [31:0] addr, input logic write, input logic [31:0] data);
+      if (write) begin
+          sch_if.dWEN = 1'b1;
+          sch_if.dREN = 1'b0;
+          sch_if.ramaddr = addr;
+          sch_if.memstore = data;
+      end else begin
+          sch_if.dWEN = 1'b0;
+          sch_if.dREN = 1'b1;
+          sch_if.ramaddr = addr;
+      end
+      #(PERIOD);
+      sch_if.dWEN = 1'b0;
+      sch_if.dREN = 1'b0;
+    endtask
+
+    //This is the task you want to write something in a specific addr
+    //Don't worry about the data context
     task writing_1(input logic [31:0] addr, input creating_dt dt_class);
         begin
-        // task_name = "Write 1";
-        
-        // add_request(.addr({16'hAAAA, 8'hAA, 8'b000_000_00}), .write(1'b1), .data(32'hAAAA_AAAA));
         add_request(.addr(addr), .write(1'b1), .data(32'hAAAA_AAAA));
         while (!dt_if.wr_en) begin
             @(posedge CLK);
@@ -409,26 +423,25 @@ module dram_top_tb;
         end
     endtask
 
+    //A random testing case
     task writing_read_row_hit(input creating_dt dt_class);
         task_name = "Writing_Cycle";
         //Case 2 check the writing cycle
-        // add_request(.addr({16'hAAAA, 8'hAA, 8'b000_000_00}), .write(1'b1), .data(32'hAAAA_AAAA));
         //Case checking the writing burst
         //Creating new addr
         sch.randomize();
-        sch.create_addr("row miss", prev_addr);
+        sch.gen_addr("row miss", prev_addr);
         writing_1(sch.creating_addr, dt_class);
         repeat (50) @(posedge CLK);
 
-        
         task_name = "Reading_Cycle";
         dq_en = 1'b0;
-        // //Case 3 check the reading cycle
-        // add_request(.addr({16'hAAAA, 8'hAA, 8'b000_000_00}), .write(1'b0), .data(32'hAAAA_AAAA));
+        //Case 3 check the reading cycle
         add_request(.addr(sch.creating_addr), .write(1'b0), .data(32'hAAAA_AAAA));
         repeat (50) @(posedge CLK);
     endtask
 
+    //This is the task where you want to read the address and verify with cache model
     task read_with_verify (
         input logic [31:0] addr,
         input sche_trans sch
@@ -449,33 +462,50 @@ module dram_top_tb;
         dq_en = 1;
         cache_read = 1;
         dt_if.clear = 0;
-        repeat(10) @(posedge CLK);
     endtask
-
-    
-
-    //Creating the assert to check the failed case
+    //Creating the assert to check the failed case of data load
     property wr_verify;
         @(posedge CLK) disable iff (!nRST)
         dt_if.rd_en && (dt_if.edge_flag) |-> (cache_load == dt_if.memload);
     endproperty
-
     assert property (wr_verify)
     else 
-        $fatal("Addr: %0x, offset: %0x, cache load: %0x, dt_memload: %0x", sch.creating_addr[30:16], cache_offset, cache_load, dt_if.memload);
+        //If failed it should stop simulation
+        $fatal("Time: [%0t], Addr: %0x, offset: %0x, cache load: %0x, dt_memload: %0x",$time,sch.creating_addr[30:16], cache_offset, cache_load, dt_if.memload);
 
 
+    //Task of writing different 16 writes of different banks
     task consecutive_16_write();
-        for (int i = 0; i < 7; i++) begin
-            task_name = ("16 write-dif bank " + i + 16);
+        for (int i = 0; i < 16; i++) begin
+            task_name = $sformatf("16 write-dif bank  -%0d", i);
             dq_en = 1'b1;
             sch.randomize();
-            sch.create_addr("row miss", prev_addr);
+            sch.gen_addr("row miss", prev_addr);
             writing_1(sch.creating_addr, dt_class);
             while (dc_if.ram_wait) begin
                 @(posedge CLK);
             end
-            repeat(10) @(posedge CLK);
+        end
+    endtask
+
+    //1000 request come one by one
+    task random_req();
+        bit wr_or_rd; 
+        for (int i = 0; i < 1000; i++) begin
+            task_name = $sformatf("Task random -%0d", i);
+            wr_or_rd = $urandom_range(0,1); // simple 0/1;
+            if (wr_or_rd) begin
+                dq_en = 1'b1;
+                sch.randomize();
+                sch.gen_addr("row miss", prev_addr);
+                writing_1(sch.creating_addr, dt_class);
+                while (dc_if.ram_wait) begin
+                    @(posedge CLK);
+                end
+            end else begin
+                dq_en = 1'b0;
+                read_with_verify(sch.creating_addr, sch);
+            end 
         end
     endtask
 
@@ -507,23 +537,17 @@ module dram_top_tb;
       #((tRESET + tPWUP + tRESETCKE + tPDc + tXPR + tDLLKc + tMOD * 7 + tZQinitc) * PERIOD);
       repeat (25) @(posedge CLK);
 
-    //   //Case 1 check the refresh case no interrept
-    //   task_name = "Refresh";
-    //   repeat (100) @(posedge CLK);
+    
     
     task_name = "Writing_Cycle";
-    //Case 2 check the writing cycle
-    //Case checking the writing burst
-    //Creating new addr
     sch.randomize();
-    sch.create_addr("row miss", prev_addr);
+    sch.gen_addr("row miss", prev_addr);
     writing_1(sch.creating_addr, dt_class);
     repeat (50) @(posedge CLK);
 
     
     task_name = "Reading_Cycle";
     dq_en = 1'b0;
-    //Case 3 check the reading cycle
     read_with_verify(sch.creating_addr, sch);
     
     
@@ -554,7 +578,7 @@ module dram_top_tb;
     dq_en = 1'b1;
     //1 consectutive
     sch.randomize();
-    sch.create_addr("row miss", prev_addr);
+    sch.gen_addr("row miss", prev_addr);
     writing_1(sch.creating_addr, dt_class);
     while (dc_if.ram_wait) begin
         @(posedge CLK);
@@ -563,7 +587,7 @@ module dram_top_tb;
 
     //2 consectutive
     sch.randomize();
-    sch.create_addr("row miss", prev_addr);
+    sch.gen_addr("row miss", prev_addr);
     writing_1(sch.creating_addr, dt_class);
     while (dc_if.ram_wait) begin
         @(posedge CLK);
@@ -573,7 +597,7 @@ module dram_top_tb;
     //3 consectutive
     task_name = "The last consecutive write of the testcase";
     sch.randomize();
-    sch.create_addr("row miss", prev_addr);
+    sch.gen_addr("row miss", prev_addr);
     writing_1(sch.creating_addr, dt_class);
     while (dc_if.ram_wait) begin
         @(posedge CLK);
@@ -584,7 +608,7 @@ module dram_top_tb;
     //After that we use the last consecutive write to test the conflict case
     task_name = "Test row conflict write row hit read";
     don_t_write = 1'b1;
-    sch.create_addr("row conflict", prev_addr);
+    sch.gen_addr("row conflict", prev_addr);
     writing_1(sch.creating_addr, dt_class);
     while(dc_if.ram_wait) begin
         @(posedge CLK);
@@ -596,33 +620,21 @@ module dram_top_tb;
     read_with_verify(prev_addr, sch);
     repeat(200) @(posedge CLK);
 
-    //CHECKPOINT: DONE ALL PREVIOUS CASES
-
-    //Task 16_consecutive writes //TODO: Faile at bank 6, issue where while waiting WRITING, refresh happened
+    //Task 16_consecutive writes
     task_name = "16 write-dif bank";
     consecutive_16_write();
+
+    //Task random
+    random_req();
+
+    //CHECKPOINT: DONE ALL PREVIOUS CASES
     $finish;
-
     end
-
-    task add_request(input logic [31:0] addr, input logic write, input logic [31:0] data);
-      if (write) begin
-          sch_if.dWEN = 1'b1;
-          sch_if.dREN = 1'b0;
-          sch_if.ramaddr = addr;
-          sch_if.memstore = data;
-      end else begin
-          sch_if.dWEN = 1'b0;
-          sch_if.dREN = 1'b1;
-          sch_if.ramaddr = addr;
-      end
-      #(PERIOD);
-      // @(posedge CLK);
-      sch_if.dWEN = 1'b0;
-      sch_if.dREN = 1'b0;
-    endtask
 endmodule
 
+
+//Reference cache for verification
+//Use to store 64byte of data in different rows
 module sw_cache #( parameter ROW_BITS = 15)
 (
     input logic CLKx2,
@@ -659,7 +671,4 @@ module sw_cache #( parameter ROW_BITS = 15)
             dmemload = sw_cache[row_addr].arr[offset];
         end
     end
-
-
-
 endmodule

@@ -31,7 +31,7 @@ module scheduler_buffer #(
     assign mysche.ramWEN_ftrt = fifo[rptr - 1][0][32] == 2'b10 ? 1'b1 : 1'b0;
 
 
-    assign full = (wptr == 7'd64) ? 1'b1: 1'b0;
+    assign full = (wptr == (rptr - 1)) ? 1'b1: 1'b0;
     
 
     

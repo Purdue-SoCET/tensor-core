@@ -1,5 +1,5 @@
 QuestaSim-64 vlog 2021.4 Compiler 2021.10 Oct 13 2021
-Start time: 01:29:29 on Oct 17,2025
+Start time: 16:39:11 on Oct 18,2025
 vlog -work work "+acc" -l vcs.log -sv "+incdir+./include" "+define+DDR4_4G_X8" ./arch_defines.v ./dimm.vh ./arch_package.sv ./proj_package.sv ./interface.sv ./ddr4_model.svp ./src/timing_signal.sv ./src/dram_top.sv ./src/flex_counter.sv ./src/signal_gen.sv ./src/init_state.sv ./src/command_FSM.sv ./src/control_unit.sv ./src/address_mapper.sv ./src/socetlib_counter.sv ./src/scheduler_buffer.sv ./src/edge_det.sv ./src/row_open.sv ./src/data_transfer.sv ./tb/dram_top_tb.sv 
 -- Compiling package dimm_vh_unit
 -- Compiling package arch_package
@@ -134,20 +134,22 @@ vlog -work work "+acc" -l vcs.log -sv "+incdir+./include" "+define+DDR4_4G_X8" .
 ** Warning: ./tb/dram_top_tb.sv(393): (vlog-2240) Treating stand-alone use of function 'randomize' as an implicit VOID cast.
 ** Warning: ./tb/dram_top_tb.sv(418): (vlog-2240) Treating stand-alone use of function 'randomize' as an implicit VOID cast.
 ** Warning: ./tb/dram_top_tb.sv(419): (vlog-2240) Treating stand-alone use of function 'create_addr' as an implicit VOID cast.
-** Warning: ./tb/dram_top_tb.sv(472): (vlog-2240) Treating stand-alone use of function 'randomize' as an implicit VOID cast.
-** Warning: ./tb/dram_top_tb.sv(473): (vlog-2240) Treating stand-alone use of function 'create_addr' as an implicit VOID cast.
-** Warning: ./tb/dram_top_tb.sv(518): (vlog-2240) Treating stand-alone use of function 'randomize' as an implicit VOID cast.
-** Warning: ./tb/dram_top_tb.sv(519): (vlog-2240) Treating stand-alone use of function 'create_addr' as an implicit VOID cast.
-** Warning: ./tb/dram_top_tb.sv(556): (vlog-2240) Treating stand-alone use of function 'randomize' as an implicit VOID cast.
-** Warning: ./tb/dram_top_tb.sv(557): (vlog-2240) Treating stand-alone use of function 'create_addr' as an implicit VOID cast.
-** Warning: ./tb/dram_top_tb.sv(565): (vlog-2240) Treating stand-alone use of function 'randomize' as an implicit VOID cast.
-** Warning: ./tb/dram_top_tb.sv(566): (vlog-2240) Treating stand-alone use of function 'create_addr' as an implicit VOID cast.
-** Warning: ./tb/dram_top_tb.sv(575): (vlog-2240) Treating stand-alone use of function 'randomize' as an implicit VOID cast.
-** Warning: ./tb/dram_top_tb.sv(576): (vlog-2240) Treating stand-alone use of function 'create_addr' as an implicit VOID cast.
-** Warning: ./tb/dram_top_tb.sv(587): (vlog-2240) Treating stand-alone use of function 'create_addr' as an implicit VOID cast.
+** Warning: ./tb/dram_top_tb.sv(470): (vlog-2240) Treating stand-alone use of function 'randomize' as an implicit VOID cast.
+** Warning: ./tb/dram_top_tb.sv(471): (vlog-2240) Treating stand-alone use of function 'create_addr' as an implicit VOID cast.
+** Warning: ./tb/dram_top_tb.sv(486): (vlog-2240) Treating stand-alone use of function 'randomize' as an implicit VOID cast.
+** Warning: ./tb/dram_top_tb.sv(487): (vlog-2240) Treating stand-alone use of function 'create_addr' as an implicit VOID cast.
+** Warning: ./tb/dram_top_tb.sv(535): (vlog-2240) Treating stand-alone use of function 'randomize' as an implicit VOID cast.
+** Warning: ./tb/dram_top_tb.sv(536): (vlog-2240) Treating stand-alone use of function 'create_addr' as an implicit VOID cast.
+** Warning: ./tb/dram_top_tb.sv(573): (vlog-2240) Treating stand-alone use of function 'randomize' as an implicit VOID cast.
+** Warning: ./tb/dram_top_tb.sv(574): (vlog-2240) Treating stand-alone use of function 'create_addr' as an implicit VOID cast.
+** Warning: ./tb/dram_top_tb.sv(582): (vlog-2240) Treating stand-alone use of function 'randomize' as an implicit VOID cast.
+** Warning: ./tb/dram_top_tb.sv(583): (vlog-2240) Treating stand-alone use of function 'create_addr' as an implicit VOID cast.
+** Warning: ./tb/dram_top_tb.sv(592): (vlog-2240) Treating stand-alone use of function 'randomize' as an implicit VOID cast.
+** Warning: ./tb/dram_top_tb.sv(593): (vlog-2240) Treating stand-alone use of function 'create_addr' as an implicit VOID cast.
+** Warning: ./tb/dram_top_tb.sv(604): (vlog-2240) Treating stand-alone use of function 'create_addr' as an implicit VOID cast.
 -- Compiling module sw_cache
 
 Top level modules:
 	dram_top_tb
-End time: 01:29:30 on Oct 17,2025, Elapsed time: 0:00:01
-Errors: 0, Warnings: 41
+End time: 16:39:12 on Oct 18,2025, Elapsed time: 0:00:01
+Errors: 0, Warnings: 43

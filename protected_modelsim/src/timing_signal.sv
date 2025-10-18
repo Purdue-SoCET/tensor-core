@@ -15,6 +15,7 @@ module timing_signal (
     parameter N = 10;
     logic [N-1:0] time_load, time_count;
     logic time_counter_en, time_count_done;
+    logic clear;
 
     always_comb begin
         timif.tACT_done = 1'b0;
@@ -29,18 +30,20 @@ module timing_signal (
         timif.wr_en = 1'b0;
         timif.rd_en = 1'b0;
         timif.clear = 1'b0;
+        clear = 1'b0;
 
         case (cfsmif.cmd_state)
             ACTIVATE : begin
                 time_counter_en = 1'b1;
+                time_load = tRAS;
                 
-                if (timif.rf_req == 1'b1) begin         // ACT -> PRE time for refresh requests
-                    time_load = tRAS;
-                end
+                // if (timif.rf_req == 1'b1) begin         // ACT -> PRE time for refresh requests
+                //     time_load = tRAS;
+                // end
 
-                else begin                              // ACT -> READ/WRITE time
-                    time_load = tRCD - tAL + 1;             // tAL = 0 if AL command not set. Only tRCD is a safer option
-                end
+                // else begin                              // ACT -> READ/WRITE time
+                //     time_load = tRCD - tAL + 1;             // tAL = 0 if AL command not set. Only tRCD is a safer option
+                // end
 
                 // TODO for consecutive commands
                 // tRRD for consecutive activates
@@ -50,6 +53,11 @@ module timing_signal (
             end
 
             ACTIVATING : begin
+                if ((time_count_done == tRAS - 12 + 1) && (!timif.rf_req)) begin
+                    clear = 1;
+                    timif.tACT_done = 1'b1;
+                end 
+
                 if (time_count_done == 1'b1) begin
                     timif.tACT_done = 1'b1;
                 end
@@ -82,21 +90,23 @@ module timing_signal (
             WRITE : begin
                 time_counter_en = 1'b1;
                 // time_load = tWL + tBURST;
-                time_load = tWL + tBURST;
-
-                // TODO for consecutive writes
+                time_load = tWL + tBURST + tWR; //tWR for the write time re
+                // TODO for Write -> to precharge case:
                 // tCCD_S = diff BG
                 // tCCD_L = same BG
             end
 
             WRITING : begin
-                if (time_count <= tBURST + 2) begin
+                if (time_count <= tBURST + tWR + 2) begin
                     timif.wr_en = 1'b1;
+                end 
+                if (time_count <= tWR) begin
+                    timif.wr_en = 1'b0;
                 end
 	                
                 if (time_count_done == 1'b1) begin
 	                timif.tWR_done = 1'b1;
-                    timif.wr_en = 1'b1;
+                    timif.wr_en = 1'b0;
                     timif.clear = 1'b0;
                 end
             end
@@ -182,7 +192,7 @@ module timing_signal (
     end 
 
     flex_counter #(.N(N)) time_counter (.CLK(CLK), .nRST(nRST), .enable(time_counter_en),
-                                        .count_load(time_load), .count(time_count), 
+                                        .count_load(time_load), .clear(clear), .count(time_count), 
                                         .count_done(time_count_done));
 
     

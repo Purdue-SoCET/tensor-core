@@ -35,7 +35,7 @@ module signal_gen #(
     logic [4:0] cmd_addr;
     logic issue;
 
-    assign issue = mysig.state != mysig.nstate;
+    assign issue = (mysig.state != mysig.nstate);
 
 
     // always_ff @(posedge CLK, negedge nRST) begin
@@ -226,7 +226,7 @@ module signal_gen #(
         end
 
         ACTIVATE: begin
-            if (issue) begin
+            if (issue && !mysig.ref_re) begin
                 // cmd_addr = cmd_t'({2'b0, mysig.R0[16], mysig.R0[15], mysig.R0[14]});
                 cmd_addr = cmd_t'({2'b0, 1'b0, 1'b0, mysig.R0[14]});
                 mysig.BG      = mysig.BG0;
@@ -236,7 +236,7 @@ module signal_gen #(
         end
 
         WRITE: begin
-            if (issue) begin
+            if (issue && !mysig.ref_re) begin
                 cmd_addr   = WRITE_CMD;
                 mysig.BG        = mysig.BG0;
                 mysig.BA        = mysig.BA0;
@@ -248,7 +248,7 @@ module signal_gen #(
         end
 
         READ: begin
-            if (issue) begin
+            if (issue && !mysig.ref_re) begin
                 cmd_addr   = READ_CMD;
                 mysig.BG        = mysig.BG0;
                 mysig.BA        = mysig.BA0;
