@@ -254,7 +254,7 @@ always_comb begin
         logic [SUM_W-1:0] norm;
         logic [EXP_W-1:0] exp_n;
 
-        logic carry = mag[SUM_W-1];
+        logic carry = mag[SUM_W-1];`
         if (carry) begin
             // Right shift 1, OR the dropped LSB into sticky
             logic tail = mag[0];
