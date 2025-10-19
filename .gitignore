@@ -3,3 +3,6 @@ work/
 .venv
 vsim.*
 *.txt
+.deps/
+.mti_uselibs/
+.deps/
