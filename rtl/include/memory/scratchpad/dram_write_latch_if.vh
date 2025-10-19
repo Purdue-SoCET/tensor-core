@@ -20,6 +20,7 @@ interface dram_write_latch_if;
     dram_write_req_t dram_write_req;
     logic dram_write_latch_busy;
     logic dram_valid, dram_write;
+    logic be_stall;
     logic [DRAM_ADDR_WIDTH-1:0] dram_addr;
     logic [COL_IDX_WIDTH-1:0]   num_bytes;
     logic dram_write_req_latched;
