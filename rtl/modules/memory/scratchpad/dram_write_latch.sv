@@ -2,6 +2,9 @@
 `include "scpad_if.sv"
 `include "dram_write_latch_if.vh"
 
+/*  Julio Hernandez - herna628@purdue.edu */
+/*  Akshath Raghav Ravikiran - araviki@purdue.edu */
+
     // modport dram_write_latch (
     //     input dram_addr, num_bytes, dram_valid, dram_write, sram_rddata, num_request,
     //     input be_stall,
@@ -23,7 +26,7 @@ module dram_write_latch ( // UUID now needs to have 2 lower bits for an offest s
 
     dram_write_req_t dram_write_latch,  nxt_dram_write_latch;
 
-    logic [3:0] request_completed_counter, nxt_request_completed_counter; // max request is 8
+    logic [3:0] request_completed_counter, nxt_request_completed_counter; // max completed request is 8
     
     always_ff @(posedge clk, negedge n_rst) begin
         if(!n_rst) begin

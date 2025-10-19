@@ -2,6 +2,9 @@
 `include "scpad_if.sv"
 `include "sram_write_latch_if.vh"
 
+/*  Julio Hernandez - herna628@purdue.edu */
+/*  Akshath Raghav Ravikiran - araviki@purdue.edu */
+
     // modport sram_write_latch (
     //     input dram_id, dram_res_valid, xbar, dram_rddata, num_request,
     //     input be_stall,

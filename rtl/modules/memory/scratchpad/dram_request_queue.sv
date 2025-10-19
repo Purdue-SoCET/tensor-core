@@ -2,6 +2,9 @@
 `include "scpad_if.sv"
 `include "dram_req_queue_if.vh"
 
+/*  Julio Hernandez - herna628@purdue.edu */
+/*  Akshath Raghav Ravikiran - araviki@purdue.edu */
+
     // modport baceknd_dram_req_queue ( 
     //     input dram_addr, id, num_bytes, sram_rdata, sram_res_valid
     //     input sched_write,       // scheduler write = 1 means it's a scpad store aka we need to do a dram write.
@@ -30,7 +33,7 @@ module dram_request_queue ( // UUID now needs to have 2 lower bits for an offest
     dram_req_t nxt_dram_head_latch_set, nxt_dram_tail_latch_set;
 
     logic [DRAM_ID_WIDTH-1:0] fifo_head, nxt_fifo_head, fifo_tail, nxt_fifo_tail;
-    logic [2:0] request_completed_counter, nxt_request_completed_counter;
+    logic [3:0] request_completed_counter, nxt_request_completed_counter;
     
     always_ff @(posedge clk, negedge n_rst) begin
         if(!n_rst) begin
