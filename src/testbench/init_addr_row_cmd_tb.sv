@@ -148,7 +148,7 @@ module init_addr_row_cmd_tb ();
 
     task do_row_miss;
         tb_expected_polif.row_stat = 2'b10; // row status should be MISS (2'b10)
-        #(PERIOD * 0.1);
+        #(PERIOD * 0.1);                    // small delay because TB didn't recognize the change and showed failed
         check_row();
 
         // continue activating the row
@@ -207,6 +207,7 @@ module init_addr_row_cmd_tb ();
 
     task do_row_hit;
         tb_expected_polif.row_stat = 2'b01;  // row status should be HIT (2'b01)
+        #(PERIOD * 0.1);                     // small delay because TB didn't recognize the change and showed failed
         check_row();
 
         @(posedge tb_CLK)           // cmd_state should now be WRITE
@@ -250,6 +251,7 @@ module init_addr_row_cmd_tb ();
     task do_row_conflict;
         tb_expected_cfsmif.cmd_state = IDLE;
         tb_expected_polif.row_stat = 2'b11;     // row status should be CONFLICT (2'b11)
+        #(PERIOD * 0.1);                        // small delay because TB didn't recognize the change and showed failed
         check_row();
 
         @(negedge tb_CLK)
@@ -264,6 +266,7 @@ module init_addr_row_cmd_tb ();
         @(negedge tb_CLK)
         tb_expected_cfsmif.cmd_state = IDLE;    // state should now be IDLE
         tb_expected_polif.row_stat = 2'b10;     // row status should be MISS (2'b10)
+        tb_timif.tPRE_done = 1'b0;                  // setting tPRE_done high
         check_row();
 
         @(negedge tb_CLK)
@@ -383,19 +386,19 @@ module init_addr_row_cmd_tb ();
         tb_test_case     = "Row miss interaction";
         tb_test_case_num = tb_test_case_num + 1;
 
-        // Set a read request to address all 0s to activate a row
         tb_amif.address             = '0;
         
+        // Opening Row 0 in each bank for the first time
         for (tb_k = 0; tb_k < 1; tb_k++) begin
-            //for (tb_i = 0; tb_i < 2**BANK_GROUP_BITS; tb_i++) begin
-            for (tb_i = 0; tb_i < 1; tb_i++) begin
+            for (tb_i = 0; tb_i < 2**BANK_GROUP_BITS; tb_i++) begin
+            //for (tb_i = 0; tb_i < 1; tb_i++) begin
                 for (tb_j = 0; tb_j < 2**BANK_BITS; tb_j++) begin
     
                     @(negedge tb_CLK)
                     tb_cfsmif.dREN              = 1'b1;
-                    {tb_amif.address[13],tb_amif.address[5]} = tb_i;
-                    tb_amif.address[15:14]                   = tb_j;
-                    tb_amif.address[30:16]                   = tb_k;
+                    {tb_amif.address[13],tb_amif.address[5]} = tb_i;        // changing the BG
+                    tb_amif.address[15:14]                   = tb_j;        // changing the Bank
+                    tb_amif.address[30:16]                   = tb_k;        // changing the row (is 0 in all the cases)
                     do_row_miss();
 
                     @(posedge tb_CLK)
@@ -411,12 +414,32 @@ module init_addr_row_cmd_tb ();
         tb_test_case     = "Row hit interaction";
         tb_test_case_num = tb_test_case_num + 1;
 
-        @(negedge tb_CLK)
-        tb_cfsmif.dWEN = 1'b1;
+        // Writing to the row 0 of all banks activated in last case
+        for (tb_k = 0; tb_k < 1; tb_k++) begin
+            for (tb_i = 0; tb_i < 2**BANK_GROUP_BITS; tb_i++) begin
+                for (tb_j = 0; tb_j < 2**BANK_BITS; tb_j++) begin
+    
+                    @(negedge tb_CLK)
+                    tb_cfsmif.dWEN                           = 1'b1;
+                    {tb_amif.address[13],tb_amif.address[5]} = tb_i;        // changing the BG
+                    tb_amif.address[15:14]                   = tb_j;        // changing the Bank
+                    tb_amif.address[30:16]                   = tb_k;        // changing the row (is 0 in all the cases)
+                    do_row_hit();
 
-        do_row_hit();
+                    @(posedge tb_CLK)
 
-        @(posedge tb_CLK)
+                    #(tb_CLK * 3);
+                end
+            end
+        end
+
+        ////////// Replace with the above loop //////////
+        // @(negedge tb_CLK)
+        // tb_cfsmif.dWEN = 1'b1;
+
+        // do_row_hit();
+
+        // @(posedge tb_CLK)
 
         //*****************************************************************************
         // Row conflict interaction
@@ -424,11 +447,35 @@ module init_addr_row_cmd_tb ();
         tb_test_case     = "Row conflict interaction";
         tb_test_case_num = tb_test_case_num + 1;
 
-        tb_amif.address[30:16] = 15'h1;         // same BG and bank but diff row. Should be row conflict
-        tb_cfsmif.dREN = 1'b1;
+        // Choosing different rows for each bank
+        // Row 0 is open from previous case, now choosing other rows
+        // for (tb_k = 1; tb_k < 2**ROW_BITS; tb_k++) begin
+        for (tb_k = 1; tb_k < 2**ROW_BITS; tb_k++) begin
+            for (tb_i = 0; tb_i < 2**BANK_GROUP_BITS; tb_i++) begin
+                for (tb_j = 0; tb_j < 2**BANK_BITS; tb_j++) begin
+    
+                    @(negedge tb_CLK)
+                    tb_cfsmif.dREN                           = 1'b1;
+                    {tb_amif.address[13],tb_amif.address[5]} = tb_i;        // changing the BG
+                    tb_amif.address[15:14]                   = tb_j;        // changing the Bank
+                    tb_amif.address[30:16]                   = tb_k;        // changing the row (is 0 in all the cases)
+                    do_row_conflict();
 
-        @(negedge tb_CLK)
-        do_row_conflict();
+                    @(posedge tb_CLK)
+
+                    #(tb_CLK * 3);
+                end
+            end
+        end
+        
+        ////////// Replace with the above loop //////////
+        // tb_amif.address[30:16] = 15'h1;         // same BG and bank but diff row. Should be row conflict
+        // tb_cfsmif.dREN = 1'b1;
+
+        // @(negedge tb_CLK)
+        // do_row_conflict();
+
+        $finish();
         
 
     end
