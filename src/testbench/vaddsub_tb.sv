@@ -292,7 +292,7 @@ initial begin
     vaddsubif.port_a = 16'b0_10000_1000000000;
     vaddsubif.port_b = 16'b0_01111_1100000000;
 
-    #(PERIOD);
+    `#(PERIOD);
 
     casenum = 4;
     casename = "Subtract Case 1 w Adder";
