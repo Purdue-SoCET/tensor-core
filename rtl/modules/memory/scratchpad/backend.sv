@@ -22,7 +22,7 @@ logic [2:0] num_bytes;
 logic nxt_sched_res_valid;
 
 always_ff @(posedge bshif.clk, negedge bshif.n_rst ) begin
-    if(!n_rst) begin
+    if(!bshif.n_rst) begin
         uuid <= 'b0;
         sub_uuid <= 'b0;
     end else begin
