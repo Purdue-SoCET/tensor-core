@@ -43,7 +43,7 @@ module dram_request_queue ( // UUID now needs to have 2 lower bits for an offest
         sr_wr_l.sram_write_req_latched = 1'b0;
 
         if(sr_wr_l.dram_res_valid) begin
-            nxt_sram_write_latch.valid = ((request_completed_counter + 1) == num_request) ? 1'b1 : 1'b0;
+            nxt_sram_write_latch.valid = ((request_completed_counter + 1) == sr_wr_l.num_request) ? 1'b1 : 1'b0;
             if(sr_wr_l.dram_id[2:0] == 3'b000) begin
                 nxt_sram_write_latch.wdata[63:0] =  sr_wr_l.dram_rddata;
             end else if(sr_wr_l.dram_id[2:0] == 3'b001) begin

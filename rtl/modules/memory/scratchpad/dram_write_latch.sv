@@ -36,7 +36,6 @@ module dram_write_latch ( // UUID now needs to have 2 lower bits for an offest s
     end
 
     always_comb begin
-        nxt_sram_rd_data = sram_rd_data;
         nxt_request_completed_counter = request_completed_counter;
         dr_wr_l.dram_write_latch_busy = 1'b0;
         dr_wr_l.dram_write_req_latched = 1'b0;
