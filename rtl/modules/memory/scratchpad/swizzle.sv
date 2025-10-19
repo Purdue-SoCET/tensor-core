@@ -1,11 +1,11 @@
 `include "swizzle_if.vh"
 /*  Akshath Raghav Ravikiran - araviki@purdue.edu */
 
-import scpad_pkg::*;
-
 module swizzle (
   swizzle_if.swizzle swizz
 );
+
+    import scpad_pkg::*;
 
     logic [ROW_IDX_WIDTH-1:0] abs_row;
 
