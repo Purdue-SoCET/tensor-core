@@ -8,13 +8,13 @@
 /*  Julio Hernandez - herna628@purdue.edu */
 /*  Akshath Raghav Ravikiran - araviki@purdue.edu */
 
+import scpad_pkg::*;
+
 module backend #(parameter logic [SCPAD_ID_WIDTH-1:0] IDX = '0) 
     (scpad_if.backend_sched bshif, 
      scpad_if.backend_body bscif, 
      scpad_if.backend_dram bdrif
 ); // grab clk and n_rst from any
-
-import scpad_pkg::*;
 
 logic [DRAM_ID_WIDTH-1:0] be_id, uuid, nxt_uuid;
 logic [2:0] sub_uuid, nxt_sub_uuid, num_request; 
