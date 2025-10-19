@@ -6,3 +6,4 @@ vsim.*
 .deps/
 .mti_uselibs/
 .deps/
+UVM_1.2
