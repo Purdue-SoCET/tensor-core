@@ -46,7 +46,7 @@ initial begin
         val = val + 16'd1;
     end
 
-    $display("%d", in[25]);
+    // $display("%d", in[25]);
 
     // default (output = input)
     // control_bit = 144'b0;
