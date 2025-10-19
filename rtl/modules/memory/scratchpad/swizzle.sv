@@ -1,3 +1,5 @@
+/*  Akshath Raghav Ravikiran - araviki@purdue.edu */
+
 import scpad_pkg::*;
 
 module swizzle (

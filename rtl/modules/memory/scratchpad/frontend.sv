@@ -1,3 +1,7 @@
+/*  Nicha Muninnimit - nmuninni@purdue.edu */
+/*  Rafael Monteiro Martins Pinheiro - rmontei@purdue.edu */
+/*  Akshath Raghav Ravikiran - araviki@purdue.edu */
+
 `include "scpad_pkg.sv"
 `include "scpad_if.sv"
 import scpad_pkg::*;

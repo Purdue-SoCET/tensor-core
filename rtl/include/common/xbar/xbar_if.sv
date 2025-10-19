@@ -8,21 +8,25 @@ interface xbar_if #(
 
     `include "xbar_params.svh"
 
-    logic [DWIDTH-1:0] din [SIZE];
-    logic [$clog2(SIZE)-1:0] shift [SIZE]; 
-    logic [DWIDTH-1:0] dout [SIZE]; 
-    logic en;
+    typedef struct packed {
+        logic [DWIDTH-1:0] din;
+        logic [$clog2(SIZE)-1:0] shift;
+    } group_t;
 
+    logic en;
+    group_t in [SIZE]; 
+    logic [DWIDTH-1:0] out [SIZE]; 
+    
     modport xbar (
         input clk, n_rst,
-        input en, din, shift, 
-        output dout
+        input en, in, 
+        output out
     );
 
     modport xbar_tb (
         output clk, n_rst,
-        output en, din, shift, 
-        input dout
+        output en, in, 
+        input out
     );
 
 endinterface

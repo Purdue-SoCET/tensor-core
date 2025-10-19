@@ -1,3 +1,5 @@
+/*  Akshath Raghav Ravikiran - araviki@purdue.edu */
+
 import scpad_pkg::*;
 
 module tail #(parameter logic [SCPAD_ID_WIDTH-1:0] IDX = '0) (scpad_if.spad_tail tif);

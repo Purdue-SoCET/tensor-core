@@ -1,3 +1,5 @@
+/*  Akshath Raghav Ravikiran - araviki@purdue.edu */
+
 `include "xbar_if.sv"
 
 import scpad_pkg::*;
