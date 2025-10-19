@@ -1,5 +1,5 @@
-`include "scpad_types_pkg.vh"
-`include "scratchpad_if.vh"
+`include "scpad_pkg.sv"
+`include "scpad_if.sv"
 `include "dram_write_latch_if.vh"
 
     // modport dram_write_latch (

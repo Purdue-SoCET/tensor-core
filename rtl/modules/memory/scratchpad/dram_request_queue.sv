@@ -1,5 +1,5 @@
-`include "scpad_types_pkg.vh"
-`include "scratchpad_if.vh"
+`include "scpad_pkg.sv"
+`include "scpad_if.sv"
 `include "dram_req_queue_if.vh"
 
     // modport baceknd_dram_req_queue ( 
@@ -13,7 +13,7 @@
 
 module dram_request_queue ( // UUID now needs to have 2 lower bits for an offest since dram can only handle 64 bits at a time
     input logic clk, n_rst, 
-    dram_read_req_queue_if.baceknd_dram_req_queue be_dr_req_q
+    dram_req_queue_if.baceknd_dram_req_queue be_dr_req_q
 );
     import scpad_types_pkg::*;
 

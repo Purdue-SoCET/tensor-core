@@ -1,10 +1,11 @@
 `ifndef SWIZZLE_IF
 `define SWIZZLE_IF
 
-`include "scpad_types_pkg.vh"
+`include "scpad_pkg.sv"
+`include "scpad_if.sv"
 
 interface swizzle_if;
-    import scpad_types_pkg::*; 
+    import scpad_pkg::*; 
 
 
     typedef struct packed {
@@ -19,7 +20,7 @@ interface swizzle_if;
 
     xbar_desc_t xbar_desc;
 
-    modport backend_addr (
+    modport swizzle (
         input  row_or_col,
         input  spad_addr,
         input  num_rows, num_cols, row_id, col_id,

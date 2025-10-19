@@ -1,10 +1,11 @@
 `ifndef DRAM_REQ_QUEUE_IF
 `define DRAM_REQ_QUEUE_IF
 
-`include "scpad_types_pkg.vh"
+`include "scpad_pkg.sv"
+`include "scpad_if.sv"
 
 interface dram_req_queue_if;
-    import scpad_types_pkg::*;
+    import scpad_pkg::*;
 
     typedef struct packed {
         logic valid; 

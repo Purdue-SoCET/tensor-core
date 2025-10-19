@@ -1,10 +1,11 @@
 `ifndef SRAM_WRITE_LATCH_IF
 `define SRAM_WRITE_LATCH_IF
 
-`include "scpad_types_pkg.vh"
+`include "scpad_pkg.sv"
+`include "scpad_if.sv"
 
 interface sram_write_latch_if;
-    import scpad_types_pkg::*;
+    import scpad_pkg::*;
 
     typedef struct packed {
         slot_mask_t slot_mask;

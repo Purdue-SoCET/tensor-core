@@ -1,9 +1,11 @@
-`include "scpad_types_pkg.vh"
-`include "scratchpad_if.vh"
+`include "scpad_pkg.sv"
+`include "scpad_if.sv"
 `include "swizzle_if.vh"
 `include "dram_req_queue_if.vh"
 `include "sram_write_latch_if.vh"
 `include "dram_write_latch_if.vh"
+
+import scpad_pkg::*;
 
 module backend #(parameter logic [SCPAD_ID_WIDTH-1:0] IDX = '0) // grab clk and n_rst from any
     (   input clk, n_rst, 
@@ -26,12 +28,12 @@ always_ff @(posedge clk, negedge n_rst ) begin
     end
 end
 
-addr_map_if baddr();
+swizzle_if baddr();
 dram_req_queue_if be_dr_req_q();
 sram_write_latch_if sr_wr_l();
 dram_write_latch_if dr_wr_l();
 
-addr_map swizzle_metadata(baddr);
+swizzle swizzle_metadata(baddr);
 assign baddr.row_or_col = bshif.sched_req.row_or_col;
 assign baddr.spad_addr = {bshif.sched_req.spad_addr[19:5], 5'b00000}; // ignore lower 5 bits
 assign baddr.num_rows = bshif.sched_req.num_rows;

@@ -1,10 +1,11 @@
 `ifndef DRAM_WRITE_LATCH_IF
 `define DRAM_WRITE_LATCH_IF
 
-`include "scpad_types_pkg.vh"
+`include "scpad_pkg.sv"
+`include "scpad_if.sv"
 
 interface dram_write_latch_if;
-    import scpad_types_pkg::*;
+    import scpad_pkg::*;
 
     typedef struct packed {
         logic valid; 
