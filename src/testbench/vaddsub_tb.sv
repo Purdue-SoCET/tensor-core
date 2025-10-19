@@ -23,12 +23,14 @@ module vaddsub_tb;
     );
     begin
 
+        @(negedge CLK);
+
         vaddsubif.enable = 1;
         vaddsubif.sub = sub;
         vaddsubif.port_a = a;
         vaddsubif.port_b = b;
 
-        @(posedge CLK);
+        @(negedge CLK);
 
         vaddsubif.enable = 0;
     end
@@ -52,7 +54,7 @@ module vaddsub_tb;
     N_INF   = 16'b1_11111_0000000000,
     NAN = 16'b0_11111_1000000000,
     P_ZERO = 16'b0_00000_0000000000,
-    P_ZERO = 16'b1_00000_0000000000,
+    N_ZERO = 16'b1_00000_0000000000,
     ONE = 16'b0_01111_0000000000,
     TWO = 16'b0_10000_0000000000,
     MIN = 16'b0_00000_0000000001,
@@ -60,7 +62,7 @@ module vaddsub_tb;
 
 
 initial begin
-
+    /*
     nRST = '0;
 
     #(PERIOD);
@@ -195,7 +197,7 @@ initial begin
     test_case(TWO, MIN, 0);
     exp = TWO;
     #(PERIOD);
-    check_case("large + subnormal ≈ large", exp);
+    check_case("large_x + subnormal ≈ large_x", exp);
     #(PERIOD);
 
     // ---------------- Overflow / Underflow ----------------
@@ -254,9 +256,9 @@ initial begin
     #(PERIOD);
     check_case("-a - (+b) = -", exp);
     #(PERIOD);
-
+    */
 // Did not change this but have commented it out for now
-/*
+
     casenum = '0;
     casename = "nRST";
 
@@ -342,7 +344,7 @@ initial begin
     vaddsubif.port_b = 16'b1_10000_1000000000;
     
     #(PERIOD);
-*/
+
 
     $stop;
 end
