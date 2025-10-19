@@ -105,11 +105,6 @@ package scpad_pkg;
         scpad_data_t rdata;
     } dram_res_t;
 
-    typedef struct packed {
-        logic valid; 
-        scpad_data_t wdata;
-        xbar_desc_t xbar;
-    } sram_write_req_t;
 
     // Crossbar descriptors
     typedef struct packed {
@@ -117,6 +112,12 @@ package scpad_pkg;
         shift_mask_t shift_mask;
         mask_t valid_mask;
     } xbar_desc_t;
+
+    typedef struct packed {
+        logic valid; 
+        scpad_data_t wdata;
+        xbar_desc_t xbar;
+    } sram_write_req_t;
 
     // FE/BE request/response structures
     typedef struct packed {
