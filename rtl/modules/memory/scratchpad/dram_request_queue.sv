@@ -17,14 +17,14 @@ module dram_request_queue ( // UUID now needs to have 2 lower bits for an offest
 );
     import scpad_pkg::*;
 
-    typedef struct packed {
-        logic valid; 
-        logic write;
-        logic [8:0]   id;
-        logic [DRAM_ADDR_WIDTH-1:0] dram_addr;
-        logic [COL_IDX_WIDTH-1:0]   num_bytes;
-        scpad_data_t wdata;
-    } dram_req_t;
+    // typedef struct packed {
+    //     logic valid; 
+    //     logic write;
+    //     logic [7:0]   id;
+    //     logic [DRAM_ADDR_WIDTH-1:0] dram_addr;
+    //     logic [COL_IDX_WIDTH-1:0]   num_bytes;
+    //     scpad_data_t wdata;
+    // } dram_req_t;
 
     dram_req_t [DRAM_ID_WIDTH-1:0] dram_req_latch_block; 
     dram_req_t nxt_dram_head_latch_set, nxt_dram_tail_latch_set;

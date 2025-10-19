@@ -10,7 +10,7 @@ interface dram_req_queue_if;
     typedef struct packed {
         logic valid; 
         logic write;
-        logic [8:0]   id;
+        logic [7:0]   id;
         logic [DRAM_ADDR_WIDTH-1:0] dram_addr;
         logic [COL_IDX_WIDTH-1:0]   num_bytes;
         scpad_data_t wdata;
@@ -23,7 +23,7 @@ interface dram_req_queue_if;
     logic [2:0]   sub_id, num_request;
     logic [COL_IDX_WIDTH-1:0]   num_bytes;
     scpad_data_t sram_rdata;
-    logic be_dram_rd_req_complete
+    logic be_dram_rd_req_complete;
     logic dram_queue_full, transaction_complete, dram_be_stall, sram_res_valid, burst_complete;
 
     modport baceknd_dram_req_queue ( 

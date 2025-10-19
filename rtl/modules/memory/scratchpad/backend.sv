@@ -11,10 +11,9 @@
 import scpad_pkg::*;
 
 module backend #(parameter logic [SCPAD_ID_WIDTH-1:0] IDX = '0) // grab clk and n_rst from any
-    (
-        scpad_if.backend_sched bshif, 
-        scpad_if.backend_body bscif, 
-        scpad_if.backend_dram bdrif
+    (scpad_if.backend_sched bshif, 
+     scpad_if.backend_body bscif, 
+     scpad_if.backend_dram bdrif
 ); 
 
 logic [DRAM_ID_WIDTH-1:0] be_id, uuid, nxt_uuid;
@@ -22,7 +21,7 @@ logic [2:0] sub_uuid, nxt_sub_uuid, num_request;
 logic [2:0] num_bytes;
 logic nxt_sched_res_valid;
 
-always_ff @(posedge clk, negedge n_rst ) begin
+always_ff @(posedge bshif.clk, negedge bshif.n_rst ) begin
     if(!n_rst) begin
         uuid <= 'b0;
         sub_uuid <= 'b0;
