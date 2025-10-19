@@ -41,8 +41,8 @@ module sync_fifo #(parameter FIFODEPTH=8, DATAWIDTH=16) // DATAWIDTH = word size
       rptr <= '0;
       dout  <= '0;
     end else begin
+      dout <= fifo[rptr]; // do not block data based on rd_en
       if (rd_en & !empty) begin
-        dout <= fifo[rptr];
         rptr <= rptr + 1;
       end
     end

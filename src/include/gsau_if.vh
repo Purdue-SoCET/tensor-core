@@ -24,7 +24,8 @@ interface gsau_if;
 
     // VEGGIE FILE
     // From Veggie File to GSAU
-    vreg_t        veg_vdata;         // [512 bits] vector data
+    vreg_t        veg_vs1;         // [512 bits] vector data (weights/activations)
+    vreg_t        veg_vs2;         // [512 bits] vector data (psums)
     logic         veg_valid;         // indicates vdata valid
 
     // From GSAU to Veggie File
@@ -59,10 +60,11 @@ interface gsau_if;
     logic         sa_input_en;          // enable data input
     logic         sa_weight_en;         // enable weight load
     logic         sa_partial_en;        // enable partial sum load
+    logic         sa_output_ready;
 
     // From Systolic Array
     logic [511:0] sa_array_output;      // output data
-    logic         sa_out_en;            // output enable flag
+    logic         sa_out_valid;            // output valid flag
     logic         sa_fifo_has_space;    // to send activations
 
   ////////////////////////////////////////////////////////////////////////////
@@ -87,7 +89,7 @@ interface gsau_if;
         // Outputs from GSAU
         output wb_psum, wb_wbdst, wb_valid,
         output sb_ready, sb_vdst, sb_valid,
-        output sa_array_in, sa_array_in_partials, sa_input_en, sa_weight_en, sa_partial_en
+        output sa_array_in, sa_array_in_partials, sa_input_en, sa_weight_en, sa_partial_en, sa_output_ready
     );
 
     //Veggie File
