@@ -17,9 +17,10 @@ module backend #(parameter logic [SCPAD_ID_WIDTH-1:0] IDX = '0) // grab clk and 
         scpad_if.backend_dram bdrif
 ); 
 
-logic [DRAM_ID_WIDTH-1:0] uuid, nxt_uuid;
+logic [DRAM_ID_WIDTH-1:0] be_id, uuid, nxt_uuid;
 logic [2:0] sub_uuid, nxt_sub_uuid, num_request; 
 logic [2:0] num_bytes;
+logic nxt_sched_res_valid;
 
 always_ff @(posedge clk, negedge n_rst ) begin
     if(!n_rst) begin
@@ -154,7 +155,7 @@ always_comb begin
     //     scpad_data_t wdata;
     // } dram_req_t;
 
-    if(bshif.sched_req.write; == 1'b1) begin // sched write == 1'b1 then sram read to a dram write.
+    if(bshif.sched_req.write == 1'b1) begin // sched write == 1'b1 then sram read to a dram write.
         be_id = uuid;
         if(bscif.be_stall == 1'b0) begin
             bscif.be_req.valid = 1'b1;

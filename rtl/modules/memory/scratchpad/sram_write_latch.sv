@@ -13,7 +13,7 @@ module dram_request_queue ( // UUID now needs to have 2 lower bits for an offest
     input logic clk, n_rst, 
     sram_write_latch_if.sram_write_latch sr_wr_l
 );
-    import scpad_types_pkg::*;
+    import scpad_pkg::*;
 
     // typedef struct packed {
     //     logic valid; 

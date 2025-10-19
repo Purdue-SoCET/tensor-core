@@ -12,7 +12,7 @@ module dram_write_latch ( // UUID now needs to have 2 lower bits for an offest s
     input logic clk, n_rst, 
     dram_write_latch_if.dram_write_latch dr_wr_l
 );
-    import scpad_types_pkg::*;
+    import scpad_pkg::*;
 
     // typedef struct packed {
     //     logic valid; 
