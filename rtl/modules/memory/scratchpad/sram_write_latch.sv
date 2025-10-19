@@ -12,7 +12,7 @@
     // );
 
 
-module dram_request_queue ( // UUID now needs to have 2 lower bits for an offest since dram can only handle 64 bits at a time
+module sram_write_latch ( // UUID now needs to have 2 lower bits for an offest since dram can only handle 64 bits at a time
     input logic clk, n_rst, 
     sram_write_latch_if.sram_write_latch sr_wr_l
 );
