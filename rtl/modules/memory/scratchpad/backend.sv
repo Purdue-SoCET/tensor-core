@@ -5,6 +5,9 @@
 `include "sram_write_latch_if.vh"
 `include "dram_write_latch_if.vh"
 
+/*  Julio Hernandez - herna628@purdue.edu */
+/*  Akshath Raghav Ravikiran - araviki@purdue.edu */
+
 import scpad_pkg::*;
 
 module backend #(parameter logic [SCPAD_ID_WIDTH-1:0] IDX = '0) // grab clk and n_rst from any

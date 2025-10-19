@@ -1,3 +1,5 @@
+/*  Akshath Raghav Ravikiran - araviki@purdue.edu */
+
 `include "xbar_if.sv"
 
 import scpad_pkg::*;
@@ -31,13 +33,16 @@ module rxbar #(parameter logic [SCPAD_ID_WIDTH-1:0] IDX = '0) (scpad_if.xbar_r r
         .empty()
     );
 
-    xbar_if #(.SIZE(NUM_COLS), .DWIDTH(ELEM_BITS)) rxbar_vif (
-        .clk(rif.clk), .n_rst(rif.n_rst), 
-        .en(!rif.r_stall[IDX]), 
-        .din(!rif.head_stomach_req[IDX].write ? rif.spad_xbar_req[IDX].wdata : '0), 
-        .shift(rif.spad_xbar_req[IDX].xbar.shift_mask), 
-        .dout(rif.stomach_tail_res[IDX].wdata)
-    );
+    xbar_if #(.SIZE(NUM_COLS), .DWIDTH(ELEM_BITS)) rxbar_vif (.clk(rif.clk), .n_rst(rif.n_rst));
+
+    always_comb begin 
+        rxbar_vif.out = rif.stomach_tail_res[IDX].wdata;
+        rxbar_vif.en = !rif.r_stall[IDX];
+        for (int i = 0; i < NUM_COLS; i++) begin 
+            rxbar_vif.in.din = !rif.head_stomach_req[IDX].write ? rif.spad_xbar_req[IDX].wdata[i] : '0;
+            rxbar_vif.in.shift = rif.spad_xbar_req[IDX].xbar.shift_mask[i];
+        end 
+    end
 
     generate
         case (XBAR_TYPE)

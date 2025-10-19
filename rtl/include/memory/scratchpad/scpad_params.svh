@@ -1,3 +1,5 @@
+/*  Akshath Raghav Ravikiran - araviki@purdue.edu */
+
 `ifndef SCPAD_PARAMS_SVH
 `define SCPAD_PARAMS_SVH
 

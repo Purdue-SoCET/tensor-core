@@ -1,10 +1,11 @@
+/*  Akshath Raghav Ravikiran - araviki@purdue.edu */
+
 `ifndef SCPAD_PKG_SV
 `define SCPAD_PKG_SV
 
 package scpad_pkg;
     `include "scpad_params.svh"
     `include "xbar_params.svh"
-
 
     
     //////////////////////////////////////////////////////////////////////

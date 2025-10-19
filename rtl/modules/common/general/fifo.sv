@@ -2,8 +2,8 @@
 // https://www.chipverify.com/images/verilog/sync_fifo.svg
 
 module sync_fifo #(
-    parameter DEPTH=8, 
-    parameter DWIDTH=16
+    parameter DEPTH = 8, 
+    parameter DWIDTH = 16
 ) (
     input rstn, clk, wr_en, rd_en, 
     input [DWIDTH-1:0] din, 	
