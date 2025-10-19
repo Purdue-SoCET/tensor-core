@@ -45,21 +45,21 @@ module dram_request_queue ( // UUID now needs to have 2 lower bits for an offest
         if(sr_wr_l.dram_res_valid) begin
             nxt_sram_write_latch.valid = ((request_completed_counter + 1) == sr_wr_l.num_request) ? 1'b1 : 1'b0;
             if(sr_wr_l.dram_id[2:0] == 3'b000) begin
-                nxt_sram_write_latch.wdata[63:0] =  sr_wr_l.dram_rddata;
+                nxt_sram_write_latch.wdata[3:0] =  sr_wr_l.dram_rddata;
             end else if(sr_wr_l.dram_id[2:0] == 3'b001) begin
-                nxt_sram_write_latch.wdata[127:64] =  sr_wr_l.dram_rddata;
+                nxt_sram_write_latch.wdata[7:4] =  sr_wr_l.dram_rddata;
             end else if(sr_wr_l.dram_id[2:0] == 3'b010) begin
-                nxt_sram_write_latch.wdata[191:128] =  sr_wr_l.dram_rddata;
+                nxt_sram_write_latch.wdata[11:8] =  sr_wr_l.dram_rddata;
             end else if(sr_wr_l.dram_id[2:0] == 3'b011) begin
-                nxt_sram_write_latch.wdata[255:192] =  sr_wr_l.dram_rddata;
+                nxt_sram_write_latch.wdata[15:12] =  sr_wr_l.dram_rddata;
             end else if(sr_wr_l.dram_id[2:0] == 3'b100) begin
-                nxt_sram_write_latch.wdata[319:256] =  sr_wr_l.dram_rddata;
+                nxt_sram_write_latch.wdata[19:16] =  sr_wr_l.dram_rddata;
             end else if(sr_wr_l.dram_id[2:0] == 3'b101) begin
-                nxt_sram_write_latch.wdata[383:320] =  sr_wr_l.dram_rddata;
+                nxt_sram_write_latch.wdata[23:20] =  sr_wr_l.dram_rddata;
             end else if(sr_wr_l.dram_id[2:0] == 3'b110) begin
-                nxt_sram_write_latch.wdata[447:384] =  sr_wr_l.dram_rddata;
+                nxt_sram_write_latch.wdata[27:24] =  sr_wr_l.dram_rddata;
             end else if(sr_wr_l.dram_id[2:0] == 3'b111) begin
-                nxt_sram_write_latch.wdata[511:448] =  sr_wr_l.dram_rddata;
+                nxt_sram_write_latch.wdata[31:28] =  sr_wr_l.dram_rddata;
             end
             nxt_sram_write_latch.xbar = sr_wr_l.xbar;
             nxt_request_completed_counter = request_completed_counter + 1;
