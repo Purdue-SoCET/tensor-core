@@ -11,7 +11,7 @@ interface swizzle_if;
     typedef struct packed {
         slot_mask_t    slot_mask; // per-col row/slot indices feeding banks
         shift_mask_t   shift_mask; // per-col shift/bank mapping
-        enable_mask_t  valid_mask;  // per-col enable/valid
+        mask_t  valid_mask;  // per-col enable/valid
     } xbar_desc_t;
 
     logic row_or_col;
