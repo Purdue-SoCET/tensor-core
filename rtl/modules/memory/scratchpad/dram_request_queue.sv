@@ -42,7 +42,7 @@ module dram_request_queue ( // UUID now needs to have 2 lower bits for an offest
             dram_req_latch_block[fifo_head] <= nxt_dram_head_latch_set;
             dram_req_latch_block[fifo_tail] <= nxt_dram_tail_latch_set;
             fifo_head <= nxt_fifo_head;
-            fifo_tail <= nxt_fifo_tail
+            fifo_tail <= nxt_fifo_tail;
             request_completed_counter <= nxt_request_completed_counter;
         end
     end

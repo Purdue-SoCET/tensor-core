@@ -7,18 +7,6 @@
 interface sram_write_latch_if;
     import scpad_pkg::*;
 
-    typedef struct packed {
-        slot_mask_t slot_mask;
-        shift_mask_t shift_mask;
-        mask_t valid_mask;
-    } xbar_desc_t;
-
-    typedef struct packed {
-        logic valid; 
-        scpad_data_t wdata;
-        xbar_desc_t xbar;
-    } sram_write_req_t;
-
     logic [7:0] dram_id;
     xbar_desc_t xbar;
     logic [2:0] num_request; // max number of request is 8 because (32*16)/64 = 8

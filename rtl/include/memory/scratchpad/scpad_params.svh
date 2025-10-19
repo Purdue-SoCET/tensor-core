@@ -11,7 +11,7 @@
     parameter int unsigned DRAM_ADDR_WIDTH  = 32;
     parameter string XBAR_TYPE = "NAIVE";
     parameter int unsigned NUM_SCPADS   = 2;
-    parameter int unsigned DRAM_ID_WIDTH  = 6;
+    parameter int unsigned DRAM_ID_WIDTH  = 8; // upper 5 is for 32 rows, bottom 3 is for offset within rows
     parameter int LATCH_INT = 0; // 1, to ignore latches in the hot path. 
 
 `endif

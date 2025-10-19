@@ -7,15 +7,6 @@
 interface dram_req_queue_if;
     import scpad_pkg::*;
 
-    typedef struct packed {
-        logic valid; 
-        logic write;
-        logic [7:0]   id;
-        logic [DRAM_ADDR_WIDTH-1:0] dram_addr;
-        logic [COL_IDX_WIDTH-1:0]   num_bytes;
-        scpad_data_t wdata;
-    } dram_req_t;
-
     logic sched_write;
     dram_req_t dram_req;
     logic [DRAM_ADDR_WIDTH-1:0] dram_addr;

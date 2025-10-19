@@ -93,10 +93,23 @@ package scpad_pkg;
 
     typedef struct packed {
         logic valid; 
+        logic [63:0] wdata;
+        logic [DRAM_ADDR_WIDTH-1:0] dram_addr;
+        logic [COL_IDX_WIDTH-1:0]   num_bytes;
+    } dram_write_req_t;
+
+    typedef struct packed {
+        logic valid; 
         logic write; 
         logic [DRAM_ID_WIDTH-1:0] id;
         scpad_data_t rdata;
     } dram_res_t;
+
+    typedef struct packed {
+        logic valid; 
+        scpad_data_t wdata;
+        xbar_desc_t xbar;
+    } sram_write_req_t;
 
     // Crossbar descriptors
     typedef struct packed {
