@@ -44,6 +44,7 @@ module sram_write_request_queue (
     end
 
     always_comb begin
+        be_sr_wr_req_q.sram_write_req = 0;
         nxt_sram_latch_set = sram_wr_req_latch_block[be_sr_wr_req_q.dram_data_id];
         nxt_req_queue = req_queue;
         nxt_queue_head = queue_head;
@@ -67,7 +68,8 @@ module sram_write_request_queue (
         // dram_data_id 4 times it's considered done
         // Would need to know how many packets to expect before considering when it's done. Keep track in backend or dram? 
 
-        if(be_sr_wr_req_q.be_sram_wr_req_accepted) begin
+        if(be_sr_wr_req_q.be_sram_wr_req_accepted && (queue_head != queue_tail)) begin
+            be_sr_wr_req_q.sram_write_req = sram_wr_req_latch_block[req_queue[queue_head]];
             nxt_sram_latch_set = 0; // invalidate the set
             nxt_queue_head = queue_head + 1; // increase the queue_head to the next dram_data_id
             // don't have to "invalidate" the previous head of the request queue
@@ -81,9 +83,6 @@ module sram_write_request_queue (
             be_sr_wr_req_q.sram_write_queue_full = 1'b1;
         end
 
-        be_sr_wr_req_q.sram_write_req = sram_wr_req_latch_block[req_queue[queue_head]];
-        // Output the 1st request found in our request queue's head
-        // If valid send a write request to SRAM from the top level.
     end
 
 endmodule

@@ -4,13 +4,13 @@
 
     // modport baceknd_dram_read_req_queue ( 
     //     input  dram_addr, id, num_bytes,
-    //     input  sched_write,       // scheduler write = 1 means it's a scpad load aka we need to do a dram read.
+    //     input  sched_write,       // scheduler write = 0 means it's a scpad load aka we need to do a dram read.
     //     input  be_dram_req_accepted, // tells us if the dram is ready to accept our req. If it is and our FIFO is valid then we can assume 
     //                               // our current req will be successfully latched in the dram controller and can invalidate nxt cycle
     //     output be_dram_read_req, dram_read_queue_full, dram_read_req_latched
     // );
 
-module dram_read_request_queue (
+module dram_read_request_queue ( // UUID now needs to have 2 lower bits for an offest since dram can only handle 64 bits at a time
     input logic clk, n_rst, 
     dram_read_req_queue.baceknd_dram_read_req_queue be_dr_rd_req_q
 );
@@ -44,12 +44,13 @@ module dram_read_request_queue (
     always_comb begin
         nxt_dram_head_latch_set = dram_rd_req_latch_block[fifo_head];
         nxt_dram_tail_latch_set = dram_rd_req_latch_block[fifo_tail];
+        be_dr_rd_req_q.be_dram_read_req = 0;
         nxt_fifo_head = fifo_head;
         nxt_fifo_tail = fifo_tail;
         dram_read_req_latched = 1'b0;
         be_dr_rd_req_q.dram_read_queue_full = 1'b0;
 
-        if(be_dr_rd_req_q.sched_write) begin
+        if(be_dr_rd_req_q.sched_write == 1'b0) begin
             nxt_dram_tail_latch_set.valid = 1'b1;
             nxt_dram_tail_latch_set.id = be_dr_rd_req_q.id;
             nxt_dram_tail_latch_set.dram_addr = be_dr_rd_req_q.dram_addr;
@@ -58,7 +59,8 @@ module dram_read_request_queue (
             be_dr_rd_req_q.dram_read_req_latched = 1'b1;
         end
 
-        if(be_dr_rd_req_q.be_dram_req_accepted) begin
+        if(be_dr_rd_req_q.be_dram_req_accepted && (fifo_head != fifo_tail)) begin //the dram is accepting request and we aren't empty
+            be_dr_rd_req_q.be_dram_read_req = dram_rd_req_latch_block[fifo_head];
             nxt_dram_head_latch_set = 0; // invalidate head when our request are accepted.
             nxt_fifo_head = fifo_head + 1;
         end
@@ -70,7 +72,7 @@ module dram_read_request_queue (
             be_dr_rd_req_q.dram_read_queue_full = 1'b1;
         end
 
-    be_dr_rd_req_q.be_dram_read_req = dram_rd_req_latch_block[fifo_head];
+    
 
     end
     

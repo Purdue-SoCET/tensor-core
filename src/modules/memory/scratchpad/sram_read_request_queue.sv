@@ -56,7 +56,7 @@ module sram_read_request_queue (
             be_sr_rd_req_q.sram_read_req_latched = 1'b1;
         end
 
-        if(be_sr_rd_req_q.be_sram_rd_req_accepted) begin
+        if(be_sr_rd_req_q.be_sram_rd_req_accepted && (fifo_head != fifo_tail)) begin
             nxt_sram_head_latch_set = 0; // invalidate head when our request are accepted.
             nxt_fifo_head = fifo_head + 1;
         end
@@ -72,5 +72,4 @@ module sram_read_request_queue (
 
     end
     
-
 endmodule

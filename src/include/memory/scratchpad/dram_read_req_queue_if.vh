@@ -32,7 +32,7 @@ interface dram_read_req_queue_if;
 
     modport baceknd_dram_read_req_queue ( 
         input  dram_addr, id, num_bytes,
-        input  sched_write,       // scheduler write = 1 means it's a scpad load aka we need to do a dram read.
+        input  sched_write,       // scheduler write = 0 means it's a scpad load aka we need to do a dram read.
         input  be_dram_req_accepted, // tells us if the dram is ready to accept our req. If it is and our FIFO is valid then we can assume 
                                   // our current req will be successfully latched in the dram controller and can invalidate nxt cycle
         output be_dram_read_req, dram_read_queue_full, dram_read_req_latched

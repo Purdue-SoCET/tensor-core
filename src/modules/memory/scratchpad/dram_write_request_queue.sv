@@ -3,11 +3,13 @@
 `include "dram_write_req_queue_if.vh"
 
     // modport baceknd_dram_write_req_queue ( 
-    //     input dram_addr, sram_data_id, num_bytes, sr_rdata, be_dram_wr_req_accepted,
-    //     input be_dram_rd_req_complete,
-
-    //     output dram_write_req, dram_write_queue_full, dram_write_req_latched
+    //     input  dram_addr, id, num_bytes, sram_rdata
+    //     input  sched_write,       // scheduler write = 1 means it's a scpad store aka we need to do a dram write.
+    //     input  be_dram_req_accepted, // tells us if the dram is ready to accept our req. If it is and our FIFO is valid then we can assume 
+    //                               // our current req will be successfully latched in the dram controller and can invalidate nxt cycle
+    //     output be_dram_read_req, dram_read_queue_full, dram_read_req_latched
     // );
+
 
 module dram_write_request_queue (
     input logic clk, n_rst, 
@@ -22,68 +24,55 @@ module dram_write_request_queue (
     //         scpad_data_t wdata;
     // } dram_write_req_t;
 
-    dram_write_req [DRAM_ID_WIDTH-1:0] dram_wr_req_latch_block; // 32 latch sets for our queue
-    dram_write_req nxt_dram_latch_set;
+    dram_read_req_t [DRAM_ID_WIDTH-1:0] dram_wr_req_latch_block; // 32 frames
+    dram_read_req_t nxt_dram_head_latch_set, nxt_dram_tail_latch_set;
 
-    logic [DRAM_ID_WIDTH-1:0][DRAM_ID_WIDTH-1:0] req_queue;
-    logic [DRAM_ID_WIDTH-1:0] nxt_req_queue, queue_head, nxt_queue_head, queue_tail, nxt_queue_tail; 
-    // The request queue will keep track of what the current latch to send out should be
-    // There are 32 latches so need to track of an array of size 32 with the elements being ints that go up to 32.
+    logic [DRAM_ID_WIDTH-1:0] fifo_head, nxt_fifo_head, fifo_tail, nxt_fifo_tail;
+    
     always_ff @(posedge clk, negedge n_rst) begin
         if(!n_rst) begin
             dram_wr_req_latch_block <= 'b0;
-            req_queue  <= 'b0;
-            queue_head <= 'b0;
-            queue_tail <= 'b0;
+            fifo_head <= 'b0;
+            fifo_tail <= 'b0;
         end else begin
-            dram_wr_req_latch_block[be_dr_wr_req_q.sram_data_id] <= nxt_dram_latch_set;
-            req_queue[queue_head]  <= nxt_req_queue; 
-            queue_head <= nxt_queue_head;
-            queue_tail <= nxt_queue_tail;                            
+            dram_wr_req_latch_block[fifo_head] <= nxt_dram_head_latch_set;
+            dram_wr_req_latch_block[fifo_tail] <= nxt_dram_tail_latch_set;
+            fifo_head <= nxt_fifo_head;
+            fifo_tail <= nxt_fifo_tail
         end
     end
 
     always_comb begin
-        nxt_dram_latch_set = dram_wr_req_latch_block[be_dr_wr_req_q.id];
-        nxt_req_queue = req_queue;
-        nxt_queue_head = queue_head;
-        nxt_queue_tail = queue_tail;
-        dram_write_req_latched = 1'b0;
-        be_dr_wr_req_q.dram_write_queue_full = 1'b0; 
+        be_dr_wr_req_q.be_dram_read_req = 0;
+        nxt_dram_head_latch_set = dram_wr_req_latch_block[fifo_head];
+        nxt_dram_tail_latch_set = dram_wr_req_latch_block[fifo_tail];
+        nxt_fifo_head = fifo_head;
+        nxt_fifo_tail = fifo_tail;
+        dram_read_req_latched = 1'b0;
+        be_dr_wr_req_q.dram_read_queue_full = 1'b0;
 
-        if(be_dr_wr_req_q.be_dr_rd_req_complete) begin
-            nxt_dram_latch_set.valid = 1'b1;
-            nxt_dram_latch_set.num_bytes = be_dr_wr_req_q.num_bytes;
-            nxt_dram_latch_set.dram_addr = be_dr_wr_req_q.dram_addr;
-            nxt_dram_latch_set.wdata = be_dr_wr_req_q.sr_rdata;
-            nxt_req_queue = be_dr_wr_req_q.sram_data_id; 
-            nxt_queue_tail = queue_tail + 1;
-            be_dr_wr_req_q.dram_write_req_latched = 1'b1;
+        if(be_dr_wr_req_q.sched_write == 1'b0) begin
+            nxt_dram_tail_latch_set.valid = 1'b1;
+            nxt_dram_tail_latch_set.id = be_dr_wr_req_q.id;
+            nxt_dram_tail_latch_set.dram_addr = be_dr_wr_req_q.dram_addr;
+            nxt_dram_tail_latch_set.num_bytes = be_dr_wr_req_q.num_bytes;
+            nxt_fifo_tail = fifo_tail + 1;
+            be_dr_wr_req_q.dram_read_req_latched = 1'b1;
         end
 
-        if(be_dr_wr_req_q.be_sram_req_accepted) begin
-            nxt_dram_latch_set = 0; // invalidate the set
-            nxt_queue_head = queue_head + 1; // increase the queue_head to the next id
+        if(be_dr_wr_req_q.be_dram_req_accepted && (fifo_head != fifo_tail)) begin
+            be_dr_wr_req_q.be_dram_read_req = dram_wr_req_latch_block[fifo_head];
+            nxt_dram_head_latch_set = 0; // invalidate head when our request are accepted.
+            nxt_fifo_head = fifo_head + 1;
         end
 
-        if((queue_tail + 1) == queue_head) begin 
-            nxt_dram_latch_set = dram_wr_req_latch_block[be_dr_wr_req_q.xbar_data_id];
-            nxt_queue_tail = fifo_tail;
-            be_dr_wr_req_q.dram_write_req_latched = 1'b0;
-            be_dr_wr_req_q.dram_write_queue_full = 1'b1;
+        if((fifo_tail + 1) == fifo_head) begin 
+            nxt_dram_tail_latch_set = dram_wr_req_latch_block[fifo_tail];
+            nxt_fifo_tail = fifo_tail;
+            be_dr_wr_req_q.dram_read_req_latched = 1'b0;
+            be_dr_wr_req_q.dram_read_queue_full = 1'b1;
         end
-        /* 
-        Since this queue is based off input from dram read what happens if we recieve a dram 
-        read result when its full? Well it shouldn't be likely here but it will be a problem for
-        the sram read to dram latch. The dram latch will potentially have to be huge. If the queue
-        is full and a result comes in, the way its set up right now then the data will just disappear.
-        How to make it not disappear? On an sram write queue stop sending request. Now how many request
-        are in flight in the sram/dram already? Maybe tell sram/dram we are full too so it can stop the request
-        until the latch can start recieving them. Again shouldn't be a problem for dram -> sram type but will be a problem
-        for sram -> dram types.
-        */
 
-        be_dr_wr_req_q.dram_write_req = dram_wr_req_latch_block[req_queue[queue_head]];
     end
 
 endmodule
