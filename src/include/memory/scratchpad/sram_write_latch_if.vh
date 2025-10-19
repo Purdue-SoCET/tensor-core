@@ -1,9 +1,9 @@
-`ifndef DRAM_RES_LATCH_IF
-`define DRAM_RES_LATCH_IF
+`ifndef SRAM_WRITE_LATCH_IF
+`define SRAM_WRITE_LATCH_IF
 
 `include "scpad_types_pkg.vh"
 
-interface dram_res_latch_if;
+interface sram_write_latch_if;
     import scpad_types_pkg::*;
 
     typedef struct packed {
@@ -35,4 +35,4 @@ interface dram_res_latch_if;
 
 endinterface
 
-`endif //DRAM_RES_LATCH_IF
+`endif //SRAM_WRITE_LATCH_IF
