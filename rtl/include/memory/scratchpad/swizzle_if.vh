@@ -1,9 +1,9 @@
-`ifndef ADDR_MAP_IF
-`define ADDR_MAP_IF
+`ifndef SWIZZLE_IF
+`define SWIZZLE_IF
 
 `include "scpad_types_pkg.vh"
 
-interface addr_map_if;
+interface swizzle_if;
     import scpad_types_pkg::*; 
 
 
@@ -29,4 +29,4 @@ interface addr_map_if;
 
 endinterface
 
-`endif //ADDR_MAP_IF
+`endif //SWIZZLE_IF
