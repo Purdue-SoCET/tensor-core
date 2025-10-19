@@ -7,3 +7,4 @@ vsim.*
 .mti_uselibs/
 .deps/
 UVM_1.2
+AMP-sim
