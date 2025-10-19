@@ -1,79 +1,96 @@
+.SILENT: verify
+.ONESHELL: verify
+
 SHELL := /bin/bash
 
-SIMTIME    ?= 100us
 TOPDIR     := .
-INCDIRROOT := $(TOPDIR)/src/include
-MODROOT    := $(TOPDIR)/src/modules
-TBROOT     := $(TOPDIR)/src/testbench
-WORK       := work
+INCDIRROOT := $(TOPDIR)/rtl/include
+SCRIPTROOT := $(TOPDIR)/scripts
+MODROOT    := $(TOPDIR)/rtl/modules
+TBROOT     := $(TOPDIR)/tb
+UVMTESTROOT  := $(TBROOT)/tb/uvm
+UNITTESTROOT := $(TBROOT)/tb/unit
+SCRATCH       := work
 
 INCFLAGS := $(shell find $(INCDIRROOT) -type d -print0 2>/dev/null | xargs -0 -I{} echo +incdir+{})
 
-PKG_SRCS := $(shell find $(TOPDIR)/src -type f \( -name "*_pkg.sv" -o -name "pkg_*.sv" \) 2>/dev/null | sort)
+PKG_SRCS := $(shell find $(TOPDIR)/rtl -type f \( -name "*_pkg.sv" -o -name "pkg_*.sv" \) 2>/dev/null | sort)
 
 RTL_SRCS := $(shell \
   find $(INCDIRROOT) $(MODROOT) -type f -name "*.sv" \
     ! -name "*_pkg.sv" ! -name "pkg_*.sv" 2>/dev/null | sort)
 
-ifneq (0,$(words $(filter %.wav,$(MAKECMDGOALS))))
-    DOFILES = $(notdir $(basename $(wildcard $(shell find . -name "*.do"))))
-    DOFILE  = $(filter $(MAKECMDGOALS:%.wav=%) $(MAKECMDGOALS:%_tb.wav=%), $(DOFILES))
-    ifeq (1,$(words $(DOFILE)))
-        WAVDO = do $(firstword $(shell find . -name $(DOFILE).do))
-    else
-        WAVDO = add wave *
-    endif
-    SIMDO = "view objects; $(WAVDO); run $(SIMTIME);"
-else
-    SIMTERM = -c
-    SIMDO   = "run $(SIMTIME);"
-endif
+VLIB ?= vlib
+VLOG ?= vlog
+VSIM ?= vsim
 
-.PHONY: all build run clean show lint
+.PHONY: all setup verify clean_lib
 
-all: build
+all: setup verify
 
-show:
-	@echo "INCFLAGS  = $(INCFLAGS)"
-	@echo "PKG_SRCS  = $(words $(PKG_SRCS)) files"
-	@echo "RTL_SRCS  = $(words $(RTL_SRCS)) files"
+setup:
+	mkdir -p $(SCRATCH)
+	python3 scripts/setup.py
+	@echo "[setup] done"
 
-$(WORK):
-	@vlib $(WORK) 2>/dev/null || true
-	@vmap work $(WORK)        2>/dev/null || true
+# Usage: make verify folder=/sub/dir [file=name.sv[,name2.sv,...]] [include=/foo/bar,/baz/qux ...]
+## Example: 
+##  make verify folder=/memory/scratchpad 
+### 	-> `vlogs` all the files under rtl/include/memory/scratchpad and rtl/modules/memory/scratchpad
+##  make verify folder=/memory/scratchpad include=/network/xbar 
+### 	-> `vlogs` all the files under rtl/include/memory/scratchpad and rtl/modules/memory/scratchpad, and adds all the include paths under rtl/modules/network/xbar and rtl/include/network/xbar
+##  make verify folder=/memory/scratchpad file=scpad_cntrl.sv,tail.sv 
+### 	-> `vlogs` the files under rtl/include/memory/scratchpad and only the specified files under it
+verify:
+	@if [ -z "$(folder)" ]; then 
+	  echo "Usage: make verify folder=/sub/dir [file=name.sv[,name2.sv,...]] [include=/foo/bar,/baz/qux ...]"; exit 1; 
+	fi; 
 
-build: $(WORK)
-	@echo "[vlog] packages: $(words $(PKG_SRCS))"
-	@if [ -n "$(PKG_SRCS)" ]; then \
-	  vlog -sv $(INCFLAGS) $(PKG_SRCS); \
-	fi
-	@echo "[vlog] rtl+if:   $(words $(RTL_SRCS))"
-	@if [ -n "$(RTL_SRCS)" ]; then \
-	  vlog -sv $(INCFLAGS) $(RTL_SRCS); \
-	fi
-	@echo "[build] done"
+	SEARCH_FIRST_IN_INCLUDE="$(INCDIRROOT)$(folder)"; 
+	[ -d "$$SEARCH_FIRST_IN_INCLUDE" ] || { echo "[verify] SEARCH_FIRST_IN_INCLUDE not found: $$SEARCH_FIRST_IN_INCLUDE"; exit 2; }; 
 
-source: build
+	SRCS=$$(find "$$SEARCH_FIRST_IN_INCLUDE" -type f -name '*.sv' -print 2>/dev/null | sort); 
+	[ -n "$$SRCS" ] || { echo "[verify] No .sv files under $$SEARCH_FIRST_IN_INCLUDE"; exit 4; }; 
 
-%: build
-	@tb="$(TBROOT)/$@_tb.sv"; \
-	if [ ! -f "$$tb" ]; then \
-	  echo "[error] testbench $$tb not found"; exit 2; \
-	fi; \
-	echo "[vlog] $$tb"; \
-	vlog -sv $(INCFLAGS) "$$tb"; \
-	echo "[vsim] $@_tb"; \
-	vsim $(SIMTERM) -voptargs="+acc" work.$@_tb -do $(SIMDO)
+	NOW_SEARCH_IN_MODULES="$(MODROOT)$(folder)"; 
 
-%_vlint:
-	@echo "[verilator] lint $*"
-	@verilator --lint-only $(MODROOT)/$*.sv -I$(INCDIRROOT) -I$(MODROOT)
+	[ -d "$$NOW_SEARCH_IN_MODULES" ] || { echo "[verify] NOW_SEARCH_IN_MODULES not found: $$NOW_SEARCH_IN_MODULES"; exit 2; }; 
 
-%.wav: build
-	@tb="$(TBROOT)/$*_tb.sv"; \
-	if [ ! -f "$$tb" ]; then echo "[error] $$tb not found"; exit 2; fi; \
-	vlog -sv $(INCFLAGS) "$$tb"; \
-	vsim -voptargs="+acc" work.$*_tb -do "run $(SIMTIME);" -suppress 2275
+	if [ -n "$(file)" ]; then
+	  for f in $$(echo "$(file)" | tr ',' ' '); do 
+	    P="$$NOW_SEARCH_IN_MODULES/$$f"; 
+	    [ -f "$$P" ] || { echo "[verify] Not found: $$P"; exit 3; }; 
+	    SRCS="$$SRCS $$P"; 
+	  done; 
+	else 
+	  SRCS=$$(find "$$NOW_SEARCH_IN_MODULES" -type f -name '*.sv' -print 2>/dev/null | sort); 
+	  [ -n "$$SRCS" ] || { echo "[verify] No .sv files under $$NOW_SEARCH_IN_MODULES"; exit 4; }; 
+	fi; 
 
-clean:
-	rm -rf $(WORK) transcript vsim.wlf *.log *.jou *.vstf *.vcd
+	PKGS=$$(printf '%s\n' $$SRCS | grep -E '_pkg\.sv$$' || true); 
+	OTHERS=$$(printf '%s\n' $$SRCS | grep -Ev '_pkg\.sv$$' || true); 
+
+	BASE_INCS="+incdir+$(INCDIRROOT)"; 
+	MOD_INCS=$$(find "$$BASE_DIR" -type d -print 2>/dev/null | sed 's/^/+incdir+/'); 
+	INC_INCS=$$(find "$(INCDIRROOT)$(folder)" -type d -print 2>/dev/null | sed 's/^/+incdir+/'); 
+
+	EXTRA_INCS=""; 
+	if [ -n "$(include)" ]; then 
+	  for p in $$(echo "$(include)" | tr ',' ' '); do 
+	    [ -d "$(MODROOT)$$p" ] && EXTRA_INCS="$$EXTRA_INCS $$(find "$(MODROOT)$$p" -type d -print 2>/dev/null | sed 's/^/+incdir+/')"; 
+	    [ -d "$(INCDIRROOT)$$p" ] && EXTRA_INCS="$$EXTRA_INCS $$(find "$(INCDIRROOT)$$p" -type d -print 2>/dev/null | sed 's/^/+incdir+/')"; 
+	  done; 
+	fi; 
+
+	ORDERED_SRCS="$$PKGS $$OTHERS"; 
+	INCFLAGS="$$BASE_INCS $$MOD_INCS $$INC_INCS $$EXTRA_INCS"; 
+	
+	echo "[verify] compiling (in-order):"; 
+	printf '  %s\n' $$ORDERED_SRCS; 
+	
+	$(VLOG) -sv -mfcu -work work +acc $$INCFLAGS $$ORDERED_SRCS; 
+	echo "[verify] done"
+
+clean_lib:
+	rm -rf $(SCRATCH) transcript vsim.wlf work modelsim.ini
+
