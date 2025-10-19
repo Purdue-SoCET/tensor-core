@@ -71,9 +71,9 @@ package scpad_pkg;
         logic [SCPAD_ADDR_WIDTH-1:0] spad_addr;
         logic [MAX_DIM_WIDTH-1:0] num_rows;
         logic [MAX_DIM_WIDTH-1:0] num_cols;
-        logic [MAX_DIM_WIDTH-1:0] row_id;
-        logic [MAX_DIM_WIDTH-1:0] col_id;
-        logic row_or_col;
+        // logic [MAX_DIM_WIDTH-1:0] row_id; // This shouldn't really be needed either
+        // logic [MAX_DIM_WIDTH-1:0] col_id; // ^^^^
+        // logic row_or_col; // In the Backend this will always be 1'b1, aka always row.
         logic [SCPAD_ID_WIDTH-1:0] scpad_id;
     } sched_req_t;
 

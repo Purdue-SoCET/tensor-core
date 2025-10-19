@@ -8,11 +8,11 @@ interface swizzle_if;
     import scpad_pkg::*; 
 
 
-    typedef struct packed {
-        slot_mask_t    slot_mask; // per-col row/slot indices feeding banks
-        shift_mask_t   shift_mask; // per-col shift/bank mapping
-        mask_t  valid_mask;  // per-col enable/valid
-    } xbar_desc_t;
+    // typedef struct packed {
+    //     slot_mask_t    slot_mask; // per-col row/slot indices feeding banks
+    //     shift_mask_t   shift_mask; // per-col shift/bank mapping
+    //     mask_t  valid_mask;  // per-col enable/valid
+    // } xbar_desc_t;
 
     logic row_or_col;
     logic [SCPAD_ADDR_WIDTH-1:0] spad_addr;

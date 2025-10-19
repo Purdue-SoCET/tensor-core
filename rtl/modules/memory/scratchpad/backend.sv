@@ -37,7 +37,7 @@ sram_write_latch_if sr_wr_l();
 dram_write_latch_if dr_wr_l();
 
 swizzle swizzle_metadata(baddr);
-assign baddr.row_or_col = bshif.sched_req.row_or_col;
+assign baddr.row_or_col = bshif.sched_req.row_or_col; // Should always be 1'b1;
 assign baddr.spad_addr = {bshif.sched_req.spad_addr[19:5], 5'b00000}; // ignore lower 5 bits
 assign baddr.num_rows = bshif.sched_req.num_rows;
 assign baddr.num_cols = bshif.sched_req.num_cols;
