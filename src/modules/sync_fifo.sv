@@ -3,7 +3,7 @@ module sync_fifo #(parameter FIFODEPTH=8, DATAWIDTH=16) // DATAWIDTH = word size
         input logic           rstn,               // Active low reset
                             	clk,                // Clock
                             	wr_en, 				// Write enable
-                            	rd_en, 				// Read enable
+                            	shift, 				// shift (increment read pointer)
         input logic  [DATAWIDTH-1:0] din, 				// Data written into FIFO
         output logic [DATAWIDTH-1:0] dout, 				// Data read from FIFO
         output logic          empty, 				// FIFO is empty when high
@@ -41,8 +41,8 @@ module sync_fifo #(parameter FIFODEPTH=8, DATAWIDTH=16) // DATAWIDTH = word size
       rptr <= '0;
       dout  <= '0;
     end else begin
-      dout <= fifo[rptr]; // do not block data based on rd_en
-      if (rd_en & !empty) begin
+      dout <= fifo[rptr]; // do not block data based on shifting (rd_en)
+      if (shift & !empty) begin
         rptr <= rptr + 1;
       end
     end
@@ -53,7 +53,7 @@ module sync_fifo #(parameter FIFODEPTH=8, DATAWIDTH=16) // DATAWIDTH = word size
     if (!rstn) begin
       count <= '0;
     end else begin
-      case ({wr_en & ~full, rd_en & ~empty})
+      case ({wr_en & ~full, shift & !empty})
         2'b10: count <= count + 1; // write only
         2'b01: count <= count - 1; // read only
         default: count <= count;   // both or neither

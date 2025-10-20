@@ -21,7 +21,7 @@ module gsau_control_unit #(
   localparam int FIFO_DEPTH = (FIFOSIZE / ENTRY_BITS);
 
   // FIFO interface signals
-  logic         fifo_wr, fifo_rd;
+  logic         fifo_wr, fifo_shift;
   logic [ENTRY_BITS-1:0] fifo_din;
   logic [ENTRY_BITS-1:0] fifo_dout;
   logic         fifo_empty, fifo_full;
@@ -99,7 +99,7 @@ module gsau_control_unit #(
     .rstn(nRST),
     .clk(CLK),
     .wr_en(fifo_wr),
-    .rd_en(fifo_rd),
+    .shift(fifo_shift),
     .din(fifo_din),
     .dout(fifo_dout),
     .empty(fifo_empty),
@@ -120,26 +120,14 @@ module gsau_control_unit #(
     o_sa_weight_en        = 1'b0;
     o_sa_partial_en       = 1'b0;
 
-    o_wb_wbdst = din;
+    o_wb_wbdst = dout;
     o_wb_psum = gsau_port.sa_array_output;
-
-    // o_wb_psum   = '0;
-    // o_wb_wbdst  = '0;
-    // o_wb_valid   = 1'b0;
-
-    // o_sb_ready  = 1'b0;
-    // o_sb_vdst   = '0;
-    // o_sb_valid  = 1'b0;
-
-    // o_veg_ready = 1'b0;
 
     // Default handshake semantics:
     // - sb_ready asserted when FIFO not full (we can accept more RD's)
     // - veg_ready asserted when FIFO not full AND SA input FIFO has space (simple backpressure)
     o_sb_ready  = !fifo_full && gsau_port.sa_fifo_has_space; // allow scoreboard to send new inst when space
     gsau_port.sa_output_ready = gsau_port.wb_output_ready;
-    //o_veg_ready = (!fifo_full) && sa_fifo_has_space;
-
 
     if (sb_valid && gsau_port.veg_valid && o_sb_ready) begin
       if (gsau_port.sb_weight) begin
@@ -154,7 +142,7 @@ module gsau_control_unit #(
     end
 
     if (gsau_port.sa_out_valid && gsau_port.sa_output_ready) begin
-      fifo_rd = 1'b1;
+      fifo_shift = 1'b1;
       o_wb_valid = 1'b1;
     end
 
