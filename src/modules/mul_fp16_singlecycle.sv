@@ -156,7 +156,7 @@ module mul_fp16_singlecycle(input logic clk, input logic nRST, input logic start
     logic [4:0] exp_sum;
     logic mul_ovf, mul_unf;
     adder_5b add_EXPs (
-        .carry(mul_round_loss),
+        .carry(mul_carryout),
         .exp1 (a_latched[14:10]),
         .exp2 (b_latched[14:10]),
         .sum  (exp_sum),
