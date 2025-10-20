@@ -31,9 +31,9 @@ module gsau_control_unit #(
   // logic         captured_weight;
 
   // outputs that we drive (local registered versions)
-  logic [511:0] o_sa_array_in;
-  logic [511:0] o_sa_array_in_partials;
-  logic         o_sa_input_en;
+  // logic [511:0] o_sa_array_in;
+  // logic [511:0] o_sa_array_in_partials;
+  //logic         o_sa_input_en;
   logic         o_sa_weight_en;
   logic         o_sa_partial_en;
 
@@ -54,9 +54,9 @@ module gsau_control_unit #(
 
   // alias interface signals for clarity
   // From Veggie File
-  vreg_t               veg_vs1      = gsau_port.veg_vs1;
-  vreg_t               veg_psums      = gsau_port.veg_vs2;
-  logic                veg_valid      = gsau_port.veg_valid;
+  // vreg_t               veg_vs1        = gsau_port.veg_vs1;
+  // vreg_t               veg_psums      = gsau_port.veg_vs2;
+  //logic                veg_valid      = gsau_port.veg_valid;
   // To Veggie File
   // veg_ready driven below
 
@@ -64,21 +64,21 @@ module gsau_control_unit #(
   logic                sb_nready      = gsau_port.sb_nready;
   logic [7:0]          sb_nvdst       = gsau_port.sb_nvdst;
   logic                sb_nvalid      = gsau_port.sb_nvalid;
-  logic                sb_weight      = gsau_port.sb_weight;
+  //logic                sb_weight      = gsau_port.sb_weight;
 
   // WB Buffer -> GSAU
-  logic                wb_output_ready = gsau_port.wb_output_ready;
+  //logic                wb_output_ready = gsau_port.wb_output_ready;
 
   // Systolic Array -> GSAU
-  logic [511:0]        sa_array_output = gsau_port.sa_array_output;
-  logic                sa_out_valid       = gsau_port.sa_out_valid;
-  logic                sa_fifo_has_space = gsau_port.sa_fifo_has_space;
-  logic                o_sa_output_ready = gsau_port.sa_output_ready;
+ // logic [511:0]        sa_array_output = gsau_port.sa_array_output;
+ // logic                sa_out_valid       = gsau_port.sa_out_valid;
+  //logic                sa_fifo_has_space = gsau_port.sa_fifo_has_space;
+ //logic                o_sa_output_ready = gsau_port.sa_output_ready;
 
   // Connect internal outputs to interface (final assignments)
-  assign gsau_port.sa_array_in          = o_sa_array_in;
-  assign gsau_port.sa_array_in_partials = o_sa_array_in_partials;
-  assign gsau_port.sa_input_en          = o_sa_input_en;
+  // assign gsau_port.sa_array_in          = o_sa_array_in;
+  // assign gsau_port.sa_array_in_partials = o_sa_array_in_partials;
+  //assign gsau_port.sa_input_en          = o_sa_input_en;
   assign gsau_port.sa_weight_en         = o_sa_weight_en;
   assign gsau_port.sa_partial_en        = o_sa_partial_en;
 
@@ -114,14 +114,14 @@ module gsau_control_unit #(
     // captured_vdst  = '0;
     // captured_weight = 1'b0;
 
-    o_sa_array_in         = veg_vs1; // send either activations or weights
-    o_sa_array_in_partials = veg_vs2; // always send partials, but only valid when inputs are loaded
-    o_sa_input_en         = 1'b0;
+    gsau_port.sa_array_in         = gsau_port.veg_vs1; // send either activations or weights
+    gsau_port.sa_array_in_partials = gsau_port.veg_vs2; // always send partials, but only valid when inputs are loaded
+    gsau_port.sa_input_en         = 1'b0;
     o_sa_weight_en        = 1'b0;
     o_sa_partial_en       = 1'b0;
 
     o_wb_wbdst = din;
-    o_wb_psum = sa_array_output;
+    o_wb_psum = gsau_port.sa_array_output;
 
     // o_wb_psum   = '0;
     // o_wb_wbdst  = '0;
@@ -136,24 +136,24 @@ module gsau_control_unit #(
     // Default handshake semantics:
     // - sb_ready asserted when FIFO not full (we can accept more RD's)
     // - veg_ready asserted when FIFO not full AND SA input FIFO has space (simple backpressure)
-    o_sb_ready  = !fifo_full && sa_fifo_has_space; // allow scoreboard to send new inst when space
-    o_sa_output_ready = wb_output_ready
+    o_sb_ready  = !fifo_full && gsau_port.sa_fifo_has_space; // allow scoreboard to send new inst when space
+    gsau_port.sa_output_ready = gsau_port.wb_output_ready;
     //o_veg_ready = (!fifo_full) && sa_fifo_has_space;
 
 
-    if (sb_valid && veg_valid && o_sb_ready) begin
-      if (sb_weight) begin
+    if (sb_valid && gsau_port.veg_valid && o_sb_ready) begin
+      if (gsau_port.sb_weight) begin
         // LOAD WEIGHTS
         o_sa_weight_en = 1'b1;
       end else begin
         din = sb_vdst; // push to fifo
         fifo_wr = 1'b1;
-        o_sa_input_en = 1'b1;
+        gsau_port.sa_input_en = 1'b1;
         o_sa_partial_en = 1'b1;
       end
     end
 
-    if (sa_out_valid && sa_output_ready) begin
+    if (gsau_port.sa_out_valid && gsau_port.sa_output_ready) begin
       fifo_rd = 1'b1;
       o_wb_valid = 1'b1;
     end
