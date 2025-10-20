@@ -71,9 +71,9 @@ package scpad_pkg;
         logic [SCPAD_ADDR_WIDTH-1:0] spad_addr;
         logic [MAX_DIM_WIDTH-1:0] num_rows;
         logic [MAX_DIM_WIDTH-1:0] num_cols;
-        logic [MAX_DIM_WIDTH-1:0] row_id;
-        logic [MAX_DIM_WIDTH-1:0] col_id;
-        logic row_or_col;
+        // logic [MAX_DIM_WIDTH-1:0] row_id; // This shouldn't really be needed either
+        // logic [MAX_DIM_WIDTH-1:0] col_id; // ^^^^
+        // logic row_or_col; // In the Backend this will always be 1'b1, aka always row.
         logic [SCPAD_ID_WIDTH-1:0] scpad_id;
     } sched_req_t;
 
@@ -93,6 +93,13 @@ package scpad_pkg;
 
     typedef struct packed {
         logic valid; 
+        logic [63:0] wdata;
+        logic [DRAM_ADDR_WIDTH-1:0] dram_addr;
+        logic [COL_IDX_WIDTH-1:0]   num_bytes;
+    } dram_write_req_t;
+
+    typedef struct packed {
+        logic valid; 
         logic write; 
         logic [DRAM_ID_WIDTH-1:0] id;
         scpad_data_t rdata;
@@ -104,6 +111,12 @@ package scpad_pkg;
         shift_mask_t shift_mask;
         mask_t valid_mask;
     } xbar_desc_t;
+
+    typedef struct packed {
+        logic valid; 
+        scpad_data_t wdata;
+        xbar_desc_t xbar;
+    } sram_write_req_t;
 
     // FE/BE request/response structures
     typedef struct packed {
