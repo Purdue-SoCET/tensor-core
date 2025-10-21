@@ -1,7 +1,7 @@
 module sync_fifo #(parameter FIFODEPTH=8, DATAWIDTH=16) // DATAWIDTH = word size
 (
-        input logic           rstn,               // Active low reset
-                            	clk,                // Clock
+        input logic           nRST,               // Active low reset
+                            	CLK,                // Clock
                             	wr_en, 				// Write enable
                             	shift, 				// shift (increment read pointer)
         input logic  [DATAWIDTH-1:0] din, 				// Data written into FIFO
@@ -13,12 +13,11 @@ module sync_fifo #(parameter FIFODEPTH=8, DATAWIDTH=16) // DATAWIDTH = word size
 
   logic [$clog2(FIFODEPTH)-1:0]   wptr;
   logic [$clog2(FIFODEPTH)-1:0]   rptr;
-  logic [$clog2(FIFODEPTH):0]     count; // one extra bit to represent full==depth
 
   logic [FIFODEPTH-1:0][DATAWIDTH-1:0] fifo; // *packed* array
 
-  always_ff @(posedge clk or negedge rstn) begin
-    if (!rstn) begin
+  always_ff @(posedge CLK or negedge nRST) begin
+    if (!nRST) begin
       wptr <= '0;
     end 
     else begin
@@ -36,8 +35,8 @@ module sync_fifo #(parameter FIFODEPTH=8, DATAWIDTH=16) // DATAWIDTH = word size
              $time, wr_en, din, rd_en, dout, empty, full);
   end */
 
-  always_ff @(posedge clk or negedge rstn) begin
-    if (!rstn) begin
+  always_ff @(posedge CLK or negedge nRST) begin
+    if (!nRST) begin
       rptr <= '0;
       dout  <= '0;
     end else begin
@@ -48,22 +47,6 @@ module sync_fifo #(parameter FIFODEPTH=8, DATAWIDTH=16) // DATAWIDTH = word size
     end
   end
 
-  // count logic (synchronous)
-  always_ff @(posedge clk or negedge rstn) begin
-    if (!rstn) begin
-      count <= '0;
-    end else begin
-      case ({wr_en & ~full, shift & !empty})
-        2'b10: count <= count + 1; // write only
-        2'b01: count <= count - 1; // read only
-        default: count <= count;   // both or neither
-      endcase
-    end
-  end
-
-  assign full  = (count == FIFODEPTH);
-  assign empty = (count == 0);
-
-  // assign full  = (wptr + 1) == rptr;
-  // assign empty = wptr == rptr;
+  assign full  = (wptr + 1) == rptr;
+  assign empty = wptr == rptr;
 endmodule
