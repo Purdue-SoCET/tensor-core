@@ -78,7 +78,7 @@ module vaddsub(
     rshift_sticky(input logic [EXT_W-1:0] x, input logic [EXP_W-1:0] shamt, output logic sticky);
     logic [EXT_W-1:0] y;
     logic [EXT_W-1:0] mask;   // lower shamt bits set
-    if (shamt==0) begin
+    if (shamt == 0) begin
       y      = x;
       sticky = 1'b0;
     end else if (shamt>=EXT_W) begin
