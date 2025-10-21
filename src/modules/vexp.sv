@@ -34,9 +34,9 @@ vaddsub VADDSUB3 (
 );
 
 logic [15:0]
-            add1_in, add1_out, add1_result, mul1_in, mul1_out, mul1_result  //stage 1
+            add1_in, add1_out, add1_result, mul1_in, mul1_out, mul1_result,  //stage 1
             add2_in, add2_out, mul2_in, mul2_out, mul2_result,              //stage 2
-            mul3_result;                                                    //stage 3
+            mul3_result,                                                    //stage 3
             add4_in, add4_out;                                              //final stage
 
 fp16_t fp1; //declaring the fp16 type
@@ -50,9 +50,9 @@ assign one = 16'b0011110000000000;
 
 //Addition
 assign vaddsubif1.port_a = one;
-assign vaddsubif1.port_b = {fp1.sign, 5b'0, fp1.mantissa}; //adding the sign bit to the mantissa
+assign vaddsubif1.port_b = {fp1.sign, 5'b0, fp1.mantissa}; //adding the sign bit to the mantissa
 assign add1_result = vaddsubif1.out;
-assing add1_in = add1_result;
+assign add1_in = add1_result;
 
 //Mulitplication
 assign fp16mulif1.port_a = {fp1.sign, 5'b0, fp1.mantissa};
@@ -61,7 +61,7 @@ assign mul1_result = fp16mulif1.out;
 assign mul1_in = mul1_result;
 
 
-always_ff @(posedge ClK, negedge nRST) begin
+always_ff @(posedge CLK, negedge nRST) begin
     if (!nRST) begin
         add1_out <= '0;
         mul1_out <= '0;
@@ -107,7 +107,7 @@ assign mul3_result = fp16mulif3.out;
 
 //Addition
 assign vaddsubif.port_a = mul3_result;
-assing vaddsubif.port_b = add2_out;
+assign vaddsubif.port_b = add2_out;
 assign t_series_approx = vaddsubif3.out;
 assign add4_in = t_series_approx;
 
@@ -123,7 +123,7 @@ end
 // STAGE 4: Multiply (Taylor Series Approximation * 2^q)
 
 //Shifted Value
-assign poweroftwo = {1'b1, (fp1.exponent), 10'b0} // 2^q value from exponent field
+assign poweroftwo = {1'b1, (fp1.exponent), 10'b0}; // 2^q value from exponent field
 
 assign fp16mulif4.port_a = add4_out;
 assign fp16mulif4.port_b = poweroftwo;

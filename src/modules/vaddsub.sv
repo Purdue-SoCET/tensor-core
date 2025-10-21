@@ -54,7 +54,7 @@ module vaddsub(
   // Leading Zero Count
   function automatic int unsigned lzc15(input logic [SUM_W-1:0] x);
     int unsigned c = SUM_W;
-    for (int i =S UM_W - 1;i >= 0;i -- ) if (x[i]) begin c = (SUM_W -1 ) - i; break; end
+    for (int i = SUM_W - 1;i >= 0;i-- ) if (x[i]) begin c = (SUM_W -1) - i; break; end
     return c;
   endfunction
 
@@ -190,7 +190,7 @@ module vaddsub(
 
       logic carry = mag[SUM_W-1];
       if (carry) begin
-        logic tail = mag[0];
+        logic tail = mag[0]; // declaring logic inside if, could we put it outside the if?
         norm  = mag >> 1;
         norm[0] = norm[0] | tail;
         exp_n = exp_r + 1;
@@ -205,7 +205,7 @@ module vaddsub(
         end else if (shl < 0) begin
           norm  = mag >> (-shl);
           exp_n = exp_r + (-shl);
-          logic tail = |mag[(-shl)-1:0];
+          logic tail = |mag[(-shl)-1:0]; // declaring logic inside if?
           norm[0] = norm[0] | tail;
         end else begin
           norm  = mag;
