@@ -28,7 +28,7 @@ program test
     output logic nRST,
     output logic [15:0] in [31:0],
     output logic [143:0] control_bit,
-    input logic [15:0] out [31:0] 
+    input var logic [15:0] out [31:0] 
 );
     parameter PERIOD = 10;
     integer i;

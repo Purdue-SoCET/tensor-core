@@ -14,12 +14,12 @@ module batcher_xbar #(
 );
 
     localparam int TAGWIDTH = $clog2(SIZE);
-    localparam int STAGES   = (TAGWIDTH * (TAGWIDTH + 1)) / 2;
+    localparam int STAGES = (TAGWIDTH * (TAGWIDTH + 1)) / 2;
 
     logic [TAGWIDTH-1:0] shift_q [1:STAGES][SIZE];
-    logic [DWIDTH-1:0]   data_q  [1:STAGES][SIZE];
+    logic [DWIDTH-1:0] data_q  [1:STAGES][SIZE];
     logic [TAGWIDTH-1:0] shift_d [1:STAGES][SIZE];
-    logic [DWIDTH-1:0]   data_d  [1:STAGES][SIZE];
+    logic [DWIDTH-1:0] data_d  [1:STAGES][SIZE];
 
     // Pipeline registers
     always_ff @(posedge xif.clk, negedge xif.n_rst) begin
@@ -45,7 +45,7 @@ module batcher_xbar #(
         for (p = 1; p <= TAGWIDTH; p++) begin : G_P
             localparam int k = (1 << p);
             for (q = p; q >= 1; q--) begin : G_Q
-                localparam int j     = (1 << (q - 1));
+                localparam int j = (1 << (q - 1));
                 localparam int stage = ((p - 1) * p) / 2 + (p - q + 1);
 
                 for (i = 0; i < SIZE; i++) begin : G_I
@@ -53,22 +53,22 @@ module batcher_xbar #(
 
                     if (ixj > i) begin : G_PAIR
                         // Intermediate wires between the two compares at this node
-                        logic [DWIDTH-1:0]   upper_din   [2];
+                        logic [DWIDTH-1:0] upper_din [2];
                         logic [TAGWIDTH-1:0] upper_shift [2];
 
                         // First compare: order by data value (from inputs or prior stage)
                         if (stage == 1) begin : G_IN_STAGE
                             compare_switch #(.DATA_W(DWIDTH), .TAG_W(TAGWIDTH)) u_less_comp (
-                                .din('{ xif.in[i].din, xif.in[ixj].din}),
-                                .tin('{ xif.in[i].shift,xif.in[ixj].shift}),
+                                .din('{xif.in[i].din, xif.in[ixj].din}),
+                                .tin('{xif.in[i].shift,xif.in[ixj].shift}),
                                 .cntrl (xif.in[i].din <= xif.in[ixj].din),
                                 .dout(upper_din),
                                 .tout(upper_shift)
                             );
                         end else begin : G_PIPE_STAGE
                             compare_switch #(.DATA_W(DWIDTH), .TAG_W(TAGWIDTH)) u_less_comp (
-                                .din('{ data_q [stage-1][i],data_q [stage-1][ixj]}),
-                                .tin('{ shift_q[stage-1][i],shift_q[stage-1][ixj]}),
+                                .din('{data_q [stage-1][i],data_q [stage-1][ixj]}),
+                                .tin('{shift_q[stage-1][i],shift_q[stage-1][ixj]}),
                                 .cntrl (data_q [stage-1][i] <=data_q [stage-1][ixj]),
                                 .dout(upper_din),
                                 .tout(upper_shift)

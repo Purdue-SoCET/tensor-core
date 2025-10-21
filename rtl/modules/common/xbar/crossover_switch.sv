@@ -1,9 +1,9 @@
 module crossover_switch #(
     parameter int SIZE = 32
 ) (
-    input  logic [SIZE-1:0] din  [2],
+    input var logic [SIZE-1:0] din  [2],
     input  logic            cntrl,
-    output logic [SIZE-1:0] dout [2]
+    output var logic [SIZE-1:0] dout [2]
 );
 
     always_comb begin
