@@ -36,15 +36,11 @@ interface gsau_control_unit_if;
     // SCOREBOARD 
     // From GSAU to Scoreboard
     logic         sb_ready;         // ready to accept next instruction
-    logic [7:0]   sb_vdst;          // destination vector register index
-    logic         sb_valid;         // scoreboard valid
-
+  
     // From Scoreboard to GSAU
-    logic         sb_nready;        // scoreboard ready
-    logic [7:0]   sb_nvdst;         // next destination reg
-    logic         sb_nvalid;       // next scoreboard valid
+    logic [7:0]   sb_vdst;         // next destination reg
+    logic         sb_valid;       // next scoreboard valid
     logic         sb_weight;        // 1 bit signal for weight indication
-    //logic         nweight;       // latched weight
 
     // WB BUFFER
     // From GSAU to WB Buffer
@@ -80,7 +76,7 @@ interface gsau_control_unit_if;
         output veg_ready,
 
         // Scoreboard handshake (inputs from scoreboard)
-        input  sb_nready, sb_nvdst, sb_nvalid, sb_weight,
+        input  sb_vdst, sb_valid, sb_weight,
 
         // From WB buffer
         input  wb_output_ready,
@@ -90,7 +86,7 @@ interface gsau_control_unit_if;
 
         // Outputs from GSAU
         output wb_psum, wb_wbdst, wb_valid,
-        output sb_ready, sb_vdst, sb_valid,
+        output sb_ready, 
         output sa_array_in, sa_array_in_partials, sa_input_en, sa_weight_en, sa_partial_en, sa_output_ready
     );
 
@@ -102,8 +98,8 @@ interface gsau_control_unit_if;
 
     //Scoreboard
     modport scoreboard (
-        input  sb_ready, sb_vdst, sb_valid,
-        output sb_nready, sb_nvdst, sb_nvalid, sb_weight
+        input  sb_ready,
+        output sb_vdst, sb_valid, sb_weight
     );
 
     //WB Buffer

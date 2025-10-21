@@ -10,7 +10,7 @@ module gsau_control_unit #(
 ) (
     input  logic        CLK,
     input  logic        nRST,
-    gsau_control_unit_if.gsau        gsau_port
+    gsau_control_unit_if.gsau gsau_port
 );
 
   import vector_pkg::*;   // reuse basic typedefs (data, addr, etc.)
@@ -42,10 +42,10 @@ module gsau_control_unit #(
 
   always_comb begin
     fifo_wr        = 1'b0;
-    fifo_shift        = 1'b0;
+    fifo_shift     = 1'b0;
     fifo_din       = '0;
 
-    gsau_port.sa_array_in         = gsau_port.veg_vdata1; // send either activations or weights
+    gsau_port.sa_array_in          = gsau_port.veg_vdata1; // send either activations or weights
     gsau_port.sa_array_in_partials = gsau_port.veg_vdata2; // always send partials, but only valid when inputs are loaded
     gsau_port.sa_input_en         = 1'b0;
     gsau_port.sa_weight_en        = 1'b0;
