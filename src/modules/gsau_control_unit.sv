@@ -108,7 +108,7 @@ module gsau_control_unit #(
 
   always_comb begin
     fifo_wr        = 1'b0;
-    fifo_rd        = 1'b0;
+    fifo_shift        = 1'b0;
     fifo_din       = '0;
 
     // captured_vdst  = '0;
