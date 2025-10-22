@@ -10,7 +10,7 @@ module vreduction #(
     vreduction_if.ruif vruif
 );
     localparam int LEVELS = $clog2(LANES);
-    localparam int PIPE_STAGES = LEVELS + 2;
+    localparam int PIPE_STAGES = 2*LEVELS + 5;
     
     // Import vector types
     import vector_pkg::*;
@@ -53,7 +53,7 @@ module vreduction #(
     );
     logic broadcast_final;
     param_sr #(
-        .DATA_WIDTH(5),
+        .DATA_WIDTH(1),
         .STAGES(PIPE_STAGES)
     ) broadcast_pipe (
         .CLK(CLK),
@@ -64,7 +64,7 @@ module vreduction #(
     );
     logic clear_final;
     param_sr #(
-        .DATA_WIDTH(5),
+        .DATA_WIDTH(1),
         .STAGES(PIPE_STAGES)
     ) clear_pipe (
         .CLK(CLK),
@@ -93,7 +93,7 @@ module vreduction #(
         end
     end
 
-    // Final value from reduction (convert back to fp16_t)
+    // Final value from reduction
     fp16_t final_value;
     assign final_value = tree_data_out;
 
@@ -114,7 +114,7 @@ module vreduction #(
         end
     end
 
-
+    //output registering
     fp16_t registered_output [NUM_ELEMENTS-1:0];
     logic   registered_valid;
 

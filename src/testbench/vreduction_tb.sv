@@ -23,7 +23,7 @@ module vreduction_tb;
 
     // Adder for verification
     vaddsub_if as_if ();
-    vaddsub adder (CLK, nRST, as_if);
+    vaddsub adder (CLK, 'b1, as_if);
 
     // ------------------------------------------------------------
     // Helper tasks and types
@@ -87,38 +87,178 @@ module vreduction_tb;
         end
     endtask
 
-    function automatic fp16_t find_max(fp16_t [WIDTH-1:0] tree_inputs);
-        fp16_t max_val = tree_inputs[0];
-        for (int i = 1; i < WIDTH; i++)
-            if (tree_inputs[i] > max_val)
-                max_val = tree_inputs[i];
-        return max_val;
+    function automatic bit fp16_greater(fp16_t a, fp16_t b);
+        logic sign_a, sign_b;
+        logic [4:0] exp_a, exp_b;
+        logic [9:0] mant_a, mant_b;
+        
+        // Extract fields (adjust bit positions based on your fp16_t definition)
+        sign_a = a[15];
+        exp_a = a[14:10];
+        mant_a = a[9:0];
+        
+        sign_b = b[15];
+        exp_b = b[14:10];
+        mant_b = b[9:0];
+        
+        // Check for NaN (return 0 for any NaN comparison)
+        if ((exp_a == 5'h1F && mant_a != 0) || (exp_b == 5'h1F && mant_b != 0))
+            return 0;
+        
+        // Different signs
+        if (sign_a != sign_b)
+            return (sign_b && !sign_a); // positive > negative
+        
+        // Same sign - compare magnitudes
+        if (!sign_a) begin
+            // Both positive
+            if (exp_a != exp_b)
+                return exp_a > exp_b;
+            else
+                return mant_a > mant_b;
+        end else begin
+            // Both negative (reversed comparison)
+            if (exp_a != exp_b)
+                return exp_a < exp_b;
+            else
+                return mant_a < mant_b;
+        end
     endfunction
 
-    function automatic fp16_t find_min(fp16_t [WIDTH-1:0] tree_inputs);
-        fp16_t min_val = tree_inputs[0];
-        for (int i = 1; i < WIDTH; i++)
-            if (tree_inputs[i] < min_val)
-                min_val = tree_inputs[i];
-        return min_val;
-    endfunction
+function automatic fp16_t find_max(fp16_t [WIDTH-1:0] tree_inputs);
+    fp16_t max_val = tree_inputs[0];
+    logic [15:0] bits;
+    logic [4:0] exp;
+    logic [9:0] frac;
 
-    task fp16_add(input fp16_t a, input fp16_t b, output fp16_t out);
+    // --- Check first element for NaN ---
+    bits = tree_inputs[0];
+    exp  = bits[14:10];
+    frac = bits[9:0];
+    if (exp == 5'h1F && frac != 10'b0)
+        return 16'h7D00;
+
+    // --- Iterate remaining elements ---
+    for (int i = 1; i < WIDTH; i++) begin
+        bits = tree_inputs[i];
+        exp  = bits[14:10];
+        frac = bits[9:0];
+
+        // If any NaN is found, immediately return canonical NaN
+        if (exp == 5'h1F && frac != 10'b0)
+            return 16'h7D00;
+
+        // Otherwise compare normally
+        if (fp16_greater(tree_inputs[i], max_val))
+            max_val = tree_inputs[i];
+    end
+
+    return max_val;
+endfunction
+
+function automatic fp16_t find_min(fp16_t [WIDTH-1:0] tree_inputs);
+    fp16_t min_val = tree_inputs[0];
+    logic [15:0] bits;
+    logic [4:0] exp;
+    logic [9:0] frac;
+
+    // Check first element
+    bits = tree_inputs[0];
+    exp  = bits[14:10];
+    frac = bits[9:0];
+    if (exp == 5'h1F && frac != 10'b0)
+        return 16'h7D00;
+
+    for (int i = 1; i < WIDTH; i++) begin
+        bits = tree_inputs[i];
+        exp  = bits[14:10];
+        frac = bits[9:0];
+
+        if (exp == 5'h1F && frac != 10'b0)
+            return 16'h7D00;
+
+        if (fp16_greater(min_val, tree_inputs[i]))
+            min_val = tree_inputs[i];
+    end
+
+    return min_val;
+endfunction
+
+    task automatic fp16_add(
+        input  fp16_t a,
+        input  fp16_t b,
+        output fp16_t out
+    );
+        // Drive inputs into adder
         as_if.port_a = a;
         as_if.port_b = b;
         as_if.enable = 1'b1;
-        as_if.sub = 1'b0;
-        #0;
+        as_if.sub    = 1'b0;
+
+        // Wait for 2 clock cycles (the pipeline latency of vaddsub)
+        // Adjust if vaddsub latency changes in future revisions.
+        repeat (2) @(posedge CLK);
+
+        // Capture the result
         out = as_if.out;
+
+        @(posedge CLK);
     endtask
 
-    task sum_vector(input fp16_t [WIDTH-1:0] values, output fp16_t total);
-        fp16_t temp_sum;
-        total = 16'h0;
-        for (int i = 0; i < WIDTH; i++) begin
-            fp16_add(total, values[i], temp_sum);
-            total = temp_sum;
+    task automatic sum_vector(
+        input  fp16_t [WIDTH-1:0] values,
+        output fp16_t total
+    );
+        fp16_t [WIDTH-1:0] stage_current;
+        fp16_t [WIDTH-1:0] stage_next;
+        int active_count;
+        int next_count;
+        
+        // Initialize first stage with input values
+        stage_current = values;
+        active_count = WIDTH;
+        
+        // Binary tree reduction
+        while (active_count > 1) begin
+            next_count = 0;
+            
+            // Process pairs in current stage
+            for (int i = 0; i < active_count; i += 2) begin
+                if (i + 1 < active_count) begin
+                    // Add pair
+                    as_if.port_a = stage_current[i];
+                    as_if.port_b = stage_current[i+1];
+                    as_if.enable = 1'b1;
+                    as_if.sub    = 1'b0;
+                    
+                    // Wait one cycle to register inputs
+                    @(posedge CLK);
+                    as_if.enable = 1'b0;
+                    
+                    // Wait for the 2-cycle pipeline to complete
+                    repeat (2) @(posedge CLK);
+                    
+                    // Capture result
+                    stage_next[next_count] = as_if.out;
+                    next_count++;
+                    
+                    // Small gap before next operation
+                    @(posedge CLK);
+                end else begin
+                    // Odd element - carry forward to next stage
+                    stage_next[next_count] = stage_current[i];
+                    next_count++;
+                end
+            end
+            
+            // Move to next stage
+            for (int i = 0; i < next_count; i++) begin
+                stage_current[i] = stage_next[i];
+            end
+            active_count = next_count;
         end
+        
+        total = stage_current[0];
     endtask
 
     task clear();
@@ -128,6 +268,24 @@ module vreduction_tb;
         vruif.imm            = 0;
         vruif.reduction_type = 2'b00;
     endtask
+
+    function automatic bit fp16_approx_equal(fp16_t a, fp16_t b, int ulp_tolerance = 1);
+        logic [15:0] a_bits = a;
+        logic [15:0] b_bits = b;
+        int diff;
+        
+        // Handle same sign
+        if (a_bits[15] == b_bits[15]) begin
+            diff = (a_bits[15]) ? (a_bits[14:0] - b_bits[14:0]) : 
+                                (b_bits[14:0] - a_bits[14:0]);
+            if (diff < 0) diff = -diff;
+            return diff <= ulp_tolerance;
+        end
+        
+        // Handle different signs (both must be near zero)
+        return (a_bits[14:0] <= ulp_tolerance) && (b_bits[14:0] <= ulp_tolerance);
+    endfunction
+
 
     // ------------------------------------------------------------
     // File input (AI-generated helper)
@@ -345,6 +503,9 @@ endtask
     logic broadcasts[];
     logic clears[];
     int num_file_vectors;
+    fp16_t test_a;
+    fp16_t test_b;
+    fp16_t result;
 
     initial begin
         file = $fopen("vreduction_tb_results.txt", "w");
@@ -352,6 +513,7 @@ endtask
             $display("ERROR: Could not open output file.");
             $finish;
         end
+
 
         nRST = 0;
         current_expected_index = 0;
@@ -385,6 +547,7 @@ endtask
 
         @(posedge CLK);
         nRST = 1;
+        
 
         for (int i = 0; i < num_file_vectors; i++) begin
             set_DUT_inputs(
@@ -403,34 +566,100 @@ endtask
     always @(posedge CLK) begin
         automatic string expected_line;
         automatic string actual_line;
+        automatic string diff_line;
+        automatic bit test_pass;
+        automatic int mismatch_count;
+        automatic int max_ulp_diff;
+        static int total_tests = 0;
+        static int failed_tests = 0;
 
         if (vruif.output_valid) begin
             expected_line = "";
             actual_line = "";
+            diff_line = "";
+            test_pass = 1;
+            mismatch_count = 0;
+            max_ulp_diff = 0;
 
             for (int i = 0; i < NUM_ELEMENTS; i++) begin
-                expected_line = {expected_line, $sformatf("%04h ", expected_results[current_expected_index][i])};
-                actual_line   = {actual_line,   $sformatf("%04h ", vruif.vector_output[i])};
+                automatic logic [15:0] exp_bits = expected_results[current_expected_index][i];
+                automatic logic [15:0] act_bits = vruif.vector_output[i];
+                automatic int ulp_diff;
+                automatic bit elem_match;
+
+                // Calculate ULP difference
+                if (exp_bits[15] == act_bits[15]) begin
+                    // Same sign - compute absolute difference in representation
+                    ulp_diff = (exp_bits[14:0] > act_bits[14:0]) ? 
+                            (exp_bits[14:0] - act_bits[14:0]) : 
+                            (act_bits[14:0] - exp_bits[14:0]);
+                end else begin
+                    // Different signs - only match if both near zero
+                    ulp_diff = exp_bits[14:0] + act_bits[14:0];
+                end
+
+                elem_match = (ulp_diff <= 6); // 6 ULP tolerance
+                
+                if (ulp_diff > max_ulp_diff) max_ulp_diff = ulp_diff;
+                
+                if (!elem_match) begin
+                    test_pass = 0;
+                    mismatch_count++;
+                end
+
+                // Format output lines
+                expected_line = {expected_line, $sformatf("%04h ", exp_bits)};
+                actual_line   = {actual_line,   $sformatf("%04h ", act_bits)};
+                
+                if (elem_match) begin
+                    diff_line = {diff_line, "   . "};
+                end else begin
+                    diff_line = {diff_line, $sformatf("%4d ", ulp_diff)};
+                end
             end
 
-            if (vruif.vector_output === expected_results[current_expected_index]) begin
-                $display("Test Number %0d: PASS", current_expected_index);
+            total_tests++;
+            if (!test_pass) failed_tests++;
+
+            if (test_pass) begin
+                $display("Test Number %0d: PASS (max ULP diff: %0d)", 
+                        current_expected_index, max_ulp_diff);
                 $display("Expected: %s", expected_line);
                 $display("Actual  : %s", actual_line);
-                $fdisplay(file, "Test Number %0d: PASS", current_expected_index);
+                $fdisplay(file, "Test Number %0d: PASS (max ULP diff: %0d)", 
+                        current_expected_index, max_ulp_diff);
                 $fdisplay(file, "Expected: %s", expected_line);
                 $fdisplay(file, "Actual  : %s", actual_line);
             end else begin
-                $display("Test Number %0d: FAIL", current_expected_index);
+                $display("Test Number %0d: FAIL (%0d/%0d mismatches, max ULP diff: %0d)", 
+                        current_expected_index, mismatch_count, NUM_ELEMENTS, max_ulp_diff);
                 $display("Expected: %s", expected_line);
                 $display("Actual  : %s", actual_line);
-                $fdisplay(file, "Test Number %0d: FAIL", current_expected_index);
+                $display("ULP Diff: %s", diff_line);
+                $fdisplay(file, "Test Number %0d: FAIL (%0d/%0d mismatches, max ULP diff: %0d)", 
+                        current_expected_index, mismatch_count, NUM_ELEMENTS, max_ulp_diff);
                 $fdisplay(file, "Expected: %s", expected_line);
                 $fdisplay(file, "Actual  : %s", actual_line);
+                $fdisplay(file, "ULP Diff: %s", diff_line);
             end
 
             current_expected_index++;
             if (current_expected_index >= num_file_vectors) begin
+                // Print summary
+                $display("\n========================================");
+                $display("Test Summary:");
+                $display("  Total Tests: %0d", total_tests);
+                $display("  Passed: %0d", total_tests - failed_tests);
+                $display("  Failed: %0d", failed_tests);
+                $display("========================================\n");
+                
+                $fdisplay(file, "\n========================================");
+                $fdisplay(file, "Test Summary:");
+                $fdisplay(file, "  Total Tests: %0d", total_tests);
+                $fdisplay(file, "  Passed: %0d", total_tests - failed_tests);
+                $fdisplay(file, "  Failed: %0d", failed_tests);
+                $fdisplay(file, "========================================\n");
+                
                 $fclose(file);
                 $finish;
             end

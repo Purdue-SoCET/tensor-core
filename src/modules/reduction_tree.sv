@@ -16,46 +16,42 @@ module reduction_tree #(
     import vector_pkg::*;
 
     localparam TREE_DEPTH = $clog2(LANES);
+    localparam ALU_LATENCY = 2;
 
-    // Pipeline registers
-    logic [15:0] stage_data [0:TREE_DEPTH][LANES-1:0];
-    logic [1:0]  stage_op   [0:TREE_DEPTH];
-    logic        stage_valid[0:TREE_DEPTH];
+    // Create enough storage for all tree levels, each with ALU_LATENCY stages
+    logic [15:0] tree_data [0:TREE_DEPTH][0:ALU_LATENCY][LANES-1:0];
+    logic [1:0]  tree_op   [0:TREE_DEPTH][0:ALU_LATENCY];
+    logic        tree_valid[0:TREE_DEPTH][0:ALU_LATENCY];
 
+    // Input stage (tree level 0, pipeline stage 0)
     always_ff @(posedge CLK or negedge nRST) begin
         if (!nRST) begin
             for (int i = 0; i < LANES; i++)
-                stage_data[0][i] <= '0;
-            stage_op[0]   <= 2'b0;
-            stage_valid[0] <= 1'b0;
-        end 
-        else if (valid_in) begin
-            // Capture new data and control when valid
-            for (int i = 0; i < LANES; i++)
-                stage_data[0][i] <= data_in[i];
-            stage_op[0]   <= alu_op;
-            stage_valid[0] <= 1'b1;
+                tree_data[0][0][i] <= '0;
+            tree_op[0][0]   <= 2'b0;
+            tree_valid[0][0] <= 1'b0;
         end 
         else begin
-            // Hold previous data, mark invalid
-            stage_data[0] <= stage_data[0];
-            stage_op[0]   <= stage_op[0];
-            stage_valid[0] <= 1'b0;
+            for (int i = 0; i < LANES; i++)
+                tree_data[0][0][i] <= data_in[i];
+            tree_op[0][0]   <= alu_op;
+            tree_valid[0][0] <= valid_in;
         end
     end
 
-
-    genvar stage, lane;
+    genvar level, lane, pipe;
     generate
-        for (stage = 0; stage < TREE_DEPTH; stage++) begin : gen_stage
-            localparam STAGE_OUTS = LANES >> (stage + 1);
+        for (level = 0; level < TREE_DEPTH; level++) begin : gen_level
+            localparam NUM_ALUS = LANES >> (level + 1);
 
-            for (lane = 0; lane < STAGE_OUTS; lane++) begin : gen_lane
+            // Instantiate ALUs for this tree level
+            for (lane = 0; lane < NUM_ALUS; lane++) begin : gen_alu
                 vreduction_alu_if vralu_if ();
 
-                assign vralu_if.value_a = stage_data[stage][2*lane];
-                assign vralu_if.value_b = stage_data[stage][2*lane + 1];
-                assign vralu_if.alu_op  = stage_op[stage];
+                // Connect inputs from stage 0 of this level
+                assign vralu_if.value_a = tree_data[level][0][2*lane];
+                assign vralu_if.value_b = tree_data[level][0][2*lane + 1];
+                assign vralu_if.alu_op  = tree_op[level][0];
 
                 vreduction_alu alu_inst (
                     .CLK(CLK),
@@ -63,36 +59,43 @@ module reduction_tree #(
                     .vraluif(vralu_if.vralu)
                 );
 
-                // Registered ALU output
+                // Capture output to next tree level, stage 0
                 always_ff @(posedge CLK or negedge nRST) begin
                     if (!nRST)
-                        stage_data[stage+1][lane] <= '0;
+                        tree_data[level+1][0][lane] <= '0;
                     else
-                        stage_data[stage+1][lane] <= vralu_if.value_out;
+                        tree_data[level+1][0][lane] <= vralu_if.value_out;
                 end
             end
 
-            // Shift control signals forward every cycle
+            // Pipeline valid and op through ALU_LATENCY stages
+            for (pipe = 1; pipe <= ALU_LATENCY; pipe++) begin : gen_pipe
+                always_ff @(posedge CLK or negedge nRST) begin
+                    if (!nRST) begin
+                        tree_op[level][pipe]   <= 2'b0;
+                        tree_valid[level][pipe] <= 1'b0;
+                    end else begin
+                        tree_op[level][pipe]   <= tree_op[level][pipe-1];
+                        tree_valid[level][pipe] <= tree_valid[level][pipe-1];
+                    end
+                end
+            end
+
+            // Transfer valid/op from end of this level to start of next level
             always_ff @(posedge CLK or negedge nRST) begin
                 if (!nRST) begin
-                    stage_op[stage+1]   <= 2'b0;
-                    stage_valid[stage+1] <= 1'b0;
+                    tree_op[level+1][0]   <= 2'b0;
+                    tree_valid[level+1][0] <= 1'b0;
                 end else begin
-                    stage_op[stage+1]   <= stage_op[stage];
-                    stage_valid[stage+1] <= stage_valid[stage];
+                    tree_op[level+1][0]   <= tree_op[level][ALU_LATENCY];
+                    tree_valid[level+1][0] <= tree_valid[level][ALU_LATENCY];
                 end
             end
         end
     endgenerate
 
-    always_ff @(posedge CLK or negedge nRST) begin
-        if (!nRST) begin
-            data_out  <= '0;
-            valid_out <= 1'b0;
-        end else begin
-            data_out  <= stage_data[TREE_DEPTH][0];
-            valid_out <= stage_valid[TREE_DEPTH];
-        end
-    end
+    // Output from final tree level
+    assign data_out  = tree_data[TREE_DEPTH][0][0];
+    assign valid_out = tree_valid[TREE_DEPTH][0];
 
 endmodule
