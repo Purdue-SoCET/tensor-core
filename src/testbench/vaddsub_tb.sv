@@ -380,8 +380,8 @@ initial begin
     // Read format: hex_a,hex_b,sub,hex_expected
     while (!$feof(fd)) begin
         int ret;
-        ret = $fscanf(fd, "%s,%s,%d,%4s\n", a_str, b_str, sub, exp_str);
-        if (ret != 4) continue; // Skip malformed lines
+        ret = $fscanf(fd, "%x,%x,%d,%4x\n", a_str, b_str, sub, exp_str);
+        if (ret != 4) continue; // Skip lines
 
         // Convert string → 16-bit value
         // Issues with questa, have to use void'$sscanf
@@ -403,9 +403,9 @@ initial begin
 
         // Compare result
         if (vaddsubif.out !== expected)
-            $display("FAIL | A=%h  B=%h  SUB=%0d → Got=%h  Exp=%h", a, b, sub, vaddsubif.out, expected);
+            $display("Fail: A=%h  B=%h  SUB=%0d → Got=%h  Exp=%h", a, b, sub, vaddsubif.out, expected);
         else
-            $display("PASS | A=%h  B=%h  SUB=%0d → %h", a, b, sub, vaddsubif.out);
+            $display("Pass: A=%h  B=%h  SUB=%0d → %h", a, b, sub, vaddsubif.out);
     end
 
     $fclose(fd);
