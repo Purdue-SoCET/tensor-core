@@ -22,6 +22,12 @@ interface xbar_if #(
         output out
     );
 
+    modport tb (
+        input out,
+        output clk, n_rst,
+        output en, in
+    );
+
 endinterface
 
 `endif 

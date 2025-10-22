@@ -10,17 +10,17 @@ module benes_xbar #(
     localparam int TAGWIDTH = $clog2(SIZE),
     localparam int STAGES = (2 * TAGWIDTH) - 1
 ) (
+    input logic CLK, nRST,
     xbar_if.xbar xif, 
-    logic control_bit [STAGES][(SIZE >> 1)]
+    input logic [STAGES * (SIZE >> 1)] control_bit 
 );
-
 
     logic [DWIDTH-1:0] out_latch [STAGES][SIZE];
     logic [DWIDTH-1:0] in_latch [STAGES][SIZE];
     
-    always_ff @(posedge xif.clk, negedge xif.n_rst) begin : blockName
-        if (!xif.n_rst) begin
-            for (int s = 1; s < STAGES; s++) begin
+    always_ff @(posedge CLK, negedge nRST) begin
+        if (!nRST) begin
+            for (int s = 0; s < STAGES; s++) begin
                 for (int i = 0; i < SIZE; i++) begin
                     in_latch[s][i] <= 16'b0;
                 end
@@ -29,14 +29,14 @@ module benes_xbar #(
         else begin
             for (int s = 1; s < STAGES; s++) begin
                 for (int i = 0; i < SIZE; i++) begin
-                    in_latch[s] <= out_latch[s-1];
+                    in_latch[s][i] <= out_latch[s-1][i];
                 end
             end
         end
     end
 
     generate
-        genvar stage, j, group, l;
+        genvar stage, j, group;
 
         for(stage = 0; stage < STAGES; stage++) begin
             // stage 1
@@ -44,17 +44,17 @@ module benes_xbar #(
                 for(j = 0; j < SIZE; j += 2) begin : stage_first
                     localparam int ctrl = j / 2;
                     crossover_switch #(.SIZE(DWIDTH)) u_less_comp (
-                        .din({xif.in[i].din[j], xif.in[i].din[j + 1]}),
+                        .din({xif.in[j], xif.in[j + 1]}),
                         .cntrl(control_bit[ctrl]), 
                         .dout({out_latch[0][j], out_latch[0][j + 1]})
                     );
                 end
             end
 
-            // stage 9
+            // stage last
             else if (stage == (STAGES - 1) ) begin
                 for(j = 0; j < SIZE; j += 2) begin : stage_last
-                    localparam int ctrl = j / 2;
+                    localparam int ctrl = 128 + j / 2;
                     crossover_switch #(.SIZE(DWIDTH)) u_less_comp (
                         .din({in_latch[stage][j], in_latch[stage][j + 1]}),
                         .cntrl(control_bit[ctrl]), 
@@ -64,20 +64,22 @@ module benes_xbar #(
             end
 
             else begin
-                localparam int d = stage > (TAGWIDTH-1) ? stage - (TAGWIDTH-1) : (TAGWIDTH-1) - stage;
-                for (group = 0; group < (1 << d); group++) begin : stage_middle
-                    localparam int base_idx = group * (1 << (TAGWIDTH - d));      // starting index for this group
-                    localparam int ctrl_adj = ((SIZE/2) * stage) - ((TAGWIDTH-1) - d) * group; // offset adjustment per group
+                // localparam int d = stage <= (STAGES-1)/2 ? stage : (STAGES-1) - stage;
+                localparam int d = (stage < TAGWIDTH) ? (1 << stage) : (1 << (STAGES - 1 - stage));
 
-                    for (j = 0; j < (1 << (TAGWIDTH-1-d)); j++) begin : pair
+                for (group = 0; group < (SIZE/2) / d; group++) begin : stage_middle
+                    localparam int base_idx = group * (d << 1);      // starting index for this group
+                    localparam int ctrl_adj = ((SIZE/2) * stage) - (d * group); // offset adjustment per group
+
+                    for (j = 0; j < d; j++) begin : pair
                         localparam int idx  = base_idx + j;      // wire index
                         localparam int ctrl = idx + ctrl_adj;    // control bit index
 
                         crossover_switch #(.SIZE(DWIDTH)) u_less_comp (
-                            .din({in_latch[stage][idx], in_latch[stage][idx + (1 << (TAGWIDTH-1-d))]}),
+                            .din({in_latch[stage][idx], in_latch[stage][idx + d]}),
                             .cntrl(control_bit[ctrl]), 
-                            .dout({out_latch[stage][idx], out_latch[stage][idx + (1 << (TAGWIDTH-1-d))]})
-                        ); 
+                            .dout({out_latch[stage][idx], out_latch[stage][idx + d]})
+                        );
                     end
                 end
             end
@@ -87,7 +89,7 @@ module benes_xbar #(
     always_comb begin
         for (int i = 0; i < SIZE; i++) begin
             xif.out[i] = out_latch[STAGES-1][i];
+            // xif.out[i] = {15'b0, control_bit[i]};
         end
     end
-
 endmodule
