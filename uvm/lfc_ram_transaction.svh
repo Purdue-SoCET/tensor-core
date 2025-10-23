@@ -17,12 +17,12 @@ class lfc_ram_transaction #(parameter NUM_BANKS = 4) extends uvm_sequence_item;
 
     `uvm_object_utils_begin(lfc_ram_transaction) // change these to uvm_field_array_int if not a single bit signal
         `uvm_field_int(n_rst, UVM_DEFAULT)
-        `uvm_field_int(ram_mem_data, UVM_DEFAULT);
-        `uvm_field_int(ram_mem_complete, UVM_DEFAULT);
-        `uvm_field_int(ram_mem_REN, UVM_DEFAULT);
-        `uvm_field_int(ram_mem_WEN, UVM_DEFAULT);
-        `uvm_field_int(ram_mem_addr, UVM_DEFAULT);
-        `uvm_field_int(ram_mem_store, UVM_DEFAULT);
+        `uvm_field_array_int(ram_mem_data, UVM_DEFAULT);
+        `uvm_field_array_int(ram_mem_complete, UVM_DEFAULT);
+        `uvm_field_array_int(ram_mem_REN, UVM_DEFAULT);
+        `uvm_field_array_int(ram_mem_WEN, UVM_DEFAULT);
+        `uvm_field_array_int(ram_mem_addr, UVM_DEFAULT);
+        `uvm_field_array_int(ram_mem_store, UVM_DEFAULT);
     `uvm_object_utils_end
 
     // no current randomization constraints

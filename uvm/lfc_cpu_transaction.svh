@@ -28,16 +28,16 @@ class lfc_cpu_transaction #(parameter NUM_BANKS = 4, parameter UUID_SIZE = 4) ex
   `uvm_object_utils_begin(lfc_cpu_transaction) // change some of these to uvm_field_array_int
     `uvm_field_int(n_rst, UVM_DEFAULT)
     `uvm_field_int(mem_in, UVM_DEFAULT)
-    `uvm_field_int(mem_in_addr, UVM_DEFAULT)
+    `uvm_field_array_int(mem_in_addr, UVM_DEFAULT)
     `uvm_field_int(mem_in_rw_mode, UVM_DEFAULT)
-    `uvm_field_int(mem_in_store_value, UVM_DEFAULT)
+    `uvm_field_array_int(mem_in_store_value, UVM_DEFAULT)
     `uvm_field_int(dp_in_halt, UVM_DEFAULT)
-    `uvm_field_int(mem_out_uuid, UVM_DEFAULT)
+    `uvm_field_array_int(mem_out_uuid, UVM_DEFAULT)
     `uvm_field_int(stall, UVM_DEFAULT)
     `uvm_field_int(hit, UVM_DEFAULT)
-    `uvm_field_int(hit_load, UVM_DEFAULT)
-    `uvm_field_int(block_status, UVM_DEFAULT)
-    `uvm_field_int(uuid_block, UVM_DEFAULT)
+    `uvm_field_array_int(hit_load, UVM_DEFAULT)
+    `uvm_field_array_int(block_status, UVM_DEFAULT)
+    `uvm_field_array_int(uuid_block, UVM_DEFAULT)
     `uvm_field_int(dp_out_flushed, UVM_DEFAULT)
   `uvm_object_utils_end
 
