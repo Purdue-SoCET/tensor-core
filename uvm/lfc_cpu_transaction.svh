@@ -25,7 +25,7 @@ class lfc_cpu_transaction #(parameter NUM_BANKS = 4, parameter UUID_SIZE = 4) ex
   logic [NUM_BANKS-1:0][UUID_SIZE-1:0] uuid_block;
   logic dp_out_flushed;
 
-  `uvm_object_utils_begin(lfc_cpu_transaction)
+  `uvm_object_utils_begin(lfc_cpu_transaction) // change some of these to uvm_field_array_int
     `uvm_field_int(n_rst, UVM_DEFAULT)
     `uvm_field_int(mem_in, UVM_DEFAULT)
     `uvm_field_int(mem_in_addr, UVM_DEFAULT)
