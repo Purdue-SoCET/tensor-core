@@ -14,7 +14,7 @@ class lfc_cpu_active_monitor extends uvm_monitor;
   `uvm_component_utils(lfc_cpu_active_monitor)
 
   // analysis port to scoreboard/subscribers
-  //uvm_analysis_port #(cpu_txn_t) ap;
+  //uvm_analysis_port #(lfc_cpu_transaction) lfc_ap;
 
   // optional: virtual interface handle
   lfc_cpu_vif_t vif;

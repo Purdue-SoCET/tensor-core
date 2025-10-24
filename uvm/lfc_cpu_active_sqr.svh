@@ -21,7 +21,7 @@ class lfc_cpu_active_sqr extends uvm_sequencer#(lfc_cpu_transaction);
 
     function void connect_phase(uvm_phase phase);
         super.connect_phase(phase);
-        `uvm_info("CPU_SQR", "Connect Phase", UVM_HIGH)=
+        `uvm_info("CPU_SQR", "Connect Phase", UVM_HIGH)
     endfunction
 
 endclass
