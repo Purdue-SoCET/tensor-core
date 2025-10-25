@@ -10,7 +10,7 @@ module vreduction #(
     vreduction_if.ruif vruif
 );
     localparam int LEVELS = $clog2(LANES);
-    localparam int PIPE_STAGES = 2*LEVELS + 5;
+    localparam int PIPE_STAGES = 2 + 2*LEVELS + LEVELS - 1;
     
     // Import vector types
     import vector_pkg::*;
