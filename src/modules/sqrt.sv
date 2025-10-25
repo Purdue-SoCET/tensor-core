@@ -22,20 +22,6 @@ module sqrt (
         16'h38F2, 16'h390E, 16'h3928, 16'h3943,
         16'h3958, 16'h396E, 16'h3988, 16'h39A3
     };
-    
-    localparam logic [15:0] subnormal_slopes [0:15] = '{
-        16'h43D9, 16'h3EA9, 16'h3D19, 16'h3C4B,
-        16'h3B90, 16'h3AD6, 16'h3A49, 16'h39D9,
-        16'h397E, 16'h3932, 16'h38F1, 16'h38B9,
-        16'h3887, 16'h385B, 16'h3834, 16'h3811
-    };
-
-    localparam logic [15:0] subnormal_intercepts [0:15] = '{
-        16'h29B7, 16'h30C2, 16'h3242, 16'h3371,
-        16'h343A, 16'h34AE, 16'h3517, 16'h3578,
-        16'h35D3, 16'h3628, 16'h367A, 16'h36C7,
-        16'h3711, 16'h3758, 16'h379D, 16'h37DF
-    };
 
     localparam MULT_LATENCY = 2;
 
@@ -49,7 +35,7 @@ module sqrt (
     logic [15:0] input_intercept;
     logic [15:0] normalized_mantissa;
     logic [3:0]  index;
-    logic        is_subnormal, is_odd, is_odd_output;
+    logic        is_subnormal, is_subnormal_output, is_odd, is_odd_output;
     logic        valid, valid_n;
 
     always_ff @(posedge CLK, negedge nRST) begin
@@ -73,35 +59,25 @@ module sqrt (
         mantissa_n = input_val[9:0];
         valid_n = valid_data_in;
         
-        // Determine if input is subnormal
+        // Determine if input is subnormal (will output 0)
         is_subnormal = ~|exponent_n;
         index = mantissa_n[9:6];
         is_odd = exponent_n[0];
         
-        // Select appropriate slope and intercept
-        if (is_subnormal) begin
-            normalized_mantissa = {1'b0, 5'd0, mantissa_n};
-            input_slope         = subnormal_slopes[index];
-            input_intercept     = subnormal_intercepts[index];
-        end else begin
-            normalized_mantissa = {1'b0, 5'd15, mantissa_n};
-            input_slope         = normal_slopes[index];
-            input_intercept     = normal_intercepts[index];
-        end
+        // Use normal slopes and intercepts for all calculations
+        normalized_mantissa = {1'b0, 5'd15, mantissa_n};
+        input_slope         = normal_slopes[index];
+        input_intercept     = normal_intercepts[index];
 
-        //calculate final exponent
-        if (is_subnormal) begin
-            final_exp = 5'd8;
-        end
-        else begin
-            final_exp = exponent_n >> 1;
-        end
+        // Calculate final exponent
+        final_exp = exponent_n >> 1;
     end
     
     //final exponent pipe
     sqrt_pipe #(.DATA_WIDTH(5), .STAGES(2*MULT_LATENCY + 2)) exp_pipe (.CLK(CLK), .nRST(nRST), .enable(valid_n), .data_in(final_exp), .data_out(final_exp_out));
     //is odd pipe
     sqrt_pipe #(.DATA_WIDTH(1), .STAGES(MULT_LATENCY + 2)) odd_pipe (.CLK(CLK), .nRST(nRST), .enable(valid_n), .data_in(is_odd), .data_out(is_odd_output));
+    //is subnormal pipe
     //intercept synchronization 
     logic [15:0] intercept_pipe_output;
     sqrt_pipe #(.DATA_WIDTH(16), .STAGES(MULT_LATENCY)) intercept_pipe (.CLK(CLK), .nRST(nRST), .enable(valid_n), .data_in(input_intercept), .data_out(intercept_pipe_output));
@@ -138,17 +114,16 @@ module sqrt (
         end
     end 
 
-    //
-    //sqrt_sum * sqrt 2 if needed
+    //sqrt_sum * adjustment factor based on odd exponent
     logic [15:0] mult2_product, exp_adj;
     logic mult2_done;
 
     always_comb begin
         if (is_odd_output) begin
-            exp_adj = 16'h3da8;
+            exp_adj = 16'h3da8;  // sqrt(2)
         end
         else begin
-            exp_adj = 16'h3C00;
+            exp_adj = 16'h3C00;  // 1.0
         end
     end
     mul_fp16 mult2 (.clk(CLK), .nRST(nRST), .start(mult2_start), .a(sqrt_sum), .b(exp_adj), .done(mult2_done), .result(mult2_product));
@@ -157,7 +132,12 @@ module sqrt (
     //recombination
     logic [15:0] final_value;
     always_comb begin
-        final_value = {1'b0, final_exp_out + mult2_product[14:10], mult2_product[9:0]};
+        // If input was subnormal, output 0, otherwise compute result
+        if (is_subnormal_output) begin
+            final_value = 16'h0000;
+        end else begin
+            final_value = {1'b0, final_exp_out + mult2_product[14:10], mult2_product[9:0]};
+        end
     end
 
     always_ff @(posedge CLK, negedge nRST) begin

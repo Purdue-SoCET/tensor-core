@@ -1,18 +1,18 @@
-`include "vaddsub_if.vh"
+`include "vls_if.vh"
 `include "vector_if.vh"
 `include "vector_types.vh"
 
 `timescale 1 ns / 1 ns
 
-module vaddsub_tb;
+module vls_tb;
 
     parameter PERIOD = 10;
     logic CLK = 0, nRST;
 
     always #(PERIOD/2) CLK++;
 
-    vaddsub_if vaddsubif ();
-    vaddsub DUT (.CLK(CLK), .nRST(nRST), .vaddsubif(vaddsubif));
+    vls_if vlsif ();
+    vls DUT (.CLK(CLK), .nRST(nRST), .vlsif(vlsif));
 
     int casenum;
     string casename;
