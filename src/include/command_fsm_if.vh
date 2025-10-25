@@ -24,7 +24,7 @@ interface command_fsm_if ();
     );
 
     modport timing_ctrl (
-        output cmd_state
+        input cmd_state
     );
 
 endinterface
