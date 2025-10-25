@@ -8,10 +8,11 @@ module benes #(
     parameter int SIZE = 32,
     parameter int DWIDTH = 16, 
     localparam int TAGWIDTH = $clog2(SIZE),
-    localparam int STAGES = (2 * TAGWIDTH) - 1
+    localparam int STAGES = (2 * TAGWIDTH) - 1, 
+    localparam int BITWIDTH = STAGES * (SIZE >> 1)
 ) (
-    xbar_if.xbar xif
-    input logic [STAGES * (SIZE >> 1)] control_bit 
+    xbar_if.xbar xif,
+    input logic [BITWIDTH] control_bit 
 );
 
     logic [DWIDTH-1:0] out_latch [STAGES][SIZE];
@@ -88,7 +89,6 @@ module benes #(
     always_comb begin
         for (int i = 0; i < SIZE; i++) begin
             xif.out[i] = out_latch[STAGES-1][i];
-            // xif.out[i] = {15'b0, control_bit[i]};
         end
     end
 endmodule

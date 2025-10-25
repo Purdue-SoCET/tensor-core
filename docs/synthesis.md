@@ -117,5 +117,5 @@ report_timing -max_paths 10 -path_type full > critical_paths.txt
 Check within Flowkit/reports. `reports/syn_opt/` has the results from the optimal synthesized flow. `reports/syn_opt/qor.prt` has the important content. 
 Create a folder for each submodule within `tensor-core/reports`, and store the relevant information in there. We will not gitignore it. 
 
-1. To get the clock speed, take the {-period} value you set in /scripts/constraint/*.sdc file, and add the slack value. If clock period is (1000) and slack is (-555) then the clock speed = 1/(1555*10^-9)Hz 
-2. To get the area, look under the Area section. Values are in (um)^2.
+1. To get the clock speed, take the {-period} value you set in /scripts/constraint/*.sdc file, and add the slack value. If clock period is (1000) and total slack is (-555) then the clock speed = (1/1555ps)MHz. If clock period is (3000) and total slack is (0) and Critical Path Slack is (1580.8), then your frequency is (1/(3000ps – 1580.8ps)) = 704.8MHz.
+2. To get the area, look under the Area section. Values are in (um)^2. 1(mm^2) = 1e-6(um)^2.
