@@ -169,6 +169,9 @@ module timing_control (
         if ((refresh_count >= refresh_limit) && (cfsmif.cmd_state != REFRESH)) begin
             timif.rf_req = 1'b1;
         end
+
+        // disabling rf_req for testing control unit
+        timif.rf_req = 1'b0;
     end 
 
     flex_counter #(.N(N)) time_counter (.clk(clk), .nRST(nRST), .enable(time_counter_en),
