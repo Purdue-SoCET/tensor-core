@@ -10,3 +10,6 @@
 	path = aihw-ppci-compiler
 	url = git@github.com:Purdue-SoCET/aihw-ppci-compiler.git
 	branch = master
+[submodule "Flowkit"]
+	path = Flowkit
+	url = git@github.com:Purdue-SoCET/Flowkit.git
