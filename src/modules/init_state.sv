@@ -26,8 +26,8 @@ module init_state (
     );
 
     assign it.init_state = state;
+    assign it.n_init_state = n_state;
     
-
     always_ff @(posedge CLK, negedge nRST) begin: dram_state_t_logic
         if (!nRST) begin
             state <= POWER_UP;

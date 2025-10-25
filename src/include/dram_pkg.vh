@@ -17,17 +17,18 @@ package dram_pkg;
     parameter COLUMN_BITS       = 10;
     parameter OFFSET_BITS       = 2;
     parameter IGNORE_BITS       = 1;
+    parameter ADDR_BITS         = 14;
 
     // TIMING PARAMETERS
     parameter tRCD = 10;
     parameter tAL = 1;
     parameter tCL = 10;
-    parameter tBURST = 10;
+    parameter tBURST = 4;
     parameter tCWL = 10;
-    parameter tREFI = 100;
+    parameter tREFI = 250;
     parameter tRP = 10;
-    parameter tRFC = 10;
-    parameter tRAS = 10;
+    parameter tRFC = 172;
+    parameter tRAS = 45;
     parameter tRC = tRAS + tRP;
     parameter tRL = tAL + tCL;        // Read Latency
     parameter tWL = tAL + tCWL;       // Write Latency
@@ -93,6 +94,14 @@ package dram_pkg;
         ZQ_CMD        = 5'b01110,
         DESEL_CMD     = 5'b11000
     } cmd_t;
+
+    // DRAM CONFIGURATIONS
+    parameter BURST_LENGTH  = 8;
+    parameter CONFIGURED_DQ_BITS     = 16;
+    parameter CONFIGURED_DQS_BITS     = 16;
+    parameter CONFIGURED_DM_BITS     = 16;
+    parameter CONFIGURED_RANKS = 1;
+    parameter DM_BITS       = 16;
 
 endpackage
 

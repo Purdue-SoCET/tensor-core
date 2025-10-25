@@ -8,11 +8,11 @@ interface init_state_if ();
 
     //Input
     logic init, init_valid;
-    dram_state_t init_state;
+    dram_state_t init_state, n_init_state;
 
     modport init_fsm (
         input init,
-        output init_valid, init_state
+        output init_valid, init_state, n_init_state
     );
 
 endinterface

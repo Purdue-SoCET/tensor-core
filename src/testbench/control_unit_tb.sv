@@ -8,6 +8,7 @@
 `include "command_fsm_if.vh"
 `include "row_open_if.vh"
 `include "init_state_if.vh"
+`include "control_unit_if.vh"
 
 `timescale 1 ns / 1 ns
 
@@ -32,11 +33,12 @@ module control_unit_tb ();
     row_open_if         tb_polif ();
     init_state_if       tb_initif ();
     timing_signals_if   tb_timif ();
+    control_unit_if     tb_cuif ();
 
-    assign tb_polif.row_resolve  = tb_cfsmif.row_resolve;
-    assign tb_cfsmif.init_done   = tb_initif.init_valid;
-    assign tb_initif.init        = tb_cfsmif.init_req;
-    assign tb_polif.req_en       = tb_cfsmif.dREN || tb_cfsmif.dWEN;
+    // assign tb_polif.row_resolve  = tb_cfsmif.row_resolve;
+    // assign tb_cfsmif.init_done   = tb_initif.init_valid;
+    // assign tb_initif.init        = tb_cfsmif.init_req;
+    // assign tb_polif.req_en       = tb_cuif.dREN || tb_cuif.dWEN;
 
     assign tb_amif.configs = x8;
 
@@ -45,7 +47,7 @@ module control_unit_tb ();
     // DUT Instance
     //*****************************************************************************
     control_unit DUT (.clk(tb_CLK), .nRST(tb_nRST), .amif(tb_amif), .initif(tb_initif),
-                      .polif(tb_polif), .cfsmif(tb_cfsmif), .timif(tb_timif));
+                      .polif(tb_polif), .cfsmif(tb_cfsmif), .timif(tb_timif), .cuif(tb_cuif));
 
     //*****************************************************************************
     // Declare TB Signals
@@ -166,25 +168,25 @@ module control_unit_tb ();
         
         @(negedge tb_CLK)
         tb_expected_polif.row_stat = 2'b01;     // row status should be HIT (2'b01) because status table updated
-        tb_expected_cfsmif.cmd_state = (tb_cfsmif.dWEN) ? WRITE : READ;
+        tb_expected_cfsmif.cmd_state = (tb_cuif.dWEN) ? WRITE : READ;
         check_row();
 
         @(posedge tb_CLK)               // cmd_state should now be READING/WRITING
 
         @(negedge tb_CLK)
-        if (tb_cfsmif.dWEN == 1'b1) begin
+        if (tb_cuif.dWEN == 1'b1) begin
             repeat (tWL + tBURST - 1) @(posedge tb_CLK); // waiting for write timer to finish counting
         end
         else begin
             repeat (tRL + tBURST - 1) @(posedge tb_CLK);  // waiting for read timer to finish counting
         end
-        tb_expected_cfsmif.cmd_state = (tb_cfsmif.dWEN) ? WRITING : READING;
+        tb_expected_cfsmif.cmd_state = (tb_cuif.dWEN) ? WRITING : READING;
         
-        if (tb_cfsmif.dWEN == 1'b1) begin
-            tb_cfsmif.dWEN = 1'b0;
+        if (tb_cuif.dWEN == 1'b1) begin
+            tb_cuif.dWEN = 1'b0;
         end
         else begin
-            tb_cfsmif.dREN = 1'b0;
+            tb_cuif.dREN = 1'b0;
         end
         check_row();
 
@@ -207,25 +209,25 @@ module control_unit_tb ();
         @(posedge tb_CLK)           // cmd_state should now be WRITE/READ
         
         @(negedge tb_CLK)
-        tb_expected_cfsmif.cmd_state = (tb_cfsmif.dWEN) ? WRITE : READ;
+        tb_expected_cfsmif.cmd_state = (tb_cuif.dWEN) ? WRITE : READ;
         check_row();
 
         @(posedge tb_CLK)               // cmd_state should now be WRITING
 
         @(negedge tb_CLK)
-        if (tb_cfsmif.dWEN == 1'b1) begin
+        if (tb_cuif.dWEN == 1'b1) begin
             repeat (tWL + tBURST - 1) @(posedge tb_CLK); // waiting for write timer to finish counting
         end
         else begin
             repeat (tRL + tBURST - 1) @(posedge tb_CLK);  // waiting for read timer to finish counting
         end
-        tb_expected_cfsmif.cmd_state = (tb_cfsmif.dWEN) ? WRITING : READING;
+        tb_expected_cfsmif.cmd_state = (tb_cuif.dWEN) ? WRITING : READING;
         
-        if (tb_cfsmif.dWEN == 1'b1) begin
-            tb_cfsmif.dWEN = 1'b0;
+        if (tb_cuif.dWEN == 1'b1) begin
+            tb_cuif.dWEN = 1'b0;
         end
         else begin
-            tb_cfsmif.dREN = 1'b0;
+            tb_cuif.dREN = 1'b0;
         end
 
         check_row();
@@ -278,25 +280,25 @@ module control_unit_tb ();
         
         @(negedge tb_CLK)
         tb_expected_polif.row_stat = 2'b01;     // row status should be HIT (2'b01) because status table updated
-        tb_expected_cfsmif.cmd_state = (tb_cfsmif.dWEN) ? WRITE : READ;
+        tb_expected_cfsmif.cmd_state = (tb_cuif.dWEN) ? WRITE : READ;
         check_row();
 
         @(posedge tb_CLK)               // cmd_state should now be READING/WRITING
 
         @(negedge tb_CLK)
-        if (tb_cfsmif.dWEN == 1'b1) begin
+        if (tb_cuif.dWEN == 1'b1) begin
             repeat (tWL + tBURST - 1) @(posedge tb_CLK); // waiting for write timer to finish counting
         end
         else begin
             repeat (tRL + tBURST - 1) @(posedge tb_CLK);  // waiting for read timer to finish counting
         end
-        tb_expected_cfsmif.cmd_state = (tb_cfsmif.dWEN) ? WRITING : READING;
+        tb_expected_cfsmif.cmd_state = (tb_cuif.dWEN) ? WRITING : READING;
         
-        if (tb_cfsmif.dWEN == 1'b1) begin
-            tb_cfsmif.dWEN = 1'b0;
+        if (tb_cuif.dWEN == 1'b1) begin
+            tb_cuif.dWEN = 1'b0;
         end
         else begin
-            tb_cfsmif.dREN = 1'b0;
+            tb_cuif.dREN = 1'b0;
         end
         check_row();
 
@@ -327,11 +329,11 @@ module control_unit_tb ();
         
         // Initialize DUT signals
         // cfsm signals
-        tb_cfsmif.dREN              = 1'b0;
-        tb_cfsmif.dWEN              = 1'b0;
+        tb_cuif.dREN              = 1'b0;
+        tb_cuif.dWEN              = 1'b0;
 
         // address mapper signals
-        tb_amif.address             = '0;
+        tb_cuif.address             = '0;
 
         //*****************************************************************************
         // Power-on-Reset Test Case
@@ -368,19 +370,18 @@ module control_unit_tb ();
         tb_test_case     = "Row miss interaction";
         tb_test_case_num = tb_test_case_num + 1;
 
-        tb_amif.address             = '0;
+        tb_cuif.address             = '0;
         
         // Opening Row 0 in each bank for the first time
         for (tb_k = 0; tb_k < 1; tb_k++) begin
             for (tb_i = 0; tb_i < 2**BANK_GROUP_BITS; tb_i++) begin
-            //for (tb_i = 0; tb_i < 1; tb_i++) begin
                 for (tb_j = 0; tb_j < 2**BANK_BITS; tb_j++) begin
     
                     @(negedge tb_CLK)
-                    tb_cfsmif.dREN              = 1'b1;
-                    {tb_amif.address[13],tb_amif.address[5]} = tb_i;        // changing the BG
-                    tb_amif.address[15:14]                   = tb_j;        // changing the Bank
-                    tb_amif.address[30:16]                   = tb_k;        // changing the row (is 0 in all the cases)
+                    tb_cuif.dREN              = 1'b1;
+                    {tb_cuif.address[13],tb_cuif.address[5]} = tb_i;        // changing the BG
+                    tb_cuif.address[15:14]                   = tb_j;        // changing the Bank
+                    tb_cuif.address[30:16]                   = tb_k;        // changing the row (is 0 in all the cases)
                     do_row_miss();
 
                     @(posedge tb_CLK)
@@ -402,10 +403,10 @@ module control_unit_tb ();
                 for (tb_j = 0; tb_j < 2**BANK_BITS; tb_j++) begin
     
                     @(negedge tb_CLK)
-                    tb_cfsmif.dWEN                           = 1'b1;
-                    {tb_amif.address[13],tb_amif.address[5]} = tb_i;        // changing the BG
-                    tb_amif.address[15:14]                   = tb_j;        // changing the Bank
-                    tb_amif.address[30:16]                   = tb_k;        // changing the row (is 0 in all the cases)
+                    tb_cuif.dWEN                           = 1'b1;
+                    {tb_cuif.address[13],tb_cuif.address[5]} = tb_i;        // changing the BG
+                    tb_cuif.address[15:14]                   = tb_j;        // changing the Bank
+                    tb_cuif.address[30:16]                   = tb_k;        // changing the row (is 0 in all the cases)
                     do_row_hit();
 
                     @(posedge tb_CLK)
@@ -423,15 +424,15 @@ module control_unit_tb ();
 
         // Choosing different rows for each bank
         // Row 0 is open from previous case, now choosing other rows
-        for (tb_k = 1; tb_k < 4; tb_k++) begin
+        for (tb_k = 1; tb_k < 2**ROW_BITS; tb_k++) begin
             for (tb_i = 0; tb_i < 2**BANK_GROUP_BITS; tb_i++) begin
                 for (tb_j = 0; tb_j < 2**BANK_BITS; tb_j++) begin
     
                     @(negedge tb_CLK)
-                    tb_cfsmif.dREN                           = 1'b1;
-                    {tb_amif.address[13],tb_amif.address[5]} = tb_i;        // changing the BG
-                    tb_amif.address[15:14]                   = tb_j;        // changing the Bank
-                    tb_amif.address[30:16]                   = tb_k;        // changing the row (is 0 in all the cases)
+                    tb_cuif.dREN                           = 1'b1;
+                    {tb_cuif.address[13],tb_cuif.address[5]} = tb_i;        // changing the BG
+                    tb_cuif.address[15:14]                   = tb_j;        // changing the Bank
+                    tb_cuif.address[30:16]                   = tb_k;        // changing the row 
                     do_row_conflict();
 
                     @(posedge tb_CLK)
