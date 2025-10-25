@@ -6,8 +6,8 @@
 `include "xbar_params.svh"
 `include "xbar_if.sv"
 
-module batcher_xbar #(
-    parameter int SIZE   = 32,
+module batcher #(
+    parameter int SIZE = 32,
     parameter int DWIDTH = 16
 ) (
     xbar_if.xbar xif

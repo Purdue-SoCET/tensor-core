@@ -13,3 +13,4 @@
 [submodule "Flowkit"]
 	path = Flowkit
 	url = git@github.com:Purdue-SoCET/Flowkit.git
+	branch = atallax01

@@ -4,14 +4,13 @@
 `include "xbar_params.svh"
 `include "xbar_if.sv"
 
-module benes_xbar #(
+module benes #(
     parameter int SIZE = 32,
     parameter int DWIDTH = 16, 
     localparam int TAGWIDTH = $clog2(SIZE),
     localparam int STAGES = (2 * TAGWIDTH) - 1
 ) (
-    input logic CLK, nRST,
-    xbar_if.xbar xif, 
+    xbar_if.xbar xif
     input logic [STAGES * (SIZE >> 1)] control_bit 
 );
 
