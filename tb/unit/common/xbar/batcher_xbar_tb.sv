@@ -16,7 +16,7 @@ module batcher_xbar_tb;
   always  #5 clk = ~clk;
 
   xbar_if #(.SIZE(SIZE), .DWIDTH(DWIDTH)) xif (.clk(clk), .n_rst(n_rst));
-  batcher_xbar #(.SIZE(SIZE), .DWIDTH(DWIDTH)) dut (xif);
+  batcher #(.SIZE(SIZE), .DWIDTH(DWIDTH)) dut (xif);
 
   typedef logic [DWIDTH-1:0] vec_t [SIZE];
   vec_t exp_q[$];  // expected sorted vectors

@@ -5,18 +5,18 @@ module benes_xbar_tb;
     parameter STAGES = 9;
     parameter SIZE = 32;
 
-    logic [STAGES * (SIZE >> 1)] control_bit ;
-    logic CLK = 1, nRST;
+    logic [STAGES * (SIZE >> 1)] control_bit;
+    logic clk, n_rst;
+    initial clk = 1'b0;
+    always  #5 clk = ~clk;
 
-    always #(PERIOD/2) CLK++;
-    
-    xbar_if xif ();
+    xbar_if #(.SIZE(SIZE), .DWIDTH(DWIDTH)) xif (.clk(clk), .n_rst(n_rst));
 
     test #(.PERIOD(PERIOD)) PROG (
         .*
     );
 
-    benes_xbar DUT (
+    benes DUT (
         .*
     );
 
@@ -27,19 +27,17 @@ program test #(
     parameter STAGES = 9,
     parameter SIZE = 32
 ) (
-    input logic CLK,
-    output logic nRST,
     xbar_if.tb xif,
     output logic [STAGES * (SIZE >> 1)] control_bit
 );
     integer i;
     logic [15:0] val;
 initial begin
-    nRST = 0;
+    xif.n_rst = 0;
 
     #(PERIOD);
 
-    nRST = 1;
+    xif.n_rst = 1;
     val = 16'd0;
 
     for (i = 0; i < 32; i = i + 1) begin
