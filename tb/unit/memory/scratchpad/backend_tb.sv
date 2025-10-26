@@ -47,9 +47,9 @@ module backend_tb;
         n_rst = 1;
     end
 
-    string fname, wavepath; 
-    getenv("WAVEPATH", wavepath);
-    $sformat(fname, "%s/backend_tb.vcd", wavepath); 
+    // string fname, wavepath; 
+    // getenv("WAVEPATH", wavepath);
+    // $sformat(fname, "%s/backend_tb.vcd", wavepath); idk what this is so I'll ignore it for now
 
     // initial begin 
     //     $dumpfile(fname);
