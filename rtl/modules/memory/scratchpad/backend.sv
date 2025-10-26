@@ -173,7 +173,7 @@ module backend #(parameter logic [SCPAD_ID_WIDTH-1:0] IDX = '0) (
                 bbif.be_req.wdata = 0;
             end
 
-            bdrif.be_dram_req.valid = dr_wr_l.dram_write_req.valid;
+            bdrif.be_dram_req.valid = dr_wr_l.dram_write_req.valid; // why not updating in git?
             bdrif.be_dram_req.write = dr_wr_l.dram_write_req.valid;
             bdrif.be_dram_req.id = 0; // doesn't matter it's just a write
             bdrif.be_dram_req.dram_addr = dr_wr_l.dram_write_req.dram_addr;
