@@ -3,22 +3,30 @@
 `include "xbar_params.svh"
 `include "xbar_if.sv"
 
-import xbar_pkg::*;
-
 module batcher_tb;
 
-  localparam int SIZE = 32;
+  import xbar_pkg::*;
+
+  // Don't change for this testbench. REGISTER_MASKs can only get used for SIZE = 32. 
+  // Read xbar_pkg.sv notes, if you want to understand more. 
+  localparam int SIZE = 32; 
+
   localparam int DWIDTH = 16;
   localparam int TAGW = $clog2(SIZE);
-  localparam int STAGES = (TAGW * (TAGW + 1)) / 2; 
-  localparam int N_REQS = STAGES * 2;
+  localparam int STAGES = (TAGW * (TAGW + 1)) / 2;
+
+  localparam logic [STAGES-2:0] REGISTER_MASK = BA_INTO_3;
+  localparam int REAL_LATENCY = $countones(REGISTER_MASK) + 1; 
+
+  localparam int N_REQS = (REAL_LATENCY * 2);
+  localparam int VERBOSE  = 0;
 
   logic clk, n_rst;
   initial clk = 1'b0;
   always  #5 clk = ~clk;
 
   xbar_if #(.SIZE(SIZE), .DWIDTH(DWIDTH)) xif (.clk(clk), .n_rst(n_rst));
-  batcher #(.SIZE(SIZE), .DWIDTH(DWIDTH)) dut (.xif(xif.xbar));
+  batcher #(.SIZE(SIZE), .DWIDTH(DWIDTH), .REGISTER_MASK(REGISTER_MASK)) dut (.xif(xif.xbar));
 
   typedef logic [DWIDTH-1:0] vec_t [SIZE];
   vec_t exp_q[$];  // expected sorted vectors
@@ -66,7 +74,7 @@ module batcher_tb;
     // Steam all stages and fill up. 
     for (int t = 0; t < N_REQS; t++) begin
       // Retire after pipeline fills
-      if (launched <= STAGES) begin
+      if (launched <= REAL_LATENCY) begin
         make_vec(in_vec);
         sort_vec(in_vec, exp_vec);
         exp_q.push_back(exp_vec);
@@ -82,20 +90,18 @@ module batcher_tb;
       @(posedge clk);
 
       // Retire after pipeline fills
-      if (launched > STAGES) begin
+      if (launched >= REAL_LATENCY) begin
         exp = exp_q.pop_front();
-
         mismatches = 0;
-        lanes = "";  
 
         for (int k = 0; k < SIZE; k++) begin
           got = xif.out[k];
           if (got !== exp[k]) begin
             mismatches++;
             errors++;
-            lanes = { lanes, (lanes.len() ? "  " : ""), $sformatf("lane%0d: got=%0h exp=%0h", k, got, exp[k]) };
-          end else begin 
-            lanes = { lanes, (lanes.len() ? "  " : ""), $sformatf("lane%0d: got=%0h exp=%0h", k, got, exp[k]) };
+            $display($sformatf("lane%0d: got=%0d exp=%0d", k, got, exp[k]));
+          end else if (VERBOSE) begin 
+            $display($sformatf("lane%0d: got=%0d exp=%0d", k, got, exp[k]));
           end 
         end
 
@@ -107,7 +113,6 @@ module batcher_tb;
 
         retired++;
       end
-
     end
 
     // stop driving; no drain needed

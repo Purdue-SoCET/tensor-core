@@ -156,6 +156,6 @@ test:
 		$(VSIM) -coverage -c -voptargs="+acc"  work.$$TB_TOP -do "run -all"; \
 	fi 
 
-clean_lib:
+clean:
 	rm -rf $(SCRATCH) transcript vsim.wlf work modelsim.ini
 

@@ -3,6 +3,7 @@
 
 `include "xbar_params.svh"
 `include "xbar_if.sv"
+`include "compare_switch.sv"
 
 import xbar_pkg::*;
 

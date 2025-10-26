@@ -21,11 +21,11 @@ module batcher #(
     logic [TAGWIDTH-1:0] shift_out [1:STAGES][SIZE];
     logic [DWIDTH-1:0] data_out  [1:STAGES][SIZE];
 
-	logic [TAGWIDTH-1:0] shift_latch [1:STAGES-1][SIZE]; 
-	logic [DWIDTH-1:0] data_latch [1:STAGES-1][SIZE]; 
+	logic [TAGWIDTH-1:0] shift_latch [1:STAGES][SIZE]; 
+	logic [DWIDTH-1:0] data_latch [1:STAGES][SIZE]; 
 
     // Pipeline registers
-    always_ff @(posedge xif.clk, negedge xif.n_rst) begin
+    always_ff @ (posedge xif.clk, negedge xif.n_rst) begin
         if (!xif.n_rst) begin
             for (int s = 1; s <= STAGES-1; s++) begin
                 for (int i = 0; i < SIZE; i++) begin
@@ -78,23 +78,13 @@ module batcher #(
                         logic [TAGWIDTH-1:0] upper_shift [2];
 
                         // First compare: order by data value (from inputs or prior stage)
-                        if (stage == 1) begin 
-                            compare_switch #(.DATA_W(DWIDTH), .TAG_W(TAGWIDTH)) u_less_comp (
-                                .din('{xif.in[i].din, xif.in[ixj].din}),
-                                .tin('{xif.in[i].shift,xif.in[ixj].shift}),
-                                .cntrl (xif.in[i].din <= xif.in[ixj].din),
-                                .dout(upper_din),
-                                .tout(upper_shift)
-                            );
-                        end else begin 
-                            compare_switch #(.DATA_W(DWIDTH), .TAG_W(TAGWIDTH)) u_less_comp (
-                                .din('{data_in[stage-1][i],data_in[stage-1][ixj]}),
-                                .tin('{shift_in[stage-1][i],shift_in[stage-1][ixj]}),
-                                .cntrl (data_in [stage-1][i] <=data_in [stage-1][ixj]),
-                                .dout(upper_din),
-                                .tout(upper_shift)
-                            );
-                        end
+                        compare_switch #(.DATA_W(DWIDTH), .TAG_W(TAGWIDTH)) u_less_comp (
+                            .din('{data_in[stage][i], data_in[stage][ixj]}),
+                            .tin('{shift_in[stage][i], shift_in[stage][ixj]}),
+                            .cntrl (data_in[stage][i] <= data_in[stage][ixj]),
+                            .dout(upper_din),
+                            .tout(upper_shift)
+                        );
 
                         compare_switch #(.DATA_W(DWIDTH), .TAG_W(TAGWIDTH)) u_asc_comp (
                             .din('{upper_din[0], upper_din[1]}),
