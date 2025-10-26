@@ -49,7 +49,7 @@ module backend_tb;
 
     string fname, wavepath; 
     getenv("WAVEPATH", wavepath);
-    $sformat(fname, "%s/head_tb.vcd", wavepath); 
+    $sformat(fname, "%s/backend_tb.vcd", wavepath); 
 
     // initial begin 
     //     $dumpfile(fname);
@@ -79,7 +79,7 @@ program test (scpad_if.backend_tb bif);
         bif = 0;
 
         reset();
-        #(CLK_PERIOD * 2);
+        #(20 * 2); // hard coded for now just want to get this up and running
 
     end 
 
