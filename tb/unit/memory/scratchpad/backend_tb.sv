@@ -64,6 +64,15 @@ module backend_tb;
 
 endmodule
 
+// modport backend_tb (
+//         input clk, n_rst, 
+//         input sched_res, be_req,
+//         input be_dram_stall, be_dram_req,
+
+//         output be_stall, dram_be_stall,
+//         output sched_req, be_res, dram_be_res
+//     );
+
 program test (scpad_if.backend_tb bif);
 
     task reset(); 
@@ -73,10 +82,13 @@ program test (scpad_if.backend_tb bif);
         repeat (2) @(posedge bif.clk);
     endtask
 
-
     initial begin
 
-        bif = 0;
+        bif.be_stall = 0;
+        bif.dram_be_stall = 0;
+        bif.sched_req = 0;
+        bif.be_res = 0;
+        bif.dram_be_res = 0;
 
         reset();
         #(20 * 2); // hard coded for now just want to get this up and running
