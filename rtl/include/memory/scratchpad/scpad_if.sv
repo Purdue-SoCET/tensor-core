@@ -13,6 +13,7 @@ interface scpad_if (input logic clk, input logic n_rst);
     // ----------------------------------------------------------------------
 
     // Backend <=> DRAM Cntrl.
+    logic dram_be_stall [NUM_SCPADS];
     logic be_dram_stall [NUM_SCPADS];
     dram_req_t be_dram_req [NUM_SCPADS];
     dram_res_t dram_be_res [NUM_SCPADS];
