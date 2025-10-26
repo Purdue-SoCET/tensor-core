@@ -2,8 +2,10 @@
 
 `include "xbar_params.svh"
 `include "xbar_if.sv"
-  
-module batcher_xbar_tb;
+
+import xbar_pkg::*;
+
+module batcher_tb;
 
   localparam int SIZE = 32;
   localparam int DWIDTH = 16;
@@ -16,7 +18,7 @@ module batcher_xbar_tb;
   always  #5 clk = ~clk;
 
   xbar_if #(.SIZE(SIZE), .DWIDTH(DWIDTH)) xif (.clk(clk), .n_rst(n_rst));
-  batcher #(.SIZE(SIZE), .DWIDTH(DWIDTH)) dut (xif);
+  batcher #(.SIZE(SIZE), .DWIDTH(DWIDTH)) dut (.xif(xif.xbar));
 
   typedef logic [DWIDTH-1:0] vec_t [SIZE];
   vec_t exp_q[$];  // expected sorted vectors

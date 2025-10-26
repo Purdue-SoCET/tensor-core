@@ -7,6 +7,8 @@ interface xbar_if #(
 ) (input logic clk, input logic n_rst);
     `include "xbar_params.svh"
 
+    import xbar_pkg::*;
+
     typedef struct packed {
         logic [DWIDTH-1:0] din;
         logic [$clog2(SIZE)-1:0] shift;

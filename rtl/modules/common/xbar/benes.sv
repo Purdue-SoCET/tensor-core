@@ -4,36 +4,53 @@
 `include "xbar_params.svh"
 `include "xbar_if.sv"
 
+import xbar_pkg::*;
+
 module benes #(
     parameter int SIZE = 32,
     parameter int DWIDTH = 16, 
+    parameter logic [7:0] REGISTER_MASK = 8'b11111111,
+
     localparam int TAGWIDTH = $clog2(SIZE),
     localparam int STAGES = (2 * TAGWIDTH) - 1, 
     localparam int BITWIDTH = STAGES * (SIZE >> 1)
 ) (
     xbar_if.xbar xif,
-    input logic [BITWIDTH] control_bit 
+    input logic [BITWIDTH-1:0] control_bit 
 );
 
+	logic [DWIDTH-1:0] reg_latch [STAGES-1][SIZE]; 
     logic [DWIDTH-1:0] out_latch [STAGES][SIZE];
     logic [DWIDTH-1:0] in_latch [STAGES][SIZE];
     
-    always_ff @(posedge CLK, negedge nRST) begin
-        if (!nRST) begin
-            for (int s = 0; s < STAGES; s++) begin
+    always_ff @ (posedge xif.clk, negedge xif.n_rst) begin
+        if (!xif.n_rst) begin
+            for (int s = 0; s < STAGES-1; s++) begin
                 for (int i = 0; i < SIZE; i++) begin
-                    in_latch[s][i] <= 16'b0;
+                    reg_latch[s][i] <= '0;
                 end
             end
         end
         else begin
-            for (int s = 1; s < STAGES; s++) begin
-                for (int i = 0; i < SIZE; i++) begin
-                    in_latch[s][i] <= out_latch[s-1][i];
-                end
+            for (int s = 0; s < STAGES-1; s++) begin
+            	if (REGISTER_MASK[s]) begin 
+	                for (int i = 0; i < SIZE; i++) begin
+	                    reg_latch[s][i] <= out_latch[s][i];
+	                end
+	            end 
             end
         end
     end
+
+    generate
+    	genvar i, s;
+
+        for (s = 1; s < STAGES; s++) begin 
+            for (i = 0; i < SIZE; i++) begin 
+                assign in_latch[s][i] = REGISTER_MASK[s-1] ? reg_latch[s-1][i] : out_latch[s-1][i];
+            end
+        end
+    endgenerate
 
     generate
         genvar stage, j, group;
@@ -54,7 +71,7 @@ module benes #(
             // stage last
             else if (stage == (STAGES - 1) ) begin
                 for(j = 0; j < SIZE; j += 2) begin : stage_last
-                    localparam int ctrl = 128 + j / 2;
+                    localparam int ctrl = ((SIZE/2)*stage) + (j/2);
                     crossover_switch #(.SIZE(DWIDTH)) u_less_comp (
                         .din({in_latch[stage][j], in_latch[stage][j + 1]}),
                         .cntrl(control_bit[ctrl]), 
@@ -91,4 +108,5 @@ module benes #(
             xif.out[i] = out_latch[STAGES-1][i];
         end
     end
+    
 endmodule

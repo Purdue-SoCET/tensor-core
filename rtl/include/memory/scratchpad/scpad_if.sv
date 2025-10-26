@@ -1,6 +1,5 @@
 /*  Akshath Raghav Ravikiran - araviki@purdue.edu */
 
-
 `ifndef SCPAD_IF_SV
 `define SCPAD_IF_SV
 
