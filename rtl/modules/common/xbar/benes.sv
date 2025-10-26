@@ -11,13 +11,8 @@ module benes #(
     localparam int STAGES = (2 * TAGWIDTH) - 1, 
     localparam int BITWIDTH = STAGES * (SIZE >> 1)
 ) (
-<<<<<<< HEAD:rtl/modules/common/xbar/benes_xbar.sv
-    xbar_if.xbar xif, 
-    input logic [STAGES * (SIZE >> 1)] control_bit
-=======
     xbar_if.xbar xif,
-    input logic [BITWIDTH] control_bit 
->>>>>>> refs/remotes/origin/scratchpad_main:rtl/modules/common/xbar/benes.sv
+    input logic [BITWIDTH-1:0] control_bit 
 );
 
     logic [DWIDTH-1:0] out_latch [STAGES][SIZE];
@@ -94,10 +89,6 @@ module benes #(
     always_comb begin
         for (int i = 0; i < SIZE; i++) begin
             xif.out[i] = out_latch[STAGES-1][i];
-<<<<<<< HEAD:rtl/modules/common/xbar/benes_xbar.sv
-            // xif.out[i] = {15'b0, control_bit[(SIZE/2*STAGES-(SIZE/2)) + i]};
-=======
->>>>>>> refs/remotes/origin/scratchpad_main:rtl/modules/common/xbar/benes.sv
         end
     end
 endmodule
