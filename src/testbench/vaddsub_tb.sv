@@ -380,15 +380,11 @@ initial begin
     // Read format: hex_a,hex_b,sub,hex_expected
     while (!$feof(fd)) begin
         int ret;
-        ret = $fscanf(fd, "%x,%x,%d,%4x\n", a_str, b_str, sub, exp_str);
-        if (ret != 4) continue; // Skip lines
-
-        // Convert string → 16-bit value
-        // Issues with questa, have to use void'$sscanf
-        void'($sscanf(a_str, "%h", a));
-        void'($sscanf(b_str, "%h", b));
-        void'($sscanf(exp_str, "%h", expected));
-
+        ret = $fscanf(fd, "%h,%h,%d,%h\n", a, b, sub, expected);
+        if (ret != 4) begin
+            $display("Skipping line (ret=%0d)", ret);
+            continue;
+        end
 
         // Apply to DUT
         @(negedge CLK);

@@ -10,12 +10,12 @@ module vaddsub(
 
   import vector_pkg::*;
 
-  localparam int EXP_W = 5;
-  localparam int FRAC_W = 10;
-  localparam int SIG_W = FRAC_W + 1;
-  localparam int GRS_W = 3;
-  localparam int EXT_W = SIG_W + GRS_W;
-  localparam int SUM_W = EXT_W + 1;
+  parameter int EXP_W = 5;
+  parameter int FRAC_W = 10;
+  parameter int SIG_W = FRAC_W + 1;
+  parameter int GRS_W = 3;
+  parameter int EXT_W = SIG_W + GRS_W;
+  parameter int SUM_W = EXT_W + 1;
 
   // Stage 1 temps
   logic [SIG_W-1:0] m1, m2;
