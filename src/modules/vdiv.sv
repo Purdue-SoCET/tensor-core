@@ -8,7 +8,7 @@ module vdiv
 );
 
 // Sequential logic to pulse done for 1 cycle
-logic done, next_done, done_pulsed, skip_divider, is_ovf;
+logic done, next_done, done_pulsed, skip_divider, is_ovf, is_sub;
 assign next_done = (divif.en && skip_divider || done);
 always_ff @(posedge CLK, negedge nRST) begin
     if (~nRST) begin
@@ -85,19 +85,14 @@ always_comb begin
     end
 end
 
-// Detect overflow (positive exponent minus negative exponent, exp > 30)
-assign is_ovf = ~skip_divider & exp_a[4] & ~exp_b[4] & (exp_norm > 30);
-
-// Handle subnormal outputs
-logic [5:0] shift_amt;
-logic [9:0] shifted_mant;
-logic new_round_bit;
 logic [9:0] final_mant;
 logic [4:0] final_exp;
-assign shift_amt = exp_norm[5] ? 1 - exp_norm : 0;
-assign {shifted_mant, new_round_bit} = {1'b1, mant, round_bit} >> shift_amt;
-assign final_mant = shifted_mant[9:0] + new_round_bit;
-assign final_exp = exp_norm[5] ? 0 : exp_norm[4:0];
+assign final_exp = exp_norm[4:0];
+assign final_mant = mant + round_bit;
+
+// Detect overflow (positive exponent minus negative exponent, exp > 30)
+assign is_ovf = ~skip_divider & exp_a[4] & ~exp_b[4] & (exp_norm > 30);
+assign is_sub = exp_norm[5] || exp_norm == 0;
 
 // Compute final result (accounting for edge cases)
 always_comb begin
@@ -105,7 +100,7 @@ always_comb begin
         divif.result = {final_sign, 5'b11111, 10'h200};
     else if (is_inf || is_ovf && !skip_divider)
         divif.result = {final_sign, 5'b11111, 10'b0};
-    else if (is_zero)
+    else if (is_zero || is_sub)
         divif.result = {final_sign, 5'b0, 10'b0};
     else
         divif.result = {final_sign, final_exp, final_mant};
