@@ -73,7 +73,7 @@ module backend #(parameter logic [SCPAD_ID_WIDTH-1:0] IDX = '0) (
     assign dr_wr_l.sram_rddata = be_dr_req_q.dram_req.wdata;
     assign dr_wr_l.num_request = num_request;
     assign dr_wr_l.be_stall = bbif.be_stall;
-    assign dr_wr_l.dram_be_stall = bdrif.dram_be_stall
+    assign dr_wr_l.dram_be_stall = bdrif.dram_be_stall;
     // output dram_write_req, dram_write_latch_busy, dram_write_req_latched
 
     always_comb begin
