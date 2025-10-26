@@ -25,7 +25,7 @@ module command_FSM (
 
     always_ff @(posedge CLK, negedge nRST) begin
         if (!nRST) begin
-            mycmd.ram_wait <= 0;
+            mycmd.ram_wait <= 1;
         end else begin
             mycmd.ram_wait <= nram_wait;
         end
