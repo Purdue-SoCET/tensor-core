@@ -6,20 +6,19 @@
 
 module benes_xbar #(
     parameter int SIZE = 32,
-    parameter int DWIDTH = 16, 
+    parameter int DWIDTH = 16,
     localparam int TAGWIDTH = $clog2(SIZE),
     localparam int STAGES = (2 * TAGWIDTH) - 1
 ) (
-    input logic CLK, nRST,
     xbar_if.xbar xif, 
-    input logic [STAGES * (SIZE >> 1)] control_bit 
+    input logic [STAGES * (SIZE >> 1)] control_bit
 );
 
     logic [DWIDTH-1:0] out_latch [STAGES][SIZE];
     logic [DWIDTH-1:0] in_latch [STAGES][SIZE];
     
-    always_ff @(posedge CLK, negedge nRST) begin
-        if (!nRST) begin
+    always_ff @(posedge xif.clk, negedge xif.n_rst) begin
+        if (!xif.n_rst) begin
             for (int s = 0; s < STAGES; s++) begin
                 for (int i = 0; i < SIZE; i++) begin
                     in_latch[s][i] <= 16'b0;
@@ -54,7 +53,7 @@ module benes_xbar #(
             // stage last
             else if (stage == (STAGES - 1) ) begin
                 for(j = 0; j < SIZE; j += 2) begin : stage_last
-                    localparam int ctrl = 128 + j / 2;
+                    localparam int ctrl = (SIZE/2*STAGES-(SIZE/2)) + (j / 2);
                     crossover_switch #(.SIZE(DWIDTH)) u_less_comp (
                         .din({in_latch[stage][j], in_latch[stage][j + 1]}),
                         .cntrl(control_bit[ctrl]), 
@@ -89,7 +88,7 @@ module benes_xbar #(
     always_comb begin
         for (int i = 0; i < SIZE; i++) begin
             xif.out[i] = out_latch[STAGES-1][i];
-            // xif.out[i] = {15'b0, control_bit[i]};
+            // xif.out[i] = {15'b0, control_bit[(SIZE/2*STAGES-(SIZE/2)) + i]};
         end
     end
 endmodule
