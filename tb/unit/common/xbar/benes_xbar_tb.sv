@@ -7,6 +7,7 @@ module benes_xbar_tb;
     localparam int TAGWIDTH = $clog2(SIZE);
     localparam int STAGES = (2 * TAGWIDTH) - 1;
 
+<<<<<<< HEAD
     logic clk, n_rst;
     logic [STAGES * (SIZE >> 1)] control_bit ;
 
@@ -16,6 +17,33 @@ module benes_xbar_tb;
     xbar_if #(.SIZE(SIZE), .DWIDTH(DWIDTH)) xif (.clk(clk), .n_rst(n_rst));
     benes_xbar #(.SIZE(SIZE), .DWIDTH(DWIDTH)) DUT (xif, control_bit);
 
+=======
+    logic [STAGES * (SIZE >> 1)] control_bit;
+    logic clk, n_rst;
+    initial clk = 1'b0;
+    always  #5 clk = ~clk;
+
+    xbar_if #(.SIZE(SIZE), .DWIDTH(DWIDTH)) xif (.clk(clk), .n_rst(n_rst));
+
+    test #(.PERIOD(PERIOD)) PROG (
+        .*
+    );
+
+    benes DUT (
+        .*
+    );
+
+endmodule
+
+program test #(
+    parameter PERIOD = 10,
+    parameter STAGES = 9,
+    parameter SIZE = 32
+) (
+    xbar_if.tb xif,
+    output logic [STAGES * (SIZE >> 1)] control_bit
+);
+>>>>>>> refs/remotes/origin/scratchpad_main
     integer i;
     logic [15:0] val;
     logic [DWIDTH-1:0] exp_out [SIZE-1:0];
@@ -46,11 +74,19 @@ module benes_xbar_tb;
     // endfunction
 
 initial begin
+<<<<<<< HEAD
     n_rst = 0;
 
     #(PERIOD);
 
     n_rst = 1;
+=======
+    xif.n_rst = 0;
+
+    #(PERIOD);
+
+    xif.n_rst = 1;
+>>>>>>> refs/remotes/origin/scratchpad_main
     val = 16'd0;
 
     for (i = 0; i < 32; i = i + 1) begin
