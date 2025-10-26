@@ -31,7 +31,7 @@ module sysarr_MAC_tb;
     // sysarr_control_unit_if instance
     systolic_array_MAC_if mac_if();
 
-    sysarr_MAC dut (.clk(tb_clk), .nRST(tb_nrst), .mac_if(mac_if.MAC));
+    sysarr_MAC_1CM dut (.clk(tb_clk), .nRST(tb_nrst), .mac_if(mac_if.MAC));
 
     logic [15:0] test_inputs[9:0];
     logic [15:0] test_weights[9:0];
