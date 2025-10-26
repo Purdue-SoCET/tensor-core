@@ -23,8 +23,8 @@ module benes #(
     logic [DWIDTH-1:0] out_latch [STAGES][SIZE];
     logic [DWIDTH-1:0] in_latch [STAGES][SIZE];
     
-    always_ff @(posedge CLK, negedge nRST) begin
-        if (!nRST) begin
+    always_ff @(posedge xif.clk, negedge xif.n_rst) begin
+        if (!xif.n_rst) begin
             for (int s = 0; s < STAGES; s++) begin
                 for (int i = 0; i < SIZE; i++) begin
                     reg_latch[s][i] <= '0;

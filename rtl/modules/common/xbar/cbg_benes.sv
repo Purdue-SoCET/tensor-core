@@ -1,5 +1,5 @@
 module cbg_benes #(
-    parameter int SIZE=32;
+    parameter int SIZE = 32,
     parameter int DWIDTH = 16,
     localparam int TAGWIDTH = $clog2(SIZE),
     localparam int STAGES = (2 * TAGWIDTH) - 1, 
