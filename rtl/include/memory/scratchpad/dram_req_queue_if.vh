@@ -16,6 +16,7 @@ interface dram_req_queue_if;
     scpad_data_t sram_rdata;
     logic be_stall;
     logic dram_queue_full, dram_be_stall, sram_res_valid, burst_complete;
+    logic dram_req_latched;
 
     modport baceknd_dram_req_queue ( 
         input dram_addr, id, sub_id, num_bytes, sram_rdata, sram_res_valid, num_request,
