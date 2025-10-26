@@ -92,7 +92,7 @@ interface scpad_if (input logic clk, input logic n_rst);
     modport backend_dram (
         input clk, n_rst, 
         output be_dram_req, be_dram_stall,
-        input dram_be_res
+        input dram_be_res, dram_be_stall
     );
 
     // Vec. Core <=> Frontend 
@@ -211,7 +211,7 @@ interface scpad_if (input logic clk, input logic n_rst);
         input sched_res, be_req,
         input be_dram_stall, be_dram_req,
 
-        output be_stall,
+        output be_stall, dram_be_stall,
         output sched_req, be_res, dram_be_res
     );
 

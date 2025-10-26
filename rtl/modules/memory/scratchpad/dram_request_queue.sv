@@ -14,7 +14,7 @@
     //     output dram_req, dram_queue_full, dram_req_latched
     // );
 
-module dram_request_queue ( // UUID now needs to have 2 lower bits for an offest since dram can only handle 64 bits at a time
+module dram_request_queue ( // UUID now needs to have 3 lower bits for an offest since dram can only handle 64 bits at a time
     input logic clk, n_rst, 
     dram_req_queue_if.baceknd_dram_req_queue be_dr_req_q
 );

@@ -11,8 +11,8 @@
 import scpad_pkg::*;
 
 module backend #(parameter logic [SCPAD_ID_WIDTH-1:0] IDX = '0) (
-    scpad_if.backend_sched bshif, 
-    scpad_if.backend_body bscif, 
+    scpad_if.backend_sched bshif,
+    scpad_if.backend_body bbif,
     scpad_if.backend_dram bdrif
 );
 
@@ -51,7 +51,7 @@ module backend #(parameter logic [SCPAD_ID_WIDTH-1:0] IDX = '0) (
 
     dram_request_queue dr_rd_req_q(bshif.clk, bshif.n_rst, be_dr_req_q);
     assign be_dr_req_q.sched_write = bshif.sched_req.write;
-    assign be_dr_req_q.be_stall = bscif.be_stall;
+    assign be_dr_req_q.be_stall = bbif.be_stall;
     assign be_dr_req_q.dram_be_stall = bdrif.dram_be_stall || dr_wr_l.dram_write_latch_busy;
     // output dram_req, dram_queue_full, dram_req_latched
 
@@ -61,17 +61,17 @@ module backend #(parameter logic [SCPAD_ID_WIDTH-1:0] IDX = '0) (
     assign sr_wr_l.xbar = baddr.xbar_desc;
     assign sr_wr_l.dram_rddata = bdrif.dram_be_res.rdata;
     assign sr_wr_l.num_request = num_request;
-    assign sr_wr_l.be_stall = bscif.be_stall;
+    assign sr_wr_l.be_stall = bbif.be_stall;
     // output sram_write_req, sram_write_req_latched
 
     dram_write_latch dr_wr_latch(bshif.clk, bshif.n_rst, dr_wr_l);
-    assign dr_wr_l.dram_addr = {bscif.sched_req.dram_addr[DRAM_ADDR_WIDTH-1:5] + uuid, 5'b00000};
+    assign dr_wr_l.dram_addr = {bbif.sched_req.dram_addr[DRAM_ADDR_WIDTH-1:5] + uuid, 5'b00000};
     assign dr_wr_l.num_bytes = num_bytes;
     assign dr_wr_l.dram_valid = be_dr_req_q.dram_req.valid;
     assign dr_wr_l.dram_write = be_dr_req_q.dram_req.write;
     assign dr_wr_l.sram_rddata = be_dr_req_q.dram_req.wdata;
     assign dr_wr_l.num_request = num_request;
-    assign dr_wr_l.be_stall = bscif.be_stall;
+    assign dr_wr_l.be_stall = bbif.be_stall;
     // output dram_write_req, dram_write_latch_busy, dram_write_req_latched
 
     always_comb begin
@@ -100,7 +100,7 @@ module backend #(parameter logic [SCPAD_ID_WIDTH-1:0] IDX = '0) (
         num_bytes = 8; // num_bytes can be a static 8 bytes unless you want to get rid of padding
         
         // sched_write == 1'b0  scpad load, dram read to a sram write.
-        be_dr_req_q.dram_addr = {bscif.sched_req.dram_addr[DRAM_ADDR_WIDTH-1:5] + uuid, sub_uuid, 2'b00};
+        be_dr_req_q.dram_addr = {bbif.sched_req.dram_addr[DRAM_ADDR_WIDTH-1:5] + uuid, sub_uuid, 2'b00};
         be_dr_req_q.id = uuid;
         be_dr_req_q.sub_id = sub_uuid;
         
@@ -128,13 +128,13 @@ module backend #(parameter logic [SCPAD_ID_WIDTH-1:0] IDX = '0) (
 
         if(be_dr_req_q.transaction_complete == 1'b1) begin
             nxt_uuid = uuid + 1;
-            if(uuid == bscif.sched_req.num_rows) begin
+            if(uuid == bbif.sched_req.num_rows) begin
                 nxt_uuid = 0;
             end
         end
 
         if(sr_wr_l.sram_write_req_latched == 1'b1) begin // be_stall is checked in sram latch 
-            bscif.be_req = sr_wr_l.sram_write_req;
+            bbif.be_req = sr_wr_l.sram_write_req;
         end
 
         bdrif.be_dram_req.valid = be_dr_req_q.dram_req.valid;
@@ -156,19 +156,19 @@ module backend #(parameter logic [SCPAD_ID_WIDTH-1:0] IDX = '0) (
 
         if(bshif.sched_req.write == 1'b1) begin // sched write == 1'b1, scpad store, sram read to a dram write.
             be_id = uuid;
-            if(bscif.be_stall == 1'b0) begin
-                bscif.be_req.valid = 1'b1;
-                bscif.be_req.write = 1'b0;
+            if(bbif.be_stall == 1'b0) begin
+                bbif.be_req.valid = 1'b1;
+                bbif.be_req.write = 1'b0;
                 /* needed?
-                bscif.be_req.addr = {bshif.sched_req.spad_addr[19:5] + uuid, 5'b00000};
-                bscif.be_req.num_rows = 0;
-                bscif.be_req.num_cols = 0;
-                bscif.be_req.row_id = 0;
-                bscif.be_req.col_id = 0;
+                bbif.be_req.addr = {bshif.sched_req.spad_addr[19:5] + uuid, 5'b00000};
+                bbif.be_req.num_rows = 0;
+                bbif.be_req.num_cols = 0;
+                bbif.be_req.row_id = 0;
+                bbif.be_req.col_id = 0;
                 */
-                bscif.be_req.row_or_col = bshif.sched_req.row_or_col;
-                bscif.be_req.xbar = baddr.xbar_desc;
-                bscif.be_req.wdata = 0;
+                bbif.be_req.row_or_col = bshif.sched_req.row_or_col;
+                bbif.be_req.xbar = baddr.xbar_desc;
+                bbif.be_req.wdata = 0;
             end
 
             bdrif.be_dram_req.valid = dr_wr_l.dram_write_latch.valid;

@@ -11,7 +11,7 @@
     //     output dram_write_req, dram_write_latch_busy, dram_write_req_latched
     // );
 
-module dram_write_latch ( // UUID now needs to have 2 lower bits for an offest since dram can only handle 64 bits at a time
+module dram_write_latch ( // UUID now needs to have 3 lower bits for an offest since dram can only handle 64 bits at a time
     input logic clk, n_rst, 
     dram_write_latch_if.dram_write_latch dr_wr_l
 );
