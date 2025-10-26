@@ -52,6 +52,7 @@ module backend #(parameter logic [SCPAD_ID_WIDTH-1:0] IDX = '0) (
     dram_request_queue dr_rd_req_q(bshif.clk, bshif.n_rst, be_dr_req_q);
     assign be_dr_req_q.sched_write = bshif.sched_req.write;
     assign be_dr_req_q.be_stall = bbif.be_stall;
+    assign be_dr_req_q.num_request = num_request;
     assign be_dr_req_q.dram_be_stall = bdrif.dram_be_stall || dr_wr_l.dram_write_latch_busy;
     // output dram_req, dram_queue_full, dram_req_latched
 
@@ -72,6 +73,7 @@ module backend #(parameter logic [SCPAD_ID_WIDTH-1:0] IDX = '0) (
     assign dr_wr_l.sram_rddata = be_dr_req_q.dram_req.wdata;
     assign dr_wr_l.num_request = num_request;
     assign dr_wr_l.be_stall = bbif.be_stall;
+    assign dr_wr_l.dram_be_stall = bdrif.dram_be_stall
     // output dram_write_req, dram_write_latch_busy, dram_write_req_latched
 
     always_comb begin
@@ -171,12 +173,12 @@ module backend #(parameter logic [SCPAD_ID_WIDTH-1:0] IDX = '0) (
                 bbif.be_req.wdata = 0;
             end
 
-            bdrif.be_dram_req.valid = dr_wr_l.dram_write_latch.valid;
-            bdrif.be_dram_req.write = dr_wr_l.dram_write_latch.valid;
+            bdrif.be_dram_req.valid = dr_wr_l.dram_write_req.valid;
+            bdrif.be_dram_req.write = dr_wr_l.dram_write_req.valid;
             bdrif.be_dram_req.id = 0; // doesn't matter it's just a write
-            bdrif.be_dram_req.dram_addr = dr_wr_l.dram_write_latch.dram_addr;
-            bdrif.be_dram_req.num_bytes = dr_wr_l.dram_write_latch.num_bytes;
-            bdrif.be_dram_req.wdata = dr_wr_l.dram_write_latch.wdata;    
+            bdrif.be_dram_req.dram_addr = dr_wr_l.dram_write_req.dram_addr;
+            bdrif.be_dram_req.num_bytes = dr_wr_l.dram_write_req.num_bytes;
+            bdrif.be_dram_req.wdata = dr_wr_l.dram_write_req.wdata;    
         end
         
     end

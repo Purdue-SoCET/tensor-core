@@ -43,7 +43,7 @@ module dram_write_latch ( // UUID now needs to have 3 lower bits for an offest s
         dr_wr_l.dram_write_latch_busy = 1'b0;
         dr_wr_l.dram_write_req_latched = 1'b0;
 
-        if(dr_wr_l.dram_be_busy == 1'b0) begin
+        if(dr_wr_l.dram_be_stall == 1'b0) begin
             if(dr_wr_l.dram_write == 1'b1 && dr_wr_l.dram_valid == 1'b1 && request_completed_counter != dr_wr_l.num_request) begin
                 dr_wr_l.dram_write_latch_busy = 1'b1;
                 nxt_dram_write_latch.valid = 1'b1;

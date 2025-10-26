@@ -24,10 +24,11 @@ interface dram_write_latch_if;
     logic [DRAM_ADDR_WIDTH-1:0] dram_addr;
     logic [COL_IDX_WIDTH-1:0]   num_bytes;
     logic dram_write_req_latched;
+    logic dram_be_stall;
 
     modport dram_write_latch (
         input dram_addr, num_bytes, dram_valid, dram_write, sram_rddata, num_request,
-        input be_stall,
+        input be_stall, dram_be_stall,
         output dram_write_req, dram_write_latch_busy, dram_write_req_latched
     );
 
