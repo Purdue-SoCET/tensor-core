@@ -23,9 +23,9 @@ module benes #(
     logic [DWIDTH-1:0] out_latch [STAGES][SIZE];
     logic [DWIDTH-1:0] in_latch [STAGES][SIZE];
     
-    always_ff @ (posedge xif.clk, negedge xif.n_rst) begin
-        if (!xif.n_rst) begin
-            for (int s = 0; s < STAGES-1; s++) begin
+    always_ff @(posedge CLK, negedge nRST) begin
+        if (!nRST) begin
+            for (int s = 0; s < STAGES; s++) begin
                 for (int i = 0; i < SIZE; i++) begin
                     reg_latch[s][i] <= '0;
                 end
@@ -71,7 +71,7 @@ module benes #(
             // stage last
             else if (stage == (STAGES - 1) ) begin
                 for(j = 0; j < SIZE; j += 2) begin : stage_last
-                    localparam int ctrl = ((SIZE/2)*stage) + (j/2);
+                    localparam int ctrl = 128 + j / 2;
                     crossover_switch #(.SIZE(DWIDTH)) u_less_comp (
                         .din({in_latch[stage][j], in_latch[stage][j + 1]}),
                         .cntrl(control_bit[ctrl]), 
