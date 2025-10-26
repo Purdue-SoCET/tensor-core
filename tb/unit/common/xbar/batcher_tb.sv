@@ -94,7 +94,9 @@ module batcher_tb;
             mismatches++;
             errors++;
             lanes = { lanes, (lanes.len() ? "  " : ""), $sformatf("lane%0d: got=%0h exp=%0h", k, got, exp[k]) };
-          end
+          end else begin 
+            lanes = { lanes, (lanes.len() ? "  " : ""), $sformatf("lane%0d: got=%0h exp=%0h", k, got, exp[k]) };
+          end 
         end
 
         if (mismatches == 0) begin

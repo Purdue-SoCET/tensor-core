@@ -6,6 +6,7 @@ SHELL := /bin/bash
 TOPDIR     := .
 INCDIRROOT := $(TOPDIR)/rtl/include
 SCRIPTROOT := $(TOPDIR)/scripts
+WAVEROOT := $(TOPDIR)/waves
 MODROOT    := $(TOPDIR)/rtl/modules
 TBROOT     := $(TOPDIR)/tb
 UVMTESTROOT  := $(TBROOT)/uvm
@@ -23,6 +24,7 @@ RTL_SRCS := $(shell \
 VLIB ?= vlib
 VLOG ?= vlog
 VSIM ?= vsim
+GUI ?= OFF
 
 .PHONY: setup lint test clean_lib
 
@@ -121,12 +123,12 @@ test:
 	PKGS=$$(printf '%s\n' $$ALLSRCS | grep -E '_pkg\.sv$$' || true); \
 	OTHERS=$$(printf '%s\n' $$ALLSRCS | grep -Ev '_pkg\.sv$$' || true); \
 	ORDERED_SRCS="$$PKGS $$OTHERS"; \
-	\
 
 	BASE_INCS="+incdir+$(INCDIRROOT) +incdir+$(MODROOT) +incdir+$(UNITTESTROOT)"; \
 	INCDIRS_INC=$$(find "$(INCDIRROOT)$(folder)" -type d -print 2>/dev/null | sed 's/^/+incdir+/'); \
 	INCDIRS_MOD=$$(find "$(MODROOT)$(folder)"   -type d -print 2>/dev/null | sed 's/^/+incdir+/'); \
 	INCDIRS_TB=$$(find "$(UNITTESTROOT)$(folder)"     -type d -print 2>/dev/null | sed 's/^/+incdir+/'); \
+
 	EXTRA_INCS=""; \
 	if [ -n "$(include)" ]; then \
 	  for p in $$(echo "$(include)" | tr ',' ' '); do \
@@ -136,19 +138,23 @@ test:
 	  done; \
 	fi; \
 	INCFLAGS="$$BASE_INCS $$INCDIRS_INC $$INCDIRS_MOD $$INCDIRS_TB $$EXTRA_INCS"; \
-	\
-	# Determine top from tb_file
+
 	TB_CAND="$(UNITTESTROOT)$(folder)/$(tb_file)"; \
 	[ -f "$$TB_CAND" ] || { echo "[$@] tb_file not found: $$TB_CAND"; exit 3; }; \
 	TB_BASENAME=$$(basename "$$TB_CAND"); \
 	TB_TOP="$${TB_BASENAME%.*}"; \
-	\
-	# Ensure library, compile, then launch GUI sim
+
 	[ -d work ] || $(VLIB) work; \
 	echo "[$@] compiling (in-order):"; printf '  %s\n' $$ORDERED_SRCS; \
 	$(VLOG) -sv -mfcu -work work +acc $$INCFLAGS $$ORDERED_SRCS; \
-	echo "[$@] launching vsim GUI on work.$$TB_TOP"; \
-	$(VSIM) -c work.$$TB_TOP -do "run -all"
+
+	@if [ "$(GUI)" = "ON" ]; then \
+		echo "[$@] launching vsim GUI on work.$$TB_TOP"; \
+		$(VSIM) -coverage -voptargs="+acc" work.$$TB_TOP -do "view objects; do $$WAVEROOT/$$TB_TOP.do; run -all;" -onfinish stop; \
+	else \
+		echo "[$@] launching vsim on work.$$TB_TOP"; \
+		$(VSIM) -coverage -c -voptargs="+acc"  work.$$TB_TOP -do "run -all"; \
+	fi 
 
 clean_lib:
 	rm -rf $(SCRATCH) transcript vsim.wlf work modelsim.ini

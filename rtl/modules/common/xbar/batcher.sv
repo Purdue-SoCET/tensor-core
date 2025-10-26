@@ -9,10 +9,11 @@ import xbar_pkg::*;
 module batcher #(
     parameter int SIZE = 32,
     parameter int DWIDTH = 16, 
-    parameter batcher_mask_t REGISTER_MASK = 14'b11111111111111, 
 
-    localparam int TAGWIDTH = $clog2(SIZE),
-    localparam int STAGES = (TAGWIDTH * (TAGWIDTH + 1)) / 2
+    parameter int TAGWIDTH = $clog2(SIZE),
+    parameter int STAGES = (TAGWIDTH * (TAGWIDTH + 1)) / 2, 
+
+    parameter logic [STAGES-2:0] REGISTER_MASK = '1
 ) (xbar_if.xbar xif);
 
     logic [TAGWIDTH-1:0] shift_in [1:STAGES][SIZE];
@@ -47,10 +48,15 @@ module batcher #(
     generate
         genvar ii, s;
 
-        for (s = 1; s < STAGES; s++) begin
+        for (ii = 0; ii < SIZE; ii++) begin
+            assign data_in[1][ii] = xif.in[ii].din;
+            assign shift_in[1][ii] = xif.in[ii].shift;
+        end
+
+        for (s = 2; s <= STAGES; s++) begin
             for (ii = 0; ii < SIZE; ii++) begin 
-                assign data_in [s][ii] = REGISTER_MASK[s-1] ? data_latch[s-1][ii] : data_out[s-1][ii];
-                assign shift_in[s][ii] = REGISTER_MASK[s-1] ? shift_latch[s-1][ii] : shift_out[s-1][ii];
+                assign data_in[s][ii] = REGISTER_MASK[s-2] ? data_latch[s-1][ii] : data_out[s-1][ii];
+                assign shift_in[s][ii] = REGISTER_MASK[s-2] ? shift_latch[s-1][ii] : shift_out[s-1][ii];
             end
         end
     endgenerate
@@ -94,7 +100,7 @@ module batcher #(
                             .din('{upper_din[0], upper_din[1]}),
                             .tin('{upper_shift[0], upper_shift[1]}),
                             .cntrl (((i & k) == 0)),
-                            .dout('{data_out [stage][i], data_out [stage][ixj]}),
+                            .dout('{data_out[stage][i], data_out[stage][ixj]}),
                             .tout('{shift_out[stage][i], shift_out[stage][ixj]})
                         );
                     end
