@@ -94,8 +94,8 @@ wb:
 	$(VSIM) $(VSIM_FLAGS) work.writeback_tb -do "do $(abspath ./src/waves/writeback.do); run -all"
 
 gsau:
-	$(VLOG) $(VLOG_FLAGS) ./src/include/gsau_control_unit_if.vh ./src/testbench/gsau_control_unit_tb.sv ./src/modules/gsau_control_unit.sv ./src/modules/sync_fifo.sv
+	$(VLOG) $(VLOG_FLAGS) ./src/modules/simple_systolic_model.sv ./src/include/gsau_control_unit_if.vh ./src/testbench/gsau_control_unit_tb.sv ./src/modules/gsau_control_unit.sv ./src/modules/sync_fifo.sv
     #$(VSIM) $(VSIM_FLAGS) work.gsau_control_unit_tb -do $(SIMDO) -onfinish stop 
-	vsim -coverage -voptargs="+acc" work.gsau_control_unit_tb -do "view objects; do ./waveforms/gsau_control_unit_tb.do; run -all;" -onfinish stop
+	vsim -coverage -voptargs="+acc" work.gsau_control_unit_tb -do "view objects; do ./src/waves/gsau_control_unit_tb.do; run -all;" -onfinish stop
 #$(VSIM) $(VSIM_FLAGS) work._tb -do $(SIMDO) -onfinish stop 
 #$(VSIM) $(VSIM_FLAGS) work.gsau_control_unit_tb -do $(SIMDO)

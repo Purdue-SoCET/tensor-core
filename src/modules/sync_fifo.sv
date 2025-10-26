@@ -19,6 +19,7 @@ module sync_fifo #(parameter FIFODEPTH=8, DATAWIDTH=16) // DATAWIDTH = word size
   always_ff @(posedge CLK or negedge nRST) begin
     if (!nRST) begin
       wptr <= '0;
+      fifo <= '0;  // Initializes entire array to 0
     end 
     else begin
       if (wr_en & !full) begin

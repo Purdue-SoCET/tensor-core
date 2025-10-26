@@ -57,7 +57,7 @@ module gsau_control_unit #(
 
     // Default handshake semantics:
     // - sb_ready asserted when FIFO not full (we can accept more RD's)
-    gsau_port.sb_ready  = !fifo_full && gsau_port.sa_fifo_has_space; // allow scoreboard to send new inst when space
+    gsau_port.sb_ready  = !fifo_full && gsau_port.sa_fifo_has_space && gsau_port.wb_output_ready; // allow scoreboard to send new inst when space
     gsau_port.sa_output_ready = gsau_port.wb_output_ready;
 
     if (gsau_port.sb_valid && gsau_port.sb_ready) begin
