@@ -10,7 +10,8 @@ module vaddsubmyles(
   input  logic [15:0] port_a,
   input  logic [15:0] port_b,
   output logic [15:0] out,
-  output logic        overflow // this and removing vaddsub.if were only changes
+  output logic        overflow,
+  output logic        out_valid
 );
  // i can prolly remove the subnormal stuff later 
   localparam int EXP_W = 5;
@@ -339,7 +340,8 @@ module vaddsubmyles(
   end
 
   // Final Outputs
-  assign out      = s2_v ? s2_out : 16'b0;
-  assign overflow = s2_v ? s2_ovf : 1'b0;
+  assign out      = s2_out;
+  assign overflow = s2_ovf;
+  assign out_valid = s2_v;
 
 endmodule

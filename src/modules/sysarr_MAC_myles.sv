@@ -54,16 +54,21 @@ module sysarr_MAC_myles(input logic clk, input logic nRST, systolic_array_MAC_if
     end
 
     logic run_latched;
-    logic start_passthrough_1, start_passthrough_2, start_passthrough_3;
+    logic start_passthrough_1;
     logic run;
+    logic vaddsub_valid;
 
     always_ff @(posedge clk, negedge nRST) begin
         if(nRST == 1'b0) begin
             run_latched <= 1'b0;
         end
-        else begin
-            run_latched <= (run_latched | mac_if.start) & ~start_passthrough_3;
+        else if (mac_if.start) begin
+            run_latched <= 1'b1;          // set wins if both true
         end
+        else if (vaddsub_valid) begin
+            run_latched <= 1'b0;          // clear when adder completes
+        end
+        // else hold
     end
 
     assign run = run_latched | mac_if.start;
@@ -215,38 +220,9 @@ module sysarr_MAC_myles(input logic clk, input logic nRST, systolic_array_MAC_if
         .port_a(mul_result_latched),
         .port_b(in_accumulate_latched),
         .out(vaddsub_out),
-        .overflow(vaddsub_ovf)
+        .overflow(vaddsub_ovf),
+        .out_valid(vaddsub_valid)
     );
-
-    // pipeline delay to match vaddsub's 2-cycle latency
-    logic start_passthrough_2b;
-    always_ff @(posedge clk, negedge nRST) begin
-        if(nRST == 1'b0)
-            start_passthrough_2b <= 0;
-        else if(run)
-            start_passthrough_2b <= start_passthrough_2a;
-        else
-            start_passthrough_2b <= start_passthrough_2b;
-    end
-
-    always_ff @(posedge clk, negedge nRST) begin
-        if(nRST == 1'b0)
-            start_passthrough_2 <= 0;
-        else if(run)
-            start_passthrough_2 <= start_passthrough_2b;
-        else
-            start_passthrough_2 <= start_passthrough_2;
-    end
-
-    // Final stage delay
-    always_ff @(posedge clk, negedge nRST) begin
-        if(nRST == 1'b0)
-            start_passthrough_3 <= 0;
-        else if(run)
-            start_passthrough_3 <= start_passthrough_2;
-        else
-            start_passthrough_3 <= start_passthrough_3;
-    end
 
     // Output assignment - check for overflow
     assign mac_if.out_accumulate = vaddsub_ovf ? 16'b0111110000000000 : vaddsub_out;
