@@ -218,10 +218,18 @@ add wave -noupdate -group {scheduler if} /dram_controller_top_tb/sch_if/ramREN_c
 add wave -noupdate -group {scheduler if} /dram_controller_top_tb/sch_if/ramREN_ftrt
 add wave -noupdate -group {scheduler if} /dram_controller_top_tb/sch_if/ramWEN_curr
 add wave -noupdate -group {scheduler if} /dram_controller_top_tb/sch_if/ramWEN_ftrt
+add wave -noupdate -group {scheduler buffer} /dram_controller_top_tb/SCH_BUFF/wptr
+add wave -noupdate -group {scheduler buffer} /dram_controller_top_tb/SCH_BUFF/rptr
+add wave -noupdate -group {scheduler buffer} /dram_controller_top_tb/SCH_BUFF/clear
+add wave -noupdate -group {scheduler buffer} /dram_controller_top_tb/SCH_BUFF/flush
+add wave -noupdate -group {scheduler buffer} /dram_controller_top_tb/SCH_BUFF/full
+add wave -noupdate -group {scheduler buffer} /dram_controller_top_tb/SCH_BUFF/i
+add wave -noupdate -group {scheduler buffer} /dram_controller_top_tb/SCH_BUFF/fifo
+add wave -noupdate -group {scheduler buffer} /dram_controller_top_tb/SCH_BUFF/n_fifo
 TreeUpdate [SetDefaultTree]
 WaveRestoreCursors {{Cursor 1} {3387750 ps} 0}
 quietly wave cursor active 1
-configure wave -namecolwidth 292
+configure wave -namecolwidth 331
 configure wave -valuecolwidth 100
 configure wave -justifyvalue left
 configure wave -signalnamewidth 0
@@ -235,4 +243,4 @@ configure wave -griddelta 40
 configure wave -timeline 0
 configure wave -timelineunits ns
 update
-WaveRestoreZoom {2760234 ps} {4084266 ps}
+WaveRestoreZoom {2869232 ps} {4158113 ps}
