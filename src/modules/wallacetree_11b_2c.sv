@@ -7,7 +7,7 @@
 
 /* verilator lint_off UNUSEDSIGNAL */
 
-module mul_wallacetree (input logic clk, nRST, [10:0] a, b, input logic active, output logic [12:0] result, output logic overflow, round_loss, value_ready);
+module wallacetree_11b_2c (input logic clk, nRST, [10:0] a, b, input logic active, output logic [12:0] result, output logic overflow, round_loss, value_ready);
 logic [2:0][12:0] stage1_sums;
 logic [2:0][10:0] stage1_carries;
 

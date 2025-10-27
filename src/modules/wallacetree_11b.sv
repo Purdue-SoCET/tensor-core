@@ -5,7 +5,7 @@
 `timescale 1ns/1ps
 
 // module mul_wallacetree #(parameter num_bits = 11) (input logic clk, nRST, start, stop, input logic [num_bits-1:0] op1, op2, output logic [num_bits-1:0] result, output logic overflow, round_loss);
-module mul_wallacetree_singlecycle (input logic [10:0] a, b, output logic [12:0] result, output logic overflow, round_loss);
+module wallacetree_11b (input logic [10:0] a, b, output logic [12:0] result, output logic overflow, round_loss);
 
 logic [2:0][12:0] stage1_sums;
 logic [2:0][10:0] stage1_carries;
