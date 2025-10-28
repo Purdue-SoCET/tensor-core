@@ -1,23 +1,25 @@
-`include "vaddsub_if.vh"
+`include "vexp_if.vh"
 `include "vector_if.vh"
 `include "vector_types.vh"
 
 `timescale 1 ns / 1 ns
 
-module vaddsub_tb;
+module vexp_tb;
 
     parameter PERIOD = 10;
     logic CLK = 0, nRST;
 
     always #(PERIOD/2) CLK++;
 
-    vaddsub_if vaddsubif ();
-    vaddsub_1stage DUT (.CLK(CLK), .nRST(nRST), .vaddsubif(vaddsubif));
+    vexp_if vexpif ();
+    vls DUT (.CLK(CLK), .nRST(nRST), .vexpif(vexpif));
 
     int casenum;
     string casename;
 
 initial begin
+    
+    //nRST Test Case
     casenum = '0;
     casename = "nRST";
 
@@ -25,12 +27,14 @@ initial begin
 
     #(PERIOD);
 
+    //
+
     nRST = 1;
 
     casenum = 1;
     casename = "Add Case 1: ";
 
-    vaddsubif.valid = 1;
+    vaddsubif.enable = 1;
     vaddsubif.sub = 0;
     vaddsubif.port_a = 16'b0_01111_0000000001;
     vaddsubif.port_b = 16'b0_01111_0000000011;
