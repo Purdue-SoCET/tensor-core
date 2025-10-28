@@ -9,7 +9,7 @@
 
 
 /* verilator lint_off UNUSEDSIGNAL */
-module sysarr_MAC_tb;
+module sysarr_MAC_myles_tb;
 
     // Parameters
     localparam CLK_PERIOD = 1;
