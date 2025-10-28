@@ -126,7 +126,7 @@ module sysarr_MAC_1CM(input logic clk, input logic nRST, systolic_array_MAC_if.M
     logic mul_carryout;
     logic mul_round_loss;
 
-    mul_wallacetree_singlecycle wallaca (
+    wallacetree_11b wallaca (
         .a({frac_leading_bit_fp1, input_x[9:0]}),
         .b({frac_leading_bit_fp2, weight[9:0]}),
         .result(mul_product),

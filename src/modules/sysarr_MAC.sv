@@ -149,7 +149,7 @@ module sysarr_MAC(input logic clk, input logic nRST, systolic_array_MAC_if.MAC m
     end
 
     logic mul_ready, mul_stall;
-    mul_wallacetree wallaca (
+    wallacetree_11b_2c wallaca (
         .clk(clk),
         .nRST(nRST),
         .active(mac_if.start),
