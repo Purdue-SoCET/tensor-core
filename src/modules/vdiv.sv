@@ -7,26 +7,29 @@ module vdiv
     vdiv_if.div divif
 );
 
+localparam int EXP_WIDTH = divif.EXP_WIDTH;
+localparam int MANT_WIDTH = divif.MANT_WIDTH;
+
 // Sequential logic to pulse done for 1 cycle
 logic done, next_done, done_pulsed, skip_divider, is_ovf, is_sub;
-assign next_done = (divif.en && skip_divider || done);
+assign next_done = (divif.in.en && skip_divider || done);
 always_ff @(posedge CLK, negedge nRST) begin
     if (~nRST) begin
-        divif.done <= 0;
+        divif.out.done <= 0;
         done_pulsed <= 0;
     end else begin
-        divif.done <= ~done_pulsed && next_done;
+        divif.out.done <= ~done_pulsed && next_done;
         if (done_pulsed) done_pulsed <= 0;
         else if (next_done) done_pulsed <= 1;
     end
 end
 
-// Split FP16 inputs into components
+// Split FP inputs into components
 logic sign_a, sign_b;
-logic [4:0] exp_a, exp_b;
-logic [9:0] mant_a, mant_b;
-assign {sign_a, exp_a, mant_a} = divif.a;
-assign {sign_b, exp_b, mant_b} = divif.b;
+logic [EXP_WIDTH-1:0] exp_a, exp_b;
+logic [MANT_WIDTH-1:0] mant_a, mant_b;
+assign {sign_a, exp_a, mant_a} = divif.in.a;
+assign {sign_b, exp_b, mant_b} = divif.in.b;
 
 // Compute sign (simple XOR)
 logic final_sign;
@@ -52,58 +55,55 @@ assign is_zero = (!is_nan) && (!is_inf) && (a_zero || b_inf);
 assign skip_divider = is_nan || is_inf || is_zero; // skip division if edge case
 
 // Compute raw exponent
-logic [5:0] exp;
-assign exp = exp_a - exp_b + 15;
+localparam int bias = (1 << (EXP_WIDTH - 1)) - 1;
+logic [EXP_WIDTH:0] exp;
+assign exp = exp_a - exp_b + bias;
 
 // Compute raw quotient
-logic [22:0] quotient;
-int_divider #(.SIZE(23), .SKIP(11)) divider (
-    .CLK(CLK), .nRST(nRST), .en(divif.en && !skip_divider),
-    .x({divif.a[14:10] != 0, divif.a[9:0], 12'b0}), .y({12'b0, divif.b[14:10] != 0, divif.b[9:0]}),
+logic [MANT_WIDTH*2+2:0] quotient;
+int_divider #(.SIZE(MANT_WIDTH*2+3), .SKIP(MANT_WIDTH+1)) divider (
+    .CLK(CLK), .nRST(nRST), .en(divif.in.en && !skip_divider),
+    .x({divif.in.a[MANT_WIDTH+:EXP_WIDTH] != 0, mant_a, {(MANT_WIDTH+2){1'b0}}}),
+    .y({{(MANT_WIDTH + 2){1'b0}}, exp_b != 0, mant_b}),
     .result(quotient), .done(done)
 );
-// assign quotient = ({exp_a != 0, mant_a, 12'b0} / {exp_b != 0, mant_b});
-// assign done = 1;
 
 // Normalize exponent and quotient, set rounding bit
-logic [9:0] mant;
+logic [MANT_WIDTH-1:0] mant, final_mant;
 logic round_bit;
-logic [5:0] exp_norm;
+logic [EXP_WIDTH:0] exp_norm;
+logic [EXP_WIDTH-1:0] final_exp;
 always_comb begin
     if (exp == 0) begin
-        {mant, round_bit} = quotient[12:2];
+        final_mant = quotient[MANT_WIDTH+2:3] + quotient[2];
         exp_norm = exp;
     end else if (exp == 1) begin
-        {mant, round_bit} = quotient[11:1];
-        exp_norm = quotient[12];
-    end else if (quotient[12]) begin
-        {mant, round_bit} = quotient[11:1];
+        final_mant = quotient[MANT_WIDTH+1:2] + quotient[1];
+        exp_norm = quotient[MANT_WIDTH+2];
+    end else if (quotient[MANT_WIDTH+2]) begin
+        final_mant = quotient[MANT_WIDTH+1:2] + quotient[1];
         exp_norm = exp;
     end else begin
-        {mant, round_bit} = quotient[10:0];
+        final_mant = quotient[MANT_WIDTH:1] + quotient[0];
         exp_norm = exp - 1;
     end
 end
+assign final_exp = exp_norm[EXP_WIDTH-1:0];
 
-logic [9:0] final_mant;
-logic [4:0] final_exp;
-assign final_exp = exp_norm[4:0];
-assign final_mant = mant + round_bit;
-
-// Detect overflow (positive exponent minus negative exponent, exp > 30)
-assign is_ovf = ~skip_divider & exp_a[4] & ~exp_b[4] & (exp_norm > 30);
-assign is_sub = exp_norm[5] || exp_norm == 0;
+// Detect overflow (positive exponent minus negative exponent, exp > 2 ^ EXP_WIDTH - 2)
+assign is_ovf = ~skip_divider & exp_a[EXP_WIDTH-1] & ~exp_b[EXP_WIDTH-1] & (exp_norm > (1 << EXP_WIDTH) - 2);
+assign is_sub = exp_norm[EXP_WIDTH] || exp_norm == 0;
 
 // Compute final result (accounting for edge cases)
 always_comb begin
     if (is_nan)
-        divif.result = {final_sign, 5'b11111, 10'h200};
+        divif.out.result = {final_sign, {EXP_WIDTH{1'b1}}, 1'b1, {(MANT_WIDTH-1){1'b0}}};
     else if (is_inf || is_ovf && !skip_divider)
-        divif.result = {final_sign, 5'b11111, 10'b0};
+        divif.out.result = {final_sign, {EXP_WIDTH{1'b1}}, {MANT_WIDTH{1'b0}}};
     else if (is_zero || is_sub)
-        divif.result = {final_sign, 5'b0, 10'b0};
+        divif.out.result = {final_sign, {EXP_WIDTH{1'b0}}, {MANT_WIDTH{1'b0}}};
     else
-        divif.result = {final_sign, final_exp, final_mant};
+        divif.out.result = {final_sign, final_exp, final_mant};
 end
 
 endmodule
