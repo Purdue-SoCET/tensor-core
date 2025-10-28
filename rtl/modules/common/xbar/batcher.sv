@@ -7,13 +7,13 @@
 import xbar_pkg::*;
 
 module batcher #(
-    parameter int SIZE = 32,
-    parameter int DWIDTH = 16, 
+    parameter int SIZE = `BATCHER_SIZE,
+    parameter int DWIDTH = `BATCHER_DWIDTH,
 
     parameter int TAGWIDTH = $clog2(SIZE),
-    parameter int STAGES = (TAGWIDTH * (TAGWIDTH + 1)) / 2, 
+    parameter int STAGES   = (TAGWIDTH * (TAGWIDTH + 1)) / 2,
 
-    parameter logic [STAGES-2:0] REGISTER_MASK = '1
+    parameter logic [STAGES-2:0] REGISTER_MASK = `BATCHER_REGISTER_MASK
 ) (xbar_if.xbar xif);
 
     logic [TAGWIDTH-1:0] shift_in [1:STAGES][SIZE];
