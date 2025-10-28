@@ -16,9 +16,9 @@ module batcher_tb;
   localparam int STAGES = (TAGW * (TAGW + 1)) / 2;
 
   localparam logic [STAGES-2:0] REGISTER_MASK = BA_INTO_3;
-  localparam int REAL_LATENCY = $countones(REGISTER_MASK) + 1; 
+  localparam int REAL_LATENCY = $countones(REGISTER_MASK) + 1;  // total pipeline delay in cycles
 
-  localparam int N_REQS = (REAL_LATENCY * 2);
+  localparam int N_REQS = (REAL_LATENCY * 2);  // number of launched vector 
   localparam int VERBOSE  = 0;
 
   logic clk, n_rst;
@@ -31,10 +31,12 @@ module batcher_tb;
   typedef logic [DWIDTH-1:0] vec_t [SIZE];
   vec_t exp_q[$];  // expected sorted vectors
 
+  // fill 32 element vec with random 16-bit values
   function automatic void make_vec(output vec_t v);
     for (int i = 0; i < SIZE; i++) v[i] = $urandom();
   endfunction
 
+  // make a copy and runs bubble sort for ascending (expected result)
   function automatic void sort_vec(input vec_t in, output vec_t out);
     for (int i = 0; i < SIZE; i++) out[i] = in[i];
 
@@ -60,7 +62,7 @@ module batcher_tb;
     xif.en = 1'b0;
     for (int i = 0; i < SIZE; i++) begin
       xif.in[i].din = '0;
-      xif.in[i].shift = TAGW'(i);  
+      xif.in[i].shift = TAGW'(i);  // tag each line with its index
     end
     repeat (5) @(posedge clk);
     n_rst = 1'b1;
@@ -75,9 +77,9 @@ module batcher_tb;
     for (int t = 0; t < N_REQS; t++) begin
       // Retire after pipeline fills
       if (launched <= REAL_LATENCY) begin
-        make_vec(in_vec);
-        sort_vec(in_vec, exp_vec);
-        exp_q.push_back(exp_vec);
+        make_vec(in_vec); // random input vector 
+        sort_vec(in_vec, exp_vec); // compute expected sorted output 
+        exp_q.push_back(exp_vec); // remember to compare later
         launched++;
 
         // Drive a request
@@ -91,11 +93,11 @@ module batcher_tb;
 
       // Retire after pipeline fills
       if (launched >= REAL_LATENCY) begin
-        exp = exp_q.pop_front();
+        exp = exp_q.pop_front(); // expected vector 
         mismatches = 0;
 
         for (int k = 0; k < SIZE; k++) begin
-          got = xif.out[k];
+          got = xif.out[k]; //read dut ouput lane k
           if (got !== exp[k]) begin
             mismatches++;
             errors++;

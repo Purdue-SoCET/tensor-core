@@ -1,77 +1,199 @@
-`timescale 1ns / 1ns
+// `timescale 1ns / 1ns
 
-module benes_xbar_tb;
-    localparam int PERIOD = 10;
+// module benes_tb;
+//     localparam int PERIOD = 10;
+//     localparam int SIZE = 32;
+//     localparam int DWIDTH = 16;
+//     localparam int TAGWIDTH = $clog2(SIZE);
+//     localparam int STAGES = (2 * TAGWIDTH) - 1;
+//     localparam int BITWIDTH = STAGES * (SIZE >> 1);
+
+//     logic clk, n_rst;
+//     logic [BITWIDTH-1:0] control_bit ;
+
+//     initial clk = 1'b0;
+//     always  #5 clk = ~clk;
+    
+//     xbar_if #(.SIZE(SIZE), .DWIDTH(DWIDTH)) xif (.clk(clk), .n_rst(n_rst));
+//     benes #(.SIZE(SIZE), .DWIDTH(DWIDTH)) DUT (xif, control_bit);
+
+//     integer i;
+//     logic [15:0] val;
+//     logic [DWIDTH-1:0] exp_out [SIZE-1:0];
+
+//     // REQUIRED FOR TESTING WITH CBG
+
+//     // typedef logic [DWIDTH-1:0] vec_t [SIZE];
+//     // vec_t in, exp_out;
+
+//     // function automatic void make_vec(output logic [TAGW-1:0] exp_out [SIZE-1:0]);
+//     //     logic [DWIDTH-1:0] idx [SIZE-1:0];
+//     //     logic [DWIDTH-1:0] tmp;
+//     //     integer i, j, tmp;
+
+//     //     for (i = 0; i < 32; i++)
+//     //     idx[i] = i;
+
+//     //     for (i = 31; i > 0; i--) begin
+//     //         j = $urandom_range(0, i); // random index to swap
+//     //         tmp = idx[i];
+//     //         idx[i] = idx[j];
+//     //         idx[j] = tmp;
+//     //     end
+
+//     //     for (i = 0; i < 32; i++)
+//     //         exp_out[i] = idx[i];
+
+//     // endfunction
+
+// initial begin
+//     n_rst = 0;
+
+//     #(PERIOD);
+
+//     n_rst = 1;
+//     val = 16'd0;
+
+//     for (i = 0; i < 32; i = i + 1) begin
+//         xif.in[i] = val;
+//         val = val + 16'd1;
+//     end
+//     exp_out = {16'd27, 16'd24, 16'd2, 16'd29, 16'd4, 16'd7, 16'd20, 16'd10, 16'd1, 16'd0, 16'd8, 16'd9, 16'd3, 16'd13, 16'd16, 16'd26,
+//                     16'd12, 16'd31, 16'd17, 16'd19, 16'd28, 16'd18, 16'd23, 16'd30, 16'd5, 16'd15, 16'd6, 16'd21, 16'd11, 16'd25, 16'd22, 16'd14};
+    
+//     control_bit = 144'b111000110101110001100100110011100111001110000000111100000001101100101011001100000000000000000000001000011001000001110110011110001011111001001100;  
+    
+//     repeat (10) #(PERIOD);
+    
+//     for (i = 0; i < 32; i = i + 1) begin
+//         if(xif.out[i] != exp_out[(SIZE-1 - i)]) begin
+//             $display("wrong output for %d", i);
+//         end
+//         // $display("output %d: %d", i, xif.out[i]);
+//     end
+//     $finish;
+// end
+
+// endmodule
+
+
+
+
+`timescale 1ns/1ns
+`include "xbar_params.svh"
+`include "xbar_if.sv"
+
+module benes_tb;
     localparam int SIZE = 32;
     localparam int DWIDTH = 16;
-    localparam int TAGWIDTH = $clog2(SIZE);
-    localparam int STAGES = (2 * TAGWIDTH) - 1;
-    localparam int BITWIDTH = STAGES * (SIZE >> 1);
+    localparam int TAGW = $clog2(SIZE); // 5
+    localparam int STAGES = (2 * TAGW) - 1; // 9 benes stages
+    localparam int BITWIDTH = STAGES * (SIZE >> 1); // = 9 stage * 16switch/stage = 144 control bits
+
+    localparam logic [7:0] REGISTER_MASK = 8'b11111111;  
+    localparam int REAL_LATENCY = $countones(REGISTER_MASK) + 1; // latency = 9 cycles
+
+    localparam int N_REQS  = (REAL_LATENCY * 2); // test run 2 * latency for full set of vector
 
     logic clk, n_rst;
-    logic [BITWIDTH-1:0] control_bit ;
-
     initial clk = 1'b0;
-    always  #5 clk = ~clk;
-    
+    always #5 clk = ~clk;
+
+    logic [BITWIDTH-1:0] control_bit; 
+
     xbar_if #(.SIZE(SIZE), .DWIDTH(DWIDTH)) xif (.clk(clk), .n_rst(n_rst));
-    benes #(.SIZE(SIZE), .DWIDTH(DWIDTH)) DUT (xif, control_bit);
 
-    integer i;
-    logic [15:0] val;
-    logic [DWIDTH-1:0] exp_out [SIZE-1:0];
+    benes #(.SIZE(SIZE), .DWIDTH(DWIDTH), .REGISTER_MASK(REGISTER_MASK)) dut (.xif(xif.xbar), .control_bit(control_bit));
 
-    // REQUIRED FOR TESTING WITH CBG
+    typedef logic [DWIDTH-1:0] vec_t [SIZE]; 
+    vec_t exp_q[$];  // scoreboard queue for expected vectors 
 
-    // typedef logic [DWIDTH-1:0] vec_t [SIZE];
-    // vec_t in, exp_out;
-
-    // function automatic void make_vec(output logic [TAGW-1:0] exp_out [SIZE-1:0]);
-    //     logic [DWIDTH-1:0] idx [SIZE-1:0];
-    //     logic [DWIDTH-1:0] tmp;
-    //     integer i, j, tmp;
-
-    //     for (i = 0; i < 32; i++)
-    //     idx[i] = i;
-
-    //     for (i = 31; i > 0; i--) begin
-    //         j = $urandom_range(0, i); // random index to swap
-    //         tmp = idx[i];
-    //         idx[i] = idx[j];
-    //         idx[j] = tmp;
-    //     end
-
-    //     for (i = 0; i < 32; i++)
-    //         exp_out[i] = idx[i];
-
-    // endfunction
-
-initial begin
-    n_rst = 0;
-
-    #(PERIOD);
-
-    n_rst = 1;
-    val = 16'd0;
-
-    for (i = 0; i < 32; i = i + 1) begin
-        xif.in[i] = val;
-        val = val + 16'd1;
-    end
-    exp_out = {16'd27, 16'd24, 16'd2, 16'd29, 16'd4, 16'd7, 16'd20, 16'd10, 16'd1, 16'd0, 16'd8, 16'd9, 16'd3, 16'd13, 16'd16, 16'd26,
-                    16'd12, 16'd31, 16'd17, 16'd19, 16'd28, 16'd18, 16'd23, 16'd30, 16'd5, 16'd15, 16'd6, 16'd21, 16'd11, 16'd25, 16'd22, 16'd14};
-    
-    control_bit = 144'b111000110101110001100100110011100111001110000000111100000001101100101011001100000000000000000000001000011001000001110110011110001011111001001100;  
-    
-    repeat (10) #(PERIOD);
-    
-    for (i = 0; i < 32; i = i + 1) begin
-        if(xif.out[i] != exp_out[(SIZE-1 - i)]) begin
-            $display("wrong output for %d", i);
+    // randome 32 lane input vector
+    function automatic void make_vec(output vec_t v);
+        for (int i = 0; i < SIZE; i++) begin
+            v[i] = $urandom();
         end
-        // $display("output %d: %d", i, xif.out[i]);
+    endfunction
+
+    // drive 1 vector into dut inputs 
+    task automatic drive_vec(input vec_t v);
+        for (int i = 0; i < SIZE; i++) begin
+            xif.in[i].din   = v[i];
+            xif.in[i].shift = TAGW'(i); // tag lanes 
+        end
+    endtask
+
+    // read current out to vector 
+    task automatic sample_vec(output vec_t v);
+        for (int i = 0; i < SIZE; i++) begin
+            v[i] = xif.out[i];
+        end
+    endtask
+
+    int launched, retired, errors;
+
+    initial begin : main
+        vec_t in_vec, exp_vec, got_vec;
+        int mismatches;
+
+        n_rst = 1'b0;
+        xif.en = 1'b0;
+        control_bit = '0; 
+
+        for (int i = 0; i < SIZE; i++) begin
+            xif.in[i].din = '0;
+            xif.in[i].shift = TAGW'(i);
+        end
+
+        repeat (5) @(posedge clk);
+        n_rst = 1'b1;
+        @(posedge clk);
+        xif.en = 1'b1;
+
+        launched = 0;
+        retired  = 0;
+        errors   = 0;
+
+        for (int t = 0; t < N_REQS; t++) begin
+            // launce new vector when still filing the pipeline
+            if (launched <= REAL_LATENCY) begin
+                make_vec(in_vec); // random in
+                for (int i = 0; i < SIZE; i++) begin
+                    exp_vec[i] = in_vec[i]; // expected
+                end
+                exp_q.push_back(exp_vec); // save for later
+                launched++;
+                drive_vec(in_vec); // put into dut
+            end
+
+            @(posedge clk);
+            if (launched >= REAL_LATENCY) begin
+                exp_vec = exp_q.pop_front();
+                sample_vec(got_vec);
+
+                mismatches = 0;
+                for (int k = 0; k < SIZE; k++) begin
+                    if (got_vec[k] !== exp_vec[k]) begin
+                        mismatches++;
+                        errors++;
+                        $display("lane%0d: got=%0d exp=%0d", k, got_vec[k], exp_vec[k]);
+                    end
+                    else if (0) begin
+                        $display("lane%0d: got=%0d exp=%0d", k, got_vec[k], exp_vec[k]);
+                    end
+                end
+
+                if (mismatches == 0) begin
+                    $display("[TB][Complete] retire=%0d OK", retired);
+                end else begin
+                    $display("[TB][Complete] retire=%0d mismatches=%0d", retired, mismatches);
+                end
+                retired++;
+            end
+        end
+        xif.en = 1'b0;
+        $display("[TB][Summary] errors=%0d, latency=%0d", errors, REAL_LATENCY);
+        $finish;
     end
-    $finish;
-end
 
 endmodule
