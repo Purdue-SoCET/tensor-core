@@ -5,78 +5,212 @@ module cbg_benes #(
     localparam int STAGES = (2 * TAGWIDTH) - 1, 
     localparam int BITWIDTH = STAGES * (SIZE >> 1)
 ) (
-    input logic [TAGWIDTH-1:0] perm [SIZE-1:0],
+    logic xif
+    input logic [TAGWIDTH-1:0] perm [SIZE],
     output logic [BITWIDTH-1:0] ctrl
 )   
     // SIGNALS FOR N=32 
-    logic [TAGWIDTH-1:0] p32 [SIZE-1:0];
-    logic [TAGWIDTH-1:0] p32 [SIZE-1:0];
-    logic [TAGWIDTH-1:0] q32 [SIZE-1:0];
-    logic [TAGWIDTH-1:0] piinv32 [SIZE-1:0];
+    logic [TAGWIDTH-1:0] block_perm [SIZE];
 
-    logic [TAGWIDTH-1:0] r32 [SIZE-1:0];
-    logic [TAGWIDTH-1:0] s32 [SIZE-1:0];
-    logic [TAGWIDTH-1:0] c32 [SIZE-1:0];
+    logic [TAGWIDTH-1:0] range32  [SIZE];
+    logic [TAGWIDTH-1:0] p      [TAGWIDTH] [SIZE];
+    logic [TAGWIDTH-1:0] q      [TAGWIDTH] [SIZE];
+    logic [TAGWIDTH-1:0] piinv  [TAGWIDTH] [SIZE];
 
-    logic [TAGWIDTH-1:0] t32 [SIZE-1:0];
-    logic [TAGWIDTH-1:0] u32 [SIZE-1:0];
+    logic [TAGWIDTH-1:0] r [TAGWIDTH] [SIZE];
+    logic [TAGWIDTH-1:0] s [TAGWIDTH] [SIZE];
+    logic [TAGWIDTH-1:0] c [TAGWIDTH] [SIZE];
 
-    logic [TAGWIDTH-1:0] cp32_0 [SIZE-1:0];
-    logic [TAGWIDTH-1:0] v32_0 [SIZE-1:0];
-    logic [TAGWIDTH-1:0] w32_0 [SIZE-1:0];
-    logic [TAGWIDTH-1:0] d32_0 [SIZE-1:0];
+    logic [TAGWIDTH-1:0] t [TAGWIDTH] [SIZE];
+    logic [TAGWIDTH-1:0] u [TAGWIDTH] [SIZE];
 
-    logic [TAGWIDTH-1:0] cp32_1 [SIZE-1:0];
-    logic [TAGWIDTH-1:0] v32_1 [SIZE-1:0];
-    logic [TAGWIDTH-1:0] w32_1 [SIZE-1:0];
-    logic [TAGWIDTH-1:0] d32_1 [SIZE-1:0];
+    logic [TAGWIDTH-1:0] v  [TAGWIDTH]    [TAGWIDTH] [TAGWIDTH-2] [SIZE];
+    logic [TAGWIDTH-1:0] cp [TAGWIDTH]    [TAGWIDTH] [TAGWIDTH-2] [SIZE];
+    logic [TAGWIDTH-1:0] w  [TAGWIDTH]    [TAGWIDTH] [TAGWIDTH-2] [SIZE];
+    logic [TAGWIDTH-1:0] d  [TAGWIDTH]    [TAGWIDTH] [TAGWIDTH-2] [SIZE];
 
-    logic [TAGWIDTH-1:0] cp32_2 [SIZE-1:0];
-    logic [TAGWIDTH-1:0] v32_2 [SIZE-1:0];
-    logic [TAGWIDTH-1:0] w32_2 [SIZE-1:0];
-    logic [TAGWIDTH-1:0] d32_2 [SIZE-1:0];
+    logic [TAGWIDTH-1:0] f   [TAGWIDTH] [SIZE/2];
+    logic [TAGWIDTH-1:0] F   [TAGWIDTH] [SIZE];
+    logic [TAGWIDTH-1:0] fpi [TAGWIDTH] [SIZE];
 
-    logic [TAGWIDTH-1:0] f32 [(SIZE-1)/2:0];
-    logic [TAGWIDTH-1:0] F32 [SIZE-1:0];
-    logic [TAGWIDTH-1:0] fpi32 [SIZE-1:0];
+    logic [TAGWIDTH-1:0] l [TAGWIDTH] [SIZE/2];
+    logic [TAGWIDTH-1:0] L [TAGWIDTH] [SIZE];
+    logic [TAGWIDTH-1:0] M [TAGWIDTH] [SIZE];
+
+    logic [TAGWIDTH-1:0] subM [TAGWIDTH] [SIZE/2][2];
+    logic [TAGWIDTH-1:0] subz [TAGWIDTH] [SIZE];
+
+    always_comb begin : range32_logic
+        for(int i = 0; i < SIZE; i++) begin
+            range32[i] = i;
+        end
+    end
 
     generate
-        genvar i;
+        genvar i, level, block;
+        for(level = 0; level < TAGWIDTH; level++) begin
+            localparam int block_size = N >> level;   // size of each block
+            localparam int num_blocks = 1 << level;  // number of blocks
+            if (level == 0) begin
+                block_perm = perm;
+            end
+            else begin
+                for(int i = 0; i < num_blocks; i++) begin
+                    block_perm = subM[level-1];
+                end
+            end
 
-        for(i = 0; i < SIZE; i++) begin
-            p32[i] = perm[i ^ 1'b1];
-            q32[i] = perm[i] ^ 1'b1;
-            piinv32[perm[i]] = i;
+            for (block = 0; block < num_blocks; block++) begin : blocks
+                localparam int offset_lower = block*block_size;
+                localparam int offset_upper = offset_lower+block_size-1;
+                
+                for(i = 0; i < SIZE; i++) begin
+                    p[level][i] = perm[level][i ^ 'b1];
+                    q[level][i] = perm[level][i] ^ 'b1;
+                end
 
-            r32[perm[p32[i]]] = i;
-            s32[perm[q32[i]]] = i;
-            c32[i] = r32[i] < i ? r32[i] : i;
-            t32[perm[r32[i]]] = i;
-            u32[perm[s32[i]]] = i;
+                composeinv #(.SIZE(block_size), .TAGWIDTH(TAGWIDTH)) cinv_piinv (
+                    .pi(range32[block_size-1:0]), 
+                    .c(block_perm[level][offset_upper:offest_lower]),
+                    .out(piinv[level][offset_upper:offest_lower])
+                );
 
-            cp32_0[perm[c32[i]]] = i;
-            v32_0[perm[t32[i]]] = i;
-            w32_0[perm[u32[i]]] = i;
-            d32_0[i] = c32[i] < cp32_0[i] ? c32[i] : cp32_0[i];
+                composeinv #(.SIZE(block_size), .TAGWIDTH(TAGWIDTH)) cinv_r (
+                    .pi(p[level][offset_upper:offest_lower]), 
+                    .c(q[level][offset_upper:offest_lower]), 
+                    .out(r[level][offset_upper:offest_lower])
+                );
 
-            cp32_1[perm[d32_0[i]]] = i;
-            v32_1[perm[v32_0[i]]] = i;
-            w32_1[perm[w32_0[i]]] = i;
-            d32_1[i] = d32_0[i] < cp32_1[i] ? d32_0[i] : cp32_1[i];
+                composeinv #(.SIZE(block_size), .TAGWIDTH(TAGWIDTH)) cinv_s (
+                    .pi(q[level][offset_upper:offest_lower]), 
+                    .cp(p[level][offset_upper:offest_lower]), 
+                    .out(s[level][offset_upper:offest_lower])
+                );
 
-            cp32_2[perm[d32_1[i]]] = i;
-            v32_2[perm[v32_1[i]]] = i;
-            w32_2[perm[w32_1[i]]] = i;
-            d32_2[i] = d32_1[i] < cp32_2[i] ? d32_1[i] : cp32_2[i];
+                find_min min_c(
+                    .in({range32[block_size-1:0], r[level][offset_upper:offest_lower]}),
+                    .out(c[level][offset_upper:offest_lower])
+                )
 
-            if(i < SIZE/2) begin
-                f32[i] = d32_2[2*i] % 2;
+                composeinv #(.SIZE(block_size), .TAGWIDTH(TAGWIDTH)) cinv_t (
+                    .pi(r[level][offset_upper:offest_lower]), 
+                    .c(s[level][offset_upper:offest_lower]), 
+                    .out(t[level][offset_upper:offest_lower])
+                );
+                composeinv #(.SIZE(block_size), .TAGWIDTH(TAGWIDTH)) cinv_u (
+                    .pi(s[level][offset_upper:offest_lower]), 
+                    .c(r[level][offset_upper:offest_lower]), 
+                    .out(u[level][offset_upper:offest_lower])
+                );
+                
+                // for loop
+                while(int i = 0; i < TAGWIDTH-2; i++) begin
+                    if(i == 0) begin
+                        composeinv #(.SIZE(block_size), .TAGWIDTH(TAGWIDTH)) cinv_cp (
+                            .pi(c[level][offset_upper:offest_lower]), 
+                            .c(u[level][offset_upper:offest_lower]), 
+                            .out(cp[level][i][offset_upper:offest_lower])
+                        );
+                        composeinv #(.SIZE(block_size), .TAGWIDTH(TAGWIDTH)) cinv_v (
+                            .pi(t[level][offset_upper:offest_lower]), 
+                            .c(u[level][offset_upper:offest_lower]), 
+                            .out(v[level][i][offset_upper:offest_lower])
+                        );
+                        composeinv #(.SIZE(block_size), .TAGWIDTH(TAGWIDTH)) cinv_w (
+                            .pi(u[level][offset_upper:offest_lower]), 
+                            .c(t[level][offset_upper:offest_lower]), 
+                            .out(w[level][i][offset_upper:offest_lower])
+                        );
+
+                        find_min min_d (
+                            .in({c[level][offset_upper:offest_lower], cp[level][i][offset_upper:offest_lower]})
+                            .out(d[level][i][offset_upper:offest_lower])
+                        )
+                    end
+                    else begin
+                        composeinv #(.SIZE(block_size), .TAGWIDTH(TAGWIDTH)) cinv_cp (
+                            .pi(d[level][i-1][offset_upper:offest_lower]), 
+                            .c(w[level][i-1][offset_upper:offest_lower]), 
+                            .out(cp[level][i][offset_upper:offest_lower])
+                        );
+                        composeinv #(.SIZE(block_size), .TAGWIDTH(TAGWIDTH)) cinv_v (
+                            .pi(v[level][i-1][offset_upper:offest_lower]), 
+                            .c(w[level][i-1][offset_upper:offest_lower]), 
+                            .out(v[level][i][offset_upper:offest_lower])
+                        );
+                        composeinv #(.SIZE(block_size), .TAGWIDTH(TAGWIDTH)) cinv_w (
+                            .pi(w[level][i-1][offset_upper:offest_lower]), 
+                            .c(v[level][i-1][offset_upper:offest_lower]), 
+                            .out(w[level][i][offset_upper:offest_lower])
+                        );
+
+                        find_min min_d (
+                            .in({d[level][i-1][offset_upper:offest_lower], cp[level][i][offset_upper:offest_lower]})
+                            .out(d[level][i][offset_upper:offest_lower])
+                        )
+                    end
+                end
+
+                for(i = 0; i < SIZE; i++) begin
+                    if(i < SIZE/2) begin
+                        f[i] = d_2[2*i] % 2;
+                    end
+                    
+                    F[i] = i ^ f[i / 2];
+
+                    if(i < SIZE/2) begin
+                        l[i] = fpi[2*i] % 2;
+                    end
+                    L[i] = i ^ l[i / 2];
+                    M[perm[L[i]]] = i;
+                end
+
+                composeinv #(.SIZE(block_size), .TAGWIDTH(TAGWIDTH)) cinv_fpi (
+                    .pi(F), 
+                    .c(piinv), 
+                    .out(fpi)
+                );
+
+                composeinv #(.SIZE(block_size), .TAGWIDTH(TAGWIDTH)) cinv_M (
+                    .pi(fpi), 
+                    .c(L), 
+                    .out(M)
+                );
+
+                for(i = 0; i < 2; i++) begin
+                    for(int j = 0; j < SIZE/2; j++) begin
+                        subM[i][j] = M[2*j+i]/2;
+                    end
+                end
             end
         end
-        F32[i] = i ^ f32[i / 2];
-        fpi32[perm[F32[i]]] = i;
-        
     endgenerate
+
+    logic [BITWIDTH-1:0] first, last;
+    always_comb begin
+        first = 0;
+        last = BITWIDTH-1;
+        for(int level = 0; level < TAGWIDTH; level++) begin
+            localparam int block_size = N >> level;   // size of each block
+            localparam int num_blocks = 1 << level;  // number of blocks
+
+            for(int sub_idx = 0; sub_idx < block_size; sub_idx++) begin
+                for(int block = 0; block < num_blocks; block++) begin
+                    localparam int offset_first = (block * block_size) + sub_idx;
+                    localparam int offset_last = (SIZE - 1) - offset_first;
+
+                    ctrl[first] = f[level][offset_first];
+                    ctrl[last] = l[level][offset_last];
+
+                    first++;
+                    last--;
+                end
+            end
+            
+        end
+
+
+    end
 endmodule
 
 // ========================================
@@ -100,7 +234,7 @@ endmodule
 //     t,u = composeinv(r,s),composeinv(s,r)
 
 //     for i in range(1,m-1): (3 times for N=32)
-//         cp = composeinv(c,u) (d,u) from 2nd iteration
+//         cp = composeinv(c,u) (d,w) from 2nd iteration
 //         v = composeinv(t,u)  (v,w) from 2nd iteration
 //         w = composeinv(u,t)  (W,v) from 2nd iteration
 //         d = [min(c[x],cp[x]) for x in range(n)]  (d,cp) from 2nd iteration
