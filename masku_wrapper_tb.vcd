@@ -1,0 +1,113 @@
+$date
+	Tue Oct 28 13:41:45 2025
+$end
+$version
+	QuestaSim Version 2021.4
+$end
+$timescale
+	1ns
+$end
+
+$scope module masku_wrapper_tb $end
+
+$scope task show_mask $end
+$upscope $end
+
+$scope module dut $end
+$var reg 1 ! mask_reg $end
+
+$scope module dut $end
+
+$scope begin g_lane_mask[15] $end
+$var parameter 32 " l $end
+$upscope $end
+
+$scope begin g_lane_mask[14] $end
+$var parameter 32 # l $end
+$upscope $end
+
+$scope begin g_lane_mask[13] $end
+$var parameter 32 $ l $end
+$upscope $end
+
+$scope begin g_lane_mask[12] $end
+$var parameter 32 % l $end
+$upscope $end
+
+$scope begin g_lane_mask[11] $end
+$var parameter 32 & l $end
+$upscope $end
+
+$scope begin g_lane_mask[10] $end
+$var parameter 32 ' l $end
+$upscope $end
+
+$scope begin g_lane_mask[9] $end
+$var parameter 32 ( l $end
+$upscope $end
+
+$scope begin g_lane_mask[8] $end
+$var parameter 32 ) l $end
+$upscope $end
+
+$scope begin g_lane_mask[7] $end
+$var parameter 32 * l $end
+$upscope $end
+
+$scope begin g_lane_mask[6] $end
+$var parameter 32 + l $end
+$upscope $end
+
+$scope begin g_lane_mask[5] $end
+$var parameter 32 , l $end
+$upscope $end
+
+$scope begin g_lane_mask[4] $end
+$var parameter 32 - l $end
+$upscope $end
+
+$scope begin g_lane_mask[3] $end
+$var parameter 32 . l $end
+$upscope $end
+
+$scope begin g_lane_mask[2] $end
+$var parameter 32 / l $end
+$upscope $end
+
+$scope begin g_lane_mask[1] $end
+$var parameter 32 0 l $end
+$upscope $end
+
+$scope begin g_lane_mask[0] $end
+$var parameter 32 1 l $end
+$upscope $end
+$upscope $end
+$upscope $end
+$upscope $end
+$enddefinitions $end
+#0
+$dumpvars
+x!
+b0 1
+b1 0
+b10 /
+b11 .
+b100 -
+b101 ,
+b110 +
+b111 *
+b1000 )
+b1001 (
+b1010 '
+b1011 &
+b1100 %
+b1101 $
+b1110 #
+b1111 "
+$end
+#25
+0!
+#35
+1!
+#45
+0!

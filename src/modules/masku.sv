@@ -14,10 +14,7 @@ module masku (
     genvar l;
     generate
         for (l = 0; l < NUM_LANES; l++) begin : g_lane_mask
-            assign vif.masku_out.mask[l] =
-                (vif.masku_in.vm)
-                    ? vif.masku_in.vmask[l*SLICE_W +: SLICE_W]
-                    : {SLICE_W{1'b1}};
+            assign vif.masku_out.mask[l] = vif.masku_in.vmask[l*SLICE_W +: SLICE_W];
         end
     endgenerate
 

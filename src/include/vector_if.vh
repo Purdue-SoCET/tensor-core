@@ -33,6 +33,13 @@ interface vector_if;
   // VEGGIE SIGNALS
   veggie_in_t veggie_in; 
   veggie_out_t veggie_out;
+  // Op Buffer Signal
+  veggie_out_t opbuff_in;
+  opbuff_out_t opbuff_out;
+
+  // VRF Signals
+  logic iready;               // consumer-ready into the buffer (driven by top)
+  logic vrf_ready;            // surfaced VRF ready (driven by wrapper from veggie_out.ready)
 /*
   // Lane Signals 
   lane_in_t lane_in;
@@ -54,9 +61,21 @@ interface vector_if;
   */
   // Veggie
   modport veggie (
-    input CLK, nRST,
     input veggie_in,
     output veggie_out
+  );
+
+  modport op_buffer (
+    input opbuff_in,
+    output opbuff_out
+  );
+
+  modport vregfile  (
+    input  CLK, nRST,
+    input  veggie_in,
+    input  iready,
+    output opbuff_out,
+    output vrf_ready
   );
   /*
   // Lane
@@ -76,6 +95,7 @@ interface vector_if;
   );
 */
   modport masku (
+    input CLK, nRST,
     input masku_in,
     output masku_out
   );

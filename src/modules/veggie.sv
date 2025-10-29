@@ -7,9 +7,17 @@
 `include "vector_types.vh"
 
 `define BANKNAME(P, N) P``BANK``N
+`define priority_encode(one_hot_vec, index_var) \
+  for (int i = 0; i < $bits(one_hot_vec); i++) begin \
+    if (one_hot_vec[i]) begin \
+      index_var = i; \
+      break; \
+    end \
+  end
 
 module veggie #(
     parameter BANK_COUNT      = 4,
+    parameter BANK_REGS       = 64,
     parameter MASK_BANK_COUNT = 2,
     parameter DREAD_PORTS     = 4,
     parameter DWRITE_PORTS    = 4,
@@ -29,6 +37,7 @@ module veggie #(
     logic [MREAD_PORTS-1:0][MASK_BANK_IDX-1:0]  vms_bnum; 
     logic [MWRITE_PORTS-1:0][MASK_BANK_IDX-1:0] vmd_bnum; 
 
+    // CHANGE INDEX LOGIC
     generate
         genvar i;
         for (i = 0; i < DREAD_PORTS; i++)  assign vs_bnum[i] = vif.veggie_in.vs[i][BANK_IDX-1:0];
@@ -47,8 +56,7 @@ module veggie #(
     bank_out_t     bank_out[BANK_COUNT-1:0]; 
     mbank_in_t     mbank_in[MASK_BANK_COUNT-1:0];
     mbank_out_t    mbank_out[MASK_BANK_COUNT-1:0];
-    vreg_t         bank_rdata[BANK_COUNT-1:0];
-    logic [63:0]   bank_mrdata[MASK_BANK_COUNT-1:0]; 
+
     logic [DREAD_PORTS-1:0]  read_grants;
     logic [MREAD_PORTS-1:0]  mread_grants;
     logic conflict, d_conflict, m_conflict, nxt_conflict;
@@ -92,7 +100,7 @@ module veggie #(
                 bank_mrpend_nxt = bank_mrreqs;
                 bank_mwpend_nxt = bank_mwreqs;
 
-                vif.veggie_out.ready = conflict;
+                vif.veggie_out.ready = 1'b1;
                 //conflict = |{<<{bank_rpend_nxt, bank_wpend_nxt, bank_mrpend_nxt, bank_mwpend_nxt}};
                 state_nxt = (conflict) ? CONFLICT : READY;
             end
@@ -139,7 +147,7 @@ module veggie #(
                 logic [DREAD_PORTS-1:0] winner;
                 int winner_idx; 
                 winner = bank_rreqs[b] & -bank_rreqs[b]; 
-                winner_idx = $clog2(winner);
+                `priority_encode(winner, winner_idx)
                 
                 // Bank Read Bus
                 bank_in[b].REN = vif.veggie_in.REN[winner_idx];
@@ -151,12 +159,14 @@ module veggie #(
             end
             if (|(bank_wreqs[b])) begin
                 logic [DWRITE_PORTS-1:0] winner;
+                int winner_idx;  
                 winner = bank_wreqs[b] & -bank_wreqs[b]; 
+                `priority_encode(winner, winner_idx)
 
                 // Setting Write Bus
-                bank_in[b].WEN   = vif.veggie_in.WEN[$clog2(winner)];
-                bank_in[b].vd    = vif.veggie_in.vd[$clog2(winner)];
-                bank_in[b].vdata = vif.veggie_in.vdata[$clog2(winner)];
+                bank_in[b].WEN   = vif.veggie_in.WEN[winner_idx];
+                bank_in[b].vd    = vif.veggie_in.vd[winner_idx];
+                bank_in[b].vdata = vif.veggie_in.vdata[winner_idx];
 
                 bank_wpend_nxt[b] &= ~winner;
             end
@@ -166,7 +176,7 @@ module veggie #(
                 logic [MREAD_PORTS-1:0] winner; 
                 int winner_idx;  
                 winner = bank_mrreqs[b] & -bank_mrreqs[b]; 
-                winner_idx = $clog2(winner);
+                `priority_encode(winner, winner_idx)
 
                 // Mask Read Bus
                 mbank_in[b].MREN = vif.veggie_in.MREN[winner_idx];
@@ -178,12 +188,14 @@ module veggie #(
             end
             if (|(bank_mwreqs[b])) begin
                 logic [MWRITE_PORTS-1:0] winner;
+                int winner_idx;  
                 winner = bank_mwreqs[b] & -bank_mwreqs[b];
+                `priority_encode(winner, winner_idx)
 
                 // Mask Write Bus
-                mbank_in[b].MWEN   = vif.veggie_in.MWEN[$clog2(winner)];
-                mbank_in[b].vmd    = vif.veggie_in.vmd[$clog2(winner)];
-                mbank_in[b].mvdata = vif.veggie_in.mvdata[$clog2(winner)];
+                mbank_in[b].MWEN   = vif.veggie_in.MWEN[winner_idx];
+                mbank_in[b].vmd    = vif.veggie_in.vmd[winner_idx];
+                mbank_in[b].mvdata = vif.veggie_in.mvdata[winner_idx];
 
                 bank_mwpend_nxt[b] &= ~winner;
             end
@@ -224,8 +236,8 @@ module veggie #(
             vbank #(
                 .DATA_WIDTH (16),          
                 .NUM_ELEMENTS(VLMAX),         
-                .NUM_ROWS   (32),        
-                .INDEX_WIDTH(8) 
+                .NUM_ROWS   (BANK_REGS),        
+                .INDEX_WIDTH($clog2(BANK_REGS)) 
             )`BANKNAME(D, i_db) (
                 .clk(CLK),
                 .ren(bank_in[i_db].REN),     .raddr(bank_in[i_db].vs),      .rdata(bank_out[i_db].ddata),
@@ -262,5 +274,5 @@ module veggie #(
         end
     end
     end
-
+    
 endmodule

@@ -147,10 +147,16 @@ package vector_pkg;
     typedef struct packed {
         vreg_t[READ_PORTS-1:0] vreg;
         logic [READ_PORTS-1:0] dvalid;
-        vmask_t[1:0] vmask;
-        logic [1:0] mvalid;
+        vmask_t[MASK_PORTS-1:0] vmask;
+        logic [MASK_PORTS-1:0] mvalid;
         logic ready; // to SB
     } veggie_out_t;
+
+    typedef struct packed {
+        vreg_t[READ_PORTS-1:0] vreg;
+        vmask_t[MASK_PORTS-1:0] vmask;
+        logic [MASK_PORTS-1:0] ivalid; // ASSUMING NUM MASKS = INSTR BW
+    } opbuff_out_t; 
 
     typedef struct {
         logic REN;
