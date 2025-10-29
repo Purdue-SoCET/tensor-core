@@ -15,6 +15,8 @@ The main source tree includes these subdirectories:
     /tb/ -> Formal, Functional and UVM verification. 
     /waves/ -> .do scripts for Questa.
     /scripts/ -> CI/CD pipelines
+    /reports/ -> Genus Optimized Reports.
+    /Flowkit/ -> SoCET-private Physical Design Flows with Genus/Innovus 
     /aihw-ppci-compiler/ -> Compiler Infra.
     /atalla-sim/ -> Cycle-Accurate Simulator.
     /UVM_1.2/ -> UVM 1.2 Core Libs.
