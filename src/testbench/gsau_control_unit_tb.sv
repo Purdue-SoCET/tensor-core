@@ -216,7 +216,7 @@ module gsau_control_unit_tb;
     end    
     repeat (10) @(posedge CLK);
 
-    // Test 7: RD Queue empty handling
+    // Test 8: RD Queue empty handling
     $display("[T8] FIFO empty handling");
     test = "8 FIFO empty handling";
     gsau_port.wb_output_ready = 1;
