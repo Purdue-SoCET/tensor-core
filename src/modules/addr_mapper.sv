@@ -27,6 +27,8 @@ module addr_mapper #(
 
 
     always_comb begin
+        amif.offset = '0;
+        
         if (amif.configs == x4 || amif.configs == x8) begin
             {amif.rank, amif.row, amif.bank, amif.BG[1], amif.col[9:3], amif.BG[0], amif.col[2:0], amif.offset} = amif.address;
         end
