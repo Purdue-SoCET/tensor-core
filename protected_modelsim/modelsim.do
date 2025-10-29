@@ -26,6 +26,6 @@
 #########################################################################################
 
 vlib work
-vlog -work work +acc -l vcs.log -sv +define+DDR4_4G_X8 arch_package.sv proj_package.sv interface.sv flexcounter.sv StateTable.svp MemoryArray.svp ddr4_model.svp tb.sv
+vlog -work work +acc -l vcs.log -sv +define+DDR4_4G_X8 +define+MODEL_DEBUG_CMDS arch_package.sv proj_package.sv interface.sv flexcounter.sv StateTable.svp MemoryArray.svp ddr4_model.svp tb.sv
 vsim tb
 run -all
