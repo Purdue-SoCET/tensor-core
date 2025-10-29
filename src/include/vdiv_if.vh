@@ -9,13 +9,13 @@ interface vdiv_if #(
   localparam int WIDTH = EXP_WIDTH + MANT_WIDTH;
 
   typedef struct packed {
-    logic en;
-    logic [WIDTH:0] a;
-    logic [WIDTH:0] b;
+    logic valid_in, ready_out;
+    logic [WIDTH:0] operand1;
+    logic [WIDTH:0] operand2;
   } vdiv_in_t;
 
   typedef struct packed {
-    logic done;
+    logic valid_out, ready_in;
     logic [WIDTH:0] result;
   } vdiv_out_t;
 

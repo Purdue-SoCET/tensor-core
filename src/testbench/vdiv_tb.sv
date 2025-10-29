@@ -62,7 +62,7 @@ module vdiv_tb;
   endfunction
 
   //-----------------------------------------------
-  // Task: apply test vector
+  // Task: apply test vector with proper handshake
   //-----------------------------------------------
   task automatic apply_vector(
     input [WIDTH-1:0] a_in,
@@ -70,25 +70,44 @@ module vdiv_tb;
     input [WIDTH-1:0] expected_in
   );
   begin
+    // Wait until DUT is ready to accept input
     @(posedge CLK);
-    divif.in.a  = a_in;
-    divif.in.b  = b_in;
-    divif.in.en = 1;
+    while (!divif.out.ready_in) @(posedge CLK);
+    
+    // Apply inputs and assert valid_in
+    divif.in.operand1 = a_in;
+    divif.in.operand2 = b_in;
+    divif.in.valid_in = 1;
     expected_result = expected_in;
     
+    // Wait for input to be accepted (ready_in goes low)
     @(posedge CLK);
-    wait (divif.out.done == 1);
-    divif.in.en = 0;
-
+    while (divif.out.ready_in) @(posedge CLK);
+    
+    // Deassert valid_in after handshake
+    divif.in.valid_in = 0;
+    
+    // Wait for output to be valid
+    while (!divif.out.valid_out) @(posedge CLK);
+    
+    // Assert ready_out to accept the output
+    divif.in.ready_out = 1;
+    
     // Compare results (special NaN handling)
     if (is_nan(divif.out.result) && is_nan(expected_in)) begin
       // Both NaN — pass
     end else if (divif.out.result !== expected_in) begin
       $display("ERROR @%0t [%s]: %h / %h = %h (expected %h)", 
-               $time, tb_test_case, divif.in.a, divif.in.b, divif.out.result, expected_in);
+               $time, tb_test_case, divif.in.operand1, divif.in.operand2, divif.out.result, expected_in);
       errors++;
     end
+    
+    // Complete the output handshake
     @(posedge CLK);
+    divif.in.ready_out = 0;
+    
+    // Wait for valid_out to deassert
+    while (divif.out.valid_out) @(posedge CLK);
   end
   endtask
 
@@ -117,9 +136,9 @@ module vdiv_tb;
       format_str = "%h,%h,%h\n"; // Same format, parser handles different widths
     
     while (!$feof(fd)) begin
-      r = $fscanf(fd, format_str, divif.in.a, divif.in.b, expected_result);
+      r = $fscanf(fd, format_str, divif.in.operand1, divif.in.operand2, expected_result);
       if (r == 3) begin
-        apply_vector(divif.in.a, divif.in.b, expected_result);
+        apply_vector(divif.in.operand1, divif.in.operand2, expected_result);
         test_count++;
       end
     end
@@ -235,10 +254,11 @@ module vdiv_tb;
     $display("TOTAL_WIDTH:  %0d", WIDTH);
     $display("=============================================\n");
     
-    // Init
-    divif.in.en = 0;
-    divif.in.a  = 0;
-    divif.in.b  = 0;
+    // Init handshake signals
+    divif.in.valid_in = 0;
+    divif.in.ready_out = 0;
+    divif.in.operand1 = 0;
+    divif.in.operand2 = 0;
     errors = 0;
     normal_tests = 0;
     subnormal_input_tests = 0;
@@ -250,16 +270,31 @@ module vdiv_tb;
     $display("Running power-on reset test...");
     
     @(posedge CLK);
-    if (divif.out.done !== 0) begin
-      $display("ERROR @%0t [POWER_ON_RESET]: done should be 0 during reset, got %b", 
-                $time, divif.out.done);
+    if (divif.out.valid_out !== 0) begin
+      $display("ERROR @%0t [POWER_ON_RESET]: valid_out should be 0 during reset, got %b", 
+                $time, divif.out.valid_out);
       errors++;
-    end else begin
+    end
+    if (divif.out.ready_in !== 0) begin
+      $display("ERROR @%0t [POWER_ON_RESET]: ready_in should be 0 during reset, got %b", 
+                $time, divif.out.ready_in);
+      errors++;
+    end
+    
+    if (errors == 0) begin
       $display("Power-on reset test passed");
     end
     
     #20 nRST = 1;
     #20;  // Settle
+    
+    // Check that ready_in goes high after reset
+    @(posedge CLK);
+    if (divif.out.ready_in !== 1) begin
+      $display("ERROR @%0t [POST_RESET]: ready_out should be 1 after reset, got %b", 
+                $time, divif.out.ready_in);
+      errors++;
+    end
 
     // Run all test categories (adjust filenames for BF16 if needed)
     if (EXP_WIDTH == 5 && MANT_WIDTH == 10) begin

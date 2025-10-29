@@ -11,25 +11,29 @@ localparam int EXP_WIDTH = divif.EXP_WIDTH;
 localparam int MANT_WIDTH = divif.MANT_WIDTH;
 
 // Sequential logic to pulse done for 1 cycle
-logic done, next_done, done_pulsed, skip_divider, is_ovf, is_sub;
-assign next_done = (divif.in.en && skip_divider || done);
+logic done, skip_divider, en_divider, is_ovf, is_sub, first_cycle;
 always_ff @(posedge CLK, negedge nRST) begin
     if (~nRST) begin
-        divif.out.done <= 0;
-        done_pulsed <= 0;
+        divif.out.valid_out <= 0;
+        divif.out.ready_in <= 0;
+        first_cycle <= 1;
     end else begin
-        divif.out.done <= ~done_pulsed && next_done;
-        if (done_pulsed) done_pulsed <= 0;
-        else if (next_done) done_pulsed <= 1;
+        if (first_cycle) divif.out.ready_in <= 1;
+        first_cycle <= 0;
+        if (done || (skip_divider && divif.in.valid_in && divif.out.ready_in)) divif.out.valid_out <= 1;
+        else if (divif.in.ready_out && divif.out.valid_out) divif.out.valid_out <= 0;
+        if (divif.out.valid_out && divif.in.ready_out) divif.out.ready_in <= 1;
+        else if (divif.in.valid_in && divif.out.ready_in) divif.out.ready_in <= 0;
     end
 end
+assign en_divider = (divif.in.valid_in && divif.out.ready_in) || (!divif.out.ready_in && !divif.out.valid_out);
 
 // Split FP inputs into components
 logic sign_a, sign_b;
 logic [EXP_WIDTH-1:0] exp_a, exp_b;
 logic [MANT_WIDTH-1:0] mant_a, mant_b;
-assign {sign_a, exp_a, mant_a} = divif.in.a;
-assign {sign_b, exp_b, mant_b} = divif.in.b;
+assign {sign_a, exp_a, mant_a} = divif.in.operand1;
+assign {sign_b, exp_b, mant_b} = divif.in.operand2;
 
 // Compute sign (simple XOR)
 logic final_sign;
@@ -62,8 +66,8 @@ assign exp = exp_a - exp_b + bias;
 // Compute raw quotient
 logic [MANT_WIDTH*2+2:0] quotient;
 int_divider #(.SIZE(MANT_WIDTH*2+3), .SKIP(MANT_WIDTH+1)) divider (
-    .CLK(CLK), .nRST(nRST), .en(divif.in.en && !skip_divider),
-    .x({divif.in.a[MANT_WIDTH+:EXP_WIDTH] != 0, mant_a, {(MANT_WIDTH+2){1'b0}}}),
+    .CLK(CLK), .nRST(nRST), .en(en_divider && !skip_divider),
+    .x({divif.in.operand1[MANT_WIDTH+:EXP_WIDTH] != 0, mant_a, {(MANT_WIDTH+2){1'b0}}}),
     .y({{(MANT_WIDTH + 2){1'b0}}, exp_b != 0, mant_b}),
     .result(quotient), .done(done)
 );
