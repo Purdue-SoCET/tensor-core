@@ -80,7 +80,7 @@ module timing_control (
             end
 
             WRITING : begin
-                if (time_count == tBURST) begin
+                if (time_count <= tBURST) begin
                     timif.wr_en = 1'b1;
                 end
 	                
