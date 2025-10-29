@@ -40,8 +40,8 @@ icache:
 	vsim $(SIMTERM) -voptargs="+acc" work.$*_tb -do $(SIMDO)
 
 %.wav:
-	vlog -sv +define+DDR4_4G_X8 +incdir+./src/include +incdir+./protected_modelsim $(DRAM_define) ./src/testbench/$*_tb.sv ./src/modules/$*.sv $(MODULES)
-	vsim -voptargs="+acc" work.$*_tb -do "do $(SCRDIR)/$*.do; run -all;" -suppress 2275
+	vlog -sv +cover +define+DDR4_4G_X8 +define+MODEL_DEBUG_CMDS +incdir+./src/include +incdir+./protected_modelsim $(DRAM_define) ./src/testbench/$*_tb.sv ./src/modules/$*.sv $(MODULES)
+	vsim -coverage -voptargs="+acc" work.$*_tb -do "do $(SCRDIR)/$*.do; run -all;" -suppress 2275
 
 
 clean:
