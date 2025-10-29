@@ -14,3 +14,7 @@
 	path = Flowkit
 	url = git@github.com:Purdue-SoCET/Flowkit.git
 	branch = atallax01
+[submodule "aihw-design-logs"]
+	path = aihw-design-logs
+	url = git@github.com:Purdue-SoCET/aihw-design-logs.git
+	branch = main

@@ -1,0 +1,26 @@
+This is "Atalla 0x01", a student-led initiative to design and implement a 
+complete **AI Hardware-Software** stack -- from RTL to PyTorch integration. 
+
+This project aims to become an open, reproducible, and 
+research-grade infrastructure that unites all key accelerator 
+components under one roof.
+
+Current synthesis flows are built on MITLL90nm, but will soon 
+be upgraded to TSMC65nm. 
+
+The main source tree includes these subdirectories:
+    /docs/ -> Documentation of Arch, Contribution Guide, etc. 
+    /kernels/ -> Benchmarking kernels.
+    /rtl/ -> Core Design Files. 
+    /tb/ -> Formal, Functional and UVM verification. 
+    /waves/ -> .do scripts for Questa.
+    /scripts/ -> CI/CD pipelines
+    /aihw-ppci-compiler/ -> Compiler Infra.
+    /atalla-sim/ -> Cycle-Accurate Simulator.
+    /UVM_1.2/ -> UVM 1.2 Core Libs.
+    /LICENSE 
+    /Makefile  
+
+If you have questions, please send mail to socet@purdue.edu.
+
+Enjoy using Atalla 0x01 and please share your modifications and extensions.
