@@ -34,7 +34,7 @@ https://www.veripool.org/ftp/verilator_doc.pdf
 `include "systolic_array_MAC_if.vh"
 `timescale 1ns/1ps
 
-module sysarr_MAC(input logic clk, input logic nRST, systolic_array_MAC_if.MAC mac_if);
+module sysarr_MAC_1CM(input logic clk, input logic nRST, systolic_array_MAC_if.MAC mac_if);
     logic [DW-1:0] input_x;
     logic [DW-1:0] nxt_input_x;
 
@@ -89,47 +89,18 @@ module sysarr_MAC(input logic clk, input logic nRST, systolic_array_MAC_if.MAC m
 
     assign run = run_latched | mac_if.start;       // This is to avoid a 1 clock cycle delay between receiving the start signal and actually starting the operation
     assign mac_if.value_ready = ~run;
-    // always_ff @(posedge clk, negedge nRST) begin
-    //     if(nRST == 1'b0)
-    //         mac_if.value_ready <= 1'b0;
-    //     else
-    //         mac_if.value_ready <= mac_if.value_ready ? 0 : ~run;
-    // end
-
-    // assign mac_if.value_ready = ~run;
-
-    // phase 1: multiply
-
-    // signals connecting mul stage1 with stage2. these are registered, so need 2 signals (one coming out of stage1 going into register, the other coming out of register going into stage2)
-    // Latching the sign and exponent bits of both input values for stage2 of multiplication
-    logic [5:0] mul_fp1_head_s1_out, mul_fp1_head_s2_in;
-    logic [5:0] mul_fp2_head_s1_out, mul_fp2_head_s2_in;
-
-    logic mul_sign1_out, mul_sign2_out, mul_carryout_out;
-    logic mul_sign1_in, mul_sign2_in, mul_carryout_in;
-    logic [4:0] mul_exp1_out, mul_exp2_out;
-    logic [4:0] mul_exp1_in, mul_exp2_in;
-    logic [12:0] mul_product_out;
-    logic [12:0] mul_product_in;
-    logic mul_round_loss_s1_out, mul_round_loss_s2;
-
-    // assign mac_if.weight_read = weight;
-    // assign mac_if.mul_result_read = mul_result_latched;
-
-    // ********************************************** Old garbage from multicycle multiplier
-    // MUL takes in latched input_x from above
-    // MUL_step1 is special in that contains a sequential multiplier. This means that other operations need to wait until it finishes, the MAC unit must not move to the next stage after just one clock cycle.
-    // It also means that it needs an enable signal. This can be on for one or more clock cycles, I dont think it matters.
-    // Since it is the very first thing in the MAC chain, i'm using mac_if.start as this enable signal.
-    // The flipflop after this should hold its values, and NOT allow the start passthrough signal to advance until the the multiply finishes (mul_stall goes low)
-    // logic mul_stall;
-    // MUL_step1 mul1 (clk, nRST, mac_if.start, input_x, weight, mul_product_out, mul_carryout_out, mul_round_loss_s1_out, mul_stall);
-    
 
 
 
-    // Logic to determine the "implilcit" leading bit of FP mantissa section prior to feeding it through multiplier
+//-----------------------------------------------------------------------------------------------------------------------------------
+// MULTIPLICATION. Copy paste mul_fp16_singlecycle.sv
+//-----------------------------------------------------------------------------------------------------------------------------------
+
+    // Step 1: Multiply mantissa bits.
+
+    // Step 1.1: determine the "implilcit" leading bit of FP mantissa section prior to feeding it through multiplier
     // If the exponent bits are zero, the implicit bit is 0, else its 1.
+
     logic frac_leading_bit_fp1;
     logic frac_leading_bit_fp2;
     always_comb begin
@@ -148,98 +119,63 @@ module sysarr_MAC(input logic clk, input logic nRST, systolic_array_MAC_if.MAC m
         end
     end
 
-    logic mul_ready, mul_stall;
-    wallacetree_11b_2c wallaca (
-        .clk(clk),
-        .nRST(nRST),
-        .active(mac_if.start),
+    // Step 1.2: Multiply mantissae.
+    // With a wallace tree multiplier, this takes two clock cycles (contains one latch in it).
+    logic mul_ready;
+    logic [12:0] mul_product;
+    logic mul_carryout;
+    logic mul_round_loss;
+
+    wallacetree_11b wallaca (
         .a({frac_leading_bit_fp1, input_x[9:0]}),
         .b({frac_leading_bit_fp2, weight[9:0]}),
-        .result(mul_product_out),
-        .overflow(mul_carryout_out),
-        .round_loss(mul_round_loss_s1_out),
-        .value_ready(mul_ready)
+        .result(mul_product),
+        .overflow(mul_carryout),
+        .round_loss(mul_round_loss)
     );
-    assign mul_stall = ~mul_ready;
 
-
-    // latching the run signal an extra time to fix a timing issue with mul_stall and mac_if.start
-    logic start_passthrough_0;
-    always_ff @(posedge clk, negedge nRST) begin
-        if(nRST == 1'b0)
-            start_passthrough_0 <= 0;
-        else
-            start_passthrough_0 <= mac_if.start | (start_passthrough_0 & mul_stall);
-    end
-
-    // flipflop to connect mul stage1 and stage 2
-    always_ff @(posedge clk, negedge nRST) begin
-        if(nRST == 1'b0) begin
-            mul_fp1_head_s2_in <= 0;
-            mul_fp2_head_s2_in <= 0;
-            mul_carryout_in <= 0;
-            mul_product_in <= 0;
-            start_passthrough_1 <= 0;
-            mul_round_loss_s2 <= 0;
-        end
-        else if(run) begin
-            if(mul_stall)
-                start_passthrough_1 <= 0;
-            else
-                start_passthrough_1 <= start_passthrough_0;
-            mul_fp1_head_s2_in <= input_x[15:10];
-            mul_fp2_head_s2_in <= weight[15:10];
-            mul_carryout_in <= mul_carryout_out;
-            mul_product_in  <= mul_product_out;
-            // start_passthrough_1 <= mac_if.start;
-            mul_round_loss_s2 <= mul_round_loss_s1_out;
-        end
-        else begin
-            mul_fp1_head_s2_in <= mul_fp1_head_s2_in;
-            mul_fp2_head_s2_in <= mul_fp2_head_s2_in;
-            mul_carryout_in <= mul_carryout_in;
-            mul_product_in  <= mul_product_in;
-            start_passthrough_1 <= start_passthrough_1;
-            mul_round_loss_s2 <= mul_round_loss_s2;
-        end
-    end
-
-    // signals coming out of mul stage2
+    // Step 2: Exponent addition, result rounding. All combinational, result is ready in this cycle.
+    
+    // step 2.1: calculate sign of result. Simple XOR
     logic mul_sign_result;
-    logic [4:0] mul_sum_exp;
-    logic mul_ovf, mul_unf;
+    assign mul_sign_result = input_x[15] ^ weight[15];
 
-    // step2 of FP multiply: Add exponents. 
+    // Step 2.2: Add exponent bits, taking into account overflow from mantissa multiplication
+    logic [4:0] exp_sum;
+    logic mul_ovf, mul_unf;
     adder_5b add_EXPs (
-        .carry(mul_carryout_in),
-        .exp1 (mul_fp1_head_s2_in[4:0]),
-        .exp2 (mul_fp2_head_s2_in[4:0]),
-        .sum  (mul_sum_exp),
+        .carry(mul_carryout),
+        .exp1 (input_x[14:10]),
+        .exp2 (weight[14:10]),
+        .sum  (exp_sum),
         .ovf  (mul_ovf),
         .unf  (mul_unf)
     );
-    assign mul_sign_result = mul_fp1_head_s2_in[5] ^ mul_fp2_head_s2_in[5];
 
-    // goodbye stupid module that just called an adder
-    // MUL_step2 mul2 (mul_sign1_in, mul_sign2_in, mul_exp1_in, mul_exp2_in, mul_sign_result, mul_sum_exp, mul_ovf, mul_unf, mul_carryout_in);
-
-    //final multiplication result
-    logic [15:0] mul_result;
+    // Step 2.3: Shift multiply product bits if an overflow occurred during mantissa multiplication (exponent was incremented, now divide mantissa by 2 to match)
+    logic [15:0] mul_result;                // this variable will hold the final multiplication result
     logic [11:0] mul_frac_product;
-    assign mul_frac_product = mul_carryout_in ? mul_product_in[12:1] : mul_product_in[11:0];
+    assign mul_frac_product = mul_carryout ? mul_product[12:1] : mul_product[11:0];
 
-    // this could potentially result in an edge case where if the mul significand is all 1's, rounding will cause it to become 0
+    // Step 2.4: Rounding.
+    // this logic could potentially result in an edge case where if the mul significand is all 1's, rounding will cause it to become 0
     logic [9:0] mul_significand_rounded;
     always_comb begin
-        if(mul_frac_product[1] & (mul_frac_product[0] | mul_round_loss_s2 | mul_frac_product[2]))
+        if(mul_frac_product[1] & (mul_frac_product[0] | mul_round_loss | mul_frac_product[2]))
             mul_significand_rounded = mul_frac_product[11:2] + 1;
         else
             mul_significand_rounded = mul_frac_product[11:2];
     end
 
+    // Concatenation to produce final result.
     logic [4:0] mul_final_exp;
-    assign mul_final_exp = (mul_product_in == 0) ? 0 : mul_sum_exp;
+    assign mul_final_exp = (mul_product == 0) ? 0 : exp_sum;
     assign mul_result = {mul_sign_result, mul_final_exp, mul_significand_rounded};
+
+
+//-----------------------------------------------------------------------------------------------------------------------------------
+// END MULTIPLICATION
+//-----------------------------------------------------------------------------------------------------------------------------------
 
 
     // latch mul_result to reduce critical path here
@@ -253,19 +189,11 @@ module sysarr_MAC(input logic clk, input logic nRST, systolic_array_MAC_if.MAC m
 	    in_accumulate_latched <= 0;
         end
         else begin
-            start_passthrough_2a <= start_passthrough_1;
+            start_passthrough_2a <= mac_if.start;
             mul_result_latched <= mul_result;
 	    in_accumulate_latched <= mac_if.in_accumulate;
         end
     end
-
-
-
-
-
-
-
-
 
 
 
