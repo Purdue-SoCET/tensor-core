@@ -177,6 +177,56 @@ module gsau_control_unit_tb;
       repeat ($urandom_range(2,5)) @(posedge CLK);
     end
 
+    // Test 6: Send weight during compute
+    $display("[T6] Send weight during compute");
+    test = "6 send weight during compute";
+    send_scoreboard_entry(8'd12, 1'b0, 512'hAAAA_AAAA_AAAA_AAAA, 512'hBBBB_BBBB_BBBB_BBBB);
+    $display("test 6 Compute issued, systolic array busy");
+    repeat (2) @(posedge CLK);
+    fork
+      begin
+        $display("Test 6 attempting to send weights during compute");
+        send_scoreboard_entry(8'd0, 1'b1, 512'hDEAD_BEEF, 512'h0);
+      end
+      begin
+        repeat (8) begin
+          @(posedge CLK);
+          if (gsau_port.sa_input_en)
+            $display("test 6 Compute still active at %0t", $time);
+        end
+      end
+    join
+    wait (!gsau_port.sa_input_en); // compute done
+    repeat (3) @(posedge CLK);     // allow new weight to propagate
+    assert(gsau_port.sa_input_en == 0)
+      else $error("TEST 6 compute overlapped with weight load");
+    
+    $display("[T6] PASS: New weight load waited until compute completed");
+
+    // Test 7: toggle wb ready high/low when fifo empty
+    $display("[T7] Toggling WB ready during empty queue");
+    test = "7 Toggling WB ready during empty queue";
+    repeat (5) begin
+      toggle_wb_ready(0);
+      repeat (2) @(posedge CLK);
+      toggle_wb_ready(1);
+      repeat (2) @(posedge CLK);
+      assert (gsau_port.wb_valid == 0)
+        else $error("TEST 7 wb_valid asserted during ready toggle");
+    end    
+    repeat (10) @(posedge CLK);
+
+    // Test 7: RD Queue empty handling
+    $display("[T8] FIFO empty handling");
+    test = "8 FIFO empty handling";
+    gsau_port.wb_output_ready = 1;
+    repeat (10) @(posedge CLK);
+    assert (gsau_port.wb_valid == 0)
+      else $error("TEST 8 wb_valid asserted while FIFO empty");
+    assert (gsau_port.sa_input_en == 0)
+      else $error("TEST 8 sa_input_en asserted while FIFO empty");
+    repeat (10) @(posedge CLK);
+
     $display("==== All Tests Complete ====");
     $finish;
   end
