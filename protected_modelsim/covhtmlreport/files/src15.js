@@ -1,0 +1,2 @@
+var g_data = {"name":"./include/init_state_if.vh","src":"`ifndef INIT_STATE_IF\n`define INIT_STATE_IF\n\n`include \"dram_pkg.vh\"\n\ninterface init_state_if ();\n    import dram_pkg::*;\n\n    //Input\n    logic init, init_done;\n    dram_state_t init_state, ninit_state;\n\n    modport dt (\n        input init,\n        output init_done, init_state, ninit_state\n    );\n\nendinterface\n\n`endif\n","lang":"verilog"};
+processSrcData(g_data);

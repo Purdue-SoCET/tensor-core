@@ -1,5 +1,0 @@
-`ifndef SOCETLIB_COUNTER_IF
-`define SOCETLIB_COUNTER_IF
-
-
-`endif

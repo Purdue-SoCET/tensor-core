@@ -1,2 +1,2 @@
-var g_data = {"36":{"pr":"/dram_top_tb","ty":2,"dui":5,"dun":"work.dram_top_tb","cvgs":[{"h":["/dram_top_tb/sche_trans/sch_group",1,1,37],"sc":[5,328],"cov":[3,1,33.33],"opts":{"goal":"100","merge_instance":"auto(true)"}}]}};
+var g_data = {"36":{"pr":"/dram_top_tb","ty":2,"dui":5,"dun":"work.dram_top_tb","cvgs":[{"h":["/dram_top_tb/sche_trans/sch_group",1,1,37],"sc":[5,325],"cov":[3,3,100.00],"opts":{"goal":"100","merge_instance":"auto(true)"}}]}};
 processCovergroupsData(g_data);

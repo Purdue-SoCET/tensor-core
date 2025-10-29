@@ -1,0 +1,2 @@
+var g_data = {"name":"edge_det_if.vh","src":"`ifndef EDGE_DET_IF\n`define EDGE_DET_IF\n`include \"dram_command_if.vh\"\ninterface edge_det_if ();\n    \n    \n    logic async_in, sync_out, edge_flag;\n\n    modport edge_mod (\n        input async_in,\n        output sync_out, edge_flag\n    );    \n\nendinterface\n\n\n`endif\n","lang":"verilog"};
+processSrcData(g_data);

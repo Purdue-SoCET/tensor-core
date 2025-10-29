@@ -53,6 +53,7 @@ module timing_signal (
             end
 
             ACTIVATING : begin
+
                 if ((time_count_done == tRAS - 12 + 1) && (!timif.rf_req)) begin
                     clear = 1;
                     timif.tACT_done = 1'b1;
@@ -81,7 +82,7 @@ module timing_signal (
                 if (time_count_done == 1'b1) begin
                     timif.tRD_done = 1'b1;
                     timif.rd_en = 1'b0;
-                    timif.clear = 1'b1;
+                    timif.clear = 1'b1; //For data transfer ignore it
                 end
 
                 

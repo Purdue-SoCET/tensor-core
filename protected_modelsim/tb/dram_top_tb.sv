@@ -20,6 +20,8 @@
 // 9. Test 16 consecutive write with different bank
 // 10. Test 1000 random read and write of different commands
 
+//RUNING SIMULATION: make dram_top
+
 module dram_top_tb;
     parameter PERIOD = 1.5;
     parameter tCK = 1.5;
@@ -27,9 +29,6 @@ module dram_top_tb;
     import proj_package::*;
 
     //parameter from dram_command_if.vh
-    parameter int MAX_DQ_BITS         = 16;
-    parameter int MAX_DQS_BITS        = 2;
-    parameter int MAX_DM_BITS         = 2;
     parameter CONFIGURED_DQ_BITS     = 8;
     parameter CONFIGURED_DQS_BITS     = (16 == CONFIGURED_DQ_BITS) ? 2 : 1;
     parameter CONFIGURED_DM_BITS     = (16 == CONFIGURED_DQ_BITS) ? 2 : 1;
@@ -266,6 +265,7 @@ module dram_top_tb;
         dt_if.DQS_c
         } : 4'bzz;
 
+    //Writing mask feature
     assign {
         iDDR4_1.DM_n,
         iDDR4_2.DM_n,
@@ -310,8 +310,10 @@ module dram_top_tb;
 
         //Random rank, bank group, bank, row, col, offset
         rand logic [RANK_BITS - 1:0] rank;
-        randc logic [BANK_GROUP_BITS - 1:0] BG;
-        randc logic [BANK_BITS - 1:0] bank;
+        // randc logic [BANK_GROUP_BITS - 1:0] BG;
+        // randc logic [BANK_BITS - 1:0] bank;
+        rand logic [BANK_GROUP_BITS - 1:0] BG;
+        rand logic [BANK_BITS - 1:0] bank;
         rand logic [ROW_BITS - 1:0] row;
         rand logic [COLUMN_BITS - 1:0] col;
         rand logic [OFFSET_BITS - 1:0] offset;
@@ -319,7 +321,7 @@ module dram_top_tb;
         logic [31:0] creating_addr; //the actual address
 
 
-        //1. Creating covergroup (IGNORE THIS)
+        //1. Creating covergroup
         covergroup sch_group @(posedge CLK);
             //2.Creating coverpoint
             sch_point : coverpoint {vif.dREN, vif.dWEN} {
@@ -342,7 +344,6 @@ module dram_top_tb;
             offset == 0;
             col[2:0] == 0; //8-byte align
         }
-
 
         function new (virtual scheduler_buffer_if vif);
             this.vif = vif;
@@ -403,6 +404,8 @@ module dram_top_tb;
         while (!dt_if.wr_en) begin
             @(posedge CLK);
         end
+
+        //This loop will wriete
         for (int i = 0; i < 9; i++) begin
             dt_class.randomize();
             // dt_class.display();
@@ -416,7 +419,7 @@ module dram_top_tb;
             end
             @(posedge CLKx2);
         end
-        dt_if.clear = 1'b1;
+        dt_if.clear = 1'b1; //Should not be here, check later this
         cache_write = 1'b0;
         @(posedge CLK);
         dt_if.clear = 1'b0;
@@ -628,6 +631,7 @@ module dram_top_tb;
     random_req();
 
     //CHECKPOINT: DONE ALL PREVIOUS CASES
+    //TODO may be: the writing burst mask cases doesn't have general test cases
     $finish;
     end
 endmodule
