@@ -406,7 +406,7 @@ module dram_controller_top_tb;
     task writing_1(input logic [31:0] addr, input creating_dt dt_class);
         begin
         add_request(.addr(addr), .write(1'b1), .data(32'hAAAA_AAAA));
-        while (!dataif.wr_en) begin
+        while (!cuif.wr_en) begin
             @(posedge CLK);
         end
         for (int i = 0; i < 9; i++) begin
