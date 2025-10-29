@@ -28,6 +28,6 @@ module edge_det #(parameter TRIG_RISE = 1, TRIG_FALL = 0, RST_VAL = 0) (
             q <= myedge.sync_out;
     end
 
-    assign myedge.edge_flag = (TRIG_RISE && (~sync_out1 & myedge.sync_out)) || (TRIG_FALL && (sync_out1 & ~myedge.sync_out));
+    assign myedge.edge_flag = (TRIG_RISE && (~sync_out1 & myedge.sync_out)) || (TRIG_FALL && (sync_out1 & ~myedge.sync_out)) ? 1'b1 : 1'b0;
 
 endmodule
