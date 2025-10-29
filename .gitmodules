@@ -1,7 +1,7 @@
-[submodule "AMP-sim"]
-	path = AMP-sim
-	url = git@github.com:Purdue-SoCET/AMP-sim.git
-	branch = atalla
+[submodule "AtallaSim"]
+	path = AtallaSim
+	url = git@github.com:Purdue-SoCET/AtallaSim.git
+	branch = master
 [submodule "UVM_1.2"]
 	path = UVM_1.2
 	url = git@github.com:Purdue-SoCET/UVM_1.2.git
