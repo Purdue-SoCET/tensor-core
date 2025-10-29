@@ -5,8 +5,11 @@
 `include "xbar_if.sv"
 `include "compare_switch.sv"
 
+<<<<<<< HEAD
 import xbar_pkg::*;
 
+=======
+>>>>>>> e53200486a0fe0a805899aa72cebe6752d263d3c
 module benes #(
     parameter int SIZE = 32,
     parameter int DWIDTH = 16, 
@@ -17,7 +20,11 @@ module benes #(
     localparam int BITWIDTH = STAGES * (SIZE >> 1)
 ) (
     xbar_if.xbar xif,
+<<<<<<< HEAD
     input logic [BITWIDTH-1:0] control_bit 
+=======
+    input logic [BITWIDTH] control_bit 
+>>>>>>> e53200486a0fe0a805899aa72cebe6752d263d3c
 );
 
 	logic [DWIDTH-1:0] reg_latch [STAGES-1][SIZE]; 
