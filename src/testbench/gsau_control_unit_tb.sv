@@ -21,10 +21,7 @@ module gsau_control_unit_tb;
   gsau_control_unit_if gsau_port();
 
   // DUT instance
-  gsau_control_unit #(
-    .VEGGIEREGS(VEGGIEREGS),
-    .FIFOSIZE(FIFOSIZE)
-  ) dut (
+  gsau_control_unit dut (
     .CLK(CLK),
     .nRST(nRST),
     .gsau_port(gsau_port)

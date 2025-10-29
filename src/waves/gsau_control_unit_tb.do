@@ -39,8 +39,12 @@ add wave -noupdate /gsau_control_unit_tb/dut/fifo_full
 add wave -noupdate -divider {systolic model}
 add wave -noupdate /gsau_control_unit_tb/systolic_array/valid
 add wave -noupdate /gsau_control_unit_tb/systolic_array/data
+add wave -noupdate -divider Fifo
+add wave -noupdate /gsau_control_unit_tb/dut/rd_fifo/wptr
+add wave -noupdate /gsau_control_unit_tb/dut/rd_fifo/rptr
+add wave -noupdate /gsau_control_unit_tb/dut/rd_fifo/fifo
 TreeUpdate [SetDefaultTree]
-WaveRestoreCursors {{Cursor 1} {318310 ps} 0}
+WaveRestoreCursors {{Cursor 1} {835000 ps} 0}
 quietly wave cursor active 1
 configure wave -namecolwidth 150
 configure wave -valuecolwidth 137
@@ -56,4 +60,4 @@ configure wave -griddelta 40
 configure wave -timeline 0
 configure wave -timelineunits ns
 update
-WaveRestoreZoom {70088 ps} {771061 ps}
+WaveRestoreZoom {831398 ps} {1798712 ps}

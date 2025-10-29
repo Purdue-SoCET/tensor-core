@@ -4,9 +4,9 @@
 
 module gsau_control_unit #(
     parameter int VEGGIEREGS = 256,
-    // FIFOSIZE is in bits in your design notes (32 regs * 3 * 8 = 768 bits).
+    // FIFOSIZE is in bits (64 cycle latency * 3 clock cycles per MAC * 8 bits per vdst)
     // We store 8-bit vdst entries -> FIFO_DEPTH = FIFOSIZE / 8 = number of entries.
-    parameter int FIFOSIZE = 32*3*8
+    parameter int FIFOSIZE = 64*3*8
 ) (
     input  logic        CLK,
     input  logic        nRST,
@@ -57,7 +57,7 @@ module gsau_control_unit #(
 
     // Default handshake semantics:
     // - sb_ready asserted when FIFO not full (we can accept more RD's)
-    gsau_port.sb_ready  = !fifo_full && gsau_port.sa_fifo_has_space && gsau_port.wb_output_ready; // allow scoreboard to send new inst when space
+    gsau_port.sb_ready = !fifo_full && gsau_port.sa_fifo_has_space && gsau_port.wb_output_ready; // allow scoreboard to send new inst when space
     gsau_port.sa_output_ready = gsau_port.wb_output_ready;
 
     if (gsau_port.sb_valid && gsau_port.sb_ready) begin
@@ -72,7 +72,7 @@ module gsau_control_unit #(
       end
     end
 
-    if (gsau_port.sa_out_valid && gsau_port.sa_output_ready) begin
+    if (gsau_port.sa_out_valid && gsau_port.sa_output_ready && !fifo_empty) begin // don't shift if fifo is empty
       fifo_shift = 1'b1;
       gsau_port.wb_valid = 1'b1;
     end
