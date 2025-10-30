@@ -28,7 +28,6 @@ module sram_write_latch ( // UUID now needs to have 3 lower bits for an offest s
     sram_write_req_t nxt_sram_write_latch;
 
     logic [2:0] request_completed_counter, nxt_request_completed_counter; // max request is 8
-    
     always_ff @(posedge clk, negedge n_rst) begin
         if(!n_rst) begin
             sram_write_latch <= 'b0;
@@ -42,11 +41,11 @@ module sram_write_latch ( // UUID now needs to have 3 lower bits for an offest s
     always_comb begin
         nxt_sram_write_latch = sram_write_latch;
         nxt_request_completed_counter = request_completed_counter;
-        sr_wr_l.sram_write_req = 0;
         sr_wr_l.sram_write_req_latched = 1'b0;
+        sr_wr_l.sram_write_req = 0;
 
         if(sr_wr_l.dram_res_valid) begin
-            nxt_sram_write_latch.valid = ((request_completed_counter + 1) == sr_wr_l.num_request) ? 1'b1 : 1'b0;
+            nxt_sram_write_latch.valid = ((request_completed_counter) == sr_wr_l.num_request) ? 1'b1 : 1'b0;
             if(sr_wr_l.dram_id[2:0] == 3'b000) begin
                 nxt_sram_write_latch.wdata[3:0] =  sr_wr_l.dram_rddata;
             end else if(sr_wr_l.dram_id[2:0] == 3'b001) begin
@@ -64,15 +63,18 @@ module sram_write_latch ( // UUID now needs to have 3 lower bits for an offest s
             end else if(sr_wr_l.dram_id[2:0] == 3'b111) begin
                 nxt_sram_write_latch.wdata[31:28] =  sr_wr_l.dram_rddata;
             end
+            nxt_sram_write_latch.spad_addr = sr_wr_l.spad_addr;
             nxt_sram_write_latch.xbar = sr_wr_l.xbar;
             nxt_request_completed_counter = request_completed_counter + 1;
+
+            if(request_completed_counter == sr_wr_l.num_request) begin
+                nxt_request_completed_counter = 0;
+            end
         end
 
         if((sr_wr_l.be_stall == 1'b0) && (sram_write_latch.valid == 1'b1)) begin
             sr_wr_l.sram_write_req = sram_write_latch;
-            nxt_sram_write_latch = 0;
             sr_wr_l.sram_write_req_latched = 1'b1;
-            nxt_request_completed_counter = 0;
         end
 
         

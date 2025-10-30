@@ -12,19 +12,19 @@ interface dram_req_queue_if;
     logic [DRAM_ADDR_WIDTH-1:0] dram_addr;
     logic [DRAM_ID_WIDTH-1:0]   id;
     logic [2:0]   sub_id, num_request;
-    logic [COL_IDX_WIDTH-1:0]   num_bytes;
+    logic [DRAM_VECTOR_MASK-1:0]   dram_vector_mask;
     scpad_data_t sram_rdata;
-    logic be_stall;
+    logic be_stall, sched_valid;
     logic dram_queue_full, dram_be_stall, sram_res_valid, burst_complete;
-    logic dram_req_latched, transaction_complete;
+    logic transaction_complete, initial_request_done;
 
     modport baceknd_dram_req_queue ( 
-        input dram_addr, id, sub_id, num_bytes, sram_rdata, sram_res_valid, num_request,
+        input dram_addr, id, sub_id, dram_vector_mask, sram_rdata, sram_res_valid, num_request, sched_valid,
         input sched_write,       // scheduler write = 1 means it's a scpad store aka we need to do a dram write.
-        input be_stall,
+        input be_stall, initial_request_done,
         input dram_be_stall,     // tells us if the dram is ready to accept our req. If it is and our FIFO is valid then we can assume 
                                   // our current req will be successfully latched in the dram controller and can invalidate nxt cycle
-        output dram_req, dram_queue_full, dram_req_latched, burst_complete, transaction_complete
+        output dram_req, dram_queue_full, burst_complete, transaction_complete
     );
 
 endinterface

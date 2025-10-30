@@ -58,7 +58,7 @@ interface scpad_if (input logic clk, input logic n_rst);
 
     modport dram_backend (
         input be_dram_stall, be_dram_req,
-        output dram_be_res
+        output dram_be_res, dram_be_stall
     );
 
     modport vec_frontend (
@@ -207,11 +207,11 @@ interface scpad_if (input logic clk, input logic n_rst);
 
     // Backend TB
     modport backend_tb (
-        input clk, n_rst, 
+        input clk, 
         input sched_res, be_req,
         input be_dram_stall, be_dram_req,
 
-        output be_stall, dram_be_stall,
+        output be_stall, dram_be_stall, n_rst,
         output sched_req, be_res, dram_be_res
     );
 

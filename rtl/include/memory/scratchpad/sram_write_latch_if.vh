@@ -15,10 +15,11 @@ interface sram_write_latch_if;
     logic be_stall;
     logic [63:0] dram_rddata; // DRAM BUS can only send 64 bits at a time.
     logic sram_write_req_latched;
+    logic [SCPAD_ADDR_WIDTH-1:0] spad_addr;
 
     modport sram_write_latch (
         input dram_id, dram_res_valid, xbar, dram_rddata, num_request,
-        input be_stall,
+        input be_stall, spad_addr,
         output sram_write_req, sram_write_req_latched
     );
 

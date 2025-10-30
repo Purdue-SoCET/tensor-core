@@ -32,6 +32,8 @@ package scpad_pkg;
 
     localparam int SCPAD_ID_WIDTH = $clog2(NUM_SCPADS);
 
+    localparam int DRAM_VECTOR_MASK = MAX_DRAM_BUS_BITS/ELEM_BITS; // (64 bits / 16 bits) means 4 elements per request. These 4 elements need a bit mask for DRAM
+
     //////////////////////////////////////////////////////////////////////
     /////////////////////////// Helper Functions /////////////////////////
     //////////////////////////////////////////////////////////////////////
@@ -68,6 +70,7 @@ package scpad_pkg;
         logic valid; 
         logic write;
         logic [SCPAD_ADDR_WIDTH-1:0] spad_addr;
+        logic [DRAM_ADDR_WIDTH-1:0] dram_addr; // the scheduler has to tell BE the base dram_addr to read from
         logic [MAX_DIM_WIDTH-1:0] num_rows;
         logic [MAX_DIM_WIDTH-1:0] num_cols;
         // logic [MAX_DIM_WIDTH-1:0] row_id; // This shouldn't really be needed either
@@ -84,24 +87,24 @@ package scpad_pkg;
     typedef struct packed {
         logic valid; 
         logic write;
-        logic [DRAM_ID_WIDTH-1:0]   id;
-        logic [DRAM_ADDR_WIDTH-1:0] dram_addr;
-        logic [COL_IDX_WIDTH-1:0]   num_bytes;
+        logic [DRAM_ID_WIDTH-1:0]    id;
+        logic [DRAM_ADDR_WIDTH-1:0]  dram_addr;
+        logic [DRAM_VECTOR_MASK-1:0] dram_vector_mask;
         scpad_data_t wdata;
     } dram_req_t;
 
     typedef struct packed {
         logic valid; 
-        logic [63:0] wdata;
-        logic [DRAM_ADDR_WIDTH-1:0] dram_addr;
-        logic [COL_IDX_WIDTH-1:0]   num_bytes;
+        logic [MAX_DRAM_BUS_BITS-1:0] wdata;
+        logic [DRAM_ADDR_WIDTH-1:0]   dram_addr;
+        logic [DRAM_VECTOR_MASK-1:0]  dram_vector_mask;
     } dram_write_req_t;
 
     typedef struct packed {
         logic valid; 
         logic write; 
         logic [DRAM_ID_WIDTH-1:0] id;
-        scpad_data_t rdata;
+        logic [MAX_DRAM_BUS_BITS-1:0] rdata;
     } dram_res_t;
 
     // Crossbar descriptors
@@ -112,7 +115,8 @@ package scpad_pkg;
     } xbar_desc_t;
 
     typedef struct packed {
-        logic valid; 
+        logic valid;
+        logic [SCPAD_ADDR_WIDTH-1:0] spad_addr;
         scpad_data_t wdata;
         xbar_desc_t xbar;
     } sram_write_req_t;
