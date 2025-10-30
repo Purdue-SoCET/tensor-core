@@ -21,18 +21,24 @@ package dram_pkg;
     parameter IGNORE_BITS       = 1;
     parameter ADDR_BITS    = 14; //TODO: Need to take a look for ROW/COL/ADDR interface
 
-    // TIMING PARAMETERS
+    // TIMING PARAMETERS for x8
     parameter tRCD = 10;
     parameter tAL = 1;
     parameter tCL = 10;
-    parameter tBURST = 10;
+    parameter tBURST = 4;
     parameter tCWL = 10;
-    parameter tREFI = 10;
+    // parameter tREFI = 96000; //The actual value is ___, but we put __ for observing
+    parameter tREFI = 250; //The actual value is ___, but we put __ for observing
     parameter tRP = 10;
-    parameter tRFC = 10;
-    parameter tRAS = 10;
+    // parameter tRFC = 10;
+    parameter tRFC = 172;  //This is not the actual __ value, but we put it for solving timing constraint
+    parameter tRAS = 45; //tns 1.5ns -> 25 cycles
     parameter tRC = tRAS + tRP;
     parameter tRL = tAL + tCL;        // Read Latency
+
+    //Tri debug
+
+    parameter tWR = 12;//tWR should be 10 but work for 12 //tCK 1.5ns -> 10, tCK 1.25ns 12 cycles, tCK 0.833ns 18 cycles
     parameter tWL = tAL + tCWL;       // Write Latency
 
     //INITIALIZE TIME

@@ -16,7 +16,7 @@ module data_transfer (
     
     logic select_low;
     logic [CONFIGURED_DQS_BITS - 1 : 0] DQS_t_1, DQS_t_2, nDQS_t;
-    logic edge_flag;
+    // logic edge_flag;
     logic [3:0] COL_choice_tr;
     
     
@@ -29,14 +29,15 @@ module data_transfer (
     assign mydata.DQ = (mydata.wr_en) ?    DQ_up : 'z;
     assign mydata.DQS_t = (mydata.wr_en) ? DQS_t_2 : 'z;
     assign mydata.DQS_c = (mydata.wr_en) ? ~DQS_t_2 : 'z;
-    assign mydata.DM_n = (mydata.wr_en) ? (count_burst == COL_choice_tr) : 1'bz;
-    assign mydata.memload = (count_burst == (BURST + 4'd2)) ? word_register[mydata.COL_choice] : '0;
+    // assign mydata.DM_n = (mydata.wr_en) ? (count_burst == COL_choice_tr) : 1'bz;
+    assign mydata.DM_n = (mydata.wr_en) ? 1 : 1'bz;
+    // assign mydata.memload = (count_burst == (BURST + 4'd2)) ? word_register[mydata.COL_choice] : '0;
     assign COL_choice_tr = mydata.COL_choice + 4'd4; 
 
 
     //Interface between DQS_t and the edge_det
     assign myedge.async_in = mydata.DQS_t; 
-    assign edge_flag = myedge.edge_flag;   
+    assign mydata.edge_flag = myedge.edge_flag;   
 
     edge_det #(.TRIG_RISE(1'b1), .TRIG_FALL(1'b1)) u0 (.clk(CLKx2), .n_rst(nRST), .myedge(myedge));
 
@@ -46,16 +47,21 @@ module data_transfer (
             cnt1 <= '0;
             DQS_t_2 <= 1;
         end else begin
-            if (mydata.wr_en ) begin
+            if (mydata.wr_en) begin
                 count_burst <= ncount_burst;
                 cnt1 <= count_burst;
+                DQS_t_2 = nDQS_t;
             end else if (mydata.rd_en) begin
                 count_burst <= ncount_burst;
+                DQS_t_2 = nDQS_t;
+            end else begin
+                count_burst <= 0;
+                DQS_t_2 = 1;
             end
-            if (mydata.clear) begin
-                count_burst <= '0;
-            end
-            DQS_t_2 = nDQS_t;
+            // if (mydata.clear) begin
+            //     count_burst <= '0;
+            // end
+            
         end
     end
 
@@ -79,7 +85,7 @@ module data_transfer (
             word_register <= '0;
         end else begin 
             //This is something we need to change
-            if (mydata.rd_en && edge_flag) begin
+            if (mydata.rd_en && mydata.edge_flag) begin
                 word_register[count_burst - 4'd2] <= mydata.DQ;
                 // if (count_burst > 4'd1) begin
                 //     word_register[count_burst - 4'd2] <= mydata.DQ;
@@ -93,7 +99,7 @@ module data_transfer (
     always_comb begin
         ncount_burst = count_burst;
         nDQS_t = DQS_t_2;
-
+        mydata.memload = 0;
         if (count_burst >= 3'd2) begin
             nDQS_t = ~DQS_t_2;
         end
@@ -104,5 +110,7 @@ module data_transfer (
         if (mydata.clear) begin
             ncount_burst = '0;
         end
+
+        if (mydata.edge_flag) mydata.memload = mydata.DQ;
     end
 endmodule

@@ -1,64 +1,27 @@
-`timescale 1ns/1ps
-
-//include modules file
-`include "command_FSM_if.vh"
-`include "init_state_if.vh"
-`include "address_mapper_if.vh"
-`include "row_open_if.vh"
-
+`timescale 1ps/1ps
+`include "dram_top_if.vh"
+`include "control_unit_if.vh"
+`include "signal_gen_if.vh"
 
 module dram_top (
     input logic CLK,
     input logic nRST,
-    dram_top_if.csm_debug mycsm,
-    dram_top_if.dut mytop
+    control_unit_if.arb myctrl,
+    control_unit_if.dram_sig myctrl_sig,
+    signal_gen_if.dut mysig
 );
-    import dram_pkg::*;
 
-    command_FSM_if mycmd();
-    init_state_if myinit();
-    address_mapper_if myaddr();
-    row_open_if myrow();
+    assign mysig.ref_re = myctrl_sig.rf_req;
+    assign mysig.state =  myctrl_sig.state;
+    assign mysig.nstate = myctrl_sig.nstate;
+    assign mysig.RA0 =     myctrl_sig.rank;
+    assign mysig.BG0 =     myctrl_sig.BG;
+    assign mysig.BA0=      myctrl_sig.bank;
+    assign mysig.R0=      myctrl_sig.row;
+    assign mysig.C0=      myctrl_sig.col;
 
-    addr_mapper u0 (.amif(myaddr));
-    row_open u1(.CLK(CLK), .nRST(nRST), .pol_if(myrow));
-    init_state u2(.CLK(CLK), .nRST(nRST), .it(myinit));
-    command_FSM u3 (.CLK(CLK), .nRST(nRST), .mycmd(mycmd));
-
-    //Interface for timing 
-    assign mycmd.tACT_done = mycsm.tACT_done;
-    assign mycmd.tWR_done =  mycsm.tWR_done;
-    assign mycmd.tPRE_done = mycsm.tPRE_done;
-    assign mycmd.rf_req =    mycsm.rf_req;
-    assign mycmd.tRD_done =  mycsm.tRD_done;
-    assign mycmd.tREF_done = mycsm.tREF_done;
-    
-
-    //Request interface between memory arbiter and command FSM
-    assign mycmd.dREN = mytop.dREN;
-    assign mycmd.dWEN = mytop.dWEN;
-    assign mytop.ram_wait = mycmd.ram_wait;
-
-    //Interface between init and command FSM
-    assign myinit.init = mycmd.init_req;
-    assign mycmd.init_done = myinit.init_valid;
-
-
-    assign myaddr.address = mytop.ram_addr;
-    assign myaddr.configs = x8;
-    assign myrow.bank_group = myaddr.BG;
-    assign myrow.bank = myaddr.bank;
-    assign myrow.row = myaddr.row;
-    assign myrow.req_en = mytop.dWEN || mytop.dREN;
-    assign myrow.row_resolve = mycmd.row_resolve;
-    assign myrow.refresh = mycsm.tREF_done;
-    assign mycmd.row_stat = myrow.row_stat;
-
-    
-
-
-
-
+    control_unit ctrl (.CLK(CLK), .nRST(nRST), .mytop(myctrl), .mysig(myctrl_sig));
+    signal_gen sig_gen (.CLK(CLK), .nRST(nRST), .mysig(mysig));
 
 
 endmodule

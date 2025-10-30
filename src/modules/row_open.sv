@@ -7,6 +7,7 @@ module row_open (
     input logic nRST,
     row_open_if.dut pol_if
 );
+    import dram_pkg::*;
     parameter int DEPTH = 16;
     typedef struct packed {
         logic [1:0] bank_group;
@@ -15,55 +16,72 @@ module row_open (
 
     typedef struct packed {
         logic valid;
-        logic [15:0] row;
+        logic [ROW_BITS-1:0] row;
     } reg_t;
 
     reg_t [DEPTH - 1:0] reg_f, nreg_f;
     logic [1:0] nrow_stat;
     logic [8:0] nrow_conflict;
     addr_t ptr;
+
+    logic [$clog2(DEPTH)-1:0] row_open_cnt, nrow_open_cnt;
+
     assign ptr = addr_t'({pol_if.bank_group, pol_if.bank});
 
     always_ff @(posedge CLK, negedge nRST) begin
         if (!nRST) begin
             reg_f <= 0;
-            pol_if.row_stat <= 0;
-            pol_if.row_conflict <= 0;
+            row_open_cnt <= 0;
+            // pol_if.row_stat <= 0;
+            // pol_if.row_conflict <= 0;
             
         end else begin
             reg_f <= nreg_f;
-            pol_if.row_stat <= nrow_stat;
-            pol_if.row_conflict <= nrow_conflict;
+            row_open_cnt <= nrow_open_cnt;
+            // pol_if.row_stat <= nrow_stat;
+            // pol_if.row_conflict <= nrow_conflict;
         end
     end
 
+    assign pol_if.row_stat = nrow_stat;
+    assign pol_if.row_conflict = nrow_conflict;
+    assign pol_if.all_row_closed = row_open_cnt == 0;
     always_comb begin
         nreg_f = reg_f;
         nrow_stat = 0;
-        nrow_conflict = pol_if.row_conflict;
+        // nrow_conflict = pol_if.row_conflict;
+        nrow_conflict = 0;
+        nrow_open_cnt = row_open_cnt;
 
+        //Comment out for check the refresh state
         if (pol_if.refresh) begin
             nreg_f = 0;
-        end else begin
+            nrow_open_cnt = 0;
+        end 
+        else begin
             if (pol_if.req_en) begin
                 if (reg_f[ptr].valid && reg_f[ptr].row == pol_if.row) begin
                     nrow_stat = 2'b01; //HIT
                     if (pol_if.row_resolve) begin
                         nreg_f[ptr].valid = 0;
+                        nrow_open_cnt = row_open_cnt - 1;
                     end
                 end else if (reg_f[ptr].valid) begin
                     nrow_stat = 2'b11; //CONFLICT
                     nrow_conflict = reg_f[ptr].row;
                     if (pol_if.row_resolve) begin
                         nreg_f[ptr].valid = 0;
+                        nrow_open_cnt = row_open_cnt -1;
                         nrow_stat = 2'b0; //IDLE
                     end
-                    
                 end
                 else begin
-                    nreg_f[ptr].valid = 1'b1;
-                    nreg_f[ptr].row = pol_if.row;
                     nrow_stat = 2'b10; //MISS
+                    if (pol_if.tACT_done) begin
+                        nreg_f[ptr].valid = 1'b1;
+                        nreg_f[ptr].row = pol_if.row;
+                        nrow_open_cnt = row_open_cnt + 1;
+                    end
                 end
             end
         end

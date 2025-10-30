@@ -3,7 +3,8 @@ SIMTIME = 100us             # Default simulation run time
 
 SCRDIR = ./src/modules
 
-EXTRA_dram_top = $(SCRDIR)/row_open.sv $(SCRDIR)/init_state.sv $(SCRDIR)/address_mapper.sv $(SCRDIR)/socetlib_counter.sv $(SCRDIR)/command_FSM.sv
+EXTRA_dram_top = $(wildcard $(SCRDIR)/*.sv)
+DRAM_define = ./src/arch_defines.v ./src/dimm.vh ./src/arch_package.sv ./src/proj_package.sv ./src/interface.sv ./src/ddr4_model.svp
 
 # modelsim viewing options
 ifneq (0,$(words $(filter %.wav,$(MAKECMDGOALS))))
@@ -26,17 +27,19 @@ fc:
 	vlog -sv ./src/testbench/flex_counter_tb.sv ./src/modules/flex_counter.sv
 	vsim $(SIMTERM) -voptargs="+acc" work.flex_counter_tb -do $(SIMDO)
 
-icache:
-	vlog -sv +incdir+./src/include ./src/testbench/icache_tb.sv ./src/modules/icache.sv
-	vsim $(SIMTERM) -voptargs="+acc" work.icache_tb -do $(SIMDO)
+dram_top:
+	vlib work
+	vlog +cover -work work +acc -l vcs.log -sv +incdir+./src/include +define+DDR4_4G_X8 $(DRAM_define) $(EXTRA_dram_top) ./src/testbench/dram_top_tb.sv
+	vsim -coverage -do ./src/scripts/dram_top_tb.do dram_top_tb
+	run -all
 
-%:
-	vlog -sv +incdir+./src/include ./src/testbench/$*_tb.sv  ./src/modules/$*.sv $(EXTRA_dram_top)
-	vsim $(SIMTERM) -voptargs="+acc" work.$*_tb -do $(SIMDO)
+# %:
+# 	vlog -sv +incdir+./src/include ./src/testbench/$*_tb.sv  ./src/modules/$*.sv
+# 	vsim $(SIMTERM) -voptargs="+acc" work.$*_tb -do $(SIMDO)
 
-%.wav:
-	vlog -sv +incdir+./src/include ./src/testbench/$*_tb.sv  ./src/modules/edge_det.sv ./src/modules/$*.sv $(EXTRA_dram_top)
-	vsim -voptargs="+acc" work.$*_tb -do "do ./src/scripts/$*.do; run $(SIMTIME);" -suppress 2275
+# %.wav:
+# 	vlog -sv +incdir+./src/include ./src/testbench/$*_tb.sv  ./src/modules/edge_det.sv ./src/modules/$*.sv $(EXTRA_dram_top)
+# 	vsim -voptargs="+acc" work.$*_tb -do "do ./src/scripts/$*.do; run $(SIMTIME);" -suppress 2275
 
 
 clean:

@@ -11,11 +11,11 @@ interface signal_gen_if ();
 
     //Signals interface between control unit and signal generator
     dram_state_t state, nstate; 
-    logic [RANK_BITS-1:0] RA;
-    logic [BANK_GROUP_BITS-1:0] BG;
-    logic [BANK_BITS-1:0] B;
-    logic [ROW_BITS-1:0] R;
-    logic [COLUMN_BITS-1:0] C;
+    logic [RANK_BITS-1:0] RA0;
+    logic [BANK_GROUP_BITS-1:0] BG0;
+    logic [BANK_BITS-1:0] BA0;
+    logic [ROW_BITS-1:0] R0;
+    logic [COLUMN_BITS-1:0] C0;
 
     //Interface between singal generator and DRAM
     logic ACT_n;
@@ -43,9 +43,8 @@ interface signal_gen_if ();
     
     modport dut (
         input ref_re,
-        input state, nstate, RA, BG, B, R, C,
-        output ACT_n, RAS_n_A16, CAS_n_A15, WE_n_A14, ALERT_n, PARITY, RESET_n, TEN, CS_n, CKE, ODT, C, BG, BA, ADDR, ADDR_17, PWR, VREF_CA, VREF_DQ, ZQ,
-        output C, BG, BA
+        input state, nstate, RA0, BG0, BA0, R0, C0,
+        output ACT_n, RAS_n_A16, CAS_n_A15, WE_n_A14, ALERT_n, PARITY, RESET_n, TEN, CS_n, CKE, ODT, C, BG, BA, ADDR, ADDR_17, PWR, VREF_CA, VREF_DQ, ZQ
     );
 
 

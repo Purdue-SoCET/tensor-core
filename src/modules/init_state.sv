@@ -12,8 +12,8 @@ module init_state (
     logic [11:0] timing_count, timing_value, ntiming_vallue;
     logic timing_clear, timing_cnt_en, timing_flag, n_timing_cnt_en;
 
-    //Latch init_valid;
-    logic n_init_valid;
+    //Latch init_done;
+    logic n_init_done;
     dram_state_t state, n_state;
     socetlib_counter #(.NBITS(12)) time_counter (
         .CLK(CLK),
@@ -26,17 +26,18 @@ module init_state (
     );
 
     assign it.init_state = state;
+    assign it.ninit_state = n_state;
     
 
     always_ff @(posedge CLK, negedge nRST) begin: dram_state_t_logic
         if (!nRST) begin
             state <= POWER_UP;
             timing_cnt_en <= 0;
-            it.init_valid <= 0;
+            it.init_done <= 0;
         end else begin
             state <= n_state;
             timing_cnt_en <= n_timing_cnt_en;            
-            it.init_valid <= n_init_valid;
+            it.init_done <= n_init_done;
         end
     end
 
@@ -45,7 +46,7 @@ module init_state (
         timing_clear = 0;
         n_timing_cnt_en = timing_cnt_en;
         timing_value =  0;
-        n_init_valid = it.init_valid;
+        n_init_done = it.init_done;
         case(state)
             POWER_UP: begin
                 timing_value = tPWUP;
@@ -149,8 +150,8 @@ module init_state (
                timing_value = tZQinitc;
                 if (timing_flag) begin
                     timing_clear = 1;
-                    n_init_valid = 1;
-                    n_state = IDLE;
+                    n_init_done = 1;
+                    // n_state = IDLE;
                     n_timing_cnt_en = 1'b0;
                 end 
             end

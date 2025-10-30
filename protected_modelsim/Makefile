@@ -35,7 +35,7 @@ icache:
 dram_top:
 	vlib work
 	vlog +cover -work work +acc -l vcs.log -sv +incdir+./include +define+DDR4_4G_X8 $(DRAM_define) $(EXTRA_dram_top) ./tb/dram_top_tb.sv
-	vsim -coverage -do ./scripts/dram_top_tb.do dram_top_tb
+	vsim -coverage -do ./src/scripts/dram_top_tb.do dram_top_tb
 	run -all
 
 # %:

@@ -16,10 +16,11 @@ interface scheduler_buffer_if();
     
 
     logic iwait, dwait;
+    logic ramREN_curr, ramREN_ftrt, ramWEN_curr, ramWEN_ftrt;
 
     modport scheduler (
         input dREN, dWEN, ramaddr, memstore,request_done,
-        output ramaddr_rq, ramstore_rq, ramaddr_rq_ft, ramstore_rq_ft, memaddr_callback
+        output ramaddr_rq, ramstore_rq, ramaddr_rq_ft, ramstore_rq_ft, memaddr_callback, ramREN_curr, ramREN_ftrt, ramWEN_curr, ramWEN_ftrt
     );
 
 
