@@ -1,114 +1,130 @@
-`include "vexp_if.vh"
-`include "vector_if.vh"
-`include "vector_types.vh"
+// vexp_tb.sv
+`timescale 1ns/1ps
 
-`timescale 1 ns / 1 ns
+`include "vector_types.vh"
+`include "vector_if.vh"
+`include "vexp_if.vh"
+`include "vaddsub_if.vh"
 
 module vexp_tb;
 
-    parameter PERIOD = 10;
-    logic CLK = 0, nRST;
+  parameter PERIOD = 10;
+  logic CLK = 0, nRST;
 
-    always #(PERIOD/2) CLK++;
+  always #(PERIOD/2) CLK++;
 
-    vexp_if vexpif ();
-    vls DUT (.CLK(CLK), .nRST(nRST), .vexpif(vexpif));
+  vexp_if vexpif();
 
-    int casenum;
-    string casename;
+  vexp dut (
+  .CLK   (CLK),
+  .nRST  (nRST),
+  .vexpif(vexpif)
+  );
+
+  localparam logic [15:0] FP16_P0   = 16'h0000; // +0
+  localparam logic [15:0] FP16_N0   = 16'h8000; // -0
+  localparam logic [15:0] FP16_ONE  = 16'h3C00; // +1
+  localparam logic [15:0] FP16_NEG1 = 16'hBC00; // -1
+  localparam logic [15:0] FP16_TWO  = 16'h4000; // +2
+  localparam logic [15:0] FP16_HALF = 16'h3800; // +0.5
+  localparam logic [15:0] FP16_PINF = 16'h7C00; // +Inf
+  localparam logic [15:0] FP16_NINF = 16'hFC00; // -Inf
+  localparam logic [15:0] FP16_QNAN = 16'h7E00; // qNaN
+
+  int casenum;
+  string casename;
 
 initial begin
-    
-    //nRST Test Case
-    casenum = '0;
-    casename = "nRST";
 
-    nRST = '0;
+  casename = "NRST";
+  casenum = 0;
 
-    #(PERIOD);
+  nRST = '0;
 
-    //
+  vexpif.port_a = '0;
+  vexpif.enable = '0;
 
-    nRST = 1;
+  #(PERIOD * 10);
 
-    casenum = 1;
-    casename = "Add Case 1: ";
+  //////////////////////////////////////////////////////
 
-    vaddsubif.enable = 1;
-    vaddsubif.sub = 0;
-    vaddsubif.port_a = 16'b0_01111_0000000001;
-    vaddsubif.port_b = 16'b0_01111_0000000011;
+  nRST = 1'b1;
+  
+  //////////////////////////////////////////////////////
 
-    #(PERIOD);
+  casename = "e^0";
+  casenum = 1;
 
-    casenum = 2;
-    casename = "Add Case 2";
+  vexpif.port_a = '0;
+  vexpif.enable = 1'b1;
 
-    vaddsubif.port_a = 16'b0_10000_0000000001;
-    vaddsubif.port_b = 16'b0_01111_0000000011;
+  #(PERIOD * 60);
 
-    #(PERIOD);
+  //////////////////////////////////////////////////////
 
-    casenum = 3;
-    casename = "Overflow Case";
+  casename = "e^1";
+  casenum = 2;
 
-    vaddsubif.port_a = 16'b0_10000_1000000000;
-    vaddsubif.port_b = 16'b0_01111_1100000000;
+  vexpif.port_a = FP16_ONE;
+  vexpif.enable = 1'b1;
 
-    `#(PERIOD);
+  #(PERIOD * 60);
 
-    casenum = 4;
-    casename = "Subtract Case 1 w Adder";
+  //////////////////////////////////////////////////////
 
-    vaddsubif.port_a = 16'b0_10000_1000000000;
-    vaddsubif.port_b = 16'b1_01111_1100000000;
+  casename = "e^3";
+  casenum = 3;
 
-    #(PERIOD);
+  vexpif.port_a = 16'b0_10000_1000000000;
+  vexpif.enable = 1'b1;
 
-    casenum = 5;
-    casename = "Subtract Case 2 w Adder";
+  #(PERIOD * 60);
 
-    vaddsubif.port_a = 16'b0_10000_1000000000;
-    vaddsubif.port_b = 16'b1_10001_0010000000;
+  //////////////////////////////////////////////////////
 
-    #(PERIOD);
+  casename = "e^1.5";
+  casenum = 4;
 
-    casenum = 6;
-    casename = "Add Case 3 Two Negatives";
+  vexpif.port_a = 16'b0_01111_1000000000;
+  vexpif.enable = 1'b1;
 
-    vaddsubif.port_a = 16'b1_10001_0010000000;
-    vaddsubif.port_b = 16'b1_10000_1000000000;
+  #(PERIOD * 60);
 
-    #(PERIOD);
+  //////////////////////////////////////////////////////
 
-    casenum = 7;
-    casename = "Subtract Case 1 Positive - Negative";
+  casename = "e^3.5";
+  casenum = 5;
 
-    vaddsubif.sub = 1;
-    vaddsubif.port_a = 16'b0_10001_0010000000;
-    vaddsubif.port_b = 16'b0_10000_1000000000;
+  vexpif.port_a = 16'b0_10000_1100000000;
+  vexpif.enable = 1'b1;
 
-    #(PERIOD);
+  #(PERIOD * 60);
 
-    casenum = 7;
-    casename = "Subtract Case 2 Postive - Negative";
+  //////////////////////////////////////////////////////
 
-    vaddsubif.sub = 1;
-    vaddsubif.port_a = 16'b0_10001_0010000000;
-    vaddsubif.port_b = 16'b1_10000_1000000000;
-    
-    #(PERIOD);
+  casename = "Burst Request";
+  casenum = 6;
 
-    casenum = 8;
-    casename = "Subtract Case 3 Negative - Negative";
+  vexpif.port_a = FP16_ONE;
+  vexpif.enable = 1'b1;
 
-    vaddsubif.sub = 1;
-    vaddsubif.port_a = 16'b1_10001_0010000000;
-    vaddsubif.port_b = 16'b1_10000_1000000000;
-    
-    #(PERIOD);
+  #(PERIOD);
 
+  vexpif.port_a = FP16_TWO;
 
-    $stop;
+  #(PERIOD);
+
+  vexpif.port_a = FP16_NEG1;
+
+  #(PERIOD);
+
+  vexpif.port_a = FP16_HALF;
+
+  #(PERIOD * 30);
+
+  $stop;
+
 end
+
+
 endmodule

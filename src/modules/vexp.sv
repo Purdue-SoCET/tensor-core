@@ -16,9 +16,9 @@ module vexp (
     vaddsub_if vaddsubif2();
     vaddsub_if vaddsubif3();
 
-    vaddsub VADDSUB1 (.CLK(CLK), .nRST(nRST), .vaddsub(vaddsubif1));
-    vaddsub VADDSUB2 (.CLK(CLK), .nRST(nRST), .vaddsub(vaddsubif2));
-    vaddsub VADDSUB3 (.CLK(CLK), .nRST(nRST), .vaddsub(vaddsubif3));
+    vaddsub VADDSUB1 (.CLK(CLK), .nRST(nRST), .vaddsubif(vaddsubif1));
+    vaddsub VADDSUB2 (.CLK(CLK), .nRST(nRST), .vaddsubif(vaddsubif2));
+    vaddsub VADDSUB3 (.CLK(CLK), .nRST(nRST), .vaddsubif(vaddsubif3));
 
 
     // S1
@@ -50,7 +50,9 @@ module vexp (
     localparam logic [15:0] ONE       = 16'h3C00;                  // +1.0
     localparam logic [15:0] ONE_SIXTH = 16'b0011000101010101;      // ~1/6
 
-    logic [15:0] r_bits = {fp1.sign, 5'b0, fp1.frac};
+    logic [15:0] r_bits;
+    // assign r_bits = {fp1.sign, 5'b0, fp1.frac};
+    assign r_bits = vexpif.port_a;
 
     // ===========================================================================
     // Stage 1: (1 + r) and (r * r)
@@ -60,7 +62,8 @@ module vexp (
     assign vaddsubif1.port_b = r_bits;
     assign vaddsubif1.enable = vexpif.enable;
     assign vaddsubif1.sub    = 1'b0;
-    logic [15:0] s1_sum_comb  = vaddsubif1.out;   // (1 + r)
+    logic [15:0] s1_sum_comb;
+    assign s1_sum_comb = vaddsubif1.out;   // (1 + r)
 
     // Mult: r * r
     assign mul1_a = r_bits;
@@ -99,14 +102,16 @@ module vexp (
     // Stage 2: (1 + r + r^2/2) and (r^2 * r = r^3)
     // ===========================================================================
     // Quick fp16-ish r^2/2: shift mantissa >>1 and bump exponent +1 to make bit fields equivalent
-    logic [15:0] r2_over_2 = {s1_r2_q[15], (s1_r2_q[14:10] + 5'd1), s1_r2_q[9:0] >> 1 };
+    logic [15:0] r2_over_2;
+    assign r2_over_2 = {s1_r2_q[15], (s1_r2_q[14:10] - 5'd1), s1_r2_q[9:0]};
 
     // Adder (combinational): s1_sum_q + r^2/2
     assign vaddsubif2.port_a = s1_sum_q;
     assign vaddsubif2.port_b = r2_over_2;
     assign vaddsubif2.enable = s1_v_q;
     assign vaddsubif2.sub    = 1'b0;
-    logic [15:0] s2_sum_comb  = vaddsubif2.out;
+    logic [15:0] s2_sum_comb;
+    assign s2_sum_comb = vaddsubif2.out;
 
     // Mult: r^2 * r = r^3
     assign mul2_a = s1_r2_q;
@@ -155,17 +160,17 @@ module vexp (
     // Add (1 + r + r^2/2) + (r^3/6). Capture on mul3_done.
     assign vaddsubif3.port_a = s2_sum_q;
     assign vaddsubif3.port_b = mul3_out;             // valid when mul3_done
-    assign vaddsubif3.enable = s2_v_q;
+    assign vaddsubif3.enable = mul3_done;
     assign vaddsubif3.sub    = 1'b0;
-    logic [15:0] s3_sum_comb  = vaddsubif3.out;
 
     logic [15:0] s3_sum_q; logic s3_v_q;
     
     always_ff @(posedge CLK or negedge nRST) begin
         if (!nRST) begin
-            s3_sum_q <= '0; s3_v_q <= 1'b0;
+            s3_sum_q <= '0; 
+            s3_v_q <= 1'b0;
         end else if (mul3_done) begin
-            s3_sum_q <= s3_sum_comb;
+            s3_sum_q <= vaddsubif3.out;
             s3_v_q   <= 1'b1;
         end else begin
             s3_v_q   <= 1'b0;
@@ -175,7 +180,8 @@ module vexp (
     // ===========================================================================
     // Stage 4: multiply by 2^q (from exponent field)
     // ===========================================================================
-    logic [15:0] poweroftwo = {1'b1, fp1.exp, 10'b0}; // quick 2^q encoding
+    logic [15:0] poweroftwo;
+    assign poweroftwo = ((fp1.exp == '0) && (fp1.frac == '0)) ? {fp1.sign, 5'b01111, 10'b0} : {fp1.sign, fp1.exp, 10'b0}; // quick 2^q encoding
 
     assign mul4_a = s3_sum_q;
     assign mul4_b = poweroftwo;

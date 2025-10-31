@@ -7,7 +7,7 @@
 module vls_tb;
 
     parameter PERIOD = 10;
-    logic CLK = 0, nRST;
+    logic CLK = 0, nRST = 1;
 
     always #(PERIOD/2) CLK++;
 
@@ -27,83 +27,138 @@ initial begin
 
     nRST = 1;
 
+    casenum = 0;
+    casename = "ASYNC Reset ";
+
+    vlsif.valid = '0;
+    // vlsif.dhit = '0;
+    vlsif.imm_a = '0;
+    vlsif.imm_b = '0;
+    vlsif.vd_a = '0;
+    vlsif.vd_b = '0;
+    vlsif.rs1_a = '0;
+    vlsif.rs1_b = '0;
+    vlsif.row_col_a = '0; 
+    vlsif.row_col_b = '0;
+    vlsif.num_rows_a = '0;
+    vlsif.num_rows_b = '0;
+    vlsif.num_cols_a = '0;
+    vlsif.num_cols_b = '0;
+    vlsif.id_a = '0; 
+    vlsif.id_b = '0;
+    foreach (vlsif.load_data_a[i]) vlsif.load_data_a[i] = '0;
+    foreach (vlsif.load_data_b[i]) vlsif.load_data_b[i] = '0;
+    vlsif.op = '0;
+    vlsif.v2_a = '0;
+    vlsif.v2_b = '0;
+    vlsif.vec_res = '0;
+    vlsif.ready_in = '0;
+    
+    #(PERIOD * 5);
+
     casenum = 1;
-    casename = "Add Case 1: ";
+    casename = "DATA";
+    
+    vlsif.valid = 1;
+    vlsif.vec_res = 1;
+    vlsif.op = 7'b0100111;
 
-    vaddsubif.enable = 1;
-    vaddsubif.sub = 0;
-    vaddsubif.port_a = 16'b0_01111_0000000001;
-    vaddsubif.port_b = 16'b0_01111_0000000011;
+    #(PERIOD * 5);
 
-    #(PERIOD);
+    ///////////////////////////////////////////////////////////////
 
     casenum = 2;
-    casename = "Add Case 2";
+    casename = "STORE";
 
-    vaddsubif.port_a = 16'b0_10000_0000000001;
-    vaddsubif.port_b = 16'b0_01111_0000000011;
+    vlsif.valid = '1;
+    // vlsif.dhit = '0;
+    vlsif.imm_a = 32'd10;
+    vlsif.imm_b = 32'd15;
+    vlsif.vd_a = '0;
+    vlsif.vd_b = '0;
+    vlsif.rs1_a = 32'd50;
+    vlsif.rs1_b = 32'd50;
+    vlsif.row_col_a = 1; 
+    vlsif.row_col_b = 1;
+    vlsif.num_rows_a = 5'b1;
+    vlsif.num_rows_b = 5'b1;
+    vlsif.num_cols_a = 5'b1;
+    vlsif.num_cols_b = 5'b1;
+    vlsif.id_a = 1; 
+    vlsif.id_b = 0;
+    foreach (vlsif.load_data_a[i]) vlsif.load_data_a[i] = '0;
+    foreach (vlsif.load_data_b[i]) vlsif.load_data_b[i] = '0;
+    vlsif.op = 7'b0101000;
+    vlsif.v2_a = 4'b1;
+    vlsif.v2_b = 4'b01;
+    vlsif.vec_res = 0;
+    vlsif.ready_in = 1;
 
-    #(PERIOD);
+    #(PERIOD * 5);
+    
+    ///////////////////////////////////////////////////////////////
 
     casenum = 3;
-    casename = "Overflow Case";
+    casename = "LOAD";
 
-    vaddsubif.port_a = 16'b0_10000_1000000000;
-    vaddsubif.port_b = 16'b0_01111_1100000000;
-
-    `#(PERIOD);
+    vlsif.valid = '1;
+    // vlsif.dhit = '0;
+    vlsif.imm_a = 32'd10;
+    vlsif.imm_b = 32'd15;
+    vlsif.vd_a = 4'b001;
+    vlsif.vd_b = 4'b010;
+    vlsif.rs1_a = 32'd50;
+    vlsif.rs1_b = 32'd50;
+    vlsif.row_col_a = 1; 
+    vlsif.row_col_b = 1;
+    vlsif.num_rows_a = 5'b1;
+    vlsif.num_rows_b = 5'b1;
+    vlsif.num_cols_a = 5'b1;
+    vlsif.num_cols_b = 5'b1;
+    vlsif.id_a = 1; 
+    vlsif.id_b = 0;
+    foreach (vlsif.load_data_a[i]) vlsif.load_data_a[i] = 32'd10;
+    foreach (vlsif.load_data_b[i]) vlsif.load_data_b[i] = 32'd10;
+    vlsif.op = 7'b0101000;
+    vlsif.v2_a = '0;
+    vlsif.v2_b = '0;
+    vlsif.vec_res = 0;
+    vlsif.ready_in = 1;
+    
+    ///////////////////////////////////////////////////////////////
 
     casenum = 4;
-    casename = "Subtract Case 1 w Adder";
+    casename = "Pop VD From Queue";
 
-    vaddsubif.port_a = 16'b0_10000_1000000000;
-    vaddsubif.port_b = 16'b1_01111_1100000000;
-
-    #(PERIOD);
-
-    casenum = 5;
-    casename = "Subtract Case 2 w Adder";
-
-    vaddsubif.port_a = 16'b0_10000_1000000000;
-    vaddsubif.port_b = 16'b1_10001_0010000000;
-
-    #(PERIOD);
-
-    casenum = 6;
-    casename = "Add Case 3 Two Negatives";
-
-    vaddsubif.port_a = 16'b1_10001_0010000000;
-    vaddsubif.port_b = 16'b1_10000_1000000000;
-
-    #(PERIOD);
-
-    casenum = 7;
-    casename = "Subtract Case 1 Positive - Negative";
-
-    vaddsubif.sub = 1;
-    vaddsubif.port_a = 16'b0_10001_0010000000;
-    vaddsubif.port_b = 16'b0_10000_1000000000;
-
-    #(PERIOD);
-
-    casenum = 7;
-    casename = "Subtract Case 2 Postive - Negative";
-
-    vaddsubif.sub = 1;
-    vaddsubif.port_a = 16'b0_10001_0010000000;
-    vaddsubif.port_b = 16'b1_10000_1000000000;
+    vlsif.valid = '1;
+    // vlsif.dhit = '0;
+    vlsif.imm_a = 32'd10;
+    vlsif.imm_b = 32'd15;
+    vlsif.vd_a = 4'b001;
+    vlsif.vd_b = 4'b010;
+    vlsif.rs1_a = 32'd50;
+    vlsif.rs1_b = 32'd50;
+    vlsif.row_col_a = 1; 
+    vlsif.row_col_b = 1;
+    vlsif.num_rows_a = 5'b1;
+    vlsif.num_rows_b = 5'b1;
+    vlsif.num_cols_a = 5'b1;
+    vlsif.num_cols_b = 5'b1;
+    vlsif.id_a = 1; 
+    vlsif.id_b = 0;
+    vlsif.op = 7'b0101000;
+    vlsif.v2_a = '0;
+    vlsif.v2_b = '0;
+    vlsif.ready_in = 1;
     
-    #(PERIOD);
+    #(PERIOD * 8);
 
-    casenum = 8;
-    casename = "Subtract Case 3 Negative - Negative";
+    foreach (vlsif.load_data_a[i]) vlsif.load_data_a[i] = 32'd10;
+    foreach (vlsif.load_data_b[i]) vlsif.load_data_b[i] = 32'd10;
 
-    vaddsubif.sub = 1;
-    vaddsubif.port_a = 16'b1_10001_0010000000;
-    vaddsubif.port_b = 16'b1_10000_1000000000;
+    vlsif.vec_res = 1;
     
-    #(PERIOD);
-
+    #(PERIOD * 10);
 
     $stop;
 end

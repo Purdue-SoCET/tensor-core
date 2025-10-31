@@ -1,5 +1,5 @@
 # SCRDIR = /home/asicfab/a/saha56/tensor-core/src/waves
-SCRDIR = /home/asicfab/a/vvaidya/seniordesign/tensor-core/src/scripts
+SCRDIR = /home/asicfab/a/cyjohnso/tensor-core/src/scripts
 # SCRDIR = /home/asicfab/a/wong371/william_pr/tensor-core/src/scripts
 
 SOURCE_FILES = \
@@ -117,7 +117,7 @@ vlog:
 	vsim $(SIMTERM) -voptargs="+acc" work.$*_tb -do $(SIMDO)
 
 %.wav:
-	vlog -sv +incdir+./src/include ./src/testbench/$*_tb.sv ./src/modules/*.sv
+	vlog -sv +incdir+./src/include ./src/testbench/$*_tb.sv ./src/modules/$*.sv
 	vsim -voptargs="+acc" work.$*_tb -sv_lib memory -do "do $(SCRDIR)/$*.do; run $(SIMTIME);" -suppress 2275
 
 %.sim:
@@ -141,3 +141,30 @@ vlog:
 
 clean:
 	rm -rf work transcript vsim.wlf *.log *.jou *.vstf *.vcd
+
+vexp.wav:
+	vlog -sv +incdir+./src/include \
+		./src/include/vector_if.vh \
+		./src/include/vector_types.vh \
+		./src/modules/vaddsub.sv \
+		./src/modules/mul_wallacetree.sv \
+		./src/modules/adder_5b.sv \
+		./src/modules/mul_fp16.sv \
+		./src/modules/fa.sv \
+		./src/modules/ha.sv \
+		./src/modules/vexp.sv \
+		./src/testbench/vexp_tb.sv
+
+	vsim -voptargs="+acc" work.vexp_tb -do "do $(abspath $(SCRDIR)/vexp.do); run $(SIMTIME);" -suppress 2275
+
+vls.wav:
+	vlog -sv +incdir+./src/include \
+		./src/include/vector_if.vh \
+		./src/include/vector_types.vh \
+		./src/include/vls_if.vh \
+		./src/modules/vls.sv \
+		./src/modules/vls_fifo.sv \
+		./src/testbench/vls_tb.sv
+
+	vsim -voptargs="+acc" work.vls_tb -do "do $(abspath $(SCRDIR)/vls.do); run $(SIMTIME);" -suppress 2275
+

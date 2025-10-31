@@ -11,7 +11,7 @@ module vls (
 
   localparam int FIFO_DEPTH_VD   = 8;              
   localparam int VEC_ELEMS       = 32;             
-  localparam int ELEM_W          = 32;             // 32-bit element
+  localparam int ELEM_W          = 16;             // 32-bit element
   localparam int VEC_W           = VEC_ELEMS*ELEM_W; // 1024-bit packed vector
   localparam int FIFO_DEPTH_DATA = 8;              // 8 stored vectors per lane
 
