@@ -9,6 +9,7 @@ import uvm_pkg::*;
 // --- Replace these with your real types if needed ---
 typedef virtual lfc_if lfc_cpu_vif_t;   // TODO: interface
 //typedef lfc_cpu_item       cpu_txn_t;       // TODO: sequence_item
+lfc_cpu_transaction prev_tx;
 
 class lfc_cpu_passive_monitor extends uvm_monitor;
   `uvm_component_utils(lfc_cpu_passive_monitor)
@@ -38,9 +39,33 @@ class lfc_cpu_passive_monitor extends uvm_monitor;
   // minimal placeholder; add your sampling here
   virtual task run_phase(uvm_phase phase);
     super.run_phase(phase);
-    
+    prev_tx = lfc_cpu_transaction::type_id::create("prev_tx");
     forever begin
         // TODO: fill this sucker in
+        lfc_transaction tx;
+        @(posedge vif.clk);
+        tx = transaction::type_id::create("tx");
+
+        tx.mem_out_uuid = vif.mem_out_uuid;
+        tx.stall = vif.stall;
+        tx.hit = vif.hit;
+        tx.hit_load = vif.hit_load;
+        tx.block_status = vif.block_status;
+        tx.uuid_block = vif.uuid_block;
+        tx.dp_out_flushed = vif.dp_out_flushed;
+
+        /*if(!tx.input_equal(prev_tx)) begin // if new outputs, send to scoreboard
+          result_ap.write(tx);
+          prev_tx.copy(tx);
+        end*/
+
+        // TODO: expand on this to handle more than just a cache hit
+        if(tx.hit == 1 && prev_tx.hit != 1) begin // if new hit, send to scoreboad
+          result_ap.write(tx);
+        end
+
+        prev_tx.copy(tx); // check for hit on every clock cycle
+        
     end
   endtask
 

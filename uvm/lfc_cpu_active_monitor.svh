@@ -41,7 +41,7 @@ class lfc_cpu_active_monitor extends uvm_monitor;
     forever begin
       // TODO: sample at @(posedge vif.clk); create cpu_txn_t t; lfc_ap.write(t);
       //@(posedge $urandom); // placeholder to avoid zero-delay loop
-      lfc_transaction tx;
+      lfc_cpu_transaction tx;
       repeat(4) @(posedge vif.clk); // 4 clock edges before input is sent from driver
       tx = transaction::type_id::create("tx");
       tx.mem_in = vif.mem_in;
