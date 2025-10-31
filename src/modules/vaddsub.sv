@@ -10,12 +10,13 @@ module vaddsub(
 
   import vector_pkg::*;
 
-  localparam int EXP_W = 5;
-  localparam int FRAC_W = 10;
+  localparam int EXP_W = 8;
+  localparam int FRAC_W = 7;
   localparam int SIG_W = FRAC_W + 1;
   localparam int GRS_W = 3;
   localparam int EXT_W = SIG_W + GRS_W;
   localparam int SUM_W = EXT_W + 1;
+  localparam int SHL_W = ($clog2(SUM_W)+1);
 
   // Stage 1 temps
   logic [SIG_W-1:0] m1, m2;
@@ -39,7 +40,7 @@ module vaddsub(
   logic [$clog2(SUM_W+1)-1:0] lz;    // [3:0] for SUM_W=15
   logic [$clog2(SUM_W)-1:0]   target;// [3:0], holds 13
   logic [$clog2(SUM_W)-1:0]   msb;   // [3:0], 0..14
-  logic signed [($clog2(SUM_W)+1)-1:0] shl;  // signed, covers -1..13
+  logic signed [SHL_W-1:0] shl;  // signed, covers -1..13
   logic [$clog2(SUM_W+1)-1:0] r_amt; // [3:0], 0..1 (future-proof)             // used when shl < 0
   logic [SUM_W-1:0] mask_sum;              // variable mask for SUM_W-width
   logic [SIG_W-1:0] sig11;
@@ -49,6 +50,16 @@ module vaddsub(
   logic [EXP_W-1:0] exp_post;
   logic [SIG_W-1:0] sig_post;
   logic [FRAC_W-1:0] subf;                 // moved here (was declared in a branch)
+  logic [EXP_W-1:0] shl_exp;  // zero-extended | truncated version of shl
+
+  generate
+    if (EXP_W >= SHL_W) begin
+        assign shl_exp = {{(EXP_W-SHL_W){1'b0}}, $unsigned(shl)};
+    end else begin
+        assign shl_exp = $unsigned(shl[EXP_W-1:0]);
+    end
+  endgenerate
+
 
 //   fp16_t fp1, fp2; //declaring the fp16 types
 //   assign fp1 = vaddsubif.port_a;
@@ -133,33 +144,24 @@ module vaddsub(
     s1n_special     = 1'b0;
     s1n_special_res = '0;
       //NaN case
-      if (is_nan(a) || is_nan(b)) begin
-          s1n_special     = 1'b1;
-          s1n_special_res = {1'b0,5'h1F,10'b1_0000_0000};
-      end 
-      //Infinity Case
-      else if (is_inf(a) && is_inf(b)) begin
-          if (sign_a ^ sign_b) begin
-              // Ifinity + (-Infinity) = NaN
-              s1n_special     = 1'b1;
-              s1n_special_res = {1'b0,5'h1F,10'b1_0000_0000};
-          end else begin
-              // same-sign Inf ± Inf = Same Infinity
-              s1n_special     = 1'b1;
-              s1n_special_res = {sign_a,5'h1F,10'h000};
-          end
-      end 
-      // Other Infininity Case (Infinity Dominates)
-      //Infinty + x = Infinity
-      else if (is_inf(a)) begin
-          s1n_special     = 1'b1;
-          s1n_special_res = {sign_a,5'h1F,10'h000};
-      end 
-      //x + Infinity = Infinity 
-      else if (is_inf(b)) begin
-          s1n_special     = 1'b1;
-          s1n_special_res = {sign_b,5'h1F,10'h000};
-      end
+    if (is_nan(a) || is_nan(b)) begin
+        s1n_special     = 1'b1;
+        s1n_special_res = {1'b0, EXP_ALL1, {1'b1, {(FRAC_W-1){1'b0}}}}; // quiet NaN
+    end else if (is_inf(a) && is_inf(b)) begin
+        if (sign_a ^ sign_b) begin
+            s1n_special     = 1'b1;
+            s1n_special_res = {1'b0, EXP_ALL1, {1'b1, {(FRAC_W-1){1'b0}}}}; // NaN
+        end else begin
+            s1n_special     = 1'b1;
+            s1n_special_res = {sign_a, EXP_ALL1, {FRAC_W{1'b0}}};           // ±Inf
+        end
+    end else if (is_inf(a)) begin
+        s1n_special     = 1'b1;
+        s1n_special_res = {sign_a, EXP_ALL1, {FRAC_W{1'b0}}};
+    end else if (is_inf(b)) begin
+        s1n_special     = 1'b1;
+        s1n_special_res = {sign_b, EXP_ALL1, {FRAC_W{1'b0}}};
+    end
   end
 
   // Magnitude Compare and Allignment
@@ -271,9 +273,9 @@ module vaddsub(
 
               if (shl > 0) begin
                   norm  = mag << shl;
-                  exp_n = (exp_r > shl[EXP_W-1:0]) ? (exp_r - shl[EXP_W-1:0]) : '0;
+                  exp_n = (exp_r > shl_exp) ? (exp_r - shl_exp) : '0;
               end else if (shl < 0) begin
-                  r_amt = logic'(-shl);
+                  r_amt = $unsigned(-shl);
                   norm  = mag >> r_amt;
                   // tail = OR of the bits shifted out on the right
                   if (r_amt >= SUM_W[$clog2(SUM_W+1)-1:0]) begin
