@@ -32,13 +32,13 @@ endclass
 //---------------------------------------------
 // basic_seq: Defines a simple sequence that sends one transaction
 //---------------------------------------------
-class basic_seq extends uvm_sequence #(seq_in);
-  `uvm_object_utils(basic_seq) // Register with UVM factory
+class lfc_basic_sequence extends uvm_sequence #(seq_in);
+  `uvm_object_utils(lfc_basic_sequence) // Register with UVM factory
 
   // --------------------------------------------
   // Constructor
   // --------------------------------------------
-  function new(string name = "basic_seq");
+  function new(string name = "lfc_basic_sequence");
     super.new(name);
   endfunction
 
@@ -50,7 +50,7 @@ class basic_seq extends uvm_sequence #(seq_in);
     seq_in req; // Declare a handle for the request item
 
     // Print info message when sequence starts
-    `uvm_info(get_type_name(), "Starting basic_seq...", UVM_MEDIUM)
+    `uvm_info(get_type_name(), "Starting lfc_basic_sequence...", UVM_MEDIUM)
 
     // Create a new sequence item using the factory
     req = seq_in::type_id::create("req");
@@ -67,18 +67,18 @@ class basic_seq extends uvm_sequence #(seq_in);
     finish_item(req);  // Send item data to the driver
 
     // Log transaction details after completion
-    `uvm_info(get_type_name(), {"basic_seq completed: ", req.convert2string()}, UVM_LOW)
+    `uvm_info(get_type_name(), {"lfc_basic_sequence completed: ", req.convert2string()}, UVM_LOW)
   endtask
 
 
   // --------------------------------------------
   // Static helper task for convenience
   // Allows starting this sequence directly on a sequencer
-  // Example: basic_seq::send(my_seqr);
+  // Example: lfc_basic_sequence::send(my_seqr);
   // --------------------------------------------
   static task send(uvm_sequencer #(seq_in) seqr);
-    basic_seq seq;
-    seq = basic_seq::type_id::create("seq");
+    lfc_basic_sequence seq;
+    seq = lfc_basic_sequence::type_id::create("seq");
     seq.start(seqr); // Run the sequence on the provided sequencer
   endtask
 endclass
