@@ -54,10 +54,17 @@ class lfc_cpu_passive_monitor extends uvm_monitor;
         tx.uuid_block = vif.uuid_block;
         tx.dp_out_flushed = vif.dp_out_flushed;
 
-        if(!tx.input_eqaul(prev_tx)) begin // if new outputs, send to scoreboard
+        /*if(!tx.input_equal(prev_tx)) begin // if new outputs, send to scoreboard
           result_ap.write(tx);
           prev_tx.copy(tx);
+        end*/
+
+        // TODO: expand on this to handle more than just a cache hit
+        if(tx.hit == 1 && prev_tx.hit != 1) begin // if new hit, send to scoreboad
+          result_ap.write(tx);
         end
+
+        prev_tx.copy(tx); // check for hit on every clock cycle
         
     end
   endtask
