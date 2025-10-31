@@ -8,6 +8,7 @@ class scoreboard extends uvm_scoreboard;
     uvm_analysis_export#(lfc_cpu_transaction) actual_cpu_export;
     uvm_analysis_export#(lfc_ram_transaction) expected_ram_export;
     uvm_analysis_export#(lfc_ram_transaction) actual_ram_export;
+
     uvm_tlm_analysis_fifo#(transaction) expected_cpu_fifo;
     uvm_tlm_analysis_fifo#(transaction) actual_cpu_fifo;
     uvm_tlm_analysis_fifo#(transaction) expected_ram_fifo;
@@ -15,6 +16,8 @@ class scoreboard extends uvm_scoreboard;
 
     function new(string name, uvm_component parent);
         super.new(name, parent);
+        m_matches = 0;
+        m_mismatches = 0;
     endfunction: new
 
     function void build_phase(uvm_phase phase);
@@ -36,13 +39,27 @@ class scoreboard extends uvm_scoreboard;
     endfunction
 
     task run_phase(uvm_phase phase);
-        // TODO: make the run_phase
+        // TODO: make the run_phase more detailed
+
+        transaction expected_tx;
+        transaction actual_tx;
+        forever begin
+            expected_fifo.get(expected_tx);
+            actual_fifo.get(actual_tx);
+            if ((expected_tx.stall).compare(actual_tx.stall)) begin // only compares stall for now
+                m_matches++;
+                uvm_report_info("Scoreboard", "Stalled Correctly");
+            end else begin
+                m_mismatches++;
+                uvm_report_info("Scoreboard", "Error: Stalled Incorrectly");
+            end
+        end
     endtask: run_phase
 
     function void report_phase(uvm_phase phase);
-        // TODO: figure out what to report
-        uvm_report_info();
-        uvm_report_info();
+        // TODO: figure out what more to report
+        uvm_report_info("Scoreboard", $sformatf("Matches:    %0d", m_matches));
+        uvm_report_info("Scoreboard", $sformatf("Mismatches: %0d", m_mismatches));
     endfunction: report_phase
 
 endclass
