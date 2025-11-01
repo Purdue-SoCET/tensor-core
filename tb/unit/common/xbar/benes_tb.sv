@@ -85,206 +85,123 @@
 
 
 
+
+
+
 `timescale 1ns/1ns
+
 `include "xbar_params.svh"
 `include "xbar_if.sv"
 
-module benes_tb;
-    localparam int SIZE = 32;
-    localparam int DWIDTH = 16;
-    localparam int TAGW = $clog2(SIZE); // 5
-    localparam int STAGES = (2 * TAGW) - 1; // 9 benes stages
-    localparam int BITWIDTH = STAGES * (SIZE >> 1); // 9 * 16 = 144 control bits
+module benes_sort_tb;
 
-    localparam logic [7:0] REGISTER_MASK = 8'b11111111;  // pipeline taps
-    localparam int REAL_LATENCY = $countones(REGISTER_MASK) + 1; // 9 cycles
+  import xbar_pkg::*;
 
-    localparam int N_REQS = (REAL_LATENCY * 2);  
-    localparam int VEC_PER_CASE = (REAL_LATENCY);
-    localparam bit REVERSE_LANES = 0; 
+  localparam int SIZE = 32;
+  localparam int DWIDTH = 16;
+  localparam int TAGW = $clog2(SIZE);
+  localparam int STAGES = (2*TAGW) - 1;
+  localparam logic [STAGES-2:0] REGISTER_MASK = 8'b11111111;
+  localparam int REAL_LATENCY = $countones(REGISTER_MASK) + 1;
 
-    logic clk, n_rst;
-    initial clk = 1'b0;
-    always #5 clk = ~clk;
+  localparam int N_REQS = (REAL_LATENCY * 2);
+  localparam int VERBOSE = 0;
 
-    logic [BITWIDTH-1:0] control_bit;
-    xbar_if #(.SIZE(SIZE), .DWIDTH(DWIDTH)) xif (.clk(clk), .n_rst(n_rst));
-    benes #(.SIZE(SIZE), .DWIDTH(DWIDTH), .REGISTER_MASK(REGISTER_MASK)) dut (.xif(xif.xbar), .control_bit(control_bit));
+  logic clk, n_rst;
+  initial clk = 1'b0;
+  always  #5 clk = ~clk;
 
-    typedef logic [DWIDTH-1:0] vec_t [SIZE];
-    vec_t exp_q[$];  // expected vectors with scoreboard
+  xbar_if #(.SIZE(SIZE), .DWIDTH(DWIDTH)) xif (.clk(clk), .n_rst(n_rst));
+  benes_sort #(.SIZE(SIZE), .DWIDTH(DWIDTH), .REGISTER_MASK(REGISTER_MASK)) dut (.xif(xif.xbar));
 
-    // 32 lane vector with random 16 bit value
-    function automatic void make_vec(output vec_t v);
-        for (int i = 0; i < SIZE; i++) v[i] = $urandom();
-    endfunction
+  typedef logic [DWIDTH-1:0] vec_t [SIZE];
+  vec_t exp_q[$];
 
-    task automatic drive_vec(input vec_t v);
-        for (int i = 0; i < SIZE; i++) begin
-            xif.in[i].din = v[i];
-            xif.in[i].shift = TAGW'(i); // tag lanes
+  function automatic void make_vec(output vec_t v);
+    for (int i = 0; i < SIZE; i++) v[i] = $urandom();
+  endfunction
+
+  function automatic void sort_vec(input vec_t in, output vec_t out);
+    for (int i = 0; i < SIZE; i++) out[i] = in[i];
+    for (int a = 0; a < SIZE-1; a++)
+      for (int b = 0; b < SIZE-1-a; b++)
+        if ($unsigned(out[b]) > $unsigned(out[b+1])) begin
+          logic [DWIDTH-1:0] t = out[b];
+          out[b]   = out[b+1];
+          out[b+1] = t;
         end
-    endtask
+  endfunction
 
-    // checking a fixed permutation
-    task automatic drive_linear();
-        for (int i = 0; i < SIZE; i++) begin
-            xif.in[i].din = DWIDTH'(i);
-            xif.in[i].shift = TAGW'(i);
-        end
-    endtask
+  int launched, retired, errors;
+  int mismatches;
+  string lanes;
 
-    // copy all outputs into 32 lane vector in 1 shot
-    task automatic sample_vec(output vec_t v);
-        for (int i = 0; i < SIZE; i++) v[i] = xif.out[i];
-    endtask
+  initial begin : main
+    vec_t exp;
+    logic [DWIDTH-1:0] got;
+    vec_t in_vec, exp_vec;
 
-    task automatic build_expected(input vec_t in, output vec_t exp, input int map[SIZE]);
-        for (int j = 0; j < SIZE; j++) exp[j] = in[map[j]];
-    endtask
-
-    // check current control bit implements the permutation map
-    // in: permutation expect (out2in), out: counts output lanes don't match expected value
-    task automatic check_linear_against_map(input int map[SIZE], output int mismatches);
-        mismatches = 0;
-        for (int c = 0; c < REAL_LATENCY + 2; c++) begin
-            drive_linear();
-            @(posedge clk);
-        end
-        for (int j = 0; j < SIZE; j++) begin
-            logic [DWIDTH-1:0] want = DWIDTH'( map[j] );
-            if (xif.out[j] !== want) begin
-                $display("[CTRL][LINEAR][ERR] lane%0d: got=%0d exp=%0d", j, xif.out[j], want);
-                mismatches++;
-            end
-        end
-    endtask
-
-    // streaming verification for general permutation
-    task automatic stream_check_using_map(input int map[SIZE], input int num_vecs, inout int errors, output int retired_cnt);
-        vec_t in_vec, exp_vec, got_vec;
-        retired_cnt = 0;
-        int launched_local = 0;
-        for (int t = 0; t < num_vecs; t++) begin
-            if (launched_local <= REAL_LATENCY) begin
-                make_vec(in_vec);
-                build_expected(in_vec, exp_vec, map);
-                exp_q.push_back(exp_vec);
-                launched_local++;
-                drive_vec(in_vec);
-            end
-            @(posedge clk);
-            if (launched_local >= REAL_LATENCY) begin
-                exp_vec = exp_q.pop_front();
-                sample_vec(got_vec);
-                int mm = 0;
-                for (int k = 0; k < SIZE; k++) begin
-                    if (got_vec[k] !== exp_vec[k]) begin
-                        mm++; errors++;
-                        $display("[CTRL][STREAM][ERR] lane%0d: got=%0d exp=%0d", k, got_vec[k], exp_vec[k]);
-                    end
-                end
-                if (mm == 0) begin 
-                    $display("[CTRL][STREAM] retire=%0d OK", retired_cnt);
-                end else begin
-                    $display("[CTRL][STREAM] retire=%0d mismatches=%0d", retired_cnt, mm);
-                end
-                retired_cnt++;
-            end
-        end
-    endtask
-
-    int launched, retired, errors;
-
-    initial begin : main
-        vec_t in_vec, exp_vec, got_vec;
-        int mismatches;
-
-        n_rst = 1'b0;
-        xif.en = 1'b0;
-        control_bit = '0;  // identity
-        for (int i = 0; i < SIZE; i++) begin
-            xif.in[i].din = '0;
-            xif.in[i].shift = TAGW'(i);
-        end
-
-        repeat (5) @(posedge clk);
-        n_rst = 1'b1;
-        @(posedge clk);
-        xif.en = 1'b1;
-
-        launched = 0;
-        retired = 0;
-        errors = 0;
-
-        for (int t = 0; t < N_REQS; t++) begin
-            if (launched <= REAL_LATENCY) begin
-                make_vec(in_vec); // random in
-                for (int i = 0; i < SIZE; i++) // expected = input 
-                    exp_vec[i] = in_vec[i];
-                exp_q.push_back(exp_vec); // save for later
-                launched++;
-                drive_vec(in_vec);
-            end
-
-            @(posedge clk);
-
-            if (launched >= REAL_LATENCY) begin
-                exp_vec = exp_q.pop_front();
-                sample_vec(got_vec);
-                mismatches = 0;
-                for (int k = 0; k < SIZE; k++) begin
-                    if (got_vec[k] !== exp_vec[k]) begin
-                        mismatches++; errors++;
-                        $display("[ID] lane%0d: got=%0d exp=%0d", k, got_vec[k], exp_vec[k]);
-                    end
-                end
-
-                if (mismatches == 0)
-                    $display("[ID][Complete] retire=%0d OK", retired);
-                else
-                    $display("[ID][Complete] retire=%0d mismatches=%0d", retired, mismatches);
-                retired++;
-            end
-        end
-
-        // Expected out->in mapping (index of input that should appear at each output)
-        logic [DWIDTH-1:0] exp_map [SIZE] = '{
-            16'd27, 16'd24, 16'd2,  16'd29, 16'd4,  16'd7,  16'd20, 16'd10,
-            16'd1,  16'd0,  16'd8,  16'd9,  16'd3,  16'd13, 16'd16, 16'd26,
-            16'd12, 16'd31, 16'd17, 16'd19, 16'd28, 16'd18, 16'd23, 16'd30,
-            16'd5,  16'd15, 16'd6,  16'd21, 16'd11, 16'd25, 16'd22, 16'd14
-        };
-
-        // test case by hand
-        control_bit = 144'b111000110101110001100100110011100111001110000000111100000001101100101011001100000000000000000000001000011001000001110110011110001011111001001100;
-        $display("\n[SCENARIO 2] Single fixed control-bit case");
-        $display("[CASE] control_bit = 0x%0h", control_bit);
-
-        // Build int map (optionally reversed)
-        int out2in[SIZE];
-        for (int j = 0; j < SIZE; j++) begin
-            int idx = REVERSE_LANES ? (SIZE-1-j) : j;
-            out2in[j] = exp_map[idx];
-        end
-
-        int retired_case;
-        int mism_lin;
-
-        check_linear_against_map(out2in, mism_lin);
-        if (mism_lin == 0) begin 
-            $display("[CASE] linear check OK");
-        end else begin 
-            $display("[CASE] linear mismatches=%0d", mism_lin);
-        end
-        errors += mism_lin;
-
-        // Streaming check
-        stream_check_using_map(out2in, VEC_PER_CASE, errors, retired_case);
-        $display("[CASE] stream retired=%0d", retired_case);
-
-        xif.en = 1'b0;
-        $display("\n[TB][Summary] total errors=%0d, latency=%0d", errors, REAL_LATENCY);
-        $finish;
+    n_rst = 1'b0;
+    xif.en  = 1'b0;
+    for (int i = 0; i < SIZE; i++) begin
+      xif.in[i].din = '0;
+      xif.in[i].shift = TAGW'(i); // tag each lane (debug)
     end
+    repeat (5) @(posedge clk);
+    n_rst = 1'b1;
+    @(posedge clk);
+
+    launched = 0;
+    retired = 0;
+    errors = 0;
+    xif.en = 1'b1;
+
+    for (int t = 0; t < N_REQS; t++) begin
+      // Launch until pipeline is filled
+      if (launched <= REAL_LATENCY) begin
+        make_vec(in_vec); // random input
+        sort_vec(in_vec, exp_vec); // sorted output
+        exp_q.push_back(exp_vec); // remember for later comparison
+        launched++;
+
+        // Drive a single request (one full vector)
+        for (int i = 0; i < SIZE; i++) begin
+          xif.in[i].din = in_vec[i];
+          xif.in[i].shift = TAGW'(i);
+        end
+      end
+
+      @(posedge clk);
+      // Start retiring after latency
+      if (launched >= REAL_LATENCY) begin
+        exp = exp_q.pop_front();
+        mismatches = 0;
+
+        for (int k = 0; k < SIZE; k++) begin
+          got = xif.out[k];
+          if (got !== exp[k]) begin
+            mismatches++;
+            errors++;
+            $display($sformatf("[BENES][lane%0d] got=%0d exp=%0d", k, got, exp[k]));
+          end else if (VERBOSE) begin
+            $display($sformatf("[BENES][lane%0d] got=%0d exp=%0d", k, got, exp[k]));
+          end
+        end
+
+        if (mismatches == 0) begin
+          $display("[BENES][Complete] retire=%0d OK", retired);
+        end else begin
+          $display("[BENES][Complete] retire=%0d mismatches=%0d", retired, mismatches);
+        end
+        retired++;
+      end
+    end
+
+    // Stop driving
+    xif.en = 1'b0;
+
+    $display("[BENES][Summary] errors=%0d (latency=%0d)", errors, REAL_LATENCY);
+    $finish;
+  end
+
 endmodule
