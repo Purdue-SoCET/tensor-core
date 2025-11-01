@@ -112,7 +112,7 @@ module benes_sort_tb;
   always  #5 clk = ~clk;
 
   xbar_if #(.SIZE(SIZE), .DWIDTH(DWIDTH)) xif (.clk(clk), .n_rst(n_rst));
-  benes_sort #(.SIZE(SIZE), .DWIDTH(DWIDTH), .REGISTER_MASK(REGISTER_MASK)) dut (.xif(xif.xbar));
+  benes #(.SIZE(SIZE), .DWIDTH(DWIDTH), .REGISTER_MASK(REGISTER_MASK)) dut (.xif(xif.xbar));
 
   typedef logic [DWIDTH-1:0] vec_t [SIZE];
   vec_t exp_q[$];
