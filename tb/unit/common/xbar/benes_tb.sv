@@ -131,7 +131,6 @@ module benes_tb;
     for (int i = 0; i < SIZE; i++) v[i] = $urandom();
   endfunction
 
-  // OUT->IN permutation generator using Fisher–Yates:
   // out_to_in[o] = index of input that should appear at output o
   function automatic void make_random_perm_out_to_in(output logic [TAGW-1:0] out_to_in [SIZE]);
     int idx [SIZE];
