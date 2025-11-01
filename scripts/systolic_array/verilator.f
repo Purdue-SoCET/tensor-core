@@ -4,6 +4,7 @@
 -j 0
 
 -Irtl/modules/common/
+-Irtl/modules/common/general
 -Irtl/modules/systolic_array
 -Irtl/include/common
 -Irtl/include/systolic_array
