@@ -261,6 +261,7 @@ module cbg_benes_tb;
             5'd10, 5'd20, 5'd7,  5'd4,  5'd29, 5'd2,  5'd24, 5'd27
         };
         #(PERIOD);
+        
         exp_ctrl = controlbits_ref(perm);
         total_errs += compare_ctrl_bits(ctrl, exp_ctrl);
         $display("Case 2 (provided perm): %s", (compare_ctrl_bits(ctrl, exp_ctrl)==0) ? "PASS" : "FAIL");
